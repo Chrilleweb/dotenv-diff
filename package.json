@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest",
-    "start": "node dist/examples.js",
+    "start": "node dist/cli.js",
     "dev": "vitest --watch"
   },
   "author": "Chrilleweb",
