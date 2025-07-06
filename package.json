@@ -1,0 +1,35 @@
+{
+  "name": "dotenv-diff",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "This package helps you find the differences between .env files",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "start": "node dist/examples.js",
+    "dev": "vitest --watch"
+  },
+  "author": "Chrilleweb",
+  "license": "MIT",
+  "keywords": [
+    "dotenv",
+    "env",
+    "dotenv-diff",
+    "comparison",
+    "environment variables"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.0"
+  }
+}
