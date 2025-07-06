@@ -32,5 +32,8 @@
     "@types/node": "^24.0.10",
     "typescript": "^5.8.3",
     "vitest": "^3.2.0"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1"
   }
 }
