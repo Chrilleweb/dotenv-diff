@@ -1,0 +1,1 @@
+# dotenv diff cli to compare .env with .env.example

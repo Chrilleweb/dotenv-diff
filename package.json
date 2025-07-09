@@ -2,19 +2,23 @@
   "name": "dotenv-diff",
   "version": "1.0.0",
   "type": "module",
-  "description": "This package helps you find the differences between .env files",
+  "description": "A small CLI and library to find differences between .env and .env.example files.",
+  "bin": {
+    "dotenv-diff": "dist/cli.js"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist/index.js",
-    "dist/index.d.ts",
-    "README.md"
-  ],
+  "dist/cli.js",
+  "dist/index.js",
+  "dist/index.d.ts",
+  "README.md"
+],
   "scripts": {
     "build": "tsc",
+    "dev": "vitest --watch",
     "test": "vitest",
-    "start": "node dist/cli.js",
-    "dev": "vitest --watch"
+    "start": "node dist/cli.js"
   },
   "author": "Chrilleweb",
   "license": "MIT",
@@ -22,18 +26,24 @@
     "dotenv",
     "env",
     "dotenv-diff",
-    "comparison",
-    "environment variables"
+    "cli",
+    "compare",
+    "environment variables",
+    "dotenv validator"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chrilleweb/dotenv-diff.git"
+  },
   "engines": {
     "node": ">=14.0.0"
   },
-  "devDependencies": {
-    "@types/node": "^24.0.10",
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.0"
-  },
   "dependencies": {
     "chalk": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.2.0",
+    "vitest": "^3.2.0"
   }
 }
