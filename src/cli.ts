@@ -1,12 +1,23 @@
 #!/usr/bin/env node
+import { Command } from 'commander';
 import path from "path";
 import fs from "fs";
 import chalk from "chalk";
 import { parseEnvFile } from "./lib/parseEnv.js";
 import { diffEnv } from "./lib/diffEnv.js";
 
-const checkValues = process.argv.includes("--check-values");
+const program = new Command();
 
+program
+  .name('dotenv-diff')
+  .description('Compare .env and .env.example files')
+  .option('--check-values', 'Compare actual values if example has values')
+  .parse(process.argv);
+
+const options = program.opts();
+const checkValues = options.checkValues ?? false;
+
+// Her kører din eksisterende diff-logik videre:
 const envPath = path.resolve(process.cwd(), ".env");
 const examplePath = path.resolve(process.cwd(), ".env.example");
 

@@ -1,6 +1,6 @@
 {
   "name": "dotenv-diff",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "type": "module",
   "description": "A small CLI and library to find differences between .env and .env.example files.",
   "bin": {
@@ -9,13 +9,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-  "dist/cli.js",
-  "dist/lib/diffEnv.js",
-  "dist/lib/parseEnv.js",
-  "dist/index.js",
-  "dist/index.d.ts",
-  "README.md"
-],
+    "dist/cli.js",
+    "dist/lib/diffEnv.js",
+    "dist/lib/parseEnv.js",
+    "dist/index.js",
+    "dist/index.d.ts",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "vitest --watch",
@@ -41,7 +41,8 @@
     "node": ">=14.0.0"
   },
   "dependencies": {
-    "chalk": "^5.4.1"
+    "chalk": "^5.4.1",
+    "commander": "^14.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
