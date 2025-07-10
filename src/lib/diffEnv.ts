@@ -10,7 +10,8 @@ export type DiffResult = {
 
 export function diffEnv(
   current: Record<string, string>,
-  example: Record<string, string>
+  example: Record<string, string>,
+  checkValues = false
 ): DiffResult {
   const currentKeys = Object.keys(current);
   const exampleKeys = Object.keys(example);
@@ -18,19 +19,23 @@ export function diffEnv(
   const missing = exampleKeys.filter((key) => !currentKeys.includes(key));
   const extra = currentKeys.filter((key) => !exampleKeys.includes(key));
 
-  const valueMismatches = exampleKeys
-    .filter((key) => {
-      return (
-        currentKeys.includes(key) &&
-        example[key].trim() !== "" &&
-        current[key] !== example[key]
-      );
-    })
-    .map((key) => ({
-      key,
-      expected: example[key],
-      actual: current[key],
-    }));
+  let valueMismatches: DiffResult["valueMismatches"] = [];
+
+  if (checkValues) {
+    valueMismatches = exampleKeys
+      .filter((key) => {
+        return (
+          currentKeys.includes(key) &&
+          example[key].trim() !== "" &&
+          current[key] !== example[key]
+        );
+      })
+      .map((key) => ({
+        key,
+        expected: example[key],
+        actual: current[key],
+      }));
+  }
 
   return { missing, extra, valueMismatches };
 }
