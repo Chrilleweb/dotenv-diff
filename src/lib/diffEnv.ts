@@ -19,8 +19,13 @@ export function diffEnv(
   const extra = currentKeys.filter((key) => !exampleKeys.includes(key));
 
   const valueMismatches = exampleKeys
-    .filter((key) => currentKeys.includes(key))
-    .filter((key) => current[key] !== example[key]) // her kan du evt. bruge .toLowerCase() hvis det skal være case-insensitive
+    .filter((key) => {
+      return (
+        currentKeys.includes(key) &&
+        example[key].trim() !== "" &&
+        current[key] !== example[key]
+      );
+    })
     .map((key) => ({
       key,
       expected: example[key],

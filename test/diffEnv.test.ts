@@ -10,10 +10,7 @@ describe('diffEnv', () => {
 
     expect(result.missing).toEqual(['D']);
     expect(result.extra).toEqual(['C']);
-    expect(result.valueMismatches).toEqual([
-      { key: 'A', expected: '', actual: '1' },
-      { key: 'B', expected: '', actual: '2' },
-    ]);
+    expect(result.valueMismatches).toEqual([]);
   });
 
   it('returns empty arrays when keys and values match', () => {
@@ -25,7 +22,7 @@ describe('diffEnv', () => {
     expect(result).toEqual({ missing: [], extra: [], valueMismatches: [] });
   });
 
-  it('detects value mismatches', () => {
+  it('detects value mismatches when .env.example provides a value', () => {
     const current = { A: 'Hello', B: 'World' };
     const example = { A: 'hello', B: 'world' };
 
@@ -37,6 +34,17 @@ describe('diffEnv', () => {
       { key: 'A', expected: 'hello', actual: 'Hello' },
       { key: 'B', expected: 'world', actual: 'World' },
     ]);
+  });
+
+  it('ignores value mismatches when .env.example values are empty', () => {
+    const current = { A: '1', B: '2' };
+    const example = { A: '', B: '' };
+
+    const result = diffEnv(current, example);
+
+    expect(result.missing).toEqual([]);
+    expect(result.extra).toEqual([]);
+    expect(result.valueMismatches).toEqual([]);
   });
 
   it('handles empty .env file as all missing', () => {
