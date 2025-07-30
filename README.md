@@ -1,5 +1,7 @@
 # dotenv-diff
 
+![Terminal_view](public/image.png)
+
 Easily compare your `.env` and `.env.example` files in Node.js projects to detect missing, extra, empty, or mismatched environment variables.
 
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
