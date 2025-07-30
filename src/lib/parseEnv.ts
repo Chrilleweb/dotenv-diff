@@ -1,5 +1,14 @@
 import fs from 'fs';
 
+/**
+ * Parses a `.env` file and returns an object with key-value pairs.
+ *
+ * @param path - The file path to the `.env` file.
+ * @returns A record object representing parsed environment variables.
+ *
+ * Lines that are empty or start with `#` (comments) are ignored.
+ * Multi-line or quoted values are not supported.
+ */
 export function parseEnvFile(path: string): Record<string, string> {
   const content = fs.readFileSync(path, 'utf-8');
   const lines = content.split('\n');

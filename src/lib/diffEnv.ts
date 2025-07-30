@@ -8,6 +8,14 @@ export type DiffResult = {
   }[];
 };
 
+/**
+ * Compares two .env files and returns their differences.
+ *
+ * @param current - An object representing the current `.env` file (key-value pairs).
+ * @param example - An object representing the `.env.example` file (key-value pairs).
+ * @param checkValues - If true, compare values when the example has a non-empty value.
+ * @returns A `DiffResult` object containing missing, extra, and mismatched keys.
+ */
 export function diffEnv(
   current: Record<string, string>,
   example: Record<string, string>,

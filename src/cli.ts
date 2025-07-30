@@ -1,4 +1,22 @@
 #!/usr/bin/env node
+
+/**
+ * CLI entry point for the `dotenv-diff` tool.
+ *
+ * - Compares `.env` and `.env.example` files.
+ * - Optionally checks for value mismatches.
+ * - Warns about missing keys, extra keys, empty values, and mismatches.
+ *
+ * Usage:
+ * ```bash
+ * dotenv-diff
+ * dotenv-diff --check-values
+ * ```
+ *
+ * Exit codes:
+ * - 0: All keys match or only warnings.
+ * - 1: Missing keys found.
+ */
 import { Command } from 'commander';
 import path from "path";
 import fs from "fs";
