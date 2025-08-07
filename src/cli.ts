@@ -15,6 +15,7 @@ import chalk from 'chalk';
 import prompts from 'prompts';
 import { parseEnvFile } from './lib/parseEnv.js';
 import { diffEnv } from './lib/diffEnv.js';
+import { warnIfEnvNotIgnored } from './lib/checkGitignore.js';
 
 const program = new Command();
 
@@ -64,6 +65,7 @@ if (!envExists && exampleExists) {
   fs.writeFileSync(envPath, exampleContent);
 
   console.log(chalk.green('✅ .env file created successfully from .env.example.\n'));
+  warnIfEnvNotIgnored();
 }
 
 // Case 3: .env exists, but .env.example is missing
@@ -99,6 +101,7 @@ if (!fs.existsSync(envPath) || !fs.existsSync(examplePath)) {
 }
 
 // Case 5: Both files exist, proceed with comparison
+warnIfEnvNotIgnored();
 console.log(chalk.bold('🔍 Comparing .env and .env.example...\n'));
 
 const current = parseEnvFile(envPath);
