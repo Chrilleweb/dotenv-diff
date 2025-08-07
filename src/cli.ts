@@ -6,23 +6,15 @@
  * - Compares `.env` and `.env.example` files.
  * - Optionally checks for value mismatches.
  * - Warns about missing keys, extra keys, empty values, and mismatches.
- *
- * Usage:
- * ```bash
- * dotenv-diff
- * dotenv-diff --check-values
- * ```
- *
- * Exit codes:
- * - 0: All keys match or only warnings.
- * - 1: Missing keys found.
  */
+
 import { Command } from 'commander';
-import path from "path";
-import fs from "fs";
-import chalk from "chalk";
-import { parseEnvFile } from "./lib/parseEnv.js";
-import { diffEnv } from "./lib/diffEnv.js";
+import path from 'path';
+import fs from 'fs';
+import chalk from 'chalk';
+import prompts from 'prompts';
+import { parseEnvFile } from './lib/parseEnv.js';
+import { diffEnv } from './lib/diffEnv.js';
 
 const program = new Command();
 
@@ -35,33 +27,87 @@ program
 const options = program.opts();
 const checkValues = options.checkValues ?? false;
 
-// Her kører din eksisterende diff-logik videre:
-const envPath = path.resolve(process.cwd(), ".env");
-const examplePath = path.resolve(process.cwd(), ".env.example");
+const cwd = process.cwd();
+const envPath = path.resolve(cwd, '.env');
+const examplePath = path.resolve(cwd, '.env.example');
 
-if (!fs.existsSync(envPath)) {
-  console.error(chalk.red("❌ Error: .env file is missing in the project root."));
+const envExists = fs.existsSync(envPath);
+const exampleExists = fs.existsSync(examplePath);
+
+// Case 1: Neither file exists
+if (!envExists && !exampleExists) {
+  console.log(chalk.yellow('⚠️  No .env or .env.example file found. Skipping comparison.'));
+  process.exit(0);
+}
+
+// Case 2: .env is missing but .env.example exists
+if (!envExists && exampleExists) {
+  console.log(chalk.yellow('📄 .env file not found.'));
+
+  const response = await prompts({
+    type: 'select',
+    name: 'createEnv',
+    message: '❓ Do you want to create a new .env file from .env.example?',
+    choices: [
+      { title: 'Yes', value: true },
+      { title: 'No', value: false }
+    ],
+    initial: 0
+  });
+
+  if (!response.createEnv) {
+    console.log(chalk.gray('🚫 Skipping .env creation.'));
+    process.exit(0);
+  }
+
+  const exampleContent = fs.readFileSync(examplePath, 'utf-8');
+  fs.writeFileSync(envPath, exampleContent);
+
+  console.log(chalk.green('✅ .env file created successfully from .env.example.\n'));
+}
+
+// Case 3: .env exists, but .env.example is missing
+if (envExists && !exampleExists) {
+  console.log(chalk.yellow('📄 .env.example file not found.'));
+
+  const response = await prompts({
+    type: 'select',
+    name: 'createExample',
+    message: '❓ Do you want to create a new .env.example file from .env?',
+    choices: [
+      { title: 'Yes', value: true },
+      { title: 'No', value: false }
+    ],
+    initial: 0
+  });
+
+  if (!response.createExample) {
+    console.log(chalk.gray('🚫 Skipping .env.example creation.'));
+    process.exit(0);
+  }
+
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  fs.writeFileSync(examplePath, envContent);
+
+  console.log(chalk.green('✅ .env.example file created successfully from .env.\n'));
+}
+
+// Case 4: Run comparison
+if (!fs.existsSync(envPath) || !fs.existsSync(examplePath)) {
+  console.error(chalk.red('❌ Error: .env or .env.example is missing after setup.'));
   process.exit(1);
 }
 
-if (!fs.existsSync(examplePath)) {
-  console.error(chalk.red("❌ Error: .env.example file is missing in the project root."));
-  process.exit(1);
-}
-
-console.log(chalk.bold("🔍 Comparing .env and .env.example..."));
+// Case 5: Both files exist, proceed with comparison
+console.log(chalk.bold('🔍 Comparing .env and .env.example...\n'));
 
 const current = parseEnvFile(envPath);
 const example = parseEnvFile(examplePath);
-
 const diff = diffEnv(current, example, checkValues);
 
-// Find tomme variabler i .env
 const emptyKeys = Object.entries(current)
-  .filter(([key, value]) => value.trim() === "")
+  .filter(([value]) => value.trim() === '')
   .map(([key]) => key);
-
-let hasWarnings = false;
 
 if (
   diff.missing.length === 0 &&
@@ -69,32 +115,30 @@ if (
   emptyKeys.length === 0 &&
   diff.valueMismatches.length === 0
 ) {
-  console.log(chalk.green("✅ All keys match! Your .env file is valid."));
+  console.log(chalk.green('✅ All keys match! Your .env file is valid.'));
   process.exit(0);
 }
 
 if (diff.missing.length > 0) {
-  console.log(chalk.red("\n❌ Missing keys in .env:"));
+  console.log(chalk.red('\n❌ Missing keys in .env:'));
   diff.missing.forEach((key) => console.log(chalk.red(`  - ${key}`)));
 }
 
 if (diff.extra.length > 0) {
-  console.log(chalk.yellow("\n⚠️  Extra keys in .env (not defined in .env.example):"));
+  console.log(chalk.yellow('\n⚠️  Extra keys in .env (not defined in .env.example):'));
   diff.extra.forEach((key) => console.log(chalk.yellow(`  - ${key}`)));
 }
 
 if (emptyKeys.length > 0) {
-  hasWarnings = true;
-  console.log(chalk.yellow("\n⚠️  The following keys in .env have no value (empty):"));
+  console.log(chalk.yellow('\n⚠️  The following keys in .env have no value (empty):'));
   emptyKeys.forEach((key) => console.log(chalk.yellow(`  - ${key}`)));
 }
 
 if (checkValues && diff.valueMismatches.length > 0) {
-  hasWarnings = true;
-  console.log(chalk.yellow("\n⚠️  The following keys have different values:"));
+  console.log(chalk.yellow('\n⚠️  The following keys have different values:'));
   diff.valueMismatches.forEach(({ key, expected, actual }) => {
     console.log(chalk.yellow(`  - ${key}: expected "${expected}", but got "${actual}"`));
   });
 }
 
-process.exit(diff.missing.length > 0 ? 1 : hasWarnings ? 0 : 0);
+process.exit(diff.missing.length > 0 ? 1 : 0);
