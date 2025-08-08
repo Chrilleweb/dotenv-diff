@@ -1,8 +1,6 @@
 # dotenv-diff
 
-![Terminal_view](public/image.png)
-
-Easily compare your `.env` and `.env.example` files in Node.js projects to detect missing, extra, empty, or mismatched environment variables.
+Easily compare your .env, .env.example, and other environment files (like .env.local, .env.production) to detect missing, extra, empty, or mismatched variables — and ensure they’re properly ignored by Git.
 
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
@@ -26,11 +24,12 @@ pnpm add -g dotenv-diff
 ```bash
 dotenv-diff
 ```
-## Compares .env and .env.example in the current working directory and checks for:
-- Missing variables in `.env.example`
-- Extra variables in `.env`
-- Empty variables in `.env`
-- Mismatched values between `.env` and `.env.example`
+## What it checks
+dotenv-diff will automatically compare all matching .env* files in your project against .env.example, including:
+- `.env`
+- `.env.local`
+- `.env.production`
+- Any other .env.* file
 
 ## Optional: Check values too 
 
