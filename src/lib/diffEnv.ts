@@ -19,7 +19,7 @@ export type DiffResult = {
 export function diffEnv(
   current: Record<string, string>,
   example: Record<string, string>,
-  checkValues = false
+  checkValues = false,
 ): DiffResult {
   const currentKeys = Object.keys(current);
   const exampleKeys = Object.keys(example);
@@ -27,14 +27,14 @@ export function diffEnv(
   const missing = exampleKeys.filter((key) => !currentKeys.includes(key));
   const extra = currentKeys.filter((key) => !exampleKeys.includes(key));
 
-  let valueMismatches: DiffResult["valueMismatches"] = [];
+  let valueMismatches: DiffResult['valueMismatches'] = [];
 
   if (checkValues) {
     valueMismatches = exampleKeys
       .filter((key) => {
         return (
           currentKeys.includes(key) &&
-          example[key].trim() !== "" &&
+          example[key].trim() !== '' &&
           current[key] !== example[key]
         );
       })

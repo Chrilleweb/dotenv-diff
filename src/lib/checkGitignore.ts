@@ -3,11 +3,11 @@ import path from 'path';
 import chalk from 'chalk';
 
 export type GitignoreCheckOptions = {
-/** Project root directory (default: process.cwd()) */
+  /** Project root directory (default: process.cwd()) */
   cwd?: string;
-/** Name of the env file (default: ".env") */
+  /** Name of the env file (default: ".env") */
   envFile?: string;
-/** Custom logger (default: console.log) */
+  /** Custom logger (default: console.log) */
   log?: (msg: string) => void;
 };
 
@@ -22,7 +22,9 @@ export function isGitRepo(cwd = process.cwd()): boolean {
  *  - false → .env-matching patterns are NOT found (or a negation exists)
  *  - null  → no .gitignore exists
  */
-export function isEnvIgnoredByGit(options: GitignoreCheckOptions = {}): boolean | null {
+export function isEnvIgnoredByGit(
+  options: GitignoreCheckOptions = {},
+): boolean | null {
   const { cwd = process.cwd(), envFile = '.env' } = options;
   const gitignorePath = path.resolve(cwd, '.gitignore');
   if (!fs.existsSync(gitignorePath)) return null;
@@ -33,8 +35,12 @@ export function isEnvIgnoredByGit(options: GitignoreCheckOptions = {}): boolean 
     .map((l) => l.trim())
     .filter((l) => l && !l.startsWith('#'));
 
-// If there is a negation (!pattern) that matches our candidates, we consider it as "not ignored"
-  if (lines.some((l) => l.startsWith('!') && matchesCandidate(l.slice(1), envFile))) {
+  // If there is a negation (!pattern) that matches our candidates, we consider it as "not ignored"
+  if (
+    lines.some(
+      (l) => l.startsWith('!') && matchesCandidate(l.slice(1), envFile),
+    )
+  ) {
     return false;
   }
 
@@ -44,14 +50,20 @@ export function isEnvIgnoredByGit(options: GitignoreCheckOptions = {}): boolean 
 
 /** Our simple candidate patterns that typically cover env files in the root and subfolders */
 function getCandidatePatterns(envFile = '.env'): Set<string> {
-  const base = envFile;           // ".env"
-  const star = `${base}*`;        // ".env*"
-  const dotStar = `${base}.*`;    // ".env.*"
+  const base = envFile; // ".env"
+  const star = `${base}*`; // ".env*"
+  const dotStar = `${base}.*`; // ".env.*"
 
   return new Set([
-    base, `/${base}`, `**/${base}`,
-    star, `/${star}`, `**/${star}`,
-    dotStar, `/${dotStar}`, `**/${dotStar}`,
+    base,
+    `/${base}`,
+    `**/${base}`,
+    star,
+    `/${star}`,
+    `**/${star}`,
+    dotStar,
+    `/${dotStar}`,
+    `**/${dotStar}`,
   ]);
 }
 
@@ -69,17 +81,17 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
   const { cwd = process.cwd(), envFile = '.env', log = console.log } = options;
 
   const envPath = path.resolve(cwd, envFile);
-if (!fs.existsSync(envPath)) return; // No .env file → nothing to warn about
+  if (!fs.existsSync(envPath)) return; // No .env file → nothing to warn about
 
-if (!isGitRepo(cwd)) return; // Not a git repo → skip
+  if (!isGitRepo(cwd)) return; // Not a git repo → skip
 
   const gitignorePath = path.resolve(cwd, '.gitignore');
 
   if (!fs.existsSync(gitignorePath)) {
     log(
       chalk.yellow(
-        `⚠️  No .gitignore found – your ${envFile} may be committed.\n   Add:\n   ${envFile}\n   ${envFile}.*\n`
-      )
+        `⚠️  No .gitignore found – your ${envFile} may be committed.\n   Add:\n   ${envFile}\n   ${envFile}.*\n`,
+      ),
     );
     return;
   }
@@ -88,8 +100,8 @@ if (!isGitRepo(cwd)) return; // Not a git repo → skip
   if (ignored === false || ignored === null) {
     log(
       chalk.yellow(
-        `⚠️  ${envFile} is not ignored by Git (.gitignore).\n   Consider adding:\n   ${envFile}\n   ${envFile}.*\n`
-      )
+        `⚠️  ${envFile} is not ignored by Git (.gitignore).\n   Consider adding:\n   ${envFile}\n   ${envFile}.*\n`,
+      ),
     );
   }
 }

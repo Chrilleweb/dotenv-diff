@@ -109,7 +109,7 @@ const example = parseEnvFile(examplePath);
 const diff = diffEnv(current, example, checkValues);
 
 const emptyKeys = Object.entries(current)
-  .filter(([value]) => value.trim() === '')
+  .filter(([, value]) => value.trim() === '')
   .map(([key]) => key);
 
 if (
@@ -140,7 +140,7 @@ if (emptyKeys.length > 0) {
 if (checkValues && diff.valueMismatches.length > 0) {
   console.log(chalk.yellow('\n⚠️  The following keys have different values:'));
   diff.valueMismatches.forEach(({ key, expected, actual }) => {
-    console.log(chalk.yellow(`  - ${key}: expected "${expected}", but got "${actual}"`));
+    console.log(chalk.yellow(`  - ${key}: expected '${expected}', but got '${actual}'`));
   });
 }
 
