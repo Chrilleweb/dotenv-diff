@@ -88,8 +88,18 @@ if (envExists && !exampleExists) {
     process.exit(0);
   }
 
-  const envContent = fs.readFileSync(envPath, 'utf-8');
-  fs.writeFileSync(examplePath, envContent);
+  const envContent = fs.readFileSync(envPath, 'utf-8')
+  .split('\n')
+  .map((line) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return trimmed;
+    const [key] = trimmed.split('=');
+    return `${key}=`;
+  })
+  .join('\n');
+
+fs.writeFileSync(examplePath, envContent);
+
 
   console.log(chalk.green('✅ .env.example file created successfully from .env.\n'));
 }
