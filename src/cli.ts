@@ -15,6 +15,7 @@ import chalk from 'chalk';
 import prompts from 'prompts';
 import { parseEnvFile } from './lib/parseEnv.js';
 import { diffEnv } from './lib/diffEnv.js';
+import { warnIfEnvNotIgnored } from './lib/checkGitignore.js';
 
 const program = new Command();
 
@@ -64,6 +65,7 @@ if (!envExists && exampleExists) {
   fs.writeFileSync(envPath, exampleContent);
 
   console.log(chalk.green('✅ .env file created successfully from .env.example.\n'));
+  warnIfEnvNotIgnored();
 }
 
 // Case 3: .env exists, but .env.example is missing
@@ -86,8 +88,18 @@ if (envExists && !exampleExists) {
     process.exit(0);
   }
 
-  const envContent = fs.readFileSync(envPath, 'utf-8');
-  fs.writeFileSync(examplePath, envContent);
+  const envContent = fs.readFileSync(envPath, 'utf-8')
+  .split('\n')
+  .map((line) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return trimmed;
+    const [key] = trimmed.split('=');
+    return `${key}=`;
+  })
+  .join('\n');
+
+fs.writeFileSync(examplePath, envContent);
+
 
   console.log(chalk.green('✅ .env.example file created successfully from .env.\n'));
 }
@@ -99,6 +111,7 @@ if (!fs.existsSync(envPath) || !fs.existsSync(examplePath)) {
 }
 
 // Case 5: Both files exist, proceed with comparison
+warnIfEnvNotIgnored();
 console.log(chalk.bold('🔍 Comparing .env and .env.example...\n'));
 
 const current = parseEnvFile(envPath);
@@ -106,7 +119,7 @@ const example = parseEnvFile(examplePath);
 const diff = diffEnv(current, example, checkValues);
 
 const emptyKeys = Object.entries(current)
-  .filter(([value]) => value.trim() === '')
+  .filter(([, value]) => value.trim() === '')
   .map(([key]) => key);
 
 if (
@@ -137,7 +150,7 @@ if (emptyKeys.length > 0) {
 if (checkValues && diff.valueMismatches.length > 0) {
   console.log(chalk.yellow('\n⚠️  The following keys have different values:'));
   diff.valueMismatches.forEach(({ key, expected, actual }) => {
-    console.log(chalk.yellow(`  - ${key}: expected "${expected}", but got "${actual}"`));
+    console.log(chalk.yellow(`  - ${key}: expected '${expected}', but got '${actual}'`));
   });
 }
 
