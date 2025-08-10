@@ -23,10 +23,19 @@ program
   .name('dotenv-diff')
   .description('Compare .env and .env.example files')
   .option('--check-values', 'Compare actual values if example has values')
+  .option('--ci', 'Run non-interactively and never create files')
+  .option('-y, --yes', 'Run non-interactively and answer Yes to prompts')
   .parse(process.argv);
 
 const options = program.opts();
 const checkValues = options.checkValues ?? false;
+const isCiMode = Boolean(options.ci);
+const isYesMode = Boolean(options.yes);
+if (isCiMode && isYesMode) {
+  console.log(
+    chalk.yellow('⚠️  Both --ci and --yes provided; proceeding with --yes.'),
+  );
+}
 
 const cwd = process.cwd();
 const envFiles = fs
@@ -58,19 +67,27 @@ if (envFiles.length === 0 && !exampleExists) {
 // Case 2: .env is missing but .env.example exists
 if (!envExists && exampleExists) {
   console.log(chalk.yellow('📄 .env file not found.'));
+  let createEnv = false;
+  if (isYesMode) {
+    createEnv = true;
+  } else if (isCiMode) {
+    console.log(chalk.gray('🚫 Skipping .env creation (CI mode).'));
+    process.exit(1);
+  } else {
+    const response = await prompts({
+      type: 'select',
+      name: 'createEnv',
+      message: '❓ Do you want to create a new .env file from .env.example?',
+      choices: [
+        { title: 'Yes', value: true },
+        { title: 'No', value: false },
+      ],
+      initial: 0,
+    });
+    createEnv = Boolean(response.createEnv);
+  }
 
-  const response = await prompts({
-    type: 'select',
-    name: 'createEnv',
-    message: '❓ Do you want to create a new .env file from .env.example?',
-    choices: [
-      { title: 'Yes', value: true },
-      { title: 'No', value: false },
-    ],
-    initial: 0,
-  });
-
-  if (!response.createEnv) {
+  if (!createEnv) {
     console.log(chalk.gray('🚫 Skipping .env creation.'));
     process.exit(0);
   }
@@ -87,19 +104,27 @@ if (!envExists && exampleExists) {
 // Case 3: .env exists, but .env.example is missing
 if (envExists && !exampleExists) {
   console.log(chalk.yellow('📄 .env.example file not found.'));
+  let createExample = false;
+  if (isYesMode) {
+    createExample = true;
+  } else if (isCiMode) {
+    console.log(chalk.gray('🚫 Skipping .env.example creation (CI mode).'));
+    process.exit(1);
+  } else {
+    const response = await prompts({
+      type: 'select',
+      name: 'createExample',
+      message: '❓ Do you want to create a new .env.example file from .env?',
+      choices: [
+        { title: 'Yes', value: true },
+        { title: 'No', value: false },
+      ],
+      initial: 0,
+    });
+    createExample = Boolean(response.createExample);
+  }
 
-  const response = await prompts({
-    type: 'select',
-    name: 'createExample',
-    message: '❓ Do you want to create a new .env.example file from .env?',
-    choices: [
-      { title: 'Yes', value: true },
-      { title: 'No', value: false },
-    ],
-    initial: 0,
-  });
-
-  if (!response.createExample) {
+  if (!createExample) {
     console.log(chalk.gray('🚫 Skipping .env.example creation.'));
     process.exit(0);
   }

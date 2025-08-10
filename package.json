@@ -1,6 +1,6 @@
 {
   "name": "dotenv-diff",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "type": "module",
   "description": "A small CLI and library to find differences between .env and .env.example files.",
   "bin": {
