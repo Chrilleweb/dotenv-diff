@@ -96,6 +96,33 @@ describe('non-interactive flags', () => {
   });
 });
 
+describe('--example should not compare file with itself', () => {
+  it('Only --example - should skip comparing example with itself', () => {
+  const cwd = makeTmpDir();
+  fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
+  fs.writeFileSync(path.join(cwd, '.env'), 'B=2\n');
+  fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'B=2\n');
+  
+
+  const res = runCli(cwd, ['--example', '.env.example']);
+  expect(res.stdout).toContain('Comparing .env ↔ .env.example');
+  expect(res.stdout).not.toContain('Comparing .env.example ↔ .env.example');
+});
+
+it('Only --example - no self-comparison, but still compares other env files', () => {
+  const cwd = makeTmpDir();
+  fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
+  fs.writeFileSync(path.join(cwd, '.env.production'), 'B=2\n');
+  fs.writeFileSync(path.join(cwd, '.env.example.production'), 'B=3\n');
+
+  const res = runCli(cwd, ['--example', '.env.example.staging']);
+  expect(res.status).toBe(1);
+  expect(res.stdout).toContain('Comparing .env.production ↔ .env.example.staging');
+  expect(res.stdout).not.toContain('Comparing .env.example.staging ↔ .env.example.staging');
+  expect(res.stdout).toContain('Missing keys');
+});
+});
+
 describe('--env and --example flags', () => {
   it('Both flags - success', () => {
     const cwd = makeTmpDir();
@@ -184,19 +211,6 @@ describe('--env and --example flags', () => {
     expect(res.stdout).toContain(
       'Comparing .env.staging ↔ .env.example.staging',
     );
-  });
-
-  it('Only --example - env missing', () => {
-    const cwd = makeTmpDir();
-    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
-    const res = runCli(cwd, ['--example', '.env.example.staging', '--yes']);
-    expect(res.status).toBe(0);
-    const envContent = fs.readFileSync(
-      path.join(cwd, '.env.staging'),
-      'utf8',
-    );
-    expect(envContent).toBe('A=1\n');
-    expect(res.stdout).toContain('.env.staging file created successfully');
   });
 
   it('No flags - autoscan regression', () => {

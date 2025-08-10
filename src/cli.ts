@@ -43,6 +43,7 @@ const cwd = process.cwd();
 const envFlag = options.env ? path.resolve(cwd, options.env) : null;
 const exampleFlag = options.example ? path.resolve(cwd, options.example) : null;
 const bothFlags = Boolean(envFlag && exampleFlag);
+let alreadyWarnedMissingEnv = false;
 
 if (bothFlags) {
   const envExistsFlag = fs.existsSync(envFlag!);
@@ -135,9 +136,7 @@ if (envFlag && !exampleFlag) {
   const envNameFromFlag = path.basename(envFlag);
   primaryEnv = envNameFromFlag;
   const exists = fs.existsSync(envFlag);
-  if (!exists) {
-    console.log(chalk.yellow(`📄 ${envNameFromFlag} file not found.`));
-  } else {
+  if (exists) {
     const set = new Set([envNameFromFlag, ...envFiles]);
     envFiles.length = 0;
     envFiles.push(...[...set]);
@@ -153,13 +152,21 @@ if (envFlag && !exampleFlag) {
 if (exampleFlag && !envFlag) {
   const exampleNameFromFlag = path.basename(exampleFlag);
   primaryExample = exampleNameFromFlag;
-  const suffix = exampleNameFromFlag.replace('.env.example', '');
-  const matchedEnv = suffix ? `.env${suffix}` : '.env';
-  primaryEnv = matchedEnv;
-  envFiles.length = 0;
-  envFiles.push(matchedEnv);
-  if (!fs.existsSync(path.resolve(cwd, matchedEnv))) {
-    console.log(chalk.yellow(`📄 ${matchedEnv} file not found.`));
+  if (exampleNameFromFlag.startsWith('.env.example')) {
+    const suffix = exampleNameFromFlag.slice('.env.example'.length); // '' eller '.staging'
+    const matchedEnv = suffix ? `.env${suffix}` : '.env';
+    if (fs.existsSync(path.resolve(cwd, matchedEnv))) {
+      primaryEnv = matchedEnv;
+      envFiles.length = 0;
+      envFiles.push(matchedEnv);
+    } else {
+      // Ingen tidlig log her; Case 2 håndterer “file not found”-logikken
+      alreadyWarnedMissingEnv = true;
+    }
+  } else {
+    // Ikke et .env.example* navn → betragt det som en arbitrær example-fil.
+    // Rør ikke env’ens valg; behold primaryEnv som tidligere (typisk '.env').
+    if (envFiles.length === 0) envFiles.push(primaryEnv);
   }
 }
 
@@ -181,7 +188,9 @@ if (envFiles.length === 0 && !exampleExists) {
 
 // Case 2: .env is missing but .env.example exists
 if (!envExists && exampleExists) {
-  console.log(chalk.yellow(`📄 ${path.basename(envPath)} file not found.`));
+  if (!alreadyWarnedMissingEnv) {
+    console.log(chalk.yellow(`📄 ${path.basename(envPath)} file not found.`));
+  }
   let createEnv = false;
   if (isYesMode) {
     createEnv = true;
@@ -279,13 +288,25 @@ if (!fs.existsSync(envPath) || !fs.existsSync(examplePath)) {
 let exitWithError = false;
 
 for (const envName of envFiles.length > 0 ? envFiles : [primaryEnv]) {
+  // Skip self-compare når --example er sat (uden --env)
+  if (exampleFlag && !envFlag) {
+    const envAbs = path.resolve(cwd, envName);
+    if (envAbs === examplePath) {
+      // (valgfri) console.log(chalk.gray(`Skipping self-compare for ${envName}`));
+      continue;
+    }
+  }
+
   const suffix = envName === '.env' ? '' : envName.replace('.env', '');
   const exampleName = suffix ? `.env.example${suffix}` : primaryExample;
 
   const envPathCurrent = path.resolve(cwd, envName);
-  const examplePathCurrent = fs.existsSync(path.resolve(cwd, exampleName))
-    ? path.resolve(cwd, exampleName)
-    : examplePath;
+  const examplePathCurrent =
+    (exampleFlag && !envFlag)
+      ? examplePath
+      : (fs.existsSync(path.resolve(cwd, exampleName))
+          ? path.resolve(cwd, exampleName)
+          : examplePath);
 
   if (!fs.existsSync(envPathCurrent) || !fs.existsSync(examplePathCurrent)) {
   console.log(chalk.bold(`🔍 Comparing ${envName} ↔ ${path.basename(examplePathCurrent)}...`));
