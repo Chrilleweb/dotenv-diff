@@ -4,7 +4,7 @@
   "type": "module",
   "description": "A small CLI and library to find differences between .env and .env.example files.",
   "bin": {
-    "dotenv-diff": "dist/cli.js"
+    "dotenv-diff": "dist/bin/dotenv-diff.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,7 +19,7 @@
     "test": "vitest",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\" \"src/*.ts\"",
-    "start": "node dist/cli.js"
+    "start": "node dist/bin/dotenv-diff.js"
   },
   "author": "Chrilleweb",
   "license": "MIT",

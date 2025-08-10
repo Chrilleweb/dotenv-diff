@@ -12,7 +12,7 @@ beforeAll(() => {
   distDir = fs.mkdtempSync(path.join(process.cwd(), 'dist-test-'));
   const tscBin = path.join(process.cwd(), 'node_modules', '.bin', 'tsc');
   execSync(`${tscBin} --outDir ${distDir}`, { stdio: 'inherit' });
-  cliPath = path.join(distDir, 'cli.js');
+  cliPath = path.join(distDir, 'bin', 'dotenv-diff.js');
 });
 
 afterAll(() => {
