@@ -31,13 +31,33 @@ dotenv-diff will automatically compare all matching .env* files in your project 
 - `.env.production`
 - Any other .env.* file
 
-## Optional: Check values too 
+## Optional: Check values too
 
 ```bash
 dotenv-diff --check-values
 ```
 
 When using the `--check-values` option, the tool will also compare the actual values of the variables in `.env` and `.env.example`. It will report any mismatches found and it also compares values if .env.example defines a non-empty expected value.
+
+## Compare specific files
+
+Override the autoscan and compare exactly two files:
+
+```bash
+dotenv-diff --env .env.staging --example .env.example.staging
+```
+
+You can also fix only one side. For example, force a particular `.env` file and let the tool find the matching `.env.example`:
+
+```bash
+dotenv-diff --env .env.production
+```
+
+Or provide just an example file and let the tool locate the appropriate `.env`:
+
+```bash
+dotenv-diff --example .env.example.production
+```
 
 ## CI usage
 
