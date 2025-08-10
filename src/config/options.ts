@@ -10,7 +10,15 @@ export type Options = {
   cwd: string;
 };
 
-export function normalizeOptions(raw: any): Options {
+type RawOptions = {
+  checkValues?: boolean;
+  ci?: boolean;
+  yes?: boolean;
+  env?: string;
+  example?: string;
+};
+
+export function normalizeOptions(raw: RawOptions): Options {
   const checkValues = raw.checkValues ?? false;
   const isCiMode = Boolean(raw.ci);
   const isYesMode = Boolean(raw.yes);
