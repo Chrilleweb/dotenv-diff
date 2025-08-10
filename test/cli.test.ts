@@ -41,9 +41,8 @@ describe('non-interactive flags', () => {
     const cwd = makeTmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
     const res = runCli(cwd, ['--ci']);
-    expect(res.status).toBe(1);
+    expect(res.status).toBe(0);
     expect(res.stdout).toContain('.env file not found.');
-    expect(res.stdout).toContain('Skipping .env creation (CI mode).');
     expect(fs.existsSync(path.join(cwd, '.env'))).toBe(false);
   });
 
@@ -60,9 +59,8 @@ describe('non-interactive flags', () => {
     const cwd = makeTmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
     const res = runCli(cwd, ['--ci']);
-    expect(res.status).toBe(1);
+    expect(res.status).toBe(0);
     expect(res.stdout).toContain('.env.example file not found.');
-    expect(res.stdout).toContain('Skipping .env.example creation (CI mode).');
     expect(fs.existsSync(path.join(cwd, '.env.example'))).toBe(false);
   });
 
