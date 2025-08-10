@@ -95,3 +95,122 @@ describe('non-interactive flags', () => {
     expect(res.stdout).toContain('No .env* or .env.example file found. Skipping comparison.');
   });
 });
+
+describe('--env and --example flags', () => {
+  it('Both flags - success', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'SHOULD=IGNORE\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'SHOULD=DIFF\n');
+    fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
+    const res = runCli(cwd, [
+      '--env',
+      '.env.staging',
+      '--example',
+      '.env.example.staging',
+    ]);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain(
+      'Comparing .env.staging ↔ .env.example.staging',
+    );
+    expect(res.stdout).not.toContain('SHOULD=DIFF');
+  });
+
+  it('Both flags - env missing', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
+    const res = runCli(cwd, [
+      '--env',
+      '.env.staging',
+      '--example',
+      '.env.example.staging',
+    ]);
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain('--env file not found');
+  });
+
+  it('Both flags - example missing', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
+    const res = runCli(cwd, [
+      '--env',
+      '.env.staging',
+      '--example',
+      '.env.example.staging',
+    ]);
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain('--example file not found');
+  });
+
+  it('Only --env - matching example exists', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
+    const res = runCli(cwd, ['--env', '.env.staging']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain(
+      'Comparing .env.staging ↔ .env.example.staging',
+    );
+  });
+
+  it('Only --env - fallback example', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
+    const res = runCli(cwd, ['--env', '.env.staging']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Comparing .env.staging ↔ .env.example');
+  });
+
+  it('Only --env - example missing entirely', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\nB=2\n');
+    const res = runCli(cwd, ['--env', '.env.staging', '--yes']);
+    expect(res.status).toBe(0);
+    const exampleContent = fs.readFileSync(
+      path.join(cwd, '.env.example'),
+      'utf8',
+    );
+    expect(exampleContent).toBe('A=\nB=\n');
+    expect(res.stdout).toContain('.env.example file created successfully');
+  });
+
+  it('Only --example - matching env exists', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
+    const res = runCli(cwd, ['--example', '.env.example.staging']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain(
+      'Comparing .env.staging ↔ .env.example.staging',
+    );
+  });
+
+  it('Only --example - env missing', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
+    const res = runCli(cwd, ['--example', '.env.example.staging', '--yes']);
+    expect(res.status).toBe(0);
+    const envContent = fs.readFileSync(
+      path.join(cwd, '.env.staging'),
+      'utf8',
+    );
+    expect(envContent).toBe('A=1\n');
+    expect(res.stdout).toContain('.env.staging file created successfully');
+  });
+
+  it('No flags - autoscan regression', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\nB=1\n');
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain('Comparing .env ↔ .env.example');
+    expect(res.stdout).toContain(
+      'Comparing .env.staging ↔ .env.example.staging',
+    );
+    expect(res.stdout).toContain('Missing keys');
+  });
+});
