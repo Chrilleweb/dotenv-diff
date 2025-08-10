@@ -39,6 +39,17 @@ dotenv-diff --check-values
 
 When using the `--check-values` option, the tool will also compare the actual values of the variables in `.env` and `.env.example`. It will report any mismatches found and it also compares values if .env.example defines a non-empty expected value.
 
+## CI usage
+
+Run non-interactively in CI environments with:
+
+```bash
+dotenv-diff --ci     # never create files, exit 1 if required files are missing
+dotenv-diff --yes    # auto-create missing files without prompts
+```
+
+You can also use `-y` as a shorthand for `--yes`.
+
 ## Automatic file creation prompts
 
 If one of the files is missing, `dotenv-diff` will ask if you want to create it from the other:
