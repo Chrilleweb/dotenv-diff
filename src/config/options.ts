@@ -6,6 +6,7 @@ export type Options = {
   isCiMode: boolean;
   isYesMode: boolean;
   allowDuplicates: boolean;
+  json: boolean;
   envFlag: string | null;
   exampleFlag: string | null;
   cwd: string;
@@ -16,6 +17,7 @@ type RawOptions = {
   ci?: boolean;
   yes?: boolean;
   allowDuplicates?: boolean;
+  json?: boolean;
   env?: string;
   example?: string;
 };
@@ -25,6 +27,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const isCiMode = Boolean(raw.ci);
   const isYesMode = Boolean(raw.yes);
   const allowDuplicates = Boolean(raw.allowDuplicates);
+  const json = Boolean(raw.json);
 
   if (isCiMode && isYesMode) {
     console.log(
@@ -45,6 +48,7 @@ export function normalizeOptions(raw: RawOptions): Options {
     isCiMode,
     isYesMode,
     allowDuplicates,
+    json,
     envFlag,
     exampleFlag,
     cwd,
