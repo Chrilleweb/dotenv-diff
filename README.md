@@ -43,6 +43,14 @@ When using the `--check-values` option, the tool will also compare the actual va
 
 `dotenv-diff` warns when a `.env*` file contains the same key multiple times. The last occurrence wins. Suppress these warnings with `--allow-duplicates`.
 
+## Output format in JSON
+
+You can output the results in JSON format using the `--json` option:
+
+```bash
+dotenv-diff --json
+```
+
 ## Compare specific files
 
 Override the autoscan and compare exactly two files:

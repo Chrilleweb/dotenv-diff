@@ -12,5 +12,6 @@ export function createProgram() {
     .option(
       '--allow-duplicates',
       'Do not warn about duplicate keys in .env* files',
-    );
+    )
+    .option('--json', 'Output results in JSON format');
 }

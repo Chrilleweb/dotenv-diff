@@ -260,4 +260,45 @@ describe('duplicate detection', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Duplicate keys');
   });
+  describe('--json output', () => {
+  it('prints a JSON array with ok=true when files match', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\n');
+
+    const res = runCli(cwd, ['--json']);
+
+    expect(res.status).toBe(0);
+    expect(() => JSON.parse(res.stdout)).not.toThrow();
+
+    const arr = JSON.parse(res.stdout);
+    expect(Array.isArray(arr)).toBe(true);
+    expect(arr.length).toBeGreaterThan(0);
+    expect(arr[0].env).toBe('.env');
+    expect(arr[0].example).toBe('.env.example');
+    expect(arr[0].ok).toBe(true);
+
+    expect(res.stdout).not.toContain('Comparing');
+    expect(res.stdout).not.toContain('Missing keys');
+  });
+
+  it('prints JSON and exits 1 when there are missing keys', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\n');
+
+    const res = runCli(cwd, ['--json']);
+
+    expect(res.status).toBe(1);
+    const arr = JSON.parse(res.stdout);
+    expect(Array.isArray(arr)).toBe(true);
+    expect(arr.length).toBeGreaterThan(0);
+    expect(arr[0].env).toBe('.env');
+    expect(arr[0].example).toBe('.env.example');
+    expect(arr[0].missing).toContain('B');
+
+    expect(res.stdout).not.toContain('Comparing');
+    expect(res.stdout).not.toContain('Missing keys');
+  });
+});
 });

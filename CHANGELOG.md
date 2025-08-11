@@ -1,7 +1,22 @@
 # Changelog
+All notable changes to this project will be documented in this file.
+This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semantic Versioning](https://semver.org/).
 
-## 1.6.2
+## [Unreleased]
+### Added
+- 
 
+### Changed
+- 
+
+### Fixed
+- 
+
+## [1.6.3] - 2025-08-11
+### Added
+- `--json` option to output results in JSON format. (Non-breaking)
+
+## [1.6.2] - 2025-08-10
 ### Added
 - Duplicate key detection for `.env*` files.
   - Prints warnings listing duplicate keys (last occurrence wins).
@@ -10,22 +25,16 @@
 ### Changed
 - No breaking changes. Exit codes and diff behavior unchanged.
 
-## 1.6.1
-
-### Added
-- `--env` and `--example` for direct file comparison; autoscan overridden when both are provided.
-- `--ci` and `--yes` non-interactive modes.
-
-### Changed
+## [1.6.1] - 2025-08-09
+### Build
 - Updated TypeScript configuration to include `bin` directory.
-- Changed CLI path to `bin/dotenv-diff.js` for consistency.
+- Switched CLI path to `bin/dotenv-diff.js` for consistency.
 - Refactored folder structure for better organization.
-## 1.6.0
 
+## [1.6.0] - 2025-08-08
 ### Added
 - `--env` and `--example` for direct file comparison; autoscan overridden when both are provided.
 
-## 1.5.0
-
+## [1.5.0] - 2025-08-07
 ### Added
-- `--ci` and `--yes` non-interactive modes.
+- Non-interactive modes: `--ci` and `--yes`.
