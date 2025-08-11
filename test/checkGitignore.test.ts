@@ -7,7 +7,7 @@ import {
   isGitRepo,
   isEnvIgnoredByGit,
   warnIfEnvNotIgnored,
-} from '../src/lib/checkGitignore.js';
+} from '../src/services/git.js';
 
 function makeTmpDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
