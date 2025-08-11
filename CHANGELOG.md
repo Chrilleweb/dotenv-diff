@@ -1,6 +1,16 @@
 # Changelog
 
-## 2.0.0
+## 1.6.2
+
+### Added
+- Duplicate key detection for `.env*` files.
+  - Prints warnings listing duplicate keys (last occurrence wins).
+  - Suppress via `--allow-duplicates`.
+
+### Changed
+- No breaking changes. Exit codes and diff behavior unchanged.
+
+## 1.6.1
 
 ### Added
 - `--env` and `--example` for direct file comparison; autoscan overridden when both are provided.
