@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { parseEnvFile } from '../lib/parseEnv.js';
 import { diffEnv } from '../lib/diffEnv.js';
 import { warnIfEnvNotIgnored } from '../services/git.js';
-import { findDuplicateKeys } from '../core/duplicates.js';
+import { findDuplicateKeys } from '../services/duplicates.js';
 
 export async function compareMany(
   pairs: Array<{ envName: string; envPath: string; examplePath: string }>,
@@ -45,9 +45,7 @@ export async function compareMany(
           ),
         );
         dupsEnv.forEach(({ key, count }) =>
-          console.log(
-            chalk.yellow(`      - ${key} (${count} occurrences)`),
-          ),
+          console.log(chalk.yellow(`      - ${key} (${count} occurrences)`)),
         );
       }
 
@@ -60,9 +58,7 @@ export async function compareMany(
           ),
         );
         dupsEx.forEach(({ key, count }) =>
-          console.log(
-            chalk.yellow(`      - ${key} (${count} occurrences)`),
-          ),
+          console.log(chalk.yellow(`      - ${key} (${count} occurrences)`)),
         );
       }
     }

@@ -7,7 +7,9 @@ import fs from 'fs';
  * - Trims the key
  * - Returns keys that appear more than once, with counts
  */
-export function findDuplicateKeys(filePath: string): Array<{ key: string; count: number }> {
+export function findDuplicateKeys(
+  filePath: string,
+): Array<{ key: string; count: number }> {
   if (!fs.existsSync(filePath)) return [];
 
   const raw = fs.readFileSync(filePath, 'utf8');
