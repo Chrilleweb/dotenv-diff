@@ -4,10 +4,11 @@ import chalk from 'chalk';
 import { parseEnvFile } from '../lib/parseEnv.js';
 import { diffEnv } from '../lib/diffEnv.js';
 import { warnIfEnvNotIgnored } from '../services/git.js';
+import { findDuplicateKeys } from '../core/duplicates.js';
 
 export async function compareMany(
   pairs: Array<{ envName: string; envPath: string; examplePath: string }>,
-  opts: { checkValues: boolean; cwd: string },
+  opts: { checkValues: boolean; cwd: string; allowDuplicates?: boolean },
 ) {
   let exitWithError = false;
 
@@ -34,6 +35,37 @@ export async function compareMany(
       envFile: envName,
       log: (msg) => console.log(msg.replace(/^/gm, '  ')),
     });
+
+    if (!opts.allowDuplicates) {
+      const dupsEnv = findDuplicateKeys(envPath);
+      if (dupsEnv.length > 0) {
+        console.log(
+          chalk.yellow(
+            `  ⚠️  Duplicate keys in ${envName} (last occurrence wins):`,
+          ),
+        );
+        dupsEnv.forEach(({ key, count }) =>
+          console.log(
+            chalk.yellow(`      - ${key} (${count} occurrences)`),
+          ),
+        );
+      }
+
+      const exName = path.basename(examplePath);
+      const dupsEx = findDuplicateKeys(examplePath);
+      if (dupsEx.length > 0) {
+        console.log(
+          chalk.yellow(
+            `  ⚠️  Duplicate keys in ${exName} (last occurrence wins):`,
+          ),
+        );
+        dupsEx.forEach(({ key, count }) =>
+          console.log(
+            chalk.yellow(`      - ${key} (${count} occurrences)`),
+          ),
+        );
+      }
+    }
 
     const current = parseEnvFile(envPath);
     const example = parseEnvFile(examplePath);

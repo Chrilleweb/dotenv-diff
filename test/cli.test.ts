@@ -226,3 +226,38 @@ describe('--env and --example flags', () => {
     expect(res.stdout).toContain('Missing keys');
   });
 });
+
+describe('duplicate detection', () => {
+  it('warns on duplicates in env file', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\nFOO=2\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain(
+      'Duplicate keys in .env (last occurrence wins):',
+    );
+    expect(res.stdout).toContain('- FOO (2 occurrences)');
+  });
+
+  it('warns on duplicates in example file', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\nFOO=\n');
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain(
+      'Duplicate keys in .env.example (last occurrence wins):',
+    );
+    expect(res.stdout).toContain('- FOO (2 occurrences)');
+  });
+
+  it('suppresses warnings with flag', () => {
+    const cwd = makeTmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\nFOO=2\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
+    const res = runCli(cwd, ['--allow-duplicates']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Duplicate keys');
+  });
+});
