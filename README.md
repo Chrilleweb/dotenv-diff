@@ -39,6 +39,10 @@ dotenv-diff --check-values
 
 When using the `--check-values` option, the tool will also compare the actual values of the variables in `.env` and `.env.example`. It will report any mismatches found and it also compares values if .env.example defines a non-empty expected value.
 
+## Duplicate key warnings
+
+`dotenv-diff` warns when a `.env*` file contains the same key multiple times. The last occurrence wins. Suppress these warnings with `--allow-duplicates`.
+
 ## Compare specific files
 
 Override the autoscan and compare exactly two files:

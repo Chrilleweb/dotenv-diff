@@ -42,7 +42,11 @@ export async function run(program: Command) {
           examplePath: opts.exampleFlag,
         },
       ],
-      { checkValues: opts.checkValues, cwd: opts.cwd },
+      {
+        checkValues: opts.checkValues,
+        cwd: opts.cwd,
+        allowDuplicates: opts.allowDuplicates,
+      },
     );
     process.exit(exitWithError ? 1 : 0);
   }
@@ -68,6 +72,7 @@ export async function run(program: Command) {
   const { exitWithError } = await compareMany(pairs, {
     checkValues: opts.checkValues,
     cwd: opts.cwd,
+    allowDuplicates: opts.allowDuplicates,
   });
   process.exit(exitWithError ? 1 : 0);
 }

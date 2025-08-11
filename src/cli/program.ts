@@ -8,5 +8,9 @@ export function createProgram() {
     .option('--ci', 'Run non-interactively and never create files')
     .option('-y, --yes', 'Run non-interactively and answer Yes to prompts')
     .option('--env <file>', 'Path to a specific .env file')
-    .option('--example <file>', 'Path to a specific .env.example file');
+    .option('--example <file>', 'Path to a specific .env.example file')
+    .option(
+      '--allow-duplicates',
+      'Do not warn about duplicate keys in .env* files',
+    );
 }
