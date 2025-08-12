@@ -1,25 +1,36 @@
 {
   "name": "dotenv-diff",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "type": "module",
-  "description": "A small CLI and library to find differences between .env and .env.example files.",
+  "description": "A CLI tool to find differences between .env and .env.example / .env.* files.",
   "bin": {
     "dotenv-diff": "dist/bin/dotenv-diff.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist/",
     "README.md",
     "LICENSE"
   ],
+  "sideEffects": false,
   "scripts": {
     "build": "tsc",
     "dev": "vitest --watch",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:unit": "vitest run test/unit",
+    "test:e2e": "vitest run test/e2e",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\" \"src/*.ts\"",
-    "start": "node dist/bin/dotenv-diff.js"
+    "start": "node dist/bin/dotenv-diff.js",
+    "prepublishOnly": "npm run lint && npm test && npm run build"
   },
   "author": "Chrilleweb",
   "license": "MIT",
@@ -36,8 +47,12 @@
     "type": "git",
     "url": "https://github.com/Chrilleweb/dotenv-diff.git"
   },
+  "homepage": "https://github.com/Chrilleweb/dotenv-diff#readme",
+  "bugs": {
+    "url": "https://github.com/Chrilleweb/dotenv-diff/issues"
+  },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "chalk": "^5.4.1",

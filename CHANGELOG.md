@@ -4,13 +4,17 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ## [Unreleased]
 ### Added
-- 
+- `--ignore` and `--ignore-regex` flags to exclude keys from diff.
 
 ### Changed
 - 
 
 ### Fixed
 - 
+
+## [1.6.4] - 2025-08-12
+### Added
+- `--ignore` and `--ignore-regex` options to specify files or directories to ignore during comparison.
 
 ## [1.6.3] - 2025-08-11
 ### Added

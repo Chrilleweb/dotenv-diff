@@ -5,6 +5,7 @@ import { parseEnvFile } from '../lib/parseEnv.js';
 import { diffEnv } from '../lib/diffEnv.js';
 import { warnIfEnvNotIgnored } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
+import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 
 export type CompareJsonEntry = {
   env: string;
@@ -28,6 +29,8 @@ export async function compareMany(
     cwd: string;
     allowDuplicates?: boolean;
     json?: boolean;
+    ignore: string[];
+    ignoreRegex: RegExp[];
     collect?: (entry: CompareJsonEntry) => void;
   },
 ) {
@@ -65,8 +68,16 @@ export async function compareMany(
 
     // Duplicate detection
     if (!opts.allowDuplicates) {
-      const dupsEnv = findDuplicateKeys(envPath);
-      const dupsEx = findDuplicateKeys(examplePath);
+      const dupsEnv = findDuplicateKeys(envPath).filter(
+        ({ key }) =>
+          !opts.ignore.includes(key) &&
+          !opts.ignoreRegex.some((rx) => rx.test(key)),
+      );
+      const dupsEx = findDuplicateKeys(examplePath).filter(
+        ({ key }) =>
+          !opts.ignore.includes(key) &&
+          !opts.ignoreRegex.some((rx) => rx.test(key)),
+      );
       if (dupsEnv.length || dupsEx.length) {
         entry.duplicates = {};
       }
@@ -99,8 +110,27 @@ export async function compareMany(
     }
 
     // Diff + empty
-    const current = parseEnvFile(envPath);
-    const example = parseEnvFile(examplePath);
+    const currentFull = parseEnvFile(envPath);
+    const exampleFull = parseEnvFile(examplePath);
+
+    const currentKeys = filterIgnoredKeys(
+      Object.keys(currentFull),
+      opts.ignore,
+      opts.ignoreRegex,
+    );
+    const exampleKeys = filterIgnoredKeys(
+      Object.keys(exampleFull),
+      opts.ignore,
+      opts.ignoreRegex,
+    );
+
+    const current = Object.fromEntries(
+      currentKeys.map((k) => [k, currentFull[k]]),
+    );
+    const example = Object.fromEntries(
+      exampleKeys.map((k) => [k, exampleFull[k]]),
+    );
+
     const diff = diffEnv(current, example, opts.checkValues);
 
     const emptyKeys = Object.entries(current)
