@@ -43,6 +43,18 @@ When using the `--check-values` option, the tool will also compare the actual va
 
 `dotenv-diff` warns when a `.env*` file contains the same key multiple times. The last occurrence wins. Suppress these warnings with `--allow-duplicates`.
 
+## Ignore specific keys
+
+Exclude certain keys from the comparison using `--ignore` for exact names or `--ignore-regex` for patterns:
+
+```bash
+dotenv-diff --ignore API_KEY,SESSION_ID
+dotenv-diff --ignore-regex '^SECRET_'
+dotenv-diff --ignore API_KEY --ignore-regex '^SECRET_'
+```
+
+Ignored keys are removed from all warnings and do not affect the exit code.
+
 ## Output format in JSON
 
 You can output the results in JSON format using the `--json` option:

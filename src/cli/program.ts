@@ -13,5 +13,10 @@ export function createProgram() {
       '--allow-duplicates',
       'Do not warn about duplicate keys in .env* files',
     )
+    .option('--ignore <keys>', 'Comma-separated list of keys to ignore')
+    .option(
+      '--ignore-regex <pattern>',
+      'Regex pattern to ignore matching keys',
+    )
     .option('--json', 'Output results in JSON format');
 }
