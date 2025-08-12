@@ -24,7 +24,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "vitest --watch",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:unit": "vitest run test/unit",
+    "test:e2e": "vitest run test/e2e",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\" \"src/*.ts\"",
     "start": "node dist/bin/dotenv-diff.js",

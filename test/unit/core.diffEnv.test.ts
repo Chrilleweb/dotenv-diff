@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { diffEnv } from "../src/lib/diffEnv.js";
+import { describe, expect, it } from 'vitest';
+import { diffEnv } from '../../src/lib/diffEnv.js';
 
 describe("diffEnv", () => {
   it("detects missing and extra keys (no value checking)", () => {

@@ -1,29 +1,16 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 
 import {
   isGitRepo,
   isEnvIgnoredByGit,
   warnIfEnvNotIgnored,
-} from '../src/services/git.js';
-
-function makeTmpDir() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
-  return dir;
-}
-function touch(filePath: string, content = '') {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, content);
-}
-function rmrf(p: string) {
-  fs.rmSync(p, { recursive: true, force: true });
-}
+} from '../../src/services/git.js';
+import { makeTmpDir, touch, rmrf } from '../utils/fs-helpers.js';
 
 let tmpDirs: string[] = [];
 afterEach(() => {
-  // clean up temp dirs
   for (const dir of tmpDirs) rmrf(dir);
   tmpDirs = [];
 });

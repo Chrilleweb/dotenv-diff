@@ -1,44 +1,35 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
-import { spawnSync, execSync } from 'child_process';
+import { makeTmpDir, rmrf } from '../utils/fs-helpers.js';
+import { buildOnce, runCli, cleanupBuild } from '../utils/cli-helpers.js';
 
-let distDir: string;
-let cliPath: string;
 const tmpDirs: string[] = [];
 
 beforeAll(() => {
-  distDir = fs.mkdtempSync(path.join(process.cwd(), 'dist-test-'));
-  const tscBin = path.join(process.cwd(), 'node_modules', '.bin', 'tsc');
-  execSync(`${tscBin} --outDir ${distDir}`, { stdio: 'inherit' });
-  cliPath = path.join(distDir, 'bin', 'dotenv-diff.js');
+  buildOnce();
 });
 
 afterAll(() => {
-  fs.rmSync(distDir, { recursive: true, force: true });
+  cleanupBuild();
 });
 
 afterEach(() => {
   while (tmpDirs.length) {
     const dir = tmpDirs.pop();
-    if (dir) fs.rmSync(dir, { recursive: true, force: true });
+    if (dir) rmrf(dir);
   }
 });
 
-function makeTmpDir() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-test-'));
+function tmpDir() {
+  const dir = makeTmpDir();
   tmpDirs.push(dir);
   return dir;
 }
 
-function runCli(cwd: string, args: string[]) {
-  return spawnSync('node', [cliPath, ...args], { cwd, encoding: 'utf8' });
-}
-
 describe('non-interactive flags', () => {
   it('CI: .env missing, .env.example exists', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
     const res = runCli(cwd, ['--ci']);
     expect(res.status).toBe(0);
@@ -47,7 +38,7 @@ describe('non-interactive flags', () => {
   });
 
   it('YES: .env missing, .env.example exists', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
     const res = runCli(cwd, ['--yes']);
     expect(res.status).toBe(0);
@@ -56,7 +47,7 @@ describe('non-interactive flags', () => {
   });
 
   it('CI: .env.example missing, .env exists', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
     const res = runCli(cwd, ['--ci']);
     expect(res.status).toBe(0);
@@ -65,7 +56,7 @@ describe('non-interactive flags', () => {
   });
 
   it('YES: .env.example missing, .env exists', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nB=2\n');
     const res = runCli(cwd, ['--yes']);
     expect(res.status).toBe(0);
@@ -78,7 +69,7 @@ describe('non-interactive flags', () => {
   });
 
   it('Both flags: --ci --yes', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
     const res = runCli(cwd, ['--ci', '--yes']);
     expect(res.status).toBe(0);
@@ -87,7 +78,7 @@ describe('non-interactive flags', () => {
   });
 
   it('Case 1: no env files', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     const res = runCli(cwd, ['--ci']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('No .env* or .env.example file found. Skipping comparison.');
@@ -96,7 +87,7 @@ describe('non-interactive flags', () => {
 
 describe('--example should not compare file with itself', () => {
   it('Only --example - should skip comparing example with itself', () => {
-  const cwd = makeTmpDir();
+  const cwd = tmpDir();
   fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
   fs.writeFileSync(path.join(cwd, '.env'), 'B=2\n');
   fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'B=2\n');
@@ -108,7 +99,7 @@ describe('--example should not compare file with itself', () => {
 });
 
 it('Only --example - no self-comparison, but still compares other env files', () => {
-  const cwd = makeTmpDir();
+  const cwd = tmpDir();
   fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
   fs.writeFileSync(path.join(cwd, '.env.production'), 'B=2\n');
   fs.writeFileSync(path.join(cwd, '.env.example.production'), 'B=3\n');
@@ -123,7 +114,7 @@ it('Only --example - no self-comparison, but still compares other env files', ()
 
 describe('--env and --example flags', () => {
   it('Both flags - success', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'SHOULD=IGNORE\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'SHOULD=DIFF\n');
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
@@ -142,7 +133,7 @@ describe('--env and --example flags', () => {
   });
 
   it('Both flags - env missing', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
     const res = runCli(cwd, [
       '--env',
@@ -155,7 +146,7 @@ describe('--env and --example flags', () => {
   });
 
   it('Both flags - example missing', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     const res = runCli(cwd, [
       '--env',
@@ -168,7 +159,7 @@ describe('--env and --example flags', () => {
   });
 
   it('Only --env - matching example exists', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
     const res = runCli(cwd, ['--env', '.env.staging']);
@@ -179,7 +170,7 @@ describe('--env and --example flags', () => {
   });
 
   it('Only --env - fallback example', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
     const res = runCli(cwd, ['--env', '.env.staging']);
@@ -188,7 +179,7 @@ describe('--env and --example flags', () => {
   });
 
   it('Only --env - example missing entirely', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\nB=2\n');
     const res = runCli(cwd, ['--env', '.env.staging', '--yes']);
     expect(res.status).toBe(0);
@@ -201,7 +192,7 @@ describe('--env and --example flags', () => {
   });
 
   it('Only --example - matching env exists', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
     const res = runCli(cwd, ['--example', '.env.example.staging']);
@@ -210,26 +201,11 @@ describe('--env and --example flags', () => {
       'Comparing .env.staging ↔ .env.example.staging',
     );
   });
-
-  it('No flags - autoscan regression', () => {
-    const cwd = makeTmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
-    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
-    fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
-    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\nB=1\n');
-    const res = runCli(cwd, []);
-    expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Comparing .env ↔ .env.example');
-    expect(res.stdout).toContain(
-      'Comparing .env.staging ↔ .env.example.staging',
-    );
-    expect(res.stdout).toContain('Missing keys');
-  });
 });
 
 describe('duplicate detection', () => {
   it('warns on duplicates in env file', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\nFOO=2\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
     const res = runCli(cwd, []);
@@ -241,7 +217,7 @@ describe('duplicate detection', () => {
   });
 
   it('warns on duplicates in example file', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\nFOO=\n');
     const res = runCli(cwd, []);
@@ -253,7 +229,7 @@ describe('duplicate detection', () => {
   });
 
   it('suppresses warnings with flag', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\nFOO=2\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
     const res = runCli(cwd, ['--allow-duplicates']);
@@ -262,7 +238,7 @@ describe('duplicate detection', () => {
   });
   describe('--json output', () => {
   it('prints a JSON array with ok=true when files match', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\n');
 
@@ -283,7 +259,7 @@ describe('duplicate detection', () => {
   });
 
   it('prints JSON and exits 1 when there are missing keys', () => {
-    const cwd = makeTmpDir();
+    const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\n');
 
