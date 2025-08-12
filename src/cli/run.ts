@@ -50,6 +50,8 @@ export async function run(program: Command) {
         cwd: opts.cwd,
         allowDuplicates: opts.allowDuplicates,
         json: opts.json,
+        ignore: opts.ignore,
+        ignoreRegex: opts.ignoreRegex,
         collect: (e) => report.push(e),
       },
     );
@@ -90,6 +92,8 @@ export async function run(program: Command) {
     cwd: opts.cwd,
     allowDuplicates: opts.allowDuplicates,
     json: opts.json,
+    ignore: opts.ignore,
+    ignoreRegex: opts.ignoreRegex,
     collect: (e) => report.push(e),
   });
 

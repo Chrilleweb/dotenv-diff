@@ -4,7 +4,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ## [Unreleased]
 ### Added
-- 
+- `--ignore` and `--ignore-regex` flags to exclude keys from diff.
 
 ### Changed
 - 
