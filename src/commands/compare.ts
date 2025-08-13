@@ -189,14 +189,14 @@ export async function compareMany(
       totals.empty += filtered.empty.length;
     }
     if (filtered.mismatches.length) {
-      entry.valueMismatches = filtered.mismatches as any;
+      entry.valueMismatches = filtered.mismatches;
       totals.mismatch += filtered.mismatches.length;
       exitWithError = true;
     }
     if (filtered.duplicatesEnv.length || filtered.duplicatesEx.length) {
       totals.duplicate +=
         filtered.duplicatesEnv.length + filtered.duplicatesEx.length;
-        exitWithError = true;
+      exitWithError = true;
     }
     if (filtered.gitignoreUnsafe) {
       totals.gitignore += 1;

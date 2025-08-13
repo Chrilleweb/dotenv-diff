@@ -7,7 +7,7 @@ export const ALLOWED_CATEGORIES = [
   'gitignore',
 ] as const;
 
-export type Category = typeof ALLOWED_CATEGORIES[number];
+export type Category = (typeof ALLOWED_CATEGORIES)[number];
 
 export type Options = {
   checkValues: boolean;

@@ -16,8 +16,8 @@ function parseCategories(val?: string | string[], flagName = ''): Category[] {
   if (bad.length) {
     console.error(
       chalk.red(
-        `❌ Error: invalid ${flagName} value(s): ${bad.join(', ')}. Allowed: ${ALLOWED_CATEGORIES.join(', ')}`
-      )
+        `❌ Error: invalid ${flagName} value(s): ${bad.join(', ')}. Allowed: ${ALLOWED_CATEGORIES.join(', ')}`,
+      ),
     );
     process.exit(1);
   }
@@ -39,19 +39,25 @@ export function normalizeOptions(raw: RawOptions): Options {
     try {
       ignoreRegex.push(new RegExp(pattern));
     } catch {
-      console.error(chalk.red(`❌ Error: invalid --ignore-regex pattern: ${pattern}`));
+      console.error(
+        chalk.red(`❌ Error: invalid --ignore-regex pattern: ${pattern}`),
+      );
       process.exit(1);
     }
   }
 
   if (isCiMode && isYesMode) {
-    console.log(chalk.yellow('⚠️  Both --ci and --yes provided; proceeding with --yes.'));
+    console.log(
+      chalk.yellow('⚠️  Both --ci and --yes provided; proceeding with --yes.'),
+    );
   }
 
   const cwd = process.cwd();
 
-  const envFlag = typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : null;
-  const exampleFlag = typeof raw.example === 'string' ? path.resolve(cwd, raw.example) : null;
+  const envFlag =
+    typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : null;
+  const exampleFlag =
+    typeof raw.example === 'string' ? path.resolve(cwd, raw.example) : null;
 
   return {
     checkValues,
