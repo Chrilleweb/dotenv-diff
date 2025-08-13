@@ -18,5 +18,6 @@ export function createProgram() {
       '--ignore-regex <pattern>',
       'Regex pattern to ignore matching keys',
     )
-    .option('--json', 'Output results in JSON format');
+    .option('--json', 'Output results in JSON format')
+    .option('--only <list>', 'Comma-separated categories to only run (missing,extra,empty,mismatch,duplicate,gitignore)')
 }

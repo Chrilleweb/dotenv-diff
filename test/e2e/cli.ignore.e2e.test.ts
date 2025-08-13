@@ -33,7 +33,7 @@ describe('--ignore and --ignore-regex', () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=1\nDEBUG=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'DEBUG=\n');
     const res = runCli(cwd, []);
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).toContain('Extra keys');
     expect(res.stdout).toContain('API_KEY');
   });

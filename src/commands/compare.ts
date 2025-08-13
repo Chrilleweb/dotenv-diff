@@ -6,21 +6,7 @@ import { diffEnv } from '../lib/diffEnv.js';
 import { warnIfEnvNotIgnored } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
-
-export type CompareJsonEntry = {
-  env: string;
-  example: string;
-  skipped?: { reason: string };
-  duplicates?: {
-    env?: Array<{ key: string; count: number }>;
-    example?: Array<{ key: string; count: number }>;
-  };
-  missing?: string[];
-  extra?: string[];
-  empty?: string[];
-  valueMismatches?: Array<{ key: string; expected: string; actual: string }>;
-  ok?: boolean;
-};
+import type { Category, CompareJsonEntry } from '../config/types.js';
 
 export async function compareMany(
   pairs: Array<{ envName: string; envPath: string; examplePath: string }>,
@@ -32,9 +18,24 @@ export async function compareMany(
     ignore: string[];
     ignoreRegex: RegExp[];
     collect?: (entry: CompareJsonEntry) => void;
+    only?: Category[];
   },
 ) {
   let exitWithError = false;
+
+  const onlySet: Set<Category> | undefined = opts.only?.length
+    ? new Set(opts.only)
+    : undefined;
+  const run = (cat: Category) => !onlySet || onlySet.has(cat);
+
+  const totals: Record<Category, number> = {
+    missing: 0,
+    extra: 0,
+    empty: 0,
+    mismatch: 0,
+    duplicate: 0,
+    gitignore: 0,
+  };
 
   for (const { envName, envPath, examplePath } of pairs) {
     const exampleName = path.basename(examplePath);
@@ -58,22 +59,30 @@ export async function compareMany(
     }
 
     // Git ignore hint (only when not JSON)
-    warnIfEnvNotIgnored({
-      cwd: opts.cwd,
-      envFile: envName,
-      log: (msg) => {
-        if (!opts.json) console.log(msg.replace(/^/gm, '  '));
-      },
-    });
+    let gitignoreUnsafe = false;
+    if (run('gitignore')) {
+      warnIfEnvNotIgnored({
+        cwd: opts.cwd,
+        envFile: envName,
+        log: (msg) => {
+          gitignoreUnsafe = true;
+          if (!opts.json) console.log(msg.replace(/^/gm, '  '));
+        },
+      });
+    } else {
+      // still call to keep previous hints? No—masked by --only.
+    }
 
-    // Duplicate detection
-    if (!opts.allowDuplicates) {
-      const dupsEnv = findDuplicateKeys(envPath).filter(
+    // Duplicate detection (skip entirely if --only excludes it)
+    let dupsEnv: Array<{ key: string; count: number }> = [];
+    let dupsEx: Array<{ key: string; count: number }> = [];
+    if (!opts.allowDuplicates && run('duplicate')) {
+      dupsEnv = findDuplicateKeys(envPath).filter(
         ({ key }) =>
           !opts.ignore.includes(key) &&
           !opts.ignoreRegex.some((rx) => rx.test(key)),
       );
-      const dupsEx = findDuplicateKeys(examplePath).filter(
+      dupsEx = findDuplicateKeys(examplePath).filter(
         ({ key }) =>
           !opts.ignore.includes(key) &&
           !opts.ignoreRegex.some((rx) => rx.test(key)),
@@ -137,11 +146,22 @@ export async function compareMany(
       .filter(([, v]) => (v ?? '').trim() === '')
       .map(([k]) => k);
 
+    const filtered = {
+      missing: run('missing') ? diff.missing : [],
+      extra: run('extra') ? diff.extra : [],
+      empty: run('empty') ? emptyKeys : [],
+      mismatches:
+        run('mismatch') && opts.checkValues ? diff.valueMismatches : [],
+      duplicatesEnv: run('duplicate') ? dupsEnv : [],
+      duplicatesEx: run('duplicate') ? dupsEx : [],
+      gitignoreUnsafe: run('gitignore') ? gitignoreUnsafe : false,
+    };
+
     const allOk =
-      diff.missing.length === 0 &&
-      diff.extra.length === 0 &&
-      emptyKeys.length === 0 &&
-      diff.valueMismatches.length === 0;
+      filtered.missing.length === 0 &&
+      filtered.extra.length === 0 &&
+      filtered.empty.length === 0 &&
+      filtered.mismatches.length === 0;
 
     if (allOk) {
       entry.ok = true;
@@ -153,34 +173,58 @@ export async function compareMany(
       continue;
     }
 
-    if (diff.missing.length) {
-      entry.missing = diff.missing;
+    if (filtered.missing.length) {
+      entry.missing = filtered.missing;
+      exitWithError = true;
+      totals.missing += filtered.missing.length;
+    }
+    if (filtered.extra.length) {
+      entry.extra = filtered.extra;
+      exitWithError = true;
+      totals.extra += filtered.extra.length;
+    }
+    if (filtered.empty.length) {
+      entry.empty = filtered.empty;
+      exitWithError = true;
+      totals.empty += filtered.empty.length;
+    }
+    if (filtered.mismatches.length) {
+      entry.valueMismatches = filtered.mismatches as any;
+      totals.mismatch += filtered.mismatches.length;
       exitWithError = true;
     }
-    if (diff.extra.length) entry.extra = diff.extra;
-    if (emptyKeys.length) entry.empty = emptyKeys;
-    if (opts.checkValues && diff.valueMismatches.length) {
-      entry.valueMismatches = diff.valueMismatches;
+    if (filtered.duplicatesEnv.length || filtered.duplicatesEx.length) {
+      totals.duplicate +=
+        filtered.duplicatesEnv.length + filtered.duplicatesEx.length;
+        exitWithError = true;
+    }
+    if (filtered.gitignoreUnsafe) {
+      totals.gitignore += 1;
+      exitWithError = true;
     }
 
     if (!opts.json) {
-      if (diff.missing.length) {
+      if (filtered.missing.length) {
         console.log(chalk.red('  ❌ Missing keys:'));
-        diff.missing.forEach((key) => console.log(chalk.red(`      - ${key}`)));
+        filtered.missing.forEach((key) =>
+          console.log(chalk.red(`      - ${key}`)),
+        );
       }
-      if (diff.extra.length) {
+      if (filtered.extra.length) {
         console.log(chalk.yellow('  ⚠️  Extra keys (not in example):'));
-        diff.extra.forEach((key) =>
+        filtered.extra.forEach((key) =>
           console.log(chalk.yellow(`      - ${key}`)),
         );
       }
-      if (emptyKeys.length) {
+      if (filtered.empty.length) {
         console.log(chalk.yellow('  ⚠️  Empty values:'));
-        emptyKeys.forEach((key) => console.log(chalk.yellow(`      - ${key}`)));
+        filtered.empty.forEach((key) =>
+          console.log(chalk.yellow(`      - ${key}`)),
+        );
       }
-      if (opts.checkValues && diff.valueMismatches.length) {
+      if (filtered.mismatches.length) {
         console.log(chalk.yellow('  ⚠️  Value mismatches:'));
-        diff.valueMismatches.forEach(({ key, expected, actual }) =>
+        filtered.mismatches.forEach(({ key, expected, actual }) =>
           console.log(
             chalk.yellow(
               `      - ${key}: expected '${expected}', but got '${actual}'`,
