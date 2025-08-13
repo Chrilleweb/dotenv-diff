@@ -14,9 +14,10 @@ export function createProgram() {
       'Do not warn about duplicate keys in .env* files',
     )
     .option('--ignore <keys>', 'Comma-separated list of keys to ignore')
+    .option('--ignore-regex <pattern>', 'Regex pattern to ignore matching keys')
+    .option('--json', 'Output results in JSON format')
     .option(
-      '--ignore-regex <pattern>',
-      'Regex pattern to ignore matching keys',
-    )
-    .option('--json', 'Output results in JSON format');
+      '--only <list>',
+      'Comma-separated categories to only run (missing,extra,empty,mismatch,duplicate,gitignore)',
+    );
 }

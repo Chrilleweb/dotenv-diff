@@ -7,7 +7,8 @@ import { normalizeOptions } from '../config/options.js';
 import { discoverEnvFiles } from '../services/envDiscovery.js';
 import { pairWithExample } from '../services/envPairing.js';
 import { ensureFilesOrPrompt } from '../commands/init.js';
-import { compareMany, type CompareJsonEntry } from '../commands/compare.js';
+import { compareMany } from '../commands/compare.js';
+import type { CompareJsonEntry } from '../config/types.js';
 
 export async function run(program: Command) {
   program.parse(process.argv);
@@ -52,6 +53,7 @@ export async function run(program: Command) {
         json: opts.json,
         ignore: opts.ignore,
         ignoreRegex: opts.ignoreRegex,
+        only: opts.only,
         collect: (e) => report.push(e),
       },
     );
@@ -94,6 +96,7 @@ export async function run(program: Command) {
     json: opts.json,
     ignore: opts.ignore,
     ignoreRegex: opts.ignoreRegex,
+    only: opts.only,
     collect: (e) => report.push(e),
   });
 

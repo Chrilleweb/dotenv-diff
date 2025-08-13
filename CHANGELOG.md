@@ -12,6 +12,10 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 - 
 
+## [1.6.5] - 2025-08-13
+### Added
+- `--only` flag to restrict output to specific categories (e.g., `missing`, `extra`, `empty`, `mismatches`, `duplicates`, `gitignore`).
+
 ## [1.6.4] - 2025-08-12
 ### Added
 - `--ignore` and `--ignore-regex` options to specify files or directories to ignore during comparison.

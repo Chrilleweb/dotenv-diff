@@ -277,4 +277,31 @@ describe('duplicate detection', () => {
     expect(res.stdout).not.toContain('Missing keys');
   });
 });
+
+describe('--only flag', () => {
+  it('fails on flag only missing', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nC=2\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\nC=\n');
+
+    const res = runCli(cwd, ['--only', 'missing']);
+
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain('Comparing .env ↔ .env.example');
+    expect(res.stdout).toContain('❌ Missing keys:');
+    expect(res.stdout).not.toContain('Extra keys');
+  });
+  it('fails on flag only extra', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nC=2\nD=3\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\nC=\n');
+
+    const res = runCli(cwd, ['--only', 'extra']);
+
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain('Comparing .env ↔ .env.example');
+    expect(res.stdout).not.toContain('❌ Missing keys:');
+    expect(res.stdout).toContain('⚠️  Extra keys (not in example):');
+  });
+});
 });
