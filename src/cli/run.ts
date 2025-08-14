@@ -9,11 +9,31 @@ import { pairWithExample } from '../services/envPairing.js';
 import { ensureFilesOrPrompt } from '../commands/init.js';
 import { compareMany } from '../commands/compare.js';
 import type { CompareJsonEntry } from '../config/types.js';
+import { scanUsage } from '../commands/scanUsage.js';
 
 export async function run(program: Command) {
   program.parse(process.argv);
   const raw = program.opts();
   const opts = normalizeOptions(raw);
+
+  if (opts.scanUsage) {
+    const envPath =
+      opts.envFlag || (fs.existsSync('.env') ? '.env' : undefined);
+
+    const { exitWithError } = await scanUsage({
+      cwd: opts.cwd,
+      include: opts.includeFiles,
+      exclude: opts.excludeFiles,
+      ignore: opts.ignore,
+      ignoreRegex: opts.ignoreRegex,
+      envPath,
+      json: opts.json,
+      showUnused: opts.showUnused,
+      showStats: opts.showStats,
+    });
+
+    process.exit(exitWithError ? 1 : 0);
+  }
 
   // Special-case: both flags → direct comparison of exactly those two files
   if (opts.envFlag && opts.exampleFlag) {
@@ -54,6 +74,7 @@ export async function run(program: Command) {
         ignore: opts.ignore,
         ignoreRegex: opts.ignoreRegex,
         only: opts.only,
+        showStats: opts.showStats,
         collect: (e) => report.push(e),
       },
     );
@@ -97,6 +118,7 @@ export async function run(program: Command) {
     ignore: opts.ignore,
     ignoreRegex: opts.ignoreRegex,
     only: opts.only,
+    showStats: opts.showStats,
     collect: (e) => report.push(e),
   });
 

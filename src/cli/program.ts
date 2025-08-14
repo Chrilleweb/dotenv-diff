@@ -19,5 +19,22 @@ export function createProgram() {
     .option(
       '--only <list>',
       'Comma-separated categories to only run (missing,extra,empty,mismatch,duplicate,gitignore)',
+    )
+    .option('--scan-usage', 'Scan codebase for environment variable usage')
+    .option(
+      '--include-files <patterns>',
+      '[requires --scan-usage] Comma-separated file patterns to include in scan (default: **/*.{js,ts,jsx,tsx,vue,svelte})',
+    )
+    .option(
+      '--exclude-files <patterns>',
+      '[requires --scan-usage] Comma-separated file patterns to exclude from scan',
+    )
+    .option(
+      '--show-unused',
+      '[requires --scan-usage] Show variables defined in .env but not used in code',
+    )
+    .option(
+      '--show-stats',
+      'Show statistics (in scan-usage mode: scan stats, in compare mode: env compare stats)',
     );
 }

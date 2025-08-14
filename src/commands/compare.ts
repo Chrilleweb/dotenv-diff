@@ -19,6 +19,7 @@ export async function compareMany(
     ignoreRegex: RegExp[];
     collect?: (entry: CompareJsonEntry) => void;
     only?: Category[];
+    showStats?: boolean;
   },
 ) {
   let exitWithError = false;
@@ -87,34 +88,35 @@ export async function compareMany(
           !opts.ignore.includes(key) &&
           !opts.ignoreRegex.some((rx) => rx.test(key)),
       );
-      if (dupsEnv.length || dupsEx.length) {
-        entry.duplicates = {};
+    }
+
+    if (dupsEnv.length || dupsEx.length) {
+      entry.duplicates = {};
+    }
+    if (dupsEnv.length) {
+      entry.duplicates!.env = dupsEnv;
+      if (!opts.json) {
+        console.log(
+          chalk.yellow(
+            `  ⚠️  Duplicate keys in ${envName} (last occurrence wins):`,
+          ),
+        );
+        dupsEnv.forEach(({ key, count }) =>
+          console.log(chalk.yellow(`      - ${key} (${count} occurrences)`)),
+        );
       }
-      if (dupsEnv.length) {
-        entry.duplicates!.env = dupsEnv;
-        if (!opts.json) {
-          console.log(
-            chalk.yellow(
-              `  ⚠️  Duplicate keys in ${envName} (last occurrence wins):`,
-            ),
-          );
-          dupsEnv.forEach(({ key, count }) =>
-            console.log(chalk.yellow(`      - ${key} (${count} occurrences)`)),
-          );
-        }
-      }
-      if (dupsEx.length) {
-        entry.duplicates!.example = dupsEx;
-        if (!opts.json) {
-          console.log(
-            chalk.yellow(
-              `  ⚠️  Duplicate keys in ${exampleName} (last occurrence wins):`,
-            ),
-          );
-          dupsEx.forEach(({ key, count }) =>
-            console.log(chalk.yellow(`      - ${key} (${count} occurrences)`)),
-          );
-        }
+    }
+    if (dupsEx.length) {
+      entry.duplicates!.example = dupsEx;
+      if (!opts.json) {
+        console.log(
+          chalk.yellow(
+            `  ⚠️  Duplicate keys in ${exampleName} (last occurrence wins):`,
+          ),
+        );
+        dupsEx.forEach(({ key, count }) =>
+          console.log(chalk.yellow(`      - ${key} (${count} occurrences)`)),
+        );
       }
     }
 
@@ -171,6 +173,42 @@ export async function compareMany(
       }
       opts.collect?.(entry);
       continue;
+    }
+
+    // --- Stats block for compare mode when --show-stats is active ---
+    if (opts.showStats && !opts.json) {
+      const envCount = currentKeys.length;
+      const exampleCount = exampleKeys.length;
+      const sharedCount = new Set(
+        currentKeys.filter((k) => exampleKeys.includes(k)),
+      ).size;
+
+      // Duplicate "occurrences beyond the first", summed across both files
+      const duplicateCount = [...dupsEnv, ...dupsEx].reduce(
+        (acc, { count }) => acc + Math.max(0, count - 1),
+        0,
+      );
+
+      const valueMismatchCount = opts.checkValues
+        ? filtered.mismatches.length
+        : 0;
+
+      console.log(chalk.bold('  📊 Compare Statistics:'));
+      console.log(chalk.gray(`     Keys in ${envName}: ${envCount}`));
+      console.log(chalk.gray(`     Keys in ${exampleName}: ${exampleCount}`));
+      console.log(chalk.gray(`     Shared keys: ${sharedCount}`));
+      console.log(
+        chalk.gray(`     Missing (in ${envName}): ${filtered.missing.length}`),
+      );
+      console.log(
+        chalk.gray(
+          `     Extra (not in ${exampleName}): ${filtered.extra.length}`,
+        ),
+      );
+      console.log(chalk.gray(`     Empty values: ${filtered.empty.length}`));
+      console.log(chalk.gray(`     Duplicate keys: ${duplicateCount}`));
+      console.log(chalk.gray(`     Value mismatches: ${valueMismatchCount}`));
+      console.log();
     }
 
     if (filtered.missing.length) {
