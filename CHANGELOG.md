@@ -16,7 +16,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Added
 - `--scan-usage` option to scan codebase for environment variable usage.
 - `--include-files` and `--exclude-files` options to specify which files to include or exclude from the scan.
--- `--show-unused` option to display variables defined in `.env` but not used in code.
+- `--show-unused` option to display variables defined in `.env` but not used in code.
 - `--show-stats` option to display scan statistics.
 
 ### Changed
