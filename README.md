@@ -42,6 +42,27 @@ dotenv-diff --scan-usage
 ``` 
 This scans your entire codebase to detect which environment variables are actually used in the code — and compare them against your `.env` file(s).
 
+## CI/CD integration with `--ci` option
+You can scan and compare against specific environment file, eg. `.env.example`
+This is useful for CI/CD pipelines to ensure that the environment variables used in your code match those defined in your `.env.example` file.
+
+Use the `--ci` flag for automated environments. This enables strict mode where the tool exits with code 1 on any issues, making it perfect for CI/CD pipelines.
+
+And the `--example` option allows you to specify which `.env.example` file to compare against.
+
+### Use it in Github Actions:
+
+```yaml
+- name: Check environment variables
+  run: dotenv-diff --scan-usage --example .env.example --ci
+```
+
+You can also change the comparison file by using the `--example` flag to point to a different `.env.example` file. 
+
+```bash
+dotenv-diff --scan-usage --example .env.example.staging --ci
+```
+
 ## Show unused variables
 
 Use `--show-unused` together with `--scan-usage` to list variables that are defined in `.env` but never used in your codebase:

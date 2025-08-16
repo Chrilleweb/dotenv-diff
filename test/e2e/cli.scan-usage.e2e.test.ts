@@ -87,7 +87,7 @@ const missing = process.env.MISSING_VAR;`
     const res = runCli(cwd, ['--scan-usage', '--show-unused']);
     
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('⚠️  Unused in codebase:');
+    expect(res.stdout).toContain('⚠️  Unused in codebase (defined in .env):');
     expect(res.stdout).toContain('UNUSED_VAR');
   });
 
@@ -306,5 +306,23 @@ describe('scan-usage error handling', () => {
     
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('API_KEY');
+  });
+
+  describe('with --ci mode', () => {
+    it('does not create any files', () => {
+      const cwd = tmpDir();
+      
+      fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=secret\n');
+      fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+      fs.writeFileSync(
+        path.join(cwd, 'src/app.js'),
+        'const api = process.env.API_KEY;'
+      );
+      
+      const res = runCli(cwd, ['--scan-usage', '--ci']);
+      
+      expect(res.status).toBe(0);
+      expect(fs.existsSync(path.join(cwd, 'scan-results.json'))).toBe(false);
+    });
   });
 });
