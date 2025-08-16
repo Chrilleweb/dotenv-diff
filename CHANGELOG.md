@@ -12,6 +12,11 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 - 
 
+## [2.1.2] - 2025-08-16
+
+### Changed
+- Updated README with Turborepo usage example.
+
 ## [2.1.1] - 2025-08-16
 ### Added
 - `--files` option to **completely override** the default file patterns.  

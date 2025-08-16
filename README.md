@@ -63,6 +63,26 @@ You can also change the comparison file by using the `--example` flag to point t
 dotenv-diff --scan-usage --example .env.example.staging --ci
 ```
 
+## Use it in a Turborepo Monorepo
+
+In a monorepo setup (e.g. with Turborepo), you often have multiple apps under apps/ and shared packages under packages/.
+You can run dotenv-diff from one app and still include files from sibling apps or packages.
+
+For example, if you want to scan from the apps/app1 folder and also include code in packages/auth, you can do:
+
+```json
+{
+  "scripts": {
+    "dotenv-diff": "dotenv-diff --scan-usage --example .env.example --include-files '../../packages/**/*' --ignore VITE_MODE"
+  }
+}
+```
+
+This will:
+- Compare the variables used in your `apps/app1` code against `apps/app1/.env.example`.
+- Also scan files in `../../packages`(like `packages/components/src/..`)
+- Ignore variables like VITE_MODE that you only use in special cases.
+
 ## Show unused variables
 
 Use `--show-unused` together with `--scan-usage` to list variables that are defined in `.env` but never used in your codebase:
@@ -158,12 +178,11 @@ Or provide just an example file and let the tool locate the appropriate `.env`:
 dotenv-diff --example .env.example.production
 ```
 
-## CI usage
+## Automatically create missing files
 
 Run non-interactively in CI environments with:
 
 ```bash
-dotenv-diff --ci     # never create files, exit 1 if required files are missing
 dotenv-diff --yes    # auto-create missing files without prompts
 ```
 
