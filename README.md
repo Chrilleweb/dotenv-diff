@@ -80,13 +80,22 @@ This will display statistics about the scan, such as the number of files scanned
 
 ## include or exclude specific files for scanning
 
-You can specify which files to include or exclude from the scan using the `--include-files` and `--exclude-files` options:
+You can specify which files to include or exclude from the scan using the `--include` and `--exclude` options:
 
 ```bash
-dotenv-diff --scan-usage --include-files '**/*.js,**/*.ts' --exclude-files '**/*.spec.ts'
+dotenv-diff --scan-usage --include '**/*.js,**/*.ts' --exclude '**/*.spec.ts'
 ```
 
-This allows you to focus the scan on specific file types or directories, making it more efficient and tailored to your project structure.
+By default, the scanner looks at JavaScript, TypeScript, Vue, and Svelte files.
+The --include and --exclude options let you refine this list to focus on specific file types or directories.
+
+### Override with `--files`
+
+If you want to completely override the default include/exclude logic (for example, to also include test files), you can use --files:
+```bash
+dotenv-diff --scan-usage --files '**/*.js'
+```
+This will only scan the files matching the given patterns, even if they would normally be excluded.
 
 ## Optional: Check values too
 

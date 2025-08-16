@@ -11,6 +11,9 @@ import {
 } from '../services/codeBaseScanner.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 
+const resolveFromCwd = (cwd: string, p: string) =>
+  path.isAbsolute(p) ? p : path.resolve(cwd, p);
+
 export interface ScanUsageOptions extends ScanOptions {
   envPath?: string;
   examplePath?: string;
@@ -18,6 +21,7 @@ export interface ScanUsageOptions extends ScanOptions {
   showUnused: boolean;
   showStats: boolean;
   isCiMode?: boolean;
+  files?: string[];
 }
 
 export interface ScanJsonEntry {
@@ -77,6 +81,24 @@ export async function scanUsage(
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
+  // If user explicitly passed --example but the file doesn't exist:
+  if (opts.examplePath) {
+    const exampleAbs = resolveFromCwd(opts.cwd, opts.examplePath);
+    const missing = !fs.existsSync(exampleAbs);
+
+    if (missing) {
+      const msg = `❌ Missing specified example file: ${opts.examplePath}`;
+      if (opts.isCiMode) {
+        // IMPORTANT: stdout (console.log), not stderr, to satisfy the test
+        console.log(chalk.red(msg));
+        return { exitWithError: true };
+      } else if (!opts.json) {
+        console.log(chalk.yellow(msg.replace('❌', '⚠️')));
+      }
+      // Non-CI: continue without comparison
+    }
+  }
+
   // Determine which file to compare against
   const compareFile = determineComparisonFile(opts);
   let envVariables: Record<string, string | undefined> = {};
@@ -98,7 +120,7 @@ export async function scanUsage(
 
       if (opts.isCiMode) {
         // In CI mode, exit with error if file doesn't exist
-        console.error(chalk.red(`❌ ${errorMessage}`));
+        console.log(chalk.red(`❌ ${errorMessage}`));
         return { exitWithError: true };
       }
 
@@ -131,17 +153,22 @@ function determineComparisonFile(
   opts: ScanUsageOptions,
 ): { path: string; name: string } | null {
   // Priority: explicit flags first, then auto-discovery
-  if (opts.examplePath && fs.existsSync(opts.examplePath)) {
-    return { path: opts.examplePath, name: path.basename(opts.examplePath) };
+  if (opts.examplePath) {
+    const p = resolveFromCwd(opts.cwd, opts.examplePath);
+    if (fs.existsSync(p)) {
+      return { path: p, name: path.basename(opts.examplePath) };
+    }
   }
 
-  if (opts.envPath && fs.existsSync(opts.envPath)) {
-    return { path: opts.envPath, name: path.basename(opts.envPath) };
+  if (opts.envPath) {
+    const p = resolveFromCwd(opts.cwd, opts.envPath);
+    if (fs.existsSync(p)) {
+      return { path: p, name: path.basename(opts.envPath) };
+    }
   }
 
-  // Auto-discovery: look for common env files
+  // Auto-discovery: look for common env files relative to cwd
   const candidates = ['.env', '.env.example', '.env.local', '.env.production'];
-
   for (const candidate of candidates) {
     const fullPath = path.resolve(opts.cwd, candidate);
     if (fs.existsSync(fullPath)) {

@@ -26,6 +26,7 @@ export type Options = {
   excludeFiles: string[];
   showUnused: boolean;
   showStats: boolean;
+  files?: string[];
 };
 
 export type RawOptions = {
@@ -44,6 +45,7 @@ export type RawOptions = {
   excludeFiles?: string | string[];
   showUnused?: boolean;
   showStats?: boolean;
+  files?: string | string[];
 };
 
 export type CompareJsonEntry = {

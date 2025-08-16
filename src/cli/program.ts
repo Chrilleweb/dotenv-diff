@@ -23,7 +23,11 @@ export function createProgram() {
     .option('--scan-usage', 'Scan codebase for environment variable usage')
     .option(
       '--include-files <patterns>',
-      '[requires --scan-usage] Comma-separated file patterns to include in scan (default: **/*.{js,ts,jsx,tsx,vue,svelte})',
+      '[requires --scan-usage] Comma-separated file patterns to ADD to default scan patterns (extends default)',
+    )
+    .option(
+      '--files <patterns>',
+      '[requires --scan-usage] Comma-separated file patterns to scan (completely replaces default patterns)',
     )
     .option(
       '--exclude-files <patterns>',
