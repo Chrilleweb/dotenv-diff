@@ -12,6 +12,13 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 - 
 
+## [2.1.0] - 2025-08-15
+### Added
+- `--ci` option for non-interactive mode in CI environments.
+
+### Changed
+- No breaking changes. Existing functionality remains intact.
+
 ## [2.0.0] - 2025-08-14
 ### Added
 - `--scan-usage` option to scan codebase for environment variable usage.

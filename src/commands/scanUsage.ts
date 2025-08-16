@@ -1,4 +1,6 @@
 import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
 import { parseEnvFile } from '../lib/parseEnv.js';
 import {
   scanCodebase,
@@ -11,9 +13,11 @@ import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 
 export interface ScanUsageOptions extends ScanOptions {
   envPath?: string;
+  examplePath?: string;
   json: boolean;
   showUnused: boolean;
   showStats: boolean;
+  isCiMode?: boolean;
 }
 
 export interface ScanJsonEntry {
@@ -39,6 +43,9 @@ export interface ScanJsonEntry {
     pattern: string;
     context: string;
   }>;
+  // Add comparison info
+  comparedAgainst?: string;
+  totalEnvVariables?: number;
 }
 
 // Type for grouped usages by variable
@@ -50,9 +57,11 @@ interface VariableUsages {
  * Scans codebase for environment variable usage and compares with .env file
  * @param {ScanUsageOptions} opts - Scan configuration options
  * @param {string} [opts.envPath] - Path to .env file for comparison
+ * @param {string} [opts.examplePath] - Path to .env.example file for comparison
  * @param {boolean} opts.json - Output as JSON instead of console
  * @param {boolean} opts.showUnused - Show unused variables from .env
  * @param {boolean} opts.showStats - Show detailed statistics
+ * @param {boolean} [opts.isCiMode] - Run in CI mode (exit with error code)
  * @returns {Promise<{exitWithError: boolean}>} Returns true if missing variables found
  */
 export async function scanUsage(
@@ -68,11 +77,14 @@ export async function scanUsage(
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
-  // If we have an env file, compare with it
+  // Determine which file to compare against
+  const compareFile = determineComparisonFile(opts);
   let envVariables: Record<string, string | undefined> = {};
-  if (opts.envPath) {
+  let comparedAgainst = '';
+
+  if (compareFile) {
     try {
-      const envFull = parseEnvFile(opts.envPath);
+      const envFull = parseEnvFile(compareFile.path);
       const envKeys = filterIgnoredKeys(
         Object.keys(envFull),
         opts.ignore,
@@ -80,31 +92,71 @@ export async function scanUsage(
       );
       envVariables = Object.fromEntries(envKeys.map((k) => [k, envFull[k]]));
       scanResult = compareWithEnvFiles(scanResult, envVariables);
+      comparedAgainst = compareFile.name;
     } catch (error) {
+      const errorMessage = `⚠️  Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
+
+      if (opts.isCiMode) {
+        // In CI mode, exit with error if file doesn't exist
+        console.error(chalk.red(`❌ ${errorMessage}`));
+        return { exitWithError: true };
+      }
+
       if (!opts.json) {
-        console.log(
-          chalk.yellow(
-            `⚠️  Could not read env file: ${opts.envPath} - ${error}`,
-          ),
-        );
+        console.log(chalk.yellow(errorMessage));
       }
     }
   }
 
   // Prepare JSON output
   if (opts.json) {
-    const jsonOutput = createJsonOutput(scanResult, opts);
+    const jsonOutput = createJsonOutput(
+      scanResult,
+      opts,
+      comparedAgainst,
+      Object.keys(envVariables).length,
+    );
     console.log(JSON.stringify(jsonOutput, null, 2));
     return { exitWithError: scanResult.missing.length > 0 };
   }
 
   // Console output
-  return outputToConsole(scanResult, opts);
+  return outputToConsole(scanResult, opts, comparedAgainst);
+}
+
+/**
+ * Determines which file to use for comparison based on provided options
+ */
+function determineComparisonFile(
+  opts: ScanUsageOptions,
+): { path: string; name: string } | null {
+  // Priority: explicit flags first, then auto-discovery
+  if (opts.examplePath && fs.existsSync(opts.examplePath)) {
+    return { path: opts.examplePath, name: path.basename(opts.examplePath) };
+  }
+
+  if (opts.envPath && fs.existsSync(opts.envPath)) {
+    return { path: opts.envPath, name: path.basename(opts.envPath) };
+  }
+
+  // Auto-discovery: look for common env files
+  const candidates = ['.env', '.env.example', '.env.local', '.env.production'];
+
+  for (const candidate of candidates) {
+    const fullPath = path.resolve(opts.cwd, candidate);
+    if (fs.existsSync(fullPath)) {
+      return { path: fullPath, name: candidate };
+    }
+  }
+
+  return null;
 }
 
 function createJsonOutput(
   scanResult: ScanResult,
   opts: ScanUsageOptions,
+  comparedAgainst: string,
+  totalEnvVariables: number,
 ): ScanJsonEntry {
   // Group usages by variable for missing variables
   const missingGrouped = scanResult.missing.map((variable: string) => ({
@@ -125,6 +177,12 @@ function createJsonOutput(
     unused: scanResult.unused,
   };
 
+  // Add comparison info if we compared against a file
+  if (comparedAgainst) {
+    output.comparedAgainst = comparedAgainst;
+    output.totalEnvVariables = totalEnvVariables;
+  }
+
   // Optionally include all usages
   if (opts.showStats) {
     output.allUsages = scanResult.used.map((u: EnvUsage) => ({
@@ -142,8 +200,17 @@ function createJsonOutput(
 function outputToConsole(
   scanResult: ScanResult,
   opts: ScanUsageOptions,
+  comparedAgainst: string,
 ): { exitWithError: boolean } {
   let exitWithError = false;
+
+  // Show what we're comparing against
+  if (comparedAgainst) {
+    console.log(
+      chalk.gray(`📋 Comparing codebase usage against: ${comparedAgainst}`),
+    );
+    console.log();
+  }
 
   // Show stats if requested
   if (opts.showStats) {
@@ -160,8 +227,8 @@ function outputToConsole(
     console.log();
   }
 
-  // Always show found variables when not in .env comparison mode
-  if (!opts.envPath || scanResult.missing.length === 0) {
+  // Always show found variables when not comparing or when no missing variables
+  if (!comparedAgainst || scanResult.missing.length === 0) {
     console.log(
       chalk.green(
         `✅ Found ${scanResult.stats.uniqueVariables} unique environment variables in use`,
@@ -209,10 +276,11 @@ function outputToConsole(
     }
   }
 
-  // Missing variables (used in code but not in .env)
+  // Missing variables (used in code but not in env file)
   if (scanResult.missing.length > 0) {
     exitWithError = true;
-    console.log(chalk.red('❌ Missing in .env:'));
+    const fileType = comparedAgainst || 'environment file';
+    console.log(chalk.red(`❌ Missing in ${fileType}:`));
 
     const grouped = scanResult.missing.reduce(
       (acc: VariableUsages, variable: string) => {
@@ -245,26 +313,47 @@ function outputToConsole(
       }
     }
     console.log();
+
+    // CI mode specific message
+    if (opts.isCiMode) {
+      console.log(
+        chalk.red(
+          `💥 Found ${scanResult.missing.length} missing environment variable(s).`,
+        ),
+      );
+      console.log(
+        chalk.red(
+          `   Add these variables to ${comparedAgainst || 'your environment file'} to fix this error.`,
+        ),
+      );
+      console.log();
+    }
   }
 
-  // Unused variables (in .env but not used in code)
+  // Unused variables (in env file but not used in code)
   if (opts.showUnused && scanResult.unused.length > 0) {
-    console.log(chalk.yellow('⚠️  Unused in codebase:'));
+    const fileType = comparedAgainst || 'environment file';
+    console.log(
+      chalk.yellow(`⚠️  Unused in codebase (defined in ${fileType}):`),
+    );
     scanResult.unused.forEach((variable: string) => {
       console.log(chalk.yellow(`   - ${variable}`));
     });
     console.log();
   }
 
-  // Success message for .env comparison
-  if (opts.envPath && scanResult.missing.length === 0) {
+  // Success message for env file comparison
+  if (comparedAgainst && scanResult.missing.length === 0) {
     console.log(
-      chalk.green('✅ All used environment variables are defined in .env'),
+      chalk.green(
+        `✅ All used environment variables are defined in ${comparedAgainst}`,
+      ),
     );
 
     if (opts.showUnused && scanResult.unused.length === 0) {
       console.log(chalk.green('✅ No unused environment variables found'));
     }
+    console.log();
   }
 
   return { exitWithError };

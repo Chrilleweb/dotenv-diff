@@ -26,10 +26,12 @@ export async function run(program: Command) {
       exclude: opts.excludeFiles,
       ignore: opts.ignore,
       ignoreRegex: opts.ignoreRegex,
+      examplePath: opts.exampleFlag || undefined,
       envPath,
       json: opts.json,
       showUnused: opts.showUnused,
       showStats: opts.showStats,
+      isCiMode: opts.isCiMode,
     });
 
     process.exit(exitWithError ? 1 : 0);
