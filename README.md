@@ -4,6 +4,8 @@ Easily compare your .env, .env.example, and other environment files (like .env.l
 
 Or scan your codebase to find out which environment variables are actually used in your code, and which ones are not.
 
+Optimized for JavaScript/TypeScript projects and frontend frameworks including Node.js, Next.js, Vite, SvelteKit, Nuxt, Vue, and Deno. Can also be used with other project types for basic .env file comparison.
+
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 

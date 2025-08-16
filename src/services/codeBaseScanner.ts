@@ -96,6 +96,11 @@ const DEFAULT_EXCLUDE_PATTERNS = [
   '__mocks__',
 ];
 
+/**
+ * Scans the codebase for environment variable usage based on the provided options.
+ * @param opts - Options for scanning the codebase.
+ * @returns A promise that resolves to the scan result containing used, missing, and unused variables.
+ */
 export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const files = await findFiles(opts.cwd, {
     include: opts.include,
@@ -138,6 +143,13 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   };
 }
 
+/**
+ * Recursively finds all files in the given directory matching the include patterns,
+ * while excluding files and directories that match the exclude patterns.
+ * @param rootDir The root directory to start searching from.
+ * @param opts Options for include and exclude patterns.
+ * @returns A promise that resolves to an array of file paths.
+ */
 async function findFiles(
   rootDir: string,
   opts: { include: string[]; exclude: string[] },
@@ -177,6 +189,13 @@ async function findFiles(
   return files;
 }
 
+/**
+ * Check if a file should be included based on its name, path, and include patterns.
+ * @param fileName The name of the file.
+ * @param relativePath The relative path of the file.
+ * @param patterns The include patterns to match against.
+ * @returns True if the file should be included, false otherwise.
+ */
 function shouldInclude(
   fileName: string,
   relativePath: string,

@@ -46,6 +46,15 @@ interface VariableUsages {
   [variable: string]: EnvUsage[];
 }
 
+/**
+ * Scans codebase for environment variable usage and compares with .env file
+ * @param {ScanUsageOptions} opts - Scan configuration options
+ * @param {string} [opts.envPath] - Path to .env file for comparison
+ * @param {boolean} opts.json - Output as JSON instead of console
+ * @param {boolean} opts.showUnused - Show unused variables from .env
+ * @param {boolean} opts.showStats - Show detailed statistics
+ * @returns {Promise<{exitWithError: boolean}>} Returns true if missing variables found
+ */
 export async function scanUsage(
   opts: ScanUsageOptions,
 ): Promise<{ exitWithError: boolean }> {
