@@ -4,13 +4,23 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ## [Unreleased]
 ### Added
-- `--ignore` and `--ignore-regex` flags to exclude keys from diff.
+- 
 
 ### Changed
 - 
 
 ### Fixed
 - 
+
+## [2.0.0] - 2025-08-14
+### Added
+- `--scan-usage` option to scan codebase for environment variable usage.
+- `--include-files` and `--exclude-files` options to specify which files to include or exclude from the scan.
+- `--show-unused` option to display variables defined in `.env` but not used in code.
+- `--show-stats` option to display scan statistics.
+
+### Changed
+- No breaking changes. Existing functionality remains intact.
 
 ## [1.6.5] - 2025-08-13
 ### Added

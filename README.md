@@ -2,6 +2,10 @@
 
 Easily compare your .env, .env.example, and other environment files (like .env.local, .env.production) to detect missing, extra, empty, or mismatched variables — and ensure they’re properly ignored by Git.
 
+Or scan your codebase to find out which environment variables are actually used in your code, and which ones are not.
+
+Optimized for JavaScript/TypeScript projects and frontend frameworks including Node.js, Next.js, Vite, SvelteKit, Nuxt, Vue, and Deno. Can also be used with other project types for basic .env file comparison.
+
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 
@@ -30,6 +34,38 @@ dotenv-diff will automatically compare all matching .env* files in your project 
 - `.env.local`
 - `.env.production`
 - Any other .env.* file
+
+## Scan your codebase for environment variable usage
+
+```bash
+dotenv-diff --scan-usage
+``` 
+This scans your entire codebase to detect which environment variables are actually used in the code — and compare them against your `.env` file(s).
+
+## Show unused variables
+
+Use `--show-unused` together with `--scan-usage` to list variables that are defined in `.env` but never used in your codebase:
+```bash
+dotenv-diff --scan-usage --show-unused
+```
+This will show you which variables are defined in your `.env` file but not used in your codebase. This helps you clean up unnecessary environment variables.
+
+## Show scan statistics
+
+```bash
+dotenv-diff --show-stats
+```
+This will display statistics about the scan, such as the number of files scanned, variables found, and any unused variables. It provides a quick overview of your environment variable usage.
+
+## include or exclude specific files for scanning
+
+You can specify which files to include or exclude from the scan using the `--include-files` and `--exclude-files` options:
+
+```bash
+dotenv-diff --scan-usage --include-files '**/*.js,**/*.ts' --exclude-files '**/*.spec.ts'
+```
+
+This allows you to focus the scan on specific file types or directories, making it more efficient and tailored to your project structure.
 
 ## Optional: Check values too
 

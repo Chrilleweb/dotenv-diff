@@ -32,6 +32,11 @@ export function normalizeOptions(raw: RawOptions): Options {
   const json = Boolean(raw.json);
   const onlyParsed = parseCategories(raw.only, '--only');
   const only = onlyParsed.length ? onlyParsed : undefined;
+  const scanUsage = Boolean(raw.scanUsage);
+  const includeFiles = parseList(raw.includeFiles);
+  const excludeFiles = parseList(raw.excludeFiles);
+  const showUnused = Boolean(raw.showUnused);
+  const showStats = Boolean(raw.showStats);
 
   const ignore = parseList(raw.ignore);
   const ignoreRegex: RegExp[] = [];
@@ -71,5 +76,10 @@ export function normalizeOptions(raw: RawOptions): Options {
     ignoreRegex,
     cwd,
     only,
+    scanUsage,
+    includeFiles,
+    excludeFiles,
+    showUnused,
+    showStats,
   };
 }
