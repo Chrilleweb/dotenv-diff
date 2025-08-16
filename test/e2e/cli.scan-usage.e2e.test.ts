@@ -213,7 +213,8 @@ const missing = process.env.MISSING_VAR;`
     expect(result.unused).toContain('UNUSED');
   });
 
-  it('works with custom file patterns', () => {
+  // UPDATED: Test for --include-files (adds to default patterns)
+  it('adds additional file patterns with --include-files', () => {
     const cwd = tmpDir();
     
     // Create files with different extensions
@@ -227,12 +228,65 @@ const missing = process.env.MISSING_VAR;`
       'api_key = os.environ.get("PYTHON_VAR")'
     );
     
-    // Only scan .js files
-    const res = runCli(cwd, ['--scan-usage', '--include-files', '**/*.js']);
+    // Include .py files in addition to default patterns
+    const res = runCli(cwd, ['--scan-usage', '--include-files', '**/*.py']);
     
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('API_KEY');
-    expect(res.stdout).not.toContain('PYTHON_VAR'); // Python file should be ignored
+    expect(res.stdout).toContain('API_KEY'); // From default .js scanning
+    // Note: PYTHON_VAR won't be found because our regex patterns don't match Python syntax
+    // But the .py file would be included in scanning
+  });
+
+  // Test for --files (replaces default patterns)
+  it('replaces default file patterns with --files', () => {
+    const cwd = tmpDir();
+    
+    // Create files with different extensions
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src/app.js'),
+      'const api = process.env.API_KEY;'
+    );
+    fs.writeFileSync(
+      path.join(cwd, 'src/config.ts'),
+      'const db = process.env.DATABASE_URL;'
+    );
+    
+    // Only scan .ts files (ignore .js)
+    const res = runCli(cwd, ['--scan-usage', '--files', '**/*.ts']);
+    
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('DATABASE_URL'); // From .ts file
+    expect(res.stdout).not.toContain('API_KEY'); // From .js file (ignored)
+  });
+
+  // Test showing the difference between --include-files and --files
+  it('demonstrates difference between --include-files and --files', () => {
+    const cwd = tmpDir();
+    
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src/app.js'),
+      'const api = process.env.API_KEY;'
+    );
+    fs.writeFileSync(
+      path.join(cwd, 'src/config.ts'),
+      'const db = process.env.DATABASE_URL;'
+    );
+    
+    // Test --include-files (should find both)
+    const includeRes = runCli(cwd, ['--scan-usage', '--include-files', '**/*.ts']);
+    expect(includeRes.status).toBe(0);
+    expect(includeRes.stdout).toContain('Found 2 unique environment variables in use');
+    expect(includeRes.stdout).toContain('API_KEY');
+    expect(includeRes.stdout).toContain('DATABASE_URL');
+    
+    // Test --files (should only find .ts)
+    const filesRes = runCli(cwd, ['--scan-usage', '--files', '**/*.ts']);
+    expect(filesRes.status).toBe(0);
+    expect(filesRes.stdout).toContain('Found 1 unique environment variables in use');
+    expect(filesRes.stdout).not.toContain('API_KEY');
+    expect(filesRes.stdout).toContain('DATABASE_URL');
   });
 
   it('excludes test files by default', () => {
@@ -255,6 +309,28 @@ const missing = process.env.MISSING_VAR;`
     expect(res.stdout).not.toContain('TEST_VAR');
   });
 
+  // Test that --files can override test file exclusion
+  it('can include test files with --files flag', () => {
+    const cwd = tmpDir();
+    
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src/app.js'),
+      'const api = process.env.API_KEY;'
+    );
+    fs.writeFileSync(
+      path.join(cwd, 'src/app.test.js'),
+      'const test = process.env.TEST_VAR;'
+    );
+    
+    // Use --files to explicitly include test files
+    const res = runCli(cwd, ['--scan-usage', '--files', '**/*.js']);
+    
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('API_KEY');
+    expect(res.stdout).toContain('TEST_VAR'); // Should now be found
+  });
+
   it('handles files with no environment variables', () => {
     const cwd = tmpDir();
     
@@ -269,6 +345,44 @@ export { add };`
     
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Found 0 unique environment variables in use');
+  });
+
+  // Test monorepo scenario with --include-files
+  it('works in monorepo scenario with --include-files', () => {
+    const cwd = tmpDir();
+    
+    // Create monorepo structure
+    fs.mkdirSync(path.join(cwd, 'apps/finance/src'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, 'packages/auth/src'), { recursive: true });
+    
+    // App file
+    fs.writeFileSync(
+      path.join(cwd, 'apps/finance/src/app.js'),
+      'const appVar = process.env.FINANCE_APP_VAR;'
+    );
+    
+    // Package file  
+    fs.writeFileSync(
+      path.join(cwd, 'packages/auth/src/auth.js'),
+      'const authVar = process.env.AUTH_PACKAGE_VAR;'
+    );
+    
+    // Create .env.example in finance app
+    fs.writeFileSync(
+      path.join(cwd, 'apps/finance/.env.example'), 
+      'FINANCE_APP_VAR=\nAUTH_PACKAGE_VAR=\n'
+    );
+    
+    // From finance app, scan both app and packages
+    const res = runCli(path.join(cwd, 'apps/finance'), [
+      '--scan-usage', 
+      '--example', '.env.example',
+      '--include-files', '../../packages/**/*.{js,ts,svelte}'
+    ]);
+    
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('FINANCE_APP_VAR');
+    expect(res.stdout).toContain('AUTH_PACKAGE_VAR');
   });
 });
 
@@ -323,6 +437,21 @@ describe('scan-usage error handling', () => {
       
       expect(res.status).toBe(0);
       expect(fs.existsSync(path.join(cwd, 'scan-results.json'))).toBe(false);
+    });
+
+    it('fails when missing .env.example file', () => {
+      const cwd = tmpDir();
+      
+      fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+      fs.writeFileSync(
+        path.join(cwd, 'src/app.js'),
+        'const api = process.env.API_KEY;'
+      );
+      
+      const res = runCli(cwd, ['--scan-usage', '--example', '.env.example', '--ci']);
+      
+      expect(res.status).toBe(1);
+      expect(res.stdout).toContain('.env.example');
     });
   });
 });

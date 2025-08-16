@@ -12,6 +12,15 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 - 
 
+## [2.1.1] - 2025-08-16
+### Added
+- `--files` option to **completely override** the default file patterns.  
+  Useful for including files that are normally excluded (e.g. `*.test.js`).
+
+### Changed
+- Clarified behavior of `--include-files`: now explicitly extends the default patterns instead of replacing them.  
+- Updated README with usage examples for `--files`, `--include-files`, and `--exclude-files`.
+
 ## [2.1.0] - 2025-08-15
 ### Added
 - `--ci` option for non-interactive mode in CI environments.

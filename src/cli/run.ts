@@ -32,6 +32,7 @@ export async function run(program: Command) {
       showUnused: opts.showUnused,
       showStats: opts.showStats,
       isCiMode: opts.isCiMode,
+      files: opts.files,
     });
 
     process.exit(exitWithError ? 1 : 0);
