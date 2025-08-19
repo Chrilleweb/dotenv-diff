@@ -84,6 +84,8 @@ const DEFAULT_INCLUDE_EXTENSIONS = [
 
 const DEFAULT_EXCLUDE_PATTERNS = [
   'node_modules',
+  '.sveltekit',
+  '_actions',
   'dist',
   'build',
   '.next',

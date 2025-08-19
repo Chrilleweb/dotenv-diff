@@ -10,10 +10,19 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 - 
 
 ### Fixed
-- 
+-
+
+## [2.1.3] - 2025-08-19
+### Added
+- Added `.sveltekit` and `_actions` to default exclude patterns in codebase scanner.
+
+### Changed
+- No breaking changes. Existing functionality remains intact.
+
+### Fixed
+- Fixed issue where `--include-files` and `--exclude-files` were not properly documented in README.
 
 ## [2.1.2] - 2025-08-16
-
 ### Changed
 - Updated README with Turborepo usage example.
 
