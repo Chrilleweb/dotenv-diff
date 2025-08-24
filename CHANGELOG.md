@@ -12,6 +12,15 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.1.4] - 2025-08-19
+### Added
+- the `--fix` flag to automatically fix common issues:
+  - Remove duplicate keys (keeping the last occurrence).
+  - Add missing keys from the example file with empty values.
+
+### Changed
+- No breaking changes. Existing functionality remains intact.
+
 ## [2.1.3] - 2025-08-19
 ### Added
 - Added `.sveltekit` and `_actions` to default exclude patterns in codebase scanner.

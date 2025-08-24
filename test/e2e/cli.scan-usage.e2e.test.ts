@@ -516,4 +516,26 @@ describe('scan-usage error handling', () => {
       expect(res.stdout).toContain('.env.example');
     });
   });
+  describe('with --fix flag', () => {
+    it('adds missing keys found in code to .env with --scan-usage --fix', () => {
+          const cwd = tmpDir();
+          fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
+          fs.writeFileSync(path.join(cwd, 'app.js'), `
+            const apiKey = process.env.API_KEY;
+            const dbUrl = process.env.DATABASE_URL;
+            const existing = process.env.EXISTING;
+          `);
+          
+          const res = runCli(cwd, ['--scan-usage', '--fix']);
+          expect(res.status).toBe(0);
+          expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+          expect(res.stdout).toContain('Added 2 missing keys');
+          expect(res.stdout).toContain('API_KEY, DATABASE_URL');
+          
+          const envContent = fs.readFileSync(path.join(cwd, '.env'), 'utf-8');
+          expect(envContent).toContain('EXISTING=value');
+          expect(envContent).toContain('API_KEY=');
+          expect(envContent).toContain('DATABASE_URL=');
+        });
+  });
 });

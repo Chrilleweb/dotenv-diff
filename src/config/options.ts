@@ -29,6 +29,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const isCiMode = Boolean(raw.ci);
   const isYesMode = Boolean(raw.yes);
   const allowDuplicates = Boolean(raw.allowDuplicates);
+  const fix = Boolean(raw.fix);
   const json = Boolean(raw.json);
   const onlyParsed = parseCategories(raw.only, '--only');
   const only = onlyParsed.length ? onlyParsed : undefined;
@@ -70,6 +71,7 @@ export function normalizeOptions(raw: RawOptions): Options {
     isCiMode,
     isYesMode,
     allowDuplicates,
+    fix,
     json,
     envFlag,
     exampleFlag,

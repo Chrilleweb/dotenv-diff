@@ -304,4 +304,85 @@ describe('--only flag', () => {
     expect(res.stdout).toContain('⚠️  Extra keys (not in example):');
   });
 });
+describe('--fix flag', () => {
+  it('returns correct JSON format when fixing in scan mode', () => {
+        const cwd = tmpDir();
+        fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
+        fs.writeFileSync(path.join(cwd, 'app.js'), `
+          const newVar = process.env.NEW_VAR;
+        `);
+        
+        const res = runCli(cwd, ['--scan-usage', '--fix', '--json']);
+        expect(res.status).toBe(0);
+        
+        const output = JSON.parse(res.stdout);
+        expect(output.missing).toHaveLength(0); // Should be empty after fix
+        expect(output.stats).toBeDefined();
+      });
+    });
+    it('does not duplicate keys in .env.example when they already exist', () => {
+          const cwd = tmpDir();
+          fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
+          fs.writeFileSync(path.join(cwd, '.env.example'), 'EXISTING=\nNEW_KEY=\n');
+          fs.writeFileSync(path.join(cwd, 'app.js'), `
+            const newKey = process.env.NEW_KEY;
+          `);
+          
+          const res = runCli(cwd, ['--scan-usage', '--fix']);
+          expect(res.status).toBe(0);
+          expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+          expect(res.stdout).toContain('Added 1 missing keys to .env');
+          expect(res.stdout).not.toContain('Synced'); // Should not sync since key already exists
+          
+          const exampleContent = fs.readFileSync(path.join(cwd, '.env.example'), 'utf-8');
+          const newKeyLines = exampleContent.split('\n').filter(line => line.includes('NEW_KEY'));
+          expect(newKeyLines).toHaveLength(1); // Should not be duplicated
+        });
+    
+        it('shows no changes needed when all used variables are already defined', () => {
+          const cwd = tmpDir();
+          fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=value\n');
+          fs.writeFileSync(path.join(cwd, 'app.js'), `
+            const apiKey = process.env.API_KEY;
+          `);
+          
+          const res = runCli(cwd, ['--scan-usage', '--fix']);
+          expect(res.status).toBe(0);
+          expect(res.stdout).toContain('Auto-fix applied: no changes needed');
+        });
+    
+        it('works with custom env file path in scan mode', () => {
+          const cwd = tmpDir();
+          fs.writeFileSync(path.join(cwd, '.env.local'), 'EXISTING=value\n');
+          fs.writeFileSync(path.join(cwd, 'app.js'), `
+            const newVar = process.env.NEW_VAR;
+          `);
+          
+          const res = runCli(cwd, ['--scan-usage', '--fix', '--env', '.env.local']);
+          expect(res.status).toBe(0);
+          expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+          expect(res.stdout).toContain('Added 1 missing keys to .env.local');
+          
+          const envContent = fs.readFileSync(path.join(cwd, '.env.local'), 'utf-8');
+          expect(envContent).toContain('NEW_VAR=');
+        });
+    
+        it('respects --ignore flag in scan mode', () => {
+          const cwd = tmpDir();
+          fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
+          fs.writeFileSync(path.join(cwd, 'app.js'), `
+            const ignored = process.env.IGNORED_VAR;
+            const included = process.env.INCLUDED_VAR;
+          `);
+          
+          const res = runCli(cwd, ['--scan-usage', '--fix', '--ignore', 'IGNORED_VAR']);
+          expect(res.status).toBe(0);
+          expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+          expect(res.stdout).toContain('INCLUDED_VAR');
+          expect(res.stdout).not.toContain('IGNORED_VAR');
+          
+          const envContent = fs.readFileSync(path.join(cwd, '.env'), 'utf-8');
+          expect(envContent).toContain('INCLUDED_VAR=');
+          expect(envContent).not.toContain('IGNORED_VAR');
+        });
 });

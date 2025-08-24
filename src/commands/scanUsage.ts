@@ -17,6 +17,7 @@ const resolveFromCwd = (cwd: string, p: string) =>
 export interface ScanUsageOptions extends ScanOptions {
   envPath?: string;
   examplePath?: string;
+  fix?: boolean;
   json: boolean;
   showUnused: boolean;
   showStats: boolean;
@@ -130,6 +131,54 @@ export async function scanUsage(
     }
   }
 
+  // Store fix information for later display
+  let fixApplied = false;
+  let fixedKeys: string[] = [];
+
+  if (opts.fix && compareFile) {
+    const missingKeys = scanResult.missing;
+
+    if (missingKeys.length > 0) {
+      const envFilePath = compareFile.path;
+      const exampleFilePath = opts.examplePath
+        ? resolveFromCwd(opts.cwd, opts.examplePath)
+        : null;
+
+      // Append missing keys to .env
+      const content = fs.readFileSync(envFilePath, 'utf-8');
+      const newContent =
+        content +
+        (content.endsWith('\n') ? '' : '\n') +
+        missingKeys.map((k) => `${k}=`).join('\n') +
+        '\n';
+      fs.writeFileSync(envFilePath, newContent);
+
+      // Append to .env.example if it exists
+      if (exampleFilePath && fs.existsSync(exampleFilePath)) {
+        const exContent = fs.readFileSync(exampleFilePath, 'utf-8');
+        const existingExKeys = new Set(
+          exContent
+            .split('\n')
+            .map((l) => l.trim().split('=')[0])
+            .filter(Boolean),
+        );
+        const newKeys = missingKeys.filter((k) => !existingExKeys.has(k));
+        if (newKeys.length) {
+          const newExContent =
+            exContent +
+            (exContent.endsWith('\n') ? '' : '\n') +
+            newKeys.join('\n') +
+            '\n';
+          fs.writeFileSync(exampleFilePath, newExContent);
+        }
+      }
+
+      fixApplied = true;
+      fixedKeys = missingKeys;
+      scanResult.missing = [];
+    }
+  }
+
   // Prepare JSON output
   if (opts.json) {
     const jsonOutput = createJsonOutput(
@@ -143,7 +192,32 @@ export async function scanUsage(
   }
 
   // Console output
-  return outputToConsole(scanResult, opts, comparedAgainst);
+  const result = outputToConsole(scanResult, opts, comparedAgainst);
+
+  // Show fix message at the bottom (after all other output)
+  if (fixApplied && !opts.json) {
+    console.log(chalk.green('✅ Auto-fix applied (scan mode):'));
+    if (compareFile) {
+      console.log(
+        chalk.green(
+          `   - Added ${fixedKeys.length} missing keys to ${compareFile.name}: ${fixedKeys.join(', ')}`,
+        ),
+      );
+    }
+    if (opts.examplePath) {
+      console.log(
+        chalk.green(
+          `   - Synced ${fixedKeys.length} keys to ${path.basename(opts.examplePath)}`,
+        ),
+      );
+    }
+    console.log();
+  } else if (opts.fix && !fixApplied && !opts.json) {
+    console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));
+    console.log();
+  }
+
+  return result;
 }
 
 /**
@@ -380,6 +454,15 @@ function outputToConsole(
     if (opts.showUnused && scanResult.unused.length === 0) {
       console.log(chalk.green('✅ No unused environment variables found'));
     }
+    console.log();
+  }
+
+  if (scanResult.missing.length > 0 && !opts.json && !opts.fix) {
+    console.log(
+      chalk.gray(
+        '💡 Tip: Run with `--fix` to add these missing keys to your .env file automatically.',
+      ),
+    );
     console.log();
   }
 

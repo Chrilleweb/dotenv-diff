@@ -50,11 +50,11 @@ Use the `--ci` flag for automated environments. This enables strict mode where t
 
 And the `--example` option allows you to specify which `.env.example` file to compare against.
 
-### Use it in Github Actions:
+### Use it in Github Actions for at turborepo, Example:
 
 ```yaml
 - name: Check environment variables
-  run: dotenv-diff --scan-usage --example .env.example --ci
+  run: dotenv-diff --ci --scan-usage --show-unused --example .env.example --include-files \"./src/**/*,../../packages/**/*\" --ignore VITE_MODE,NODE_ENV
 ```
 
 You can also change the comparison file by using the `--example` flag to point to a different `.env.example` file. 
@@ -82,6 +82,42 @@ This will:
 - Compare the variables used in your `apps/app1` code against `apps/app1/.env.example`.
 - Also scan files in `../../packages`(like `packages/components/src/..`)
 - Ignore variables like VITE_MODE that you only use in special cases.
+
+## Automatic fixes with `--fix`
+
+Use the `--fix` flag to automatically fix missing keys in your `.env` and remove duplicate keys. 
+
+```bash
+dotenv-diff --fix
+```
+
+This will:
+- Add any missing keys from `.env.example` to your `.env` file with empty values
+- Remove duplicate keys in your `.env` file (keeping the last occurrence)
+
+## Use --fix with scan-usage
+
+You can also combine `--fix` with `--scan-usage` to automatically add any missing keys that are used in your code but not defined in your `.env` file:
+
+```bash
+dotenv-diff --scan-usage --fix
+```
+
+Using `--fix`with `--scan-usage` will not detect duplicate keys, it will only add missing keys.
+
+# Example workflow
+
+1. You add `process.env.NEW_API_KEY` in your code.
+2. You run `dotenv-diff --scan-usage --fix`.
+3. The tool automatically adds `NEW_API_KEY=` to your `.env` file.
+
+## Scan your codebase for environment variables and add it directly to .env.example?
+
+```bash
+dotenv-diff --scan-usage --example .env.example --fix
+```
+
+This scans your codebase for environment variable usage and adds any missing keys directly to your `.env.example` file with empty values.
 
 ## Show unused variables
 
