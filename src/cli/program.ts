@@ -15,6 +15,10 @@ export function createProgram() {
     )
     .option('--ignore <keys>', 'Comma-separated list of keys to ignore')
     .option('--ignore-regex <pattern>', 'Regex pattern to ignore matching keys')
+    .option(
+      '--fix',
+      'Automatically fix common issues: remove duplicates, add missing keys',
+    )
     .option('--json', 'Output results in JSON format')
     .option(
       '--only <list>',

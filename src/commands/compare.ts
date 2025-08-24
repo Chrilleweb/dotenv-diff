@@ -7,6 +7,7 @@ import { warnIfEnvNotIgnored } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type { Category, CompareJsonEntry } from '../config/types.js';
+import { applyFixes } from '../core/fixEnv.js';
 
 export async function compareMany(
   pairs: Array<{ envName: string; envPath: string; examplePath: string }>,
@@ -14,6 +15,7 @@ export async function compareMany(
     checkValues: boolean;
     cwd: string;
     allowDuplicates?: boolean;
+    fix?: boolean;
     json?: boolean;
     ignore: string[];
     ignoreRegex: RegExp[];
@@ -242,7 +244,7 @@ export async function compareMany(
     }
 
     if (!opts.json) {
-      if (filtered.missing.length) {
+      if (filtered.missing.length && !opts.fix) {
         console.log(chalk.red('  ❌ Missing keys:'));
         filtered.missing.forEach((key) =>
           console.log(chalk.red(`      - ${key}`)),
@@ -271,6 +273,60 @@ export async function compareMany(
         );
       }
       console.log();
+    }
+
+    if (!opts.json && !opts.fix) {
+      if (
+        filtered.missing.length ||
+        filtered.duplicatesEnv.length ||
+        filtered.duplicatesEx.length
+      ) {
+        console.log(
+          chalk.gray(
+            '💡 Tip: Run with `--fix` to automatically add missing keys and remove duplicates.',
+          ),
+        );
+        console.log();
+      }
+    }
+
+    if (opts.fix) {
+      const { changed, result } = applyFixes({
+        envPath,
+        examplePath,
+        missingKeys: filtered.missing,
+        duplicateKeys: dupsEnv.map((d) => d.key),
+      });
+
+      if (!opts.json) {
+        if (changed) {
+          console.log(chalk.green('  ✅ Auto-fix applied:'));
+          if (result.removedDuplicates.length) {
+            console.log(
+              chalk.green(
+                `      - Removed ${result.removedDuplicates.length} duplicate keys from ${envName}: ${result.removedDuplicates.join(', ')}`,
+              ),
+            );
+          }
+          if (result.addedEnv.length) {
+            console.log(
+              chalk.green(
+                `      - Added ${result.addedEnv.length} missing keys to ${envName}: ${result.addedEnv.join(', ')}`,
+              ),
+            );
+          }
+          if (result.addedExample.length) {
+            console.log(
+              chalk.green(
+                `      - Synced ${result.addedExample.length} keys to ${exampleName}: ${result.addedExample.join(', ')}`,
+              ),
+            );
+          }
+        } else {
+          console.log(chalk.green('  ✅ Auto-fix applied: no changes needed.'));
+        }
+        console.log();
+      }
     }
 
     opts.collect?.(entry);

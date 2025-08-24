@@ -14,6 +14,7 @@ export type Options = {
   isCiMode: boolean;
   isYesMode: boolean;
   allowDuplicates: boolean;
+  fix: boolean;
   json: boolean;
   envFlag: string | null;
   exampleFlag: string | null;
@@ -34,6 +35,7 @@ export type RawOptions = {
   ci?: boolean;
   yes?: boolean;
   allowDuplicates?: boolean;
+  fix?: boolean;
   json?: boolean;
   env?: string;
   example?: string;
