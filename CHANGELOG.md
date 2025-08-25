@@ -12,6 +12,13 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.1.5] - 2025-08-25
+### Added
+- Added `--no-color` option to disable colored output.
+
+### Changed
+- No breaking changes. Existing functionality remains intact.
+
 ## [2.1.4] - 2025-08-19
 ### Added
 - the `--fix` flag to automatically fix common issues:

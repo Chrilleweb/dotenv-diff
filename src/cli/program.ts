@@ -20,6 +20,7 @@ export function createProgram() {
       'Automatically fix common issues: remove duplicates, add missing keys',
     )
     .option('--json', 'Output results in JSON format')
+    .option('--no-color', 'Disable colored output')
     .option(
       '--only <list>',
       'Comma-separated categories to only run (missing,extra,empty,mismatch,duplicate,gitignore)',

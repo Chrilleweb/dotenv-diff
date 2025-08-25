@@ -16,6 +16,10 @@ export async function run(program: Command) {
   const raw = program.opts();
   const opts = normalizeOptions(raw);
 
+  if (opts.noColor) {
+    chalk.level = 0; // disable colors globally
+  }
+
   if (opts.scanUsage) {
     const envPath =
       opts.envFlag || (fs.existsSync('.env') ? '.env' : undefined);
