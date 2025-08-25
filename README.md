@@ -105,7 +105,7 @@ dotenv-diff --scan-usage --fix
 
 Using `--fix`with `--scan-usage` will not detect duplicate keys, it will only add missing keys.
 
-# Example workflow
+### Example workflow
 
 1. You add `process.env.NEW_API_KEY` in your code.
 2. You run `dotenv-diff --scan-usage --fix`.
@@ -192,6 +192,16 @@ You can output the results in JSON format using the `--json` option:
 
 ```bash
 dotenv-diff --json
+```
+
+## Disable colored output
+
+By default, `dotenv-diff` uses colored output to enhance readability.
+
+If you prefer plain text output, you can disable colored output using the `--no-color` option:
+
+```bash
+dotenv-diff --no-color
 ```
 
 ## Compare specific files

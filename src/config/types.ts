@@ -28,6 +28,7 @@ export type Options = {
   showUnused: boolean;
   showStats: boolean;
   files?: string[];
+  noColor?: boolean;
 };
 
 export type RawOptions = {
