@@ -43,7 +43,9 @@ describe('non-interactive flags', () => {
     const res = runCli(cwd, ['--yes']);
     expect(res.status).toBe(0);
     expect(fs.readFileSync(path.join(cwd, '.env'), 'utf8')).toBe('A=1\n');
-    expect(res.stdout).toContain('.env file created successfully from .env.example');
+    expect(res.stdout).toContain(
+      '.env file created successfully from .env.example',
+    );
   });
 
   it('CI: .env.example missing, .env exists', () => {
@@ -65,7 +67,9 @@ describe('non-interactive flags', () => {
       'utf8',
     );
     expect(exampleContent).toBe('A=\nB=\n');
-    expect(res.stdout).toContain('.env.example file created successfully from .env');
+    expect(res.stdout).toContain(
+      '.env.example file created successfully from .env',
+    );
   });
 
   it('Both flags: --ci --yes', () => {
@@ -81,35 +85,40 @@ describe('non-interactive flags', () => {
     const cwd = tmpDir();
     const res = runCli(cwd, ['--ci']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('No .env* or .env.example file found. Skipping comparison.');
+    expect(res.stdout).toContain(
+      'No .env* or .env.example file found. Skipping comparison.',
+    );
   });
 });
 
 describe('--example should not compare file with itself', () => {
   it('Only --example - should skip comparing example with itself', () => {
-  const cwd = tmpDir();
-  fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
-  fs.writeFileSync(path.join(cwd, '.env'), 'B=2\n');
-  fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'B=2\n');
-  
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env'), 'B=2\n');
+    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'B=2\n');
 
-  const res = runCli(cwd, ['--example', '.env.example']);
-  expect(res.stdout).toContain('Comparing .env ↔ .env.example');
-  expect(res.stdout).not.toContain('Comparing .env.example ↔ .env.example');
-});
+    const res = runCli(cwd, ['--example', '.env.example']);
+    expect(res.stdout).toContain('Comparing .env ↔ .env.example');
+    expect(res.stdout).not.toContain('Comparing .env.example ↔ .env.example');
+  });
 
-it('Only --example - no self-comparison, but still compares other env files', () => {
-  const cwd = tmpDir();
-  fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
-  fs.writeFileSync(path.join(cwd, '.env.production'), 'B=2\n');
-  fs.writeFileSync(path.join(cwd, '.env.example.production'), 'B=3\n');
+  it('Only --example - no self-comparison, but still compares other env files', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.production'), 'B=2\n');
+    fs.writeFileSync(path.join(cwd, '.env.example.production'), 'B=3\n');
 
-  const res = runCli(cwd, ['--example', '.env.example.staging']);
-  expect(res.status).toBe(1);
-  expect(res.stdout).toContain('Comparing .env.production ↔ .env.example.staging');
-  expect(res.stdout).not.toContain('Comparing .env.example.staging ↔ .env.example.staging');
-  expect(res.stdout).toContain('Missing keys');
-});
+    const res = runCli(cwd, ['--example', '.env.example.staging']);
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain(
+      'Comparing .env.production ↔ .env.example.staging',
+    );
+    expect(res.stdout).not.toContain(
+      'Comparing .env.example.staging ↔ .env.example.staging',
+    );
+    expect(res.stdout).toContain('Missing keys');
+  });
 });
 
 describe('--env and --example flags', () => {
@@ -132,7 +141,7 @@ describe('--env and --example flags', () => {
     expect(res.stdout).not.toContain('SHOULD=DIFF');
   });
 
-  it('Both flags - env missing', () => {
+  it('Both flags - env missing, should be created with --yes flag', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
     const res = runCli(cwd, [
@@ -140,12 +149,14 @@ describe('--env and --example flags', () => {
       '.env.staging',
       '--example',
       '.env.example.staging',
+      '--yes',
     ]);
-    expect(res.status).toBe(1);
-    expect(res.stderr).toContain('--env file not found');
+    expect(res.status).toBe(0);
+    expect(fs.existsSync(path.join(cwd, '.env.staging'))).toBe(true);
+    expect(res.stdout).toContain('.env.staging file created successfully');
   });
 
-  it('Both flags - example missing', () => {
+  it('Both flags - example missing, should be created with --yes flag', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     const res = runCli(cwd, [
@@ -153,9 +164,13 @@ describe('--env and --example flags', () => {
       '.env.staging',
       '--example',
       '.env.example.staging',
+      '--yes',
     ]);
-    expect(res.status).toBe(1);
-    expect(res.stderr).toContain('--example file not found');
+    expect(res.status).toBe(0);
+    expect(fs.existsSync(path.join(cwd, '.env.example.staging'))).toBe(true);
+    expect(res.stdout).toContain(
+      '.env.example.staging file created successfully',
+    );
   });
 
   it('Only --env - matching example exists', () => {
@@ -237,152 +252,177 @@ describe('duplicate detection', () => {
     expect(res.stdout).not.toContain('Duplicate keys');
   });
   describe('--json output', () => {
-  it('prints a JSON array with ok=true when files match', () => {
-    const cwd = tmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
-    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\n');
+    it('prints a JSON array with ok=true when files match', () => {
+      const cwd = tmpDir();
+      fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+      fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\n');
 
-    const res = runCli(cwd, ['--json']);
+      const res = runCli(cwd, ['--json']);
 
-    expect(res.status).toBe(0);
-    expect(() => JSON.parse(res.stdout)).not.toThrow();
+      expect(res.status).toBe(0);
+      expect(() => JSON.parse(res.stdout)).not.toThrow();
 
-    const arr = JSON.parse(res.stdout);
-    expect(Array.isArray(arr)).toBe(true);
-    expect(arr.length).toBeGreaterThan(0);
-    expect(arr[0].env).toBe('.env');
-    expect(arr[0].example).toBe('.env.example');
-    expect(arr[0].ok).toBe(true);
+      const arr = JSON.parse(res.stdout);
+      expect(Array.isArray(arr)).toBe(true);
+      expect(arr.length).toBeGreaterThan(0);
+      expect(arr[0].env).toBe('.env');
+      expect(arr[0].example).toBe('.env.example');
+      expect(arr[0].ok).toBe(true);
 
-    expect(res.stdout).not.toContain('Comparing');
-    expect(res.stdout).not.toContain('Missing keys');
-  });
-
-  it('prints JSON and exits 1 when there are missing keys', () => {
-    const cwd = tmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
-    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\n');
-
-    const res = runCli(cwd, ['--json']);
-
-    expect(res.status).toBe(1);
-    const arr = JSON.parse(res.stdout);
-    expect(Array.isArray(arr)).toBe(true);
-    expect(arr.length).toBeGreaterThan(0);
-    expect(arr[0].env).toBe('.env');
-    expect(arr[0].example).toBe('.env.example');
-    expect(arr[0].missing).toContain('B');
-
-    expect(res.stdout).not.toContain('Comparing');
-    expect(res.stdout).not.toContain('Missing keys');
-  });
-});
-
-describe('--only flag', () => {
-  it('fails on flag only missing', () => {
-    const cwd = tmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nC=2\n');
-    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\nC=\n');
-
-    const res = runCli(cwd, ['--only', 'missing']);
-
-    expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Comparing .env ↔ .env.example');
-    expect(res.stdout).toContain('❌ Missing keys:');
-    expect(res.stdout).not.toContain('Extra keys');
-  });
-  it('fails on flag only extra', () => {
-    const cwd = tmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nC=2\nD=3\n');
-    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\nC=\n');
-
-    const res = runCli(cwd, ['--only', 'extra']);
-
-    expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Comparing .env ↔ .env.example');
-    expect(res.stdout).not.toContain('❌ Missing keys:');
-    expect(res.stdout).toContain('⚠️  Extra keys (not in example):');
-  });
-});
-describe('--fix flag', () => {
-  it('returns correct JSON format when fixing in scan mode', () => {
-        const cwd = tmpDir();
-        fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
-        fs.writeFileSync(path.join(cwd, 'app.js'), `
-          const newVar = process.env.NEW_VAR;
-        `);
-        
-        const res = runCli(cwd, ['--scan-usage', '--fix', '--json']);
-        expect(res.status).toBe(0);
-        
-        const output = JSON.parse(res.stdout);
-        expect(output.missing).toHaveLength(0); // Should be empty after fix
-        expect(output.stats).toBeDefined();
-      });
+      expect(res.stdout).not.toContain('Comparing');
+      expect(res.stdout).not.toContain('Missing keys');
     });
-    it('does not duplicate keys in .env.example when they already exist', () => {
-          const cwd = tmpDir();
-          fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
-          fs.writeFileSync(path.join(cwd, '.env.example'), 'EXISTING=\nNEW_KEY=\n');
-          fs.writeFileSync(path.join(cwd, 'app.js'), `
+
+    it('prints JSON and exits 1 when there are missing keys', () => {
+      const cwd = tmpDir();
+      fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+      fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\n');
+
+      const res = runCli(cwd, ['--json']);
+
+      expect(res.status).toBe(1);
+      const arr = JSON.parse(res.stdout);
+      expect(Array.isArray(arr)).toBe(true);
+      expect(arr.length).toBeGreaterThan(0);
+      expect(arr[0].env).toBe('.env');
+      expect(arr[0].example).toBe('.env.example');
+      expect(arr[0].missing).toContain('B');
+
+      expect(res.stdout).not.toContain('Comparing');
+      expect(res.stdout).not.toContain('Missing keys');
+    });
+  });
+
+  describe('--only flag', () => {
+    it('fails on flag only missing', () => {
+      const cwd = tmpDir();
+      fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nC=2\n');
+      fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\nC=\n');
+
+      const res = runCli(cwd, ['--only', 'missing']);
+
+      expect(res.status).toBe(1);
+      expect(res.stdout).toContain('Comparing .env ↔ .env.example');
+      expect(res.stdout).toContain('❌ Missing keys:');
+      expect(res.stdout).not.toContain('Extra keys');
+    });
+    it('fails on flag only extra', () => {
+      const cwd = tmpDir();
+      fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nC=2\nD=3\n');
+      fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\nC=\n');
+
+      const res = runCli(cwd, ['--only', 'extra']);
+
+      expect(res.status).toBe(1);
+      expect(res.stdout).toContain('Comparing .env ↔ .env.example');
+      expect(res.stdout).not.toContain('❌ Missing keys:');
+      expect(res.stdout).toContain('⚠️  Extra keys (not in example):');
+    });
+  });
+  describe('--fix flag', () => {
+    it('returns correct JSON format when fixing in scan mode', () => {
+      const cwd = tmpDir();
+      fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
+      fs.writeFileSync(
+        path.join(cwd, 'app.js'),
+        `
+          const newVar = process.env.NEW_VAR;
+        `,
+      );
+
+      const res = runCli(cwd, ['--scan-usage', '--fix', '--json']);
+      expect(res.status).toBe(0);
+
+      const output = JSON.parse(res.stdout);
+      expect(output.missing).toHaveLength(0); // Should be empty after fix
+      expect(output.stats).toBeDefined();
+    });
+  });
+  it('does not duplicate keys in .env.example when they already exist', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'EXISTING=\nNEW_KEY=\n');
+    fs.writeFileSync(
+      path.join(cwd, 'app.js'),
+      `
             const newKey = process.env.NEW_KEY;
-          `);
-          
-          const res = runCli(cwd, ['--scan-usage', '--fix']);
-          expect(res.status).toBe(0);
-          expect(res.stdout).toContain('Auto-fix applied (scan mode)');
-          expect(res.stdout).toContain('Added 1 missing keys to .env');
-          expect(res.stdout).not.toContain('Synced'); // Should not sync since key already exists
-          
-          const exampleContent = fs.readFileSync(path.join(cwd, '.env.example'), 'utf-8');
-          const newKeyLines = exampleContent.split('\n').filter(line => line.includes('NEW_KEY'));
-          expect(newKeyLines).toHaveLength(1); // Should not be duplicated
-        });
-    
-        it('shows no changes needed when all used variables are already defined', () => {
-          const cwd = tmpDir();
-          fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=value\n');
-          fs.writeFileSync(path.join(cwd, 'app.js'), `
+          `,
+    );
+
+    const res = runCli(cwd, ['--scan-usage', '--fix']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+    expect(res.stdout).toContain('Added 1 missing keys to .env');
+    expect(res.stdout).not.toContain('Synced'); // Should not sync since key already exists
+
+    const exampleContent = fs.readFileSync(
+      path.join(cwd, '.env.example'),
+      'utf-8',
+    );
+    const newKeyLines = exampleContent
+      .split('\n')
+      .filter((line) => line.includes('NEW_KEY'));
+    expect(newKeyLines).toHaveLength(1); // Should not be duplicated
+  });
+
+  it('shows no changes needed when all used variables are already defined', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=value\n');
+    fs.writeFileSync(
+      path.join(cwd, 'app.js'),
+      `
             const apiKey = process.env.API_KEY;
-          `);
-          
-          const res = runCli(cwd, ['--scan-usage', '--fix']);
-          expect(res.status).toBe(0);
-          expect(res.stdout).toContain('Auto-fix applied: no changes needed');
-        });
-    
-        it('works with custom env file path in scan mode', () => {
-          const cwd = tmpDir();
-          fs.writeFileSync(path.join(cwd, '.env.local'), 'EXISTING=value\n');
-          fs.writeFileSync(path.join(cwd, 'app.js'), `
+          `,
+    );
+
+    const res = runCli(cwd, ['--scan-usage', '--fix']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Auto-fix applied: no changes needed');
+  });
+
+  it('works with custom env file path in scan mode', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.local'), 'EXISTING=value\n');
+    fs.writeFileSync(
+      path.join(cwd, 'app.js'),
+      `
             const newVar = process.env.NEW_VAR;
-          `);
-          
-          const res = runCli(cwd, ['--scan-usage', '--fix', '--env', '.env.local']);
-          expect(res.status).toBe(0);
-          expect(res.stdout).toContain('Auto-fix applied (scan mode)');
-          expect(res.stdout).toContain('Added 1 missing keys to .env.local');
-          
-          const envContent = fs.readFileSync(path.join(cwd, '.env.local'), 'utf-8');
-          expect(envContent).toContain('NEW_VAR=');
-        });
-    
-        it('respects --ignore flag in scan mode', () => {
-          const cwd = tmpDir();
-          fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
-          fs.writeFileSync(path.join(cwd, 'app.js'), `
+          `,
+    );
+
+    const res = runCli(cwd, ['--scan-usage', '--fix', '--env', '.env.local']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+    expect(res.stdout).toContain('Added 1 missing keys to .env.local');
+
+    const envContent = fs.readFileSync(path.join(cwd, '.env.local'), 'utf-8');
+    expect(envContent).toContain('NEW_VAR=');
+  });
+
+  it('respects --ignore flag in scan mode', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
+    fs.writeFileSync(
+      path.join(cwd, 'app.js'),
+      `
             const ignored = process.env.IGNORED_VAR;
             const included = process.env.INCLUDED_VAR;
-          `);
-          
-          const res = runCli(cwd, ['--scan-usage', '--fix', '--ignore', 'IGNORED_VAR']);
-          expect(res.status).toBe(0);
-          expect(res.stdout).toContain('Auto-fix applied (scan mode)');
-          expect(res.stdout).toContain('INCLUDED_VAR');
-          expect(res.stdout).not.toContain('IGNORED_VAR');
-          
-          const envContent = fs.readFileSync(path.join(cwd, '.env'), 'utf-8');
-          expect(envContent).toContain('INCLUDED_VAR=');
-          expect(envContent).not.toContain('IGNORED_VAR');
-        });
+          `,
+    );
+
+    const res = runCli(cwd, [
+      '--scan-usage',
+      '--fix',
+      '--ignore',
+      'IGNORED_VAR',
+    ]);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+    expect(res.stdout).toContain('INCLUDED_VAR');
+    expect(res.stdout).not.toContain('IGNORED_VAR');
+
+    const envContent = fs.readFileSync(path.join(cwd, '.env'), 'utf-8');
+    expect(envContent).toContain('INCLUDED_VAR=');
+    expect(envContent).not.toContain('IGNORED_VAR');
+  });
 });

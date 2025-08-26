@@ -47,22 +47,42 @@ export async function run(program: Command) {
   if (opts.envFlag && opts.exampleFlag) {
     const envExists = fs.existsSync(opts.envFlag);
     const exExists = fs.existsSync(opts.exampleFlag);
+
+    // Handle missing files with prompting (unless in CI mode)
     if (!envExists || !exExists) {
-      if (!envExists) {
-        console.error(
-          chalk.red(
-            `❌ Error: --env file not found: ${path.basename(opts.envFlag)}`,
-          ),
-        );
+      // Check if we should prompt for file creation
+      if (!opts.isCiMode) {
+        const res = await ensureFilesOrPrompt({
+          cwd: opts.cwd,
+          primaryEnv: opts.envFlag,
+          primaryExample: opts.exampleFlag,
+          alreadyWarnedMissingEnv: false,
+          isYesMode: opts.isYesMode,
+          isCiMode: opts.isCiMode,
+        });
+
+        if (res.shouldExit) {
+          if (opts.json) console.log(JSON.stringify([], null, 2));
+          process.exit(res.exitCode);
+        }
+      } else {
+        // In CI mode, we just show errors and exit
+        if (!envExists) {
+          console.error(
+            chalk.red(
+              `❌ Error: --env file not found: ${path.basename(opts.envFlag)}`,
+            ),
+          );
+        }
+        if (!exExists) {
+          console.error(
+            chalk.red(
+              `❌ Error: --example file not found: ${path.basename(opts.exampleFlag)}`,
+            ),
+          );
+        }
+        process.exit(1);
       }
-      if (!exExists) {
-        console.error(
-          chalk.red(
-            `❌ Error: --example file not found: ${path.basename(opts.exampleFlag)}`,
-          ),
-        );
-      }
-      process.exit(1);
     }
 
     const report: CompareJsonEntry[] = [];
