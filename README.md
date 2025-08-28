@@ -1,6 +1,6 @@
 # dotenv-diff
 
-[![Demo](./public/demo.gif)]
+![Demo](./public/demo.gif)
 
 Easily compare your .env, .env.example, and other environment files (like .env.local, .env.production) to detect missing, extra, empty, or mismatched variables — and ensure they’re properly ignored by Git.
 
