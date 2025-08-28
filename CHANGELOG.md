@@ -12,6 +12,13 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.1.7] - 2025-08-28
+### Added
+- gif to README file.
+
+### Changed
+- No breaking changes. Existing functionality remains intact.
+
 ## [2.1.6] - 2025-08-26
 ### fixed
 - Fixed issue where prompts were disabled when using `--env` and `--example` flags.
