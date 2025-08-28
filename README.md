@@ -1,5 +1,7 @@
 # dotenv-diff
 
+[![Demo](./public/demo.gif)]
+
 Easily compare your .env, .env.example, and other environment files (like .env.local, .env.production) to detect missing, extra, empty, or mismatched variables — and ensure they’re properly ignored by Git.
 
 Or scan your codebase to find out which environment variables are actually used in your code, and which ones are not.
@@ -35,6 +37,14 @@ dotenv-diff will automatically compare all matching .env* files in your project 
 - `.env.production`
 - Any other .env.* file
 
+## Why dotenv-diff?
+
+- **Prevent production issues**: Ensure all required environment variables are defined before deploying.
+- **Avoid runtime errors**: Catch missing or misconfigured variables early in development.
+- **Improve collaboration**: Keep your team aligned on necessary environment variables.
+- **Enhance security**: Ensure sensitive variables are not accidentally committed to version control.
+- **Scale confidently**: Perfect for turbo monorepos and multi-environment setups.
+
 ## Scan your codebase for environment variable usage
 
 ```bash
@@ -50,11 +60,11 @@ Use the `--ci` flag for automated environments. This enables strict mode where t
 
 And the `--example` option allows you to specify which `.env.example` file to compare against.
 
-### Use it in Github Actions for at turborepo, Example:
+### Use it in Github Actions Example:
 
 ```yaml
 - name: Check environment variables
-  run: dotenv-diff --ci --scan-usage --show-unused --example .env.example --include-files \"./src/**/*,../../packages/**/*\" --ignore VITE_MODE,NODE_ENV
+  run: dotenv-diff --ci --scan-usage --example .env.example --ignore VITE_MODE,NODE_ENV
 ```
 
 You can also change the comparison file by using the `--example` flag to point to a different `.env.example` file. 
