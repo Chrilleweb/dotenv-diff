@@ -459,9 +459,7 @@ function outputToConsole(
 
   if (scanResult.missing.length > 0 && !opts.json && !opts.fix) {
     console.log(
-      chalk.gray(
-        '💡 Tip: Run with `--fix` to add these missing keys to your .env file automatically.',
-      ),
+      chalk.gray('💡 Tip: Run with `--fix` to add these missing keys'),
     );
     console.log();
   }

@@ -73,7 +73,7 @@ const missing = process.env.MISSING_VAR;`,
     expect(res.stdout).not.toContain('API_KEY'); // Should not be listed as missing
   });
 
-  it('shows unused variables with --show-unused', () => {
+  it('shows unused variables', () => {
     const cwd = tmpDir();
 
     // Create .env with unused variable
@@ -89,7 +89,7 @@ const missing = process.env.MISSING_VAR;`,
       'const apiKey = process.env.API_KEY;',
     );
 
-    const res = runCli(cwd, ['--scan-usage', '--show-unused']);
+    const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('⚠️  Unused in codebase (defined in .env):');
@@ -173,7 +173,7 @@ const ignored = process.env.IGNORED_VAR;`,
     expect(res.stdout).not.toContain('IGNORED_VAR');
   });
 
-  it('shows scan statistics with --show-stats', () => {
+  it('shows scan statistics', () => {
     const cwd = tmpDir();
 
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
@@ -186,7 +186,7 @@ const ignored = process.env.IGNORED_VAR;`,
       'const db = process.env.API_KEY;', // Same variable used twice
     );
 
-    const res = runCli(cwd, ['--scan-usage', '--show-stats']);
+    const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('📊 Scan Statistics:');
@@ -206,7 +206,7 @@ const ignored = process.env.IGNORED_VAR;`,
 const missing = process.env.MISSING_VAR;`,
     );
 
-    const res = runCli(cwd, ['--scan-usage', '--show-unused', '--json']);
+    const res = runCli(cwd, ['--scan-usage', '--json']);
 
     expect(res.status).toBe(1); // Should exit with error due to missing variable
     expect(() => JSON.parse(res.stdout)).not.toThrow();

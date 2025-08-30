@@ -22,6 +22,7 @@ export type Options = {
   ignoreRegex: RegExp[];
   cwd: string;
   only?: Category[];
+  compare: boolean;
   scanUsage: boolean;
   includeFiles: string[];
   excludeFiles: string[];
@@ -43,6 +44,8 @@ export type RawOptions = {
   ignore?: string | string[];
   ignoreRegex?: string | string[];
   only?: string | string[];
+  compare?: boolean;
+  noColor?: boolean;
   scanUsage?: boolean;
   includeFiles?: string | string[];
   excludeFiles?: string | string[];
