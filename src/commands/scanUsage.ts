@@ -51,7 +51,6 @@ export interface ScanJsonEntry {
   // Add comparison info
   comparedAgainst?: string;
   totalEnvVariables?: number;
-
   secrets?: Array<{
     file: string;
     line: number;

@@ -72,8 +72,6 @@ export async function compareMany(
           if (!opts.json) console.log(msg.replace(/^/gm, '  '));
         },
       });
-    } else {
-      // still call to keep previous hints? No—masked by --only.
     }
 
     // Duplicate detection (skip entirely if --only excludes it)

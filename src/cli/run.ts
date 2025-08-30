@@ -45,8 +45,6 @@ export async function run(program: Command) {
     process.exit(exitWithError ? 1 : 0);
   }
 
-  // === Compare flow (now behind --compare) ===
-
   // Special-case: both flags → direct comparison of exactly those two files
   if (opts.envFlag && opts.exampleFlag) {
     const envExists = fs.existsSync(opts.envFlag);
