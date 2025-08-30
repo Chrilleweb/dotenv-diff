@@ -35,7 +35,7 @@ describe('no-flag autoscan', () => {
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\nB=1\n');
 
-    const res = runCli(cwd, []);
+    const res = runCli(cwd, ['--compare']);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('Comparing .env ↔ .env.example');
     expect(res.stdout).toContain('Comparing .env.staging ↔ .env.example.staging');

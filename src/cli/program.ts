@@ -26,24 +26,26 @@ export function createProgram() {
       'Comma-separated categories to only run (missing,extra,empty,mismatch,duplicate,gitignore)',
     )
     .option('--scan-usage', 'Scan codebase for environment variable usage')
+    .option('--compare', 'Compare .env and .env.example files')
     .option(
       '--include-files <patterns>',
-      '[requires --scan-usage] Comma-separated file patterns to ADD to default scan patterns (extends default)',
+      'Comma-separated file patterns to ADD to default scan patterns (extends default)',
     )
     .option(
       '--files <patterns>',
-      '[requires --scan-usage] Comma-separated file patterns to scan (completely replaces default patterns)',
+      'Comma-separated file patterns to scan (completely replaces default patterns)',
     )
     .option(
       '--exclude-files <patterns>',
-      '[requires --scan-usage] Comma-separated file patterns to exclude from scan',
+      'Comma-separated file patterns to exclude from scan',
     )
     .option(
-      '--show-unused',
-      '[requires --scan-usage] Show variables defined in .env but not used in code',
+      '--no-show-unused',
+      'Do not list variables that are defined in .env but not used in code',
     )
+    .option('--no-show-stats', 'Do not show statistics')
     .option(
-      '--show-stats',
-      'Show statistics (in scan-usage mode: scan stats, in compare mode: env compare stats)',
+      '--no-secrets',
+      'Disable secret detection during scan (enabled by default)',
     );
 }

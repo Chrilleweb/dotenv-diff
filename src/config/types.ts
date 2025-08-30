@@ -22,6 +22,7 @@ export type Options = {
   ignoreRegex: RegExp[];
   cwd: string;
   only?: Category[];
+  compare: boolean;
   scanUsage: boolean;
   includeFiles: string[];
   excludeFiles: string[];
@@ -29,6 +30,7 @@ export type Options = {
   showStats: boolean;
   files?: string[];
   noColor?: boolean;
+  secrets: boolean;
 };
 
 export type RawOptions = {
@@ -43,12 +45,15 @@ export type RawOptions = {
   ignore?: string | string[];
   ignoreRegex?: string | string[];
   only?: string | string[];
+  compare?: boolean;
+  noColor?: boolean;
   scanUsage?: boolean;
   includeFiles?: string | string[];
   excludeFiles?: string | string[];
   showUnused?: boolean;
   showStats?: boolean;
   files?: string | string[];
+  secrets?: boolean;
 };
 
 export type CompareJsonEntry = {
