@@ -33,11 +33,13 @@ export function normalizeOptions(raw: RawOptions): Options {
   const json = Boolean(raw.json);
   const onlyParsed = parseCategories(raw.only, '--only');
   const only = onlyParsed.length ? onlyParsed : undefined;
-  const scanUsage = Boolean(raw.scanUsage);
+  const noColor = Boolean((raw as any).noColor);
+  const compare = Boolean(raw.compare);
+  const scanUsage = raw.scanUsage ?? !compare;
   const includeFiles = parseList(raw.includeFiles);
   const excludeFiles = parseList(raw.excludeFiles);
-  const showUnused = Boolean(raw.showUnused);
-  const showStats = Boolean(raw.showStats);
+  const showUnused = raw.showUnused === false ? false : true;
+  const showStats = raw.showStats === false ? false : true;
   const files = parseList(raw.files);
 
   const ignore = parseList(raw.ignore);
@@ -79,6 +81,8 @@ export function normalizeOptions(raw: RawOptions): Options {
     ignoreRegex,
     cwd,
     only,
+    compare,
+    noColor,
     scanUsage,
     includeFiles,
     excludeFiles,

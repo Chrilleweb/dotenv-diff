@@ -31,7 +31,7 @@ describe('non-interactive flags', () => {
   it('CI: .env missing, .env.example exists', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
-    const res = runCli(cwd, ['--ci']);
+    const res = runCli(cwd, ['--compare', '--ci']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('.env file not found.');
     expect(fs.existsSync(path.join(cwd, '.env'))).toBe(false);
@@ -40,7 +40,7 @@ describe('non-interactive flags', () => {
   it('YES: .env missing, .env.example exists', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
-    const res = runCli(cwd, ['--yes']);
+    const res = runCli(cwd, ['--compare', '--yes']);
     expect(res.status).toBe(0);
     expect(fs.readFileSync(path.join(cwd, '.env'), 'utf8')).toBe('A=1\n');
     expect(res.stdout).toContain(
@@ -51,7 +51,7 @@ describe('non-interactive flags', () => {
   it('CI: .env.example missing, .env exists', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
-    const res = runCli(cwd, ['--ci']);
+    const res = runCli(cwd, ['--compare', '--ci']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('.env.example file not found.');
     expect(fs.existsSync(path.join(cwd, '.env.example'))).toBe(false);
@@ -60,7 +60,7 @@ describe('non-interactive flags', () => {
   it('YES: .env.example missing, .env exists', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nB=2\n');
-    const res = runCli(cwd, ['--yes']);
+    const res = runCli(cwd, ['--compare', '--yes']);
     expect(res.status).toBe(0);
     const exampleContent = fs.readFileSync(
       path.join(cwd, '.env.example'),
@@ -75,7 +75,7 @@ describe('non-interactive flags', () => {
   it('Both flags: --ci --yes', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
-    const res = runCli(cwd, ['--ci', '--yes']);
+    const res = runCli(cwd, ['--compare', '--ci', '--yes']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Both --ci and --yes provided');
     expect(fs.existsSync(path.join(cwd, '.env'))).toBe(true);
@@ -83,7 +83,7 @@ describe('non-interactive flags', () => {
 
   it('Case 1: no env files', () => {
     const cwd = tmpDir();
-    const res = runCli(cwd, ['--ci']);
+    const res = runCli(cwd, ['--compare', '--ci']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
       'No .env* or .env.example file found. Skipping comparison.',
@@ -98,7 +98,7 @@ describe('--example should not compare file with itself', () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'B=2\n');
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'B=2\n');
 
-    const res = runCli(cwd, ['--example', '.env.example']);
+    const res = runCli(cwd, ['--compare', '--example', '.env.example']);
     expect(res.stdout).toContain('Comparing .env ↔ .env.example');
     expect(res.stdout).not.toContain('Comparing .env.example ↔ .env.example');
   });
@@ -109,7 +109,7 @@ describe('--example should not compare file with itself', () => {
     fs.writeFileSync(path.join(cwd, '.env.production'), 'B=2\n');
     fs.writeFileSync(path.join(cwd, '.env.example.production'), 'B=3\n');
 
-    const res = runCli(cwd, ['--example', '.env.example.staging']);
+    const res = runCli(cwd, ['--compare', '--example', '.env.example.staging']);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain(
       'Comparing .env.production ↔ .env.example.staging',
@@ -129,6 +129,7 @@ describe('--env and --example flags', () => {
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
     const res = runCli(cwd, [
+      '--compare',
       '--env',
       '.env.staging',
       '--example',
@@ -145,6 +146,7 @@ describe('--env and --example flags', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
     const res = runCli(cwd, [
+      '--compare',
       '--env',
       '.env.staging',
       '--example',
@@ -160,6 +162,7 @@ describe('--env and --example flags', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     const res = runCli(cwd, [
+      '--compare',
       '--env',
       '.env.staging',
       '--example',
@@ -177,7 +180,7 @@ describe('--env and --example flags', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
-    const res = runCli(cwd, ['--env', '.env.staging']);
+    const res = runCli(cwd, ['--compare', '--env', '.env.staging']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
       'Comparing .env.staging ↔ .env.example.staging',
@@ -188,7 +191,7 @@ describe('--env and --example flags', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
-    const res = runCli(cwd, ['--env', '.env.staging']);
+    const res = runCli(cwd, ['--compare', '--env', '.env.staging']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Comparing .env.staging ↔ .env.example');
   });
@@ -196,7 +199,7 @@ describe('--env and --example flags', () => {
   it('Only --env - example missing entirely', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\nB=2\n');
-    const res = runCli(cwd, ['--env', '.env.staging', '--yes']);
+    const res = runCli(cwd, ['--compare', '--env', '.env.staging', '--yes']);
     expect(res.status).toBe(0);
     const exampleContent = fs.readFileSync(
       path.join(cwd, '.env.example'),
@@ -210,7 +213,7 @@ describe('--env and --example flags', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.staging'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), 'A=1\n');
-    const res = runCli(cwd, ['--example', '.env.example.staging']);
+    const res = runCli(cwd, ['--compare', '--example', '.env.example.staging']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
       'Comparing .env.staging ↔ .env.example.staging',
@@ -223,7 +226,7 @@ describe('duplicate detection', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\nFOO=2\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
-    const res = runCli(cwd, []);
+    const res = runCli(cwd, ['--compare']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
       'Duplicate keys in .env (last occurrence wins):',
@@ -235,7 +238,7 @@ describe('duplicate detection', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\nFOO=\n');
-    const res = runCli(cwd, []);
+    const res = runCli(cwd, ['--compare']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
       'Duplicate keys in .env.example (last occurrence wins):',
@@ -247,7 +250,7 @@ describe('duplicate detection', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\nFOO=2\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
-    const res = runCli(cwd, ['--allow-duplicates']);
+    const res = runCli(cwd, ['--compare', '--allow-duplicates']);
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Duplicate keys');
   });
@@ -257,7 +260,7 @@ describe('duplicate detection', () => {
       fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
       fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\n');
 
-      const res = runCli(cwd, ['--json']);
+      const res = runCli(cwd, ['--compare', '--json']);
 
       expect(res.status).toBe(0);
       expect(() => JSON.parse(res.stdout)).not.toThrow();
@@ -278,7 +281,7 @@ describe('duplicate detection', () => {
       fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
       fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\n');
 
-      const res = runCli(cwd, ['--json']);
+      const res = runCli(cwd, ['--compare', '--json']);
 
       expect(res.status).toBe(1);
       const arr = JSON.parse(res.stdout);
@@ -299,7 +302,7 @@ describe('duplicate detection', () => {
       fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nC=2\n');
       fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\nC=\n');
 
-      const res = runCli(cwd, ['--only', 'missing']);
+      const res = runCli(cwd, ['--compare', '--only', 'missing']);
 
       expect(res.status).toBe(1);
       expect(res.stdout).toContain('Comparing .env ↔ .env.example');
@@ -311,7 +314,7 @@ describe('duplicate detection', () => {
       fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nC=2\nD=3\n');
       fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\nC=\n');
 
-      const res = runCli(cwd, ['--only', 'extra']);
+      const res = runCli(cwd, ['--compare', '--only', 'extra']);
 
       expect(res.status).toBe(1);
       expect(res.stdout).toContain('Comparing .env ↔ .env.example');

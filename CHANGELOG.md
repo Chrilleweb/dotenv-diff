@@ -12,6 +12,15 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.2.0] - 2025-08-30
+### Added
+- `--compare` flag to enable comparison mode.
+
+### Changed
+- Default behavior is now **scan-usage** (you no longer need `--scan-usage`), but you can still use it for clarity.
+- `--compare` flag is now required for all comparison operations.
+
+
 ## [2.1.7] - 2025-08-28
 ### Added
 - gif to README file.

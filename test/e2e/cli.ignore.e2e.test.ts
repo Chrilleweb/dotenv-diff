@@ -32,7 +32,7 @@ describe('--ignore and --ignore-regex', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=1\nDEBUG=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'DEBUG=\n');
-    const res = runCli(cwd, []);
+    const res = runCli(cwd, ['--compare']);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('Extra keys');
     expect(res.stdout).toContain('API_KEY');
@@ -42,7 +42,7 @@ describe('--ignore and --ignore-regex', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=1\nDEBUG=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'DEBUG=\n');
-    const res = runCli(cwd, ['--ignore', 'API_KEY']);
+    const res = runCli(cwd, ['--compare', '--ignore', 'API_KEY']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('All keys match');
     expect(res.stdout).not.toContain('API_KEY');
@@ -52,7 +52,7 @@ describe('--ignore and --ignore-regex', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_TOKEN=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), '');
-    const res = runCli(cwd, ['--ignore-regex', '^SECRET_']);
+    const res = runCli(cwd, ['--compare', '--ignore-regex', '^SECRET_']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('All keys match');
     expect(res.stdout).not.toContain('SECRET_TOKEN');
@@ -65,7 +65,7 @@ describe('--ignore and --ignore-regex', () => {
       'API_KEY=1\nSECRET_TOKEN=1\n',
     );
     fs.writeFileSync(path.join(cwd, '.env.example'), '');
-    const res = runCli(cwd, ['--ignore', 'API_KEY', '--ignore-regex', '^SECRET_']);
+    const res = runCli(cwd, ['--compare', '--ignore', 'API_KEY', '--ignore-regex', '^SECRET_']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('All keys match');
     expect(res.stdout).not.toContain('API_KEY');
@@ -76,7 +76,7 @@ describe('--ignore and --ignore-regex', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\n');
-    const res = runCli(cwd, ['--ignore-regex', '[']);
+    const res = runCli(cwd, ['--compare', '--ignore-regex', '[']);
     expect(res.status).toBe(1);
     expect(res.stderr).toContain('invalid --ignore-regex pattern');
   });

@@ -20,7 +20,8 @@ export async function run(program: Command) {
     chalk.level = 0; // disable colors globally
   }
 
-  if (opts.scanUsage) {
+  // DEFAULT: scan-usage unless --compare is set
+  if (!opts.compare) {
     const envPath =
       opts.envFlag || (fs.existsSync('.env') ? '.env' : undefined);
 
@@ -42,6 +43,8 @@ export async function run(program: Command) {
 
     process.exit(exitWithError ? 1 : 0);
   }
+
+  // === Compare flow (now behind --compare) ===
 
   // Special-case: both flags → direct comparison of exactly those two files
   if (opts.envFlag && opts.exampleFlag) {
@@ -130,7 +133,6 @@ export async function run(program: Command) {
     isCiMode: opts.isCiMode,
   });
   if (res.shouldExit) {
-    // For JSON mode, emit an empty report to keep output machine-friendly (optional; safe).
     if (opts.json) console.log(JSON.stringify([], null, 2));
     process.exit(res.exitCode);
   }

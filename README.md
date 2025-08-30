@@ -2,9 +2,9 @@
 
 ![Demo](./public/demo.gif)
 
-Easily compare your .env, .env.example, and other environment files (like .env.local, .env.production) to detect missing, extra, empty, or mismatched variables — and ensure they’re properly ignored by Git.
+Easily scan your codebase to detect which environment variables are actually used in your code — and which ones are not.
 
-Or scan your codebase to find out which environment variables are actually used in your code, and which ones are not.
+Or compare your .env, .env.example, and other environment files (like .env.local, .env.production) to detect missing, extra, empty, or mismatched variables.
 
 Optimized for JavaScript/TypeScript projects and frontend frameworks including Node.js, Next.js, Vite, SvelteKit, Nuxt, Vue, and Deno. Can also be used with other project types for basic .env file comparison.
 
@@ -30,12 +30,8 @@ pnpm add -g dotenv-diff
 ```bash
 dotenv-diff
 ```
-## What it checks
-dotenv-diff will automatically compare all matching .env* files in your project against .env.example, including:
-- `.env`
-- `.env.local`
-- `.env.production`
-- Any other .env.* file
+
+This scans your entire codebase to detect which environment variables are actually used in the code — and compare them against your `.env` file.
 
 ## Why dotenv-diff?
 
@@ -45,12 +41,6 @@ dotenv-diff will automatically compare all matching .env* files in your project 
 - **Enhance security**: Ensure sensitive variables are not accidentally committed to version control.
 - **Scale confidently**: Perfect for turbo monorepos and multi-environment setups.
 
-## Scan your codebase for environment variable usage
-
-```bash
-dotenv-diff --scan-usage
-``` 
-This scans your entire codebase to detect which environment variables are actually used in the code — and compare them against your `.env` file(s).
 
 ## CI/CD integration with `--ci` option
 You can scan and compare against specific environment file, eg. `.env.example`
@@ -64,26 +54,26 @@ And the `--example` option allows you to specify which `.env.example` file to co
 
 ```yaml
 - name: Check environment variables
-  run: dotenv-diff --ci --scan-usage --example .env.example --ignore VITE_MODE,NODE_ENV
+  run: dotenv-diff --ci --example .env.example --ignore VITE_MODE,NODE_ENV
 ```
 
 You can also change the comparison file by using the `--example` flag to point to a different `.env.example` file. 
 
 ```bash
-dotenv-diff --scan-usage --example .env.example.staging --ci
+dotenv-diff --example .env.example.staging --ci
 ```
 
 ## Use it in a Turborepo Monorepo
 
 In a monorepo setup (e.g. with Turborepo), you often have multiple apps under apps/ and shared packages under packages/.
-You can run dotenv-diff from one app and still include files from sibling apps or packages.
+You can run dotenv-diff from one app and still include files from your packages folder.
 
 For example, if you want to scan from the apps/app1 folder and also include code in packages/auth, you can do:
 
 ```json
 {
   "scripts": {
-    "dotenv-diff": "dotenv-diff --scan-usage --example .env.example --include-files '../../packages/**/*' --ignore VITE_MODE"
+    "dotenv-diff": "dotenv-diff --example .env.example --include-files '../../packages/**/*' --ignore VITE_MODE"
   }
 }
 ```
@@ -91,65 +81,49 @@ For example, if you want to scan from the apps/app1 folder and also include code
 This will:
 - Compare the variables used in your `apps/app1` code against `apps/app1/.env.example`.
 - Also scan files in `../../packages`(like `packages/components/src/..`)
-- Ignore variables like VITE_MODE that you only use in special cases.
+- Ignore variables like VITE_MODE that you only use in special cases (.env.test).
 
 ## Automatic fixes with `--fix`
 
-Use the `--fix` flag to automatically fix missing keys in your `.env` and remove duplicate keys. 
+Use the `--fix` flag to automatically fix missing keys in your `.env`.
 
 ```bash
 dotenv-diff --fix
 ```
 
-This will:
-- Add any missing keys from `.env.example` to your `.env` file with empty values
-- Remove duplicate keys in your `.env` file (keeping the last occurrence)
-
-## Use --fix with scan-usage
-
-You can also combine `--fix` with `--scan-usage` to automatically add any missing keys that are used in your code but not defined in your `.env` file:
-
-```bash
-dotenv-diff --scan-usage --fix
-```
-
-Using `--fix`with `--scan-usage` will not detect duplicate keys, it will only add missing keys.
-
 ### Example workflow
 
-1. You add `process.env.NEW_API_KEY` in your code.
-2. You run `dotenv-diff --scan-usage --fix`.
+1. You have `process.env.NEW_API_KEY` in your code.
+2. You run `dotenv-diff --fix`.
 3. The tool automatically adds `NEW_API_KEY=` to your `.env` file.
-
-## Scan your codebase for environment variables and add it directly to .env.example?
-
-```bash
-dotenv-diff --scan-usage --example .env.example --fix
-```
-
-This scans your codebase for environment variable usage and adds any missing keys directly to your `.env.example` file with empty values.
 
 ## Show unused variables
 
-Use `--show-unused` together with `--scan-usage` to list variables that are defined in `.env` but never used in your codebase:
-```bash
-dotenv-diff --scan-usage --show-unused
-```
-This will show you which variables are defined in your `.env` file but not used in your codebase. This helps you clean up unnecessary environment variables.
+As default, `dotenv-diff` will list variables that are defined in `.env` but never used in your codebase.
 
-## Show scan statistics
+To disable this behavior, use the `--no-show-unused` flag:
+```bash
+dotenv-diff --no-show-unused
+```
+This will prevent the tool from listing variables that are defined in `.env` but not used in your codebase.
+
+## Show statistics
+
+By default, `dotenv-diff` will show statistics about the scan, such as the number of files scanned, variables found, and unique variables used.
+
+To disable this behavior, use the `--no-show-stats` flag:
 
 ```bash
-dotenv-diff --show-stats
+dotenv-diff --no-show-stats
 ```
-This will display statistics about the scan, such as the number of files scanned, variables found, and any unused variables. It provides a quick overview of your environment variable usage.
+This will prevent the tool from displaying statistics about the scan.
 
 ## include or exclude specific files for scanning
 
 You can specify which files to include or exclude from the scan using the `--include-files` and `--exclude-files` options:
 
 ```bash
-dotenv-diff --scan-usage --include-files '**/*.js,**/*.ts' --exclude-files '**/*.spec.ts'
+dotenv-diff --include-files '**/*.js,**/*.ts' --exclude-files '**/*.spec.ts'
 ```
 
 By default, the scanner looks at JavaScript, TypeScript, Vue, and Svelte files.
@@ -157,32 +131,18 @@ The --include-files and --exclude-files options let you refine this list to focu
 
 ### Override with `--files`
 
-If you want to completely override the default include/exclude logic (for example, to also include test files), you can use --files:
+If you want to completely override the default include/exclude logic (for example, to only include specific files), you can use --files:
 ```bash
-dotenv-diff --scan-usage --files '**/*.js'
+dotenv-diff --files '**/*.js'
 ```
-This will only scan the files matching the given patterns, even if they would normally be excluded.
 
 ## Optional: Check values too
 
 ```bash
-dotenv-diff --check-values
+dotenv-diff --check-values --compare
 ```
 
-When using the `--check-values` option, the tool will also compare the actual values of the variables in `.env` and `.env.example`. It will report any mismatches found and it also compares values if .env.example defines a non-empty expected value.
-
-## Duplicate key warnings
-
-`dotenv-diff` warns when a `.env*` file contains the same key multiple times. The last occurrence wins. Suppress these warnings with `--allow-duplicates`.
-
-## Only show specific categories
-
-Use the `--only` flag to restrict the comparison to specific categories. For example:
-
-```bash
-dotenv-diff --only missing,extra
-```
-This will only show missing and extra keys, ignoring empty, mismatched, duplicate keys and so on.
+When using the `--check-values` option together with `--compare`, the tool will also compare the actual values of the variables in `.env` and `.env.example`. It will report any mismatches found and it also compares values if .env.example defines a non-empty expected value.
 
 ## Ignore specific keys
 
@@ -216,35 +176,40 @@ dotenv-diff --no-color
 
 ## Compare specific files
 
+The `--compare` flag will compare all matching .env* files in your project against .env.example, including:
+- `.env`
+- `.env.local`
+- `.env.production`
+- Any other .env.* file
+
 Override the autoscan and compare exactly two files:
 
 ```bash
-dotenv-diff --env .env.staging --example .env.example.staging
+dotenv-diff --compare --env .env.local --example .env.example.local
 ```
 
 You can also fix only one side. For example, force a particular `.env` file and let the tool find the matching `.env.example`:
 
-```bash
-dotenv-diff --env .env.production
-```
+When using the `--compare` flag, `dotenv-diff` warns when a `.env*` file contains the same key multiple times. The last occurrence wins. Suppress these warnings with `--allow-duplicates`.
 
-Or provide just an example file and let the tool locate the appropriate `.env`:
+Use the `--only` flag to restrict the comparison to specific categories. For example:
 
 ```bash
-dotenv-diff --example .env.example.production
+dotenv-diff --only missing,extra
 ```
+This will only show missing and extra keys, ignoring empty, mismatched, duplicate keys and so on.
 
 ## Automatically create missing files
 
 Run non-interactively in CI environments with:
 
 ```bash
-dotenv-diff --yes    # auto-create missing files without prompts
+dotenv-diff --compare --yes    # auto-create missing files without prompts
 ```
 
 You can also use `-y` as a shorthand for `--yes`.
 
-## Automatic file creation prompts
+### Automatic file creation prompts
 
 If one of the files is missing, `dotenv-diff` will ask if you want to create it from the other:
 
@@ -253,7 +218,7 @@ If one of the files is missing, `dotenv-diff` will ask if you want to create it 
 
 This makes it quick to set up environment files without manually copying or retyping variable names.
 
-## Also checks your .gitignore
+### Also checks your .gitignore
 
 `dotenv-diff` will warn you if your `.env` file is **not** ignored by Git.  
 This helps prevent accidentally committing sensitive environment variables.
