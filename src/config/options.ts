@@ -41,6 +41,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const showUnused = raw.showUnused === false ? false : true;
   const showStats = raw.showStats === false ? false : true;
   const files = parseList(raw.files);
+  const secrets = raw.secrets === false ? false : true;
 
   const ignore = parseList(raw.ignore);
   const ignoreRegex: RegExp[] = [];
@@ -89,5 +90,6 @@ export function normalizeOptions(raw: RawOptions): Options {
     showUnused,
     showStats,
     files,
+    secrets,
   };
 }

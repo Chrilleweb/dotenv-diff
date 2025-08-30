@@ -4,7 +4,11 @@
 
 Easily scan your codebase to detect which environment variables are actually used in your code — and which ones are not.
 
-Or compare your .env, .env.example, and other environment files (like .env.local, .env.production) to detect missing, extra, empty, or mismatched variables.
+This package will:
+- Scan your codebase to find environment variables in use.
+- Show statistics about the usage of these variables.
+- Detect missing environment variables.
+- Find potential secrets in your codebase.
 
 Optimized for JavaScript/TypeScript projects and frontend frameworks including Node.js, Next.js, Vite, SvelteKit, Nuxt, Vue, and Deno. Can also be used with other project types for basic .env file comparison.
 

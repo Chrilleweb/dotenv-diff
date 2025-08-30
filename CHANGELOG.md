@@ -15,6 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ## [2.2.0] - 2025-08-30
 ### Added
 - `--compare` flag to enable comparison mode.
+- `dotenv-diff` will now detect potential secrets in your codebase.
 
 ### Changed
 - Default behavior is now **scan-usage** (you no longer need `--scan-usage`), but you can still use it for clarity.

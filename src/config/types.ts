@@ -30,6 +30,7 @@ export type Options = {
   showStats: boolean;
   files?: string[];
   noColor?: boolean;
+  secrets: boolean;
 };
 
 export type RawOptions = {
@@ -52,6 +53,7 @@ export type RawOptions = {
   showUnused?: boolean;
   showStats?: boolean;
   files?: string | string[];
+  secrets?: boolean;
 };
 
 export type CompareJsonEntry = {

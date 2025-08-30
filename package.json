@@ -2,7 +2,7 @@
   "name": "dotenv-diff",
   "version": "2.2.0",
   "type": "module",
-  "description": "Find differences between .env and .env.example / .env.* files. And optionally scan your codebase to find environment variables in use.",
+  "description": "scan your codebase to find environment variables in use.",
   "bin": {
     "dotenv-diff": "dist/bin/dotenv-diff.js"
   },

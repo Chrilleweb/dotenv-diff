@@ -39,6 +39,7 @@ export async function run(program: Command) {
       showStats: opts.showStats,
       isCiMode: opts.isCiMode,
       files: opts.files,
+      secrets: opts.secrets,
     });
 
     process.exit(exitWithError ? 1 : 0);

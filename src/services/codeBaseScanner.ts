@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import fsSync from 'fs';
+import { detectSecretsInSource, type SecretFinding } from '../core/secretDetectors.js';
 
 export interface EnvUsage {
   variable: string;
@@ -24,6 +25,7 @@ export interface ScanOptions {
   ignore: string[];
   ignoreRegex: RegExp[];
   files?: string[];
+  secrets?: boolean;
 }
 
 export interface ScanResult {
@@ -35,6 +37,7 @@ export interface ScanResult {
     totalUsages: number;
     uniqueVariables: number;
   };
+  secrets: SecretFinding[];
 }
 
 // Framework-specific patterns for finding environment variable usage
@@ -114,12 +117,23 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
 
   const allUsages: EnvUsage[] = [];
   let filesScanned = 0;
+  const allSecrets: SecretFinding[] = [];
 
   for (const filePath of files) {
     try {
       const content = await fs.readFile(filePath, 'utf-8');
       const fileUsages = await scanFile(filePath, content, opts);
       allUsages.push(...fileUsages);
+      if (opts.secrets) {
+    try {
+    // Brug relativ path i findings, så output matcher dine øvrige prints
+    const relativePath = path.relative(opts.cwd, filePath);
+    const sec = detectSecretsInSource(relativePath, content);
+    if (sec.length) allSecrets.push(...sec);
+  } catch {
+    // aldrig fail scannet pga. detector; bare fortsæt
+  }
+}
       filesScanned++;
     } catch {
       // Skip files we can't read (binary, permissions, etc.)
@@ -140,6 +154,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     used: filteredUsages,
     missing: [],
     unused: [],
+    secrets: allSecrets,
     stats: {
       filesScanned,
       totalUsages: filteredUsages.length,

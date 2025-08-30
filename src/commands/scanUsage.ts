@@ -217,6 +217,13 @@ export async function scanUsage(
     console.log();
   }
 
+    if (scanResult.missing.length > 0 && !opts.json && !opts.fix) {
+    console.log(
+      chalk.gray('💡 Tip: Run with `--fix` to add missing keys'),
+    );
+    console.log();
+  }
+
   return result;
 }
 
@@ -277,6 +284,15 @@ function createJsonOutput(
     missing: missingGrouped,
     unused: scanResult.unused,
   };
+
+  if (scanResult.secrets?.length) {
+    (output as any).secrets = scanResult.secrets.map((s) => ({
+      file: s.file,
+      line: s.line,
+      message: s.message,
+      snippet: s.snippet,
+    }));
+  }
 
   // Add comparison info if we compared against a file
   if (comparedAgainst) {
@@ -443,6 +459,26 @@ function outputToConsole(
     console.log();
   }
 
+  if (scanResult.secrets && scanResult.secrets.length > 0) {
+  console.log(chalk.yellow('🔒 Potential secrets detected in codebase:'));
+  const byFile = new Map<string, typeof scanResult.secrets>();
+  for (const f of scanResult.secrets) {
+    if (!byFile.has(f.file)) byFile.set(f.file, []);
+    byFile.get(f.file)!.push(f);
+  }
+  for (const [file, findings] of byFile) {
+    console.log(chalk.bold(`  ${file}`));
+    for (const f of findings) {
+      console.log(
+        chalk.yellow(
+          `   - Line ${f.line}: ${f.message}\n     ${chalk.dim(f.snippet)}`,
+        ),
+      );
+    }
+  }
+  console.log();
+}
+
   // Success message for env file comparison
   if (comparedAgainst && scanResult.missing.length === 0) {
     console.log(
@@ -454,13 +490,6 @@ function outputToConsole(
     if (opts.showUnused && scanResult.unused.length === 0) {
       console.log(chalk.green('✅ No unused environment variables found'));
     }
-    console.log();
-  }
-
-  if (scanResult.missing.length > 0 && !opts.json && !opts.fix) {
-    console.log(
-      chalk.gray('💡 Tip: Run with `--fix` to add these missing keys'),
-    );
     console.log();
   }
 
