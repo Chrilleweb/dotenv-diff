@@ -33,7 +33,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const json = Boolean(raw.json);
   const onlyParsed = parseCategories(raw.only, '--only');
   const only = onlyParsed.length ? onlyParsed : undefined;
-  const noColor = Boolean((raw as any).noColor);
+  const noColor = Boolean(raw.noColor);
   const compare = Boolean(raw.compare);
   const scanUsage = raw.scanUsage ?? !compare;
   const includeFiles = parseList(raw.includeFiles);
