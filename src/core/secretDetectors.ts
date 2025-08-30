@@ -8,15 +8,16 @@ export type SecretFinding = {
   snippet: string;
 };
 
-const SUSPICIOUS_KEYS = /\b(pass(word)?|secret|token|apikey|api_key|key|auth|bearer|private|client_secret|access[_-]?token)\b/i;
+const SUSPICIOUS_KEYS =
+  /\b(pass(word)?|secret|token|apikey|api_key|key|auth|bearer|private|client_secret|access[_-]?token)\b/i;
 
 const PROVIDER_PATTERNS: RegExp[] = [
-  /\bAKIA[0-9A-Z]{16}\b/,                    // AWS access key id
-  /\bASIA[0-9A-Z]{16}\b/,                    // AWS temp key
-  /\bghp_[0-9A-Za-z]{30,}\b/,                // GitHub token
-  /\bsk_live_[0-9a-zA-Z]{24,}\b/,            // Stripe live secret
-  /\bsk_test_[0-9a-zA-Z]{24,}\b/,            // Stripe test secret
-  /\bAIza[0-9A-Za-z\-_]{20,}\b/,             // Google API key
+  /\bAKIA[0-9A-Z]{16}\b/, // AWS access key id
+  /\bASIA[0-9A-Z]{16}\b/, // AWS temp key
+  /\bghp_[0-9A-Za-z]{30,}\b/, // GitHub token
+  /\bsk_live_[0-9a-zA-Z]{24,}\b/, // Stripe live secret
+  /\bsk_test_[0-9a-zA-Z]{24,}\b/, // Stripe test secret
+  /\bAIza[0-9A-Za-z\-_]{20,}\b/, // Google API key
 ];
 
 const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
@@ -27,7 +28,10 @@ function looksHarmlessLiteral(s: string): boolean {
 
 // Undgå støj fra typiske test/fixture/mock filer (meget konservativ liste)
 function isProbablyTestPath(p: string): boolean {
-  return /\b(__tests__|__mocks__|fixtures|sandbox|samples)\b/i.test(p) || /\.(spec|test)\.[jt]sx?$/.test(p);
+  return (
+    /\b(__tests__|__mocks__|fixtures|sandbox|samples)\b/i.test(p) ||
+    /\.(spec|test)\.[jt]sx?$/.test(p)
+  );
 }
 
 const DEFAULT_SECRET_THRESHOLD = 0.9 as const;

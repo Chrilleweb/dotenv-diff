@@ -44,5 +44,8 @@ export function createProgram() {
       'Do not list variables that are defined in .env but not used in code',
     )
     .option('--no-show-stats', 'Do not show statistics')
-    .option('--no-secrets', 'Disable secret detection during scan (enabled by default)');
+    .option(
+      '--no-secrets',
+      'Disable secret detection during scan (enabled by default)',
+    );
 }

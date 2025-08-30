@@ -1,7 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 import fsSync from 'fs';
-import { detectSecretsInSource, type SecretFinding } from '../core/secretDetectors.js';
+import {
+  detectSecretsInSource,
+  type SecretFinding,
+} from '../core/secretDetectors.js';
 
 export interface EnvUsage {
   variable: string;
@@ -125,15 +128,15 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       const fileUsages = await scanFile(filePath, content, opts);
       allUsages.push(...fileUsages);
       if (opts.secrets) {
-    try {
-    // Brug relativ path i findings, så output matcher dine øvrige prints
-    const relativePath = path.relative(opts.cwd, filePath);
-    const sec = detectSecretsInSource(relativePath, content);
-    if (sec.length) allSecrets.push(...sec);
-  } catch {
-    // aldrig fail scannet pga. detector; bare fortsæt
-  }
-}
+        try {
+          // Brug relativ path i findings, så output matcher dine øvrige prints
+          const relativePath = path.relative(opts.cwd, filePath);
+          const sec = detectSecretsInSource(relativePath, content);
+          if (sec.length) allSecrets.push(...sec);
+        } catch {
+          // aldrig fail scannet pga. detector; bare fortsæt
+        }
+      }
       filesScanned++;
     } catch {
       // Skip files we can't read (binary, permissions, etc.)
