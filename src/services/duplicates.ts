@@ -6,6 +6,8 @@ import fs from 'fs';
  * - Splits on first '='
  * - Trims the key
  * - Returns keys that appear more than once, with counts
+ * @param filePath - Path to the .env file to scan
+ * @returns An array of objects representing duplicate keys and their counts.
  */
 export function findDuplicateKeys(
   filePath: string,

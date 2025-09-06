@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 
+/**
+ * Represents the discovery of environment files in a project.
+ * Contains information about the current working directory, found environment files,
+ * and the primary environment and example files.
+ */
 export type Discovery = {
   cwd: string;
   envFiles: string[];
@@ -11,6 +16,13 @@ export type Discovery = {
   alreadyWarnedMissingEnv: boolean;
 };
 
+/**
+ * Discovers environment files in the specified directory.
+ * @param cwd - The current working directory.
+ * @param envFlag - The --env flag value if provided.
+ * @param exampleFlag - The --example flag value if provided.
+ * @returns A Discovery object containing the found environment files and their metadata.
+ */
 export function discoverEnvFiles({
   cwd,
   envFlag,

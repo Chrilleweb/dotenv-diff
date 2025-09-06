@@ -34,14 +34,15 @@ export function diffEnv(
       .filter((key) => {
         return (
           currentKeys.includes(key) &&
+          typeof example[key] === 'string' &&
           example[key].trim() !== '' &&
           current[key] !== example[key]
         );
       })
       .map((key) => ({
         key,
-        expected: example[key],
-        actual: current[key],
+        expected: example[key] ?? '',
+        actual: current[key] ?? '',
       }));
   }
 

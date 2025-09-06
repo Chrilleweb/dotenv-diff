@@ -9,6 +9,12 @@ import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type { Category, CompareJsonEntry } from '../config/types.js';
 import { applyFixes } from '../core/fixEnv.js';
 
+/**
+ * Compares multiple pairs of .env and .env.example files.
+ * @param pairs - The pairs of environment files to compare.
+ * @param opts - The comparison options.
+ * @returns An object indicating the overall comparison results.
+ */
 export async function compareMany(
   pairs: Array<{ envName: string; envPath: string; examplePath: string }>,
   opts: {
@@ -136,10 +142,10 @@ export async function compareMany(
     );
 
     const current = Object.fromEntries(
-      currentKeys.map((k) => [k, currentFull[k]]),
+      currentKeys.map((k) => [k, currentFull[k] ?? '']),
     );
     const example = Object.fromEntries(
-      exampleKeys.map((k) => [k, exampleFull[k]]),
+      exampleKeys.map((k) => [k, exampleFull[k] ?? '']),
     );
 
     const diff = diffEnv(current, example, opts.checkValues);

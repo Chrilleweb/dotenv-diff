@@ -11,6 +11,10 @@ import { compareMany } from '../commands/compare.js';
 import type { CompareJsonEntry } from '../config/types.js';
 import { scanUsage } from '../commands/scanUsage.js';
 
+/**
+ * Run the CLI program
+ * @param program The commander program instance
+ */
 export async function run(program: Command) {
   program.parse(process.argv);
   const raw = program.opts();
@@ -31,15 +35,15 @@ export async function run(program: Command) {
       exclude: opts.excludeFiles,
       ignore: opts.ignore,
       ignoreRegex: opts.ignoreRegex,
-      examplePath: opts.exampleFlag || undefined,
+      examplePath: opts.exampleFlag,
       envPath,
       fix: opts.fix,
       json: opts.json,
       showUnused: opts.showUnused,
       showStats: opts.showStats,
       isCiMode: opts.isCiMode,
-      files: opts.files,
       secrets: opts.secrets,
+      ...(opts.files ? { files: opts.files } : {}),
     });
 
     process.exit(exitWithError ? 1 : 0);
@@ -103,9 +107,9 @@ export async function run(program: Command) {
         json: opts.json,
         ignore: opts.ignore,
         ignoreRegex: opts.ignoreRegex,
-        only: opts.only,
         showStats: opts.showStats,
         collect: (e) => report.push(e),
+        ...(opts.only ? { only: opts.only } : {}),
       },
     );
 
@@ -118,8 +122,8 @@ export async function run(program: Command) {
   // Auto-discovery flow
   const d = discoverEnvFiles({
     cwd: opts.cwd,
-    envFlag: opts.envFlag,
-    exampleFlag: opts.exampleFlag,
+    envFlag: opts.envFlag ?? null,
+    exampleFlag: opts.exampleFlag ?? null,
   });
 
   // Init cases (may create files or early-exit)
@@ -147,9 +151,9 @@ export async function run(program: Command) {
     json: opts.json,
     ignore: opts.ignore,
     ignoreRegex: opts.ignoreRegex,
-    only: opts.only,
     showStats: opts.showStats,
     collect: (e) => report.push(e),
+    ...(opts.only ? { only: opts.only } : {}),
   });
 
   if (opts.json) {

@@ -1,8 +1,8 @@
 {
   "name": "dotenv-diff",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "type": "module",
-  "description": "scan your codebase to find environment variables in use.",
+  "description": "Scan your codebase to find environment variables in use.",
   "bin": {
     "dotenv-diff": "dist/bin/dotenv-diff.js"
   },

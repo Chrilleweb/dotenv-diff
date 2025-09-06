@@ -11,12 +11,14 @@ import {
 } from '../services/codeBaseScanner.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 
+// Helper to resolve paths relative to cwd
 const resolveFromCwd = (cwd: string, p: string) =>
   path.isAbsolute(p) ? p : path.resolve(cwd, p);
 
+/** Options for scanning the codebase for environment variable usage. */
 export interface ScanUsageOptions extends ScanOptions {
-  envPath?: string;
-  examplePath?: string;
+  envPath?: string | undefined;
+  examplePath?: string | undefined;
   fix?: boolean;
   json: boolean;
   showUnused: boolean;
@@ -25,6 +27,7 @@ export interface ScanUsageOptions extends ScanOptions {
   files?: string[];
 }
 
+/** Represents a single entry in the scan results. */
 export interface ScanJsonEntry {
   stats: {
     filesScanned: number;
@@ -79,8 +82,9 @@ export async function scanUsage(
   opts: ScanUsageOptions,
 ): Promise<{ exitWithError: boolean }> {
   if (!opts.json) {
+    console.log();
     console.log(
-      chalk.bold('🔍 Scanning codebase for environment variable usage...'),
+      chalk.blue('🔍 Scanning codebase for environment variable usage...'),
     );
     console.log();
   }
@@ -233,10 +237,12 @@ export async function scanUsage(
 
 /**
  * Determines which file to use for comparison based on provided options
+ * @param {ScanUsageOptions} opts - Scan configuration options
+ * @returns {Object|null} - The comparison file information or undefined if not found
  */
 function determineComparisonFile(
   opts: ScanUsageOptions,
-): { path: string; name: string } | null {
+): { path: string; name: string } | undefined {
   // Priority: explicit flags first, then auto-discovery
   if (opts.examplePath) {
     const p = resolveFromCwd(opts.cwd, opts.examplePath);
@@ -261,9 +267,17 @@ function determineComparisonFile(
     }
   }
 
-  return null;
+  return undefined;
 }
 
+/**
+ * Creates a JSON output for the scan results.
+ * @param scanResult - The result of the scan.
+ * @param opts - The scan options.
+ * @param comparedAgainst - The file being compared against.
+ * @param totalEnvVariables - The total number of environment variables.
+ * @returns The JSON output.
+ */
 function createJsonOutput(
   scanResult: ScanResult,
   opts: ScanUsageOptions,
@@ -318,6 +332,13 @@ function createJsonOutput(
   return output;
 }
 
+/**
+ * Outputs the scan results to the console.
+ * @param scanResult - The result of the scan.
+ * @param opts - The scan options.
+ * @param comparedAgainst - The file being compared against.
+ * @returns An object indicating whether to exit with an error.
+ */
 function outputToConsole(
   scanResult: ScanResult,
   opts: ScanUsageOptions,
@@ -328,22 +349,22 @@ function outputToConsole(
   // Show what we're comparing against
   if (comparedAgainst) {
     console.log(
-      chalk.gray(`📋 Comparing codebase usage against: ${comparedAgainst}`),
+      chalk.magenta(`📋 Comparing codebase usage against: ${comparedAgainst}`),
     );
     console.log();
   }
 
   // Show stats if requested
   if (opts.showStats) {
-    console.log(chalk.bold('📊 Scan Statistics:'));
+    console.log(chalk.magenta('📊 Scan Statistics:'));
     console.log(
-      chalk.gray(`   Files scanned: ${scanResult.stats.filesScanned}`),
+      chalk.magenta.dim(`   Files scanned: ${scanResult.stats.filesScanned}`),
     );
     console.log(
-      chalk.gray(`   Total usages found: ${scanResult.stats.totalUsages}`),
+      chalk.magenta.dim(`   Total usages found: ${scanResult.stats.totalUsages}`),
     );
     console.log(
-      chalk.gray(`   Unique variables: ${scanResult.stats.uniqueVariables}`),
+      chalk.magenta.dim(`   Unique variables: ${scanResult.stats.uniqueVariables}`),
     );
     console.log();
   }
@@ -351,8 +372,8 @@ function outputToConsole(
   // Always show found variables when not comparing or when no missing variables
   if (!comparedAgainst || scanResult.missing.length === 0) {
     console.log(
-      chalk.green(
-        `✅ Found ${scanResult.stats.uniqueVariables} unique environment variables in use`,
+      chalk.blue(
+        `🌐 Found ${scanResult.stats.uniqueVariables} unique environment variables in use`,
       ),
     );
     console.log();
@@ -365,7 +386,7 @@ function outputToConsole(
           if (!acc[usage.variable]) {
             acc[usage.variable] = [];
           }
-          acc[usage.variable].push(usage);
+          acc[usage.variable]!.push(usage);
           return acc;
         },
         {},
@@ -380,7 +401,7 @@ function outputToConsole(
           const displayUsages = usages.slice(0, 2);
           displayUsages.forEach((usage: EnvUsage) => {
             console.log(
-              chalk.gray(
+              chalk.blue.dim(
                 `     Used in: ${usage.file}:${usage.line} (${usage.pattern})`,
               ),
             );
@@ -421,7 +442,7 @@ function outputToConsole(
       const maxShow = 3;
       usages.slice(0, maxShow).forEach((usage: EnvUsage) => {
         console.log(
-          chalk.gray(
+          chalk.red.dim(
             `     Used in: ${usage.file}:${usage.line} (${usage.pattern})`,
           ),
         );

@@ -4,6 +4,11 @@ import chalk from 'chalk';
 import { confirmYesNo } from '../ui/prompts.js';
 import { warnIfEnvNotIgnored } from '../services/git.js';
 
+/**
+ * Ensures that the necessary .env files exist or prompts the user to create them.
+ * @param args - The arguments for the function.
+ * @returns An object indicating whether a file was created or if the process should exit.
+ */
 export async function ensureFilesOrPrompt(args: {
   cwd: string;
   primaryEnv: string;

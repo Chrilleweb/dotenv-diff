@@ -2,7 +2,13 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
+    "verbatimModuleSyntax": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "rootDir": ".",
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
     "outDir": "dist",
     "declaration": true,
     "declarationDir": "dist",
@@ -11,7 +17,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "typeRoots": ["./types", "./node_modules/@types"],
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "bin/**/*.ts", "types/**/*.d.ts"]
 }
