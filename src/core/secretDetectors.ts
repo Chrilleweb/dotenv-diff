@@ -1,5 +1,6 @@
 import { shannonEntropyNormalized } from './entropy.js';
 
+// Represents a secret finding in the source code.
 export type SecretFinding = {
   file: string;
   line: number;
@@ -8,9 +9,11 @@ export type SecretFinding = {
   snippet: string;
 };
 
+// Regular expressions for detecting suspicious keys and provider patterns
 const SUSPICIOUS_KEYS =
   /\b(pass(word)?|secret|token|apikey|api_key|key|auth|bearer|private|client_secret|access[_-]?token)\b/i;
 
+// Regular expressions for detecting provider patterns
 const PROVIDER_PATTERNS: RegExp[] = [
   /\bAKIA[0-9A-Z]{16}\b/, // AWS access key id
   /\bASIA[0-9A-Z]{16}\b/, // AWS temp key
@@ -26,7 +29,12 @@ function looksHarmlessLiteral(s: string): boolean {
   return /^https?:\/\//i.test(s) || /\S+@\S+/.test(s);
 }
 
-// Undgå støj fra typiske test/fixture/mock filer (meget konservativ liste)
+/**
+ * Checks if a file path is probably a test path.
+ * This is determined by looking for common test folder names and file extensions.
+ * @param p - The file path to check.
+ * @returns True if the file path is probably a test path, false otherwise.
+ */
 function isProbablyTestPath(p: string): boolean {
   return (
     /\b(__tests__|__mocks__|fixtures|sandbox|samples)\b/i.test(p) ||
@@ -34,8 +42,15 @@ function isProbablyTestPath(p: string): boolean {
   );
 }
 
+// Threshold is the value between 0 and 1 that determines the sensitivity of the detection.
 const DEFAULT_SECRET_THRESHOLD = 0.9 as const;
 
+/**
+ * Detects secrets in the source code of a file.
+ * @param file - The file path to check.
+ * @param source - The source code to scan for secrets.
+ * @returns An array of secret findings.
+ */
 export function detectSecretsInSource(
   file: string,
   source: string,
@@ -47,11 +62,11 @@ export function detectSecretsInSource(
 
   for (let i = 0; i < lines.length; i++) {
     const lineNo = i + 1;
-    const line = lines[i];
+    const line = lines[i] || '';
 
     // 1) Suspicious key literal assignments
     if (SUSPICIOUS_KEYS.test(line)) {
-      const m = line.match(/=\s*["'`](.+?)["'`]/);
+      const m = line!.match(/=\s*["'`](.+?)["'`]/);
       if (m && m[1] && !looksHarmlessLiteral(m[1]) && m[1].length >= 12) {
         findings.push({
           file,
@@ -80,7 +95,7 @@ export function detectSecretsInSource(
     LONG_LITERAL.lastIndex = 0;
     let lm: RegExpExecArray | null;
     while ((lm = LONG_LITERAL.exec(line))) {
-      const literal = lm[1];
+      const literal = lm[1] || '';
       if (looksHarmlessLiteral(literal)) continue;
       if (literal.length < 32) continue; // ekstra støjfilter
       const ent = shannonEntropyNormalized(literal);

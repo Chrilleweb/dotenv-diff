@@ -12,6 +12,15 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.2.1] - 2025-08-30
+### Changed
+- tsconfig updates for improved type checking.
+- Updated codebase for new tsconfig rules
+- No breaking changes.
+
+### Added
+- Improved jsDocs for better code documentation.
+
 ## [2.2.0] - 2025-08-30
 ### Added
 - `--compare` flag to enable comparison mode.

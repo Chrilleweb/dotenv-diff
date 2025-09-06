@@ -1,7 +1,12 @@
 import chalk from 'chalk';
 import path from 'path';
-import { ALLOWED_CATEGORIES, Category, Options, RawOptions } from './types.js';
+import { ALLOWED_CATEGORIES, type Category, type Options, type RawOptions } from './types.js';
 
+/**
+ * Parses a comma-separated list of strings into an array of strings.
+ * @param val - The input value, which can be a string, an array of strings, or undefined.
+ * @returns An array of strings.
+ */
 function parseList(val?: string | string[]): string[] {
   const arr = Array.isArray(val) ? val : val ? [val] : [];
   return arr
@@ -10,6 +15,12 @@ function parseList(val?: string | string[]): string[] {
     .filter(Boolean);
 }
 
+/**
+ * Parses a comma-separated list of strings into an array of strings.
+ * @param val - The input value, which can be a string, an array of strings, or undefined.
+ * @param flagName - The name of the flag being parsed (for error messages).
+ * @returns An array of categories.
+ */
 function parseCategories(val?: string | string[], flagName = ''): Category[] {
   const raw = parseList(val);
   const bad = raw.filter((c) => !ALLOWED_CATEGORIES.includes(c as Category));
@@ -24,6 +35,11 @@ function parseCategories(val?: string | string[], flagName = ''): Category[] {
   return raw as Category[];
 }
 
+/**
+ * Normalizes the raw options by providing default values and parsing specific fields.
+ * @param raw - The raw options to normalize.
+ * @returns The normalized options.
+ */
 export function normalizeOptions(raw: RawOptions): Options {
   const checkValues = raw.checkValues ?? false;
   const isCiMode = Boolean(raw.ci);
@@ -32,7 +48,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const fix = Boolean(raw.fix);
   const json = Boolean(raw.json);
   const onlyParsed = parseCategories(raw.only, '--only');
-  const only = onlyParsed.length ? onlyParsed : undefined;
+  const only = onlyParsed.length ? onlyParsed : [];
   const noColor = Boolean(raw.noColor);
   const compare = Boolean(raw.compare);
   const scanUsage = raw.scanUsage ?? !compare;
@@ -65,9 +81,9 @@ export function normalizeOptions(raw: RawOptions): Options {
   const cwd = process.cwd();
 
   const envFlag =
-    typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : null;
+    typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : undefined;
   const exampleFlag =
-    typeof raw.example === 'string' ? path.resolve(cwd, raw.example) : null;
+    typeof raw.example === 'string' ? path.resolve(cwd, raw.example) : undefined;
 
   return {
     checkValues,

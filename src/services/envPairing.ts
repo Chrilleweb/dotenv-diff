@@ -2,6 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import type { Discovery } from './envDiscovery.js';
 
+/**
+ * Pairs each environment file with its corresponding example file.
+ * @param d - The discovery object containing environment and example file information.
+ * @returns An array of objects containing the environment name, path, and example path.
+ */
 export function pairWithExample(
   d: Discovery,
 ): Array<{ envName: string; envPath: string; examplePath: string }> {

@@ -1,3 +1,9 @@
+/**
+ * Calculates the normalized Shannon entropy of a string.
+ * Shannon entropy is a measure of the unpredictability or randomness of a string.
+ * @param s - The input string.
+ * @returns The normalized Shannon entropy (between 0 and 1).
+ */
 export function shannonEntropyNormalized(s: string): number {
   if (!s) return 0;
   const freq = new Map<string, number>();

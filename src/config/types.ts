@@ -1,3 +1,4 @@
+// Allowed categories for comparison
 export const ALLOWED_CATEGORIES = [
   'missing',
   'extra',
@@ -7,8 +8,12 @@ export const ALLOWED_CATEGORIES = [
   'gitignore',
 ] as const;
 
+// Type representing a single category for comparison
 export type Category = (typeof ALLOWED_CATEGORIES)[number];
 
+/** Type representing the options for the comparison
+ * These are the options that are processed and validated before being used in the comparison.
+ */
 export type Options = {
   checkValues: boolean;
   isCiMode: boolean;
@@ -16,8 +21,8 @@ export type Options = {
   allowDuplicates: boolean;
   fix: boolean;
   json: boolean;
-  envFlag: string | null;
-  exampleFlag: string | null;
+  envFlag: string | undefined;
+  exampleFlag: string | undefined;
   ignore: string[];
   ignoreRegex: RegExp[];
   cwd: string;
@@ -33,6 +38,9 @@ export type Options = {
   secrets: boolean;
 };
 
+/** Type representing the raw options for the comparison
+ * These are the options that are directly passed to the comparison function without any processing or validation.
+ */
 export type RawOptions = {
   checkValues?: boolean;
   ci?: boolean;
@@ -56,6 +64,10 @@ export type RawOptions = {
   secrets?: boolean;
 };
 
+/** 
+ * Type representing a single entry in the comparison results
+ * This entry contains the environment variable and its example value.
+ */
 export type CompareJsonEntry = {
   env: string;
   example: string;

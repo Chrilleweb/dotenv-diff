@@ -21,6 +21,8 @@ export function isGitRepo(cwd = process.cwd()): boolean {
  *  - true  → .env-matching patterns are found in .gitignore
  *  - false → .env-matching patterns are NOT found (or a negation exists)
  *  - null  → no .gitignore exists
+ * @param options - Options for the gitignore check.
+ * @returns True if the env file is ignored, false if not, or null if no .gitignore exists.
  */
 export function isEnvIgnoredByGit(
   options: GitignoreCheckOptions = {},
@@ -76,6 +78,8 @@ function matchesCandidate(pattern: string, envFile: string): boolean {
  * Logs a friendly warning if .env is not ignored by Git.
  * - Does not hard fail: non-blocking DX.
  * - Skips if not in a git repo or if .env does not exist.
+ * @param options - Options for the warning behavior.
+ * @returns console.log messages or void
  */
 export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
   const { cwd = process.cwd(), envFile = '.env', log = console.log } = options;

@@ -115,7 +115,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const files = await findFiles(opts.cwd, {
     include: opts.include,
     exclude: [...DEFAULT_EXCLUDE_PATTERNS, ...opts.exclude],
-    files: opts.files, // Pass files option
+    ...(opts.files ? { files: opts.files } : {}) // Pass files option
   });
 
   const allUsages: EnvUsage[] = [];
@@ -169,7 +169,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
 function expandBraceSets(pattern: string): string[] {
   // Single-level brace expansion: **/*.{js,ts,svelte} -> [**/*.js, **/*.ts, **/*.svelte]
   const m = pattern.match(/\{([^}]+)\}/);
-  if (!m) return [pattern];
+  if (!m || m[1] === undefined) return [pattern];
   const variants = m[1]
     .split(',')
     .map((p) => p.trim())
@@ -416,6 +416,7 @@ async function scanFile(
 
     while ((match = regex.exec(content)) !== null) {
       const variable = match[1];
+      if (!variable) continue;
       const matchIndex = match.index;
 
       // Find line and column

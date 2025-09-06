@@ -1,5 +1,13 @@
 import fs from 'fs';
 
+/**
+ * Applies fixes to the .env and .env.example files based on the detected issues.
+ * @param envPath - The path to the .env file.
+ * @param examplePath - The path to the .env.example file.
+ * @param missingKeys - The list of missing keys to add.
+ * @param duplicateKeys - The list of duplicate keys to remove.
+ * @returns An object indicating whether changes were made and details of the changes.
+ */
 export function applyFixes({
   envPath,
   examplePath,
@@ -24,9 +32,10 @@ export function applyFixes({
     const newLines: string[] = [];
     for (let i = lines.length - 1; i >= 0; i--) {
       const line = lines[i];
+      if (line === undefined) continue;
       const match = line.match(/^\s*([\w.-]+)\s*=/);
       if (match) {
-        const key = match[1];
+        const key = match[1] || '';
         if (duplicateKeys.includes(key)) {
           if (seen.has(key)) continue; // skip duplicate
           seen.add(key);
