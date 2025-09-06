@@ -1,6 +1,11 @@
 import chalk from 'chalk';
 import path from 'path';
-import { ALLOWED_CATEGORIES, type Category, type Options, type RawOptions } from './types.js';
+import {
+  ALLOWED_CATEGORIES,
+  type Category,
+  type Options,
+  type RawOptions,
+} from './types.js';
 
 /**
  * Parses a comma-separated list of strings into an array of strings.
@@ -83,7 +88,9 @@ export function normalizeOptions(raw: RawOptions): Options {
   const envFlag =
     typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : undefined;
   const exampleFlag =
-    typeof raw.example === 'string' ? path.resolve(cwd, raw.example) : undefined;
+    typeof raw.example === 'string'
+      ? path.resolve(cwd, raw.example)
+      : undefined;
 
   return {
     checkValues,

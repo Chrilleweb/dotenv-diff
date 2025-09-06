@@ -95,4 +95,23 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
+    it('does not warn on process.env and import.meta.env usage', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'USER_API=\nVITE_KEYCLOAK_URL=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      // Skal ikke flagges som secrets
+      const apiUrl = '${"process.env.USER_API"}/users/${"userId"}/reset-password';
+      const tokenEndpoint = '${"import.meta.env.VITE_KEYCLOAK_URL"}/token';
+
+      console.log(apiUrl, tokenEndpoint);
+    `.trimStart()
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
 });
