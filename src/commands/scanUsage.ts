@@ -361,10 +361,14 @@ function outputToConsole(
       chalk.magenta.dim(`   Files scanned: ${scanResult.stats.filesScanned}`),
     );
     console.log(
-      chalk.magenta.dim(`   Total usages found: ${scanResult.stats.totalUsages}`),
+      chalk.magenta.dim(
+        `   Total usages found: ${scanResult.stats.totalUsages}`,
+      ),
     );
     console.log(
-      chalk.magenta.dim(`   Unique variables: ${scanResult.stats.uniqueVariables}`),
+      chalk.magenta.dim(
+        `   Unique variables: ${scanResult.stats.uniqueVariables}`,
+      ),
     );
     console.log();
   }

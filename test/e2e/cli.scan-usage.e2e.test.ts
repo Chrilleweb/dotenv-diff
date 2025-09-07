@@ -324,7 +324,7 @@ const missing = process.env.MISSING_VAR;`,
     expect(res.stdout).not.toContain('TEST_VAR');
   });
 
-  it('excludes .sveltekit files by default', () => {
+  it('excludes .sveltekit and .svelte-kit files by default', () => {
     const cwd = tmpDir();
 
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
@@ -333,6 +333,11 @@ const missing = process.env.MISSING_VAR;`,
       'const api = process.env.API_KEY;',
     );
     fs.mkdirSync(path.join(cwd, '.sveltekit'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, '.svelte-kit'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, '.svelte-kit/kit.js'),
+      'const test = process.env.TEST_VAR;',
+    );
     fs.writeFileSync(
       path.join(cwd, '.sveltekit/app.js'),
       'const test = process.env.TEST_VAR;',

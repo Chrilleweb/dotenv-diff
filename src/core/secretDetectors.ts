@@ -25,8 +25,18 @@ const PROVIDER_PATTERNS: RegExp[] = [
 
 const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
 
+/**
+ * Checks if a string looks like a harmless literal.
+ * @param s - The string to check.
+ * @returns True if the string looks harmless, false otherwise.
+ */
 function looksHarmlessLiteral(s: string): boolean {
-  return /^https?:\/\//i.test(s) || /\S+@\S+/.test(s);
+  return (
+    /^https?:\/\//i.test(s) ||
+    /\S+@\S+/.test(s) ||
+    /^\.{0,2}\//.test(s) ||
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+  );
 }
 
 /**
@@ -44,6 +54,17 @@ function isProbablyTestPath(p: string): boolean {
 
 // Threshold is the value between 0 and 1 that determines the sensitivity of the detection.
 const DEFAULT_SECRET_THRESHOLD = 0.9 as const;
+
+/**
+ * Optimized for sveltekit and vite env accessors
+ * @param line - A line of code to check.
+ * @returns True if the line is an environment variable accessor, false otherwise.
+ */
+function isEnvAccessor(line: string): boolean {
+  return /\b(process\.env|import\.meta\.env|\$env\/(static|dynamic)\/(public|private))\b/.test(
+    line,
+  );
+}
 
 /**
  * Detects secrets in the source code of a file.
@@ -67,7 +88,13 @@ export function detectSecretsInSource(
     // 1) Suspicious key literal assignments
     if (SUSPICIOUS_KEYS.test(line)) {
       const m = line!.match(/=\s*["'`](.+?)["'`]/);
-      if (m && m[1] && !looksHarmlessLiteral(m[1]) && m[1].length >= 12) {
+      if (
+        m &&
+        m[1] &&
+        !looksHarmlessLiteral(m[1]) &&
+        m[1].length >= 12 &&
+        !isEnvAccessor(line)
+      ) {
         findings.push({
           file,
           line: lineNo,

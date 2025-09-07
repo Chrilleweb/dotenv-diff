@@ -64,7 +64,7 @@ export type RawOptions = {
   secrets?: boolean;
 };
 
-/** 
+/**
  * Type representing a single entry in the comparison results
  * This entry contains the environment variable and its example value.
  */

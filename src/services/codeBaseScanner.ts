@@ -91,6 +91,7 @@ const DEFAULT_INCLUDE_EXTENSIONS = [
 const DEFAULT_EXCLUDE_PATTERNS = [
   'node_modules',
   '.sveltekit',
+  '.svelte-kit',
   '_actions',
   'dist',
   'build',
@@ -115,7 +116,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const files = await findFiles(opts.cwd, {
     include: opts.include,
     exclude: [...DEFAULT_EXCLUDE_PATTERNS, ...opts.exclude],
-    ...(opts.files ? { files: opts.files } : {}) // Pass files option
+    ...(opts.files ? { files: opts.files } : {}), // Pass files option
   });
 
   const allUsages: EnvUsage[] = [];
