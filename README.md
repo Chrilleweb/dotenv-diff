@@ -2,15 +2,10 @@
 
 ![Demo](./public/demo.gif)
 
-Easily scan your codebase to detect which environment variables are actually used in your code — and which ones are not.
+Scan your codebase to detect which environment variables are used in your code.
 
-This package will:
-- Scan your codebase to find environment variables in use.
-- Show statistics about the usage of these variables.
-- Detect missing environment variables.
-- Find potential secrets in your codebase.
-
-Optimized for JavaScript/TypeScript projects and frontend frameworks including Node.js, Next.js, Vite, SvelteKit, Nuxt, Vue, and Deno. Can also be used with other project types for basic .env file comparison.
+Optimized for SvelteKit. </br>
+Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js, Next.js, Nuxt, and Vue — or any other setup where you want reliable .env file comparison.
 
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
@@ -45,26 +40,24 @@ This scans your entire codebase to detect which environment variables are actual
 - **Enhance security**: Ensure sensitive variables are not accidentally committed to version control.
 - **Scale confidently**: Perfect for turbo monorepos and multi-environment setups.
 
-
-## CI/CD integration with `--ci` option
-You can scan and compare against specific environment file, eg. `.env.example`
-This is useful for CI/CD pipelines to ensure that the environment variables used in your code match those defined in your `.env.example` file.
-
-Use the `--ci` flag for automated environments. This enables strict mode where the tool exits with code 1 on any issues, making it perfect for CI/CD pipelines.
-
-And the `--example` option allows you to specify which `.env.example` file to compare against.
-
 ### Use it in Github Actions Example:
 
 ```yaml
 - name: Check environment variables
-  run: dotenv-diff --ci --example .env.example --ignore VITE_MODE,NODE_ENV
+  run: dotenv-diff --example .env.example
 ```
 
 You can also change the comparison file by using the `--example` flag to point to a different `.env.example` file. 
 
 ```bash
-dotenv-diff --example .env.example.staging --ci
+dotenv-diff --example .env.example.staging
+```
+
+If your project doesn’t use a .env.example file, you can simply run dotenv-diff without any arguments.
+It will scan your codebase for environment variable usage, but won’t compare against an example file.
+
+```bash
+dotenv-diff
 ```
 
 ## Use it in a Turborepo Monorepo
