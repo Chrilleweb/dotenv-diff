@@ -17,6 +17,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 - Fixed issue where it would give a false warning on secrets with process.env
 - Code cleanup.
 - exclude `.svelte-kit` from codebase scan by default.
+- Updated README
 
 ### Changed
 - No breaking changes.
