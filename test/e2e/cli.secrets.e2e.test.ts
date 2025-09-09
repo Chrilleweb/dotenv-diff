@@ -249,4 +249,24 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Potential secrets detected in codebase:');
   });
+  it('should give warning on stripe keys in codebase', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      const stripeLive = "sk_live_51N72ePpL8F1D2d3tD8K3mE9Qp4tBvCyhZ1lWx2Kj7cP6fR8a9L";
+      const stripeTest = "sk_test_51N72ePpL8F1D2d3tD8K3mE9Qp4tBvCyhZ1lWx2Kj7cP6fR8a9L";
+
+      console.log(stripeLive, stripeTest);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Potential secrets detected in codebase:');
+    expect(res.stdout).toMatch(/(stripeLive|stripeTest)/);
+  });
 });
