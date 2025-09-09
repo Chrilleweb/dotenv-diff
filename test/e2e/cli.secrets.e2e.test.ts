@@ -45,7 +45,7 @@ describe('secrets detection (default scan mode)', () => {
 
       // lidt brug af env så stats/scan virker
       console.log(process.env.API_KEY, process.env.NEW_API_KEY);
-    `.trimStart()
+    `.trimStart(),
     );
 
     const local = runCli(cwd, []);
@@ -58,26 +58,6 @@ describe('secrets detection (default scan mode)', () => {
     expect(ci.stdout).toContain('Potential secrets detected in codebase:');
   });
 
-  it('does not warn on URLs like localhost (noise guard)', () => {
-    const cwd = tmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), '\n');
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'src', 'index.ts'),
-      `
-      // URL skal ikke flagges
-      const service = 'http://localhost:3000';
-      // kort literal skal ikke flagges
-      const token = "12345";
-      console.log(service, token);
-    `.trimStart()
-    );
-
-    const res = runCli(cwd, []);
-    expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
-  });
-
   it('does not warn when no secrets are present', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=\n');
@@ -88,14 +68,14 @@ describe('secrets detection (default scan mode)', () => {
       // helt harmløst
       const a = "hello";
       console.log(a);
-    `.trimStart()
+    `.trimStart(),
     );
 
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
-    it('does not warn on process.env and import.meta.env usage', () => {
+  it('does not warn on process.env and import.meta.env usage', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'USER_API=\nVITE_KEYCLOAK_URL=\n');
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
@@ -103,11 +83,11 @@ describe('secrets detection (default scan mode)', () => {
       path.join(cwd, 'src', 'index.ts'),
       `
       // Skal ikke flagges som secrets
-      const apiUrl = '${"process.env.USER_API"}/users/${"userId"}/reset-password';
-      const tokenEndpoint = '${"import.meta.env.VITE_KEYCLOAK_URL"}/token';
+      const apiUrl = '${'process.env.USER_API'}/users/${'userId'}/reset-password';
+      const tokenEndpoint = '${'import.meta.env.VITE_KEYCLOAK_URL'}/token';
 
       console.log(apiUrl, tokenEndpoint);
-    `.trimStart()
+    `.trimStart(),
     );
 
     const res = runCli(cwd, []);
@@ -137,7 +117,7 @@ describe('secrets detection (default scan mode)', () => {
       const apiEndpoint = "https://service.com/api/auth/token";
       
       console.log(authUrl, redirectUrl, apiEndpoint);
-    `.trimStart()
+    `.trimStart(),
     );
 
     const res = runCli(cwd, []);
@@ -160,7 +140,7 @@ describe('secrets detection (default scan mode)', () => {
       const loginUrl = \`\${baseUrl}/auth/login\`;
       
       console.log(process.env.DUMMY);
-    `.trimStart()
+    `.trimStart(),
     );
 
     const res = runCli(cwd, []);
@@ -169,5 +149,88 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.stdout).toContain('src/secrets.ts');
     // Should contain warnings for the actual secrets but not the URL
     expect(res.stdout).toMatch(/(auth_token|api_key|client_secret)/);
+  });
+  it('should give warning on http://localhost*', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      // URL skal ikke flagges
+      const service = 'http://localhost:3000';
+      const service2 = "http://localhost/api";
+      const service3 = \`http://localhost:8080/path\`;
+
+      console.log(service, service2, service3);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Potential secrets detected in codebase:');
+  });
+  it('should not give warning on localhost URLs i .env files', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      `
+      DUMMY=
+      LOCAL_URL=http://localhost:3000
+      ANOTHER_URL=http://localhost/api
+      TEMPLATE_URL=http://localhost:8080/path
+    `.trimStart(),
+    );
+    fs.writeFileSync(
+      path.join(cwd, '.env.example'),
+      `
+      DUMMY=
+      LOCAL_URL=http://localhost:3000
+      ANOTHER_URL=http://localhost/api
+      TEMPLATE_URL=http://localhost:8080/path
+    `.trimStart(),
+    );
+    fs.writeFileSync(
+      path.join(cwd, '.env.test'),
+      `
+      DUMMY=
+      LOCAL_URL=http://localhost:3000
+      ANOTHER_URL=http://localhost/api
+      TEMPLATE_URL=http://localhost:8080/path
+    `.trimStart(),
+    );
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      // lidt brug af env så stats/scan virker
+      console.log(process.env.DUMMY);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
+  it('should not give warning on base64 ', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      // Base64 encoded string - should not be flagged
+      const encoded = "SGVsbG8gV29ybGQh"; // "Hello World!" in Base64
+
+      console.log(encoded);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
 });

@@ -12,26 +12,13 @@ Also works well in modern JavaScript/TypeScript projects and frameworks like Nod
 
 ---
 
-## Installation
-
-```bash
-# npm
-npm install -g dotenv-diff
-
-# yarn
-yarn global add dotenv-diff
-
-# pnpm
-pnpm add -g dotenv-diff
-```
-
 ## Why dotenv-diff?
 
-- **Prevent production issues**: Ensure all required environment variables are defined before deploying.
-- **Avoid runtime errors**: Catch missing or misconfigured variables early in development.
-- **Improve collaboration**: Keep your team aligned on necessary environment variables.
-- **Enhance security**: Ensure sensitive variables are not accidentally committed to version control.
-- **Scale confidently**: Perfect for turbo monorepos and multi-environment setups.
+- Ensure all required environment variables are defined before deploying.
+- Catch missing or misconfigured variables early in development.
+- Improve collaboration: Keep your team aligned on necessary environment variables.
+- Enhance security: Ensure sensitive variables are not accidentally committed to version control.
+- Scale confidently: Perfect for turbo monorepos and multi-environment setups.
 
 ### Use it in Github Actions Example:
 

@@ -25,6 +25,9 @@ const PROVIDER_PATTERNS: RegExp[] = [
 
 const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
 
+// Pattern to detect localhost URLs
+const LOCALHOST_PATTERN = /["'`](https?:\/\/localhost[^"'`]*)["'`]/g;
+
 /**
  * Checks if a string looks like a harmless literal.
  * @param s - The string to check.
@@ -32,7 +35,8 @@ const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
  */
 function looksHarmlessLiteral(s: string): boolean {
   return (
-    /^https?:\/\//i.test(s) ||
+    // Remove localhost check from here - we want to flag localhost URLs now
+    /^https?:\/\/(?!localhost)/i.test(s) ||
     /\S+@\S+/.test(s) ||
     /^\.{0,2}\//.test(s) ||
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
@@ -103,6 +107,19 @@ export function detectSecretsInSource(
   for (let i = 0; i < lines.length; i++) {
     const lineNo = i + 1;
     const line = lines[i] || '';
+
+    // Check for localhost URLs first
+    LOCALHOST_PATTERN.lastIndex = 0;
+    let localhostMatch: RegExpExecArray | null;
+    while ((localhostMatch = LOCALHOST_PATTERN.exec(line))) {
+      findings.push({
+        file,
+        line: lineNo,
+        kind: 'pattern',
+        message: 'localhost URL detected',
+        snippet: line.trim().slice(0, 180),
+      });
+    }
 
     // 1) Suspicious key literal assignments
     if (SUSPICIOUS_KEYS.test(line)) {
