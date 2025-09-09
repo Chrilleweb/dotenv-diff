@@ -102,19 +102,16 @@ describe('secrets detection (default scan mode)', () => {
       path.join(cwd, 'src', 'auth.ts'),
       `
       // These should NOT be flagged as secrets - they're URL constructions
-      const baseURL = 'https://example.com/';
       window.location.href = \`\${baseURL}auth/login\`;
       
-      const keycloakBase = 'https://keycloak.example.com';
-      const realm = 'myrealm';
       const authUrl = \`\${keycloakBase}/realms/\${realm}/protocol/openid-connect/auth?client_id=test\`;
       const tokenUrl = \`\${keycloakBase}/realms/\${realm}/protocol/openid-connect/token\`;
       const authUrl = \`\${keycloakBase}/realms/\${realm}/protocol/openid-connect/auth?response_type=code&client_id=\${clientId}\`;
       const logoutUrl = \`\${keycloakBase}/realms/\${realm}/protocol/openid-connect/logout\`;
-      
-      // String concatenation should also not be flagged
-      const redirectUrl = 'https://api.example.com' + '/auth/callback';
-      const apiEndpoint = "https://service.com/api/auth/token";
+
+      const UUID = '123e4567-e89b-12d3-a456-426614174000'; // should not be flagged
+
+      const SHA256Hash = '3f79bb7b435b05321651daefd374cd21b4f2d3a0a4f1e5e6e7f8a9b0c1d2e3f4'; // should not be flagged
       
       console.log(authUrl, redirectUrl, apiEndpoint);
     `.trimStart(),
@@ -150,7 +147,7 @@ describe('secrets detection (default scan mode)', () => {
     // Should contain warnings for the actual secrets but not the URL
     expect(res.stdout).toMatch(/(auth_token|api_key|client_secret)/);
   });
-  it('should give warning on http://localhost*', () => {
+  it('should not give warning on http://localhost*', () => {
     const cwd = tmpDir();
 
     fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
@@ -158,7 +155,6 @@ describe('secrets detection (default scan mode)', () => {
     fs.writeFileSync(
       path.join(cwd, 'src', 'index.ts'),
       `
-      // URL skal ikke flagges
       const service = 'http://localhost:3000';
       const service2 = "http://localhost/api";
       const service3 = \`http://localhost:8080/path\`;
@@ -169,9 +165,9 @@ describe('secrets detection (default scan mode)', () => {
 
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Potential secrets detected in codebase:');
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
-  it('should not give warning on localhost URLs i .env files', () => {
+  it('should not give warning on localhost URLs in .env files', () => {
     const cwd = tmpDir();
 
     fs.writeFileSync(
@@ -232,5 +228,25 @@ describe('secrets detection (default scan mode)', () => {
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
+  it('should warn about using https URLs in codebase', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      const service = 'https://example.com';
+      const service2 = "https://example.com/api";
+      const service3 = \`https://example.com:8080/path\`;
+
+      console.log(service, service2, service3);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Potential secrets detected in codebase:');
   });
 });

@@ -21,12 +21,15 @@ const PROVIDER_PATTERNS: RegExp[] = [
   /\bsk_live_[0-9a-zA-Z]{24,}\b/, // Stripe live secret
   /\bsk_test_[0-9a-zA-Z]{24,}\b/, // Stripe test secret
   /\bAIza[0-9A-Za-z\-_]{20,}\b/, // Google API key
+  /\bya29\.[0-9A-Za-z\-_]+\b/, // Google OAuth access token
+  /\b[A-Za-z0-9_-]{21}:[A-Za-z0-9_-]{140}\b/, // Firebase token
+  /\b0x[a-fA-F0-9]{40}\b/, // Ethereum address
+  /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/, // JWT token
 ];
 
 const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
 
-// Pattern to detect localhost URLs
-const LOCALHOST_PATTERN = /["'`](https?:\/\/localhost[^"'`]*)["'`]/g;
+const HTTPS_PATTERN = /["'`](https?:\/\/(?!localhost)[^"'`]*)["'`]/g;
 
 /**
  * Checks if a string looks like a harmless literal.
@@ -38,8 +41,12 @@ function looksHarmlessLiteral(s: string): boolean {
     // Remove localhost check from here - we want to flag localhost URLs now
     /^https?:\/\/(?!localhost)/i.test(s) ||
     /\S+@\S+/.test(s) ||
+    /^data:[a-z]+\/[a-z0-9.+-]+;base64,/i.test(s) ||
     /^\.{0,2}\//.test(s) ||
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s) ||
+    /^[0-9a-f]{32,128}$/i.test(s) || // MD5, SHA1, SHA256, etc.
+    /^[A-Za-z0-9+/_\-]{16,20}={0,2}$/.test(s) ||
+    /^[A-Za-z0-9+/_\-]*(_PUBLIC|_PRIVATE|VITE_|NEXT_PUBLIC|VUE_)[A-Za-z0-9+/_\-]*={0,2}$/.test(s)
   );
 }
 
@@ -56,7 +63,9 @@ function looksLikeUrlConstruction(line: string): boolean {
     // String concatenation with slashes
     /=\s*["'][^"']*\/[^"']*["']\s*\+/.test(line) ||
     // Contains common URL patterns
-    /=\s*["'`][^"'`]*\/[^"'`]*(auth|api|login|redirect|callback|protocol)[^"'`]*\/[^"'`]*["'`]/.test(line) ||
+    /=\s*["'`][^"'`]*\/[^"'`]*(auth|api|login|redirect|callback|protocol)[^"'`]*\/[^"'`]*["'`]/.test(
+      line,
+    ) ||
     // Keycloak-specific patterns
     /realms\/.*\/protocol\/openid-connect/.test(line)
   );
@@ -108,17 +117,23 @@ export function detectSecretsInSource(
     const lineNo = i + 1;
     const line = lines[i] || '';
 
-    // Check for localhost URLs first
-    LOCALHOST_PATTERN.lastIndex = 0;
-    let localhostMatch: RegExpExecArray | null;
-    while ((localhostMatch = LOCALHOST_PATTERN.exec(line))) {
-      findings.push({
-        file,
-        line: lineNo,
-        kind: 'pattern',
-        message: 'localhost URL detected',
-        snippet: line.trim().slice(0, 180),
-      });
+    // Skip comments
+    if (/^\s*\/\//.test(line)) continue;
+
+    // Check for HTTPS URLs
+    HTTPS_PATTERN.lastIndex = 0;
+    let httpsMatch: RegExpExecArray | null;
+    while ((httpsMatch = HTTPS_PATTERN.exec(line))) {
+      // Skip if it's already been flagged as localhost
+      if (!httpsMatch[1]?.includes('localhost')) {
+        findings.push({
+          file,
+          line: lineNo,
+          kind: 'pattern',
+          message: 'HTTPS URL detected - consider using environment variable',
+          snippet: line.trim().slice(0, 180),
+        });
+      }
     }
 
     // 1) Suspicious key literal assignments
