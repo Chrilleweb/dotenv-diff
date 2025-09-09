@@ -30,6 +30,7 @@
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\" \"src/*.ts\"",
     "start": "node dist/bin/dotenv-diff.js",
+    "dotenv-diff": "dotenv-diff",
     "prepublishOnly": "npm run lint && npm test && npm run build"
   },
   "author": "Chrilleweb",

@@ -92,6 +92,11 @@ export async function scanUsage(
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
+  scanResult.used = scanResult.used.filter(
+  (u: EnvUsage) =>
+    u.context && !/^\s*(\/\/|#)/.test(u.context.trim())
+);
+
   // If user explicitly passed --example but the file doesn't exist:
   if (opts.examplePath) {
     const exampleAbs = resolveFromCwd(opts.cwd, opts.examplePath);

@@ -86,7 +86,7 @@ function isProbablyTestPath(p: string): boolean {
 }
 
 // Threshold is the value between 0 and 1 that determines the sensitivity of the detection.
-const DEFAULT_SECRET_THRESHOLD = 0.9 as const;
+const DEFAULT_SECRET_THRESHOLD = 0.85 as const;
 
 /**
  * Optimized for sveltekit and vite env accessors
@@ -177,7 +177,7 @@ export function detectSecretsInSource(
     while ((lm = LONG_LITERAL.exec(line))) {
       const literal = lm[1] || '';
       if (looksHarmlessLiteral(literal)) continue;
-      if (literal.length < 32) continue; // ekstra støjfilter
+      if (literal.length < 32) continue;
       const ent = shannonEntropyNormalized(literal);
       if (ent >= threshold) {
         findings.push({
@@ -190,5 +190,14 @@ export function detectSecretsInSource(
       }
     }
   }
-  return findings;
+  const uniqueFindings = findings.filter(
+  (f, idx, arr) =>
+    idx === arr.findIndex(other =>
+      other.file === f.file &&
+      other.line === f.line &&
+      other.snippet === f.snippet
+    )
+);
+
+  return uniqueFindings;
 }
