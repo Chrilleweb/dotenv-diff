@@ -15,6 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ## [2.2.3] - 2025-09-08
 ### Added
 - Warning for HTTPS URLs detected in codebase.
+- Added duplicate key detection to codebase scanner.
 
 ### Fixed
 - Fixed issue with false warnings on secrets in certain edge cases.
@@ -22,6 +23,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 - No breaking changes.
+- `--compare` feature coloring improved for better readability.
 
 ## [2.2.2] - 2025-09-07
 ### Fixed
