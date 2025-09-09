@@ -24,13 +24,6 @@ yarn global add dotenv-diff
 # pnpm
 pnpm add -g dotenv-diff
 ```
-## Usage
-
-```bash
-dotenv-diff
-```
-
-This scans your entire codebase to detect which environment variables are actually used in the code — and compare them against your `.env` file.
 
 ## Why dotenv-diff?
 

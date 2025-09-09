@@ -12,6 +12,14 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.2.3] - 2025-09-08
+### Fixed
+- Fixed issue with false warnings on secrets in certain edge cases.
+- Updated README
+
+### Changed
+- No breaking changes.
+
 ## [2.2.2] - 2025-09-07
 ### Fixed
 - Fixed issue where it would give a false warning on secrets with process.env

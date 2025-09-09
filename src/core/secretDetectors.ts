@@ -40,6 +40,25 @@ function looksHarmlessLiteral(s: string): boolean {
 }
 
 /**
+ * Checks if a line looks like a URL construction pattern.
+ * @param line - The line to check.
+ * @returns True if the line looks like URL construction, false otherwise.
+ */
+function looksLikeUrlConstruction(line: string): boolean {
+  // Check for template literals or string concatenation that looks like URLs
+  return (
+    // Template literals with URL-like patterns
+    /=\s*`[^`]*\$\{[^}]+\}[^`]*\/[^`]*`/.test(line) ||
+    // String concatenation with slashes
+    /=\s*["'][^"']*\/[^"']*["']\s*\+/.test(line) ||
+    // Contains common URL patterns
+    /=\s*["'`][^"'`]*\/[^"'`]*(auth|api|login|redirect|callback|protocol)[^"'`]*\/[^"'`]*["'`]/.test(line) ||
+    // Keycloak-specific patterns
+    /realms\/.*\/protocol\/openid-connect/.test(line)
+  );
+}
+
+/**
  * Checks if a file path is probably a test path.
  * This is determined by looking for common test folder names and file extensions.
  * @param p - The file path to check.
@@ -92,6 +111,7 @@ export function detectSecretsInSource(
         m &&
         m[1] &&
         !looksHarmlessLiteral(m[1]) &&
+        !looksLikeUrlConstruction(line) &&
         m[1].length >= 12 &&
         !isEnvAccessor(line)
       ) {

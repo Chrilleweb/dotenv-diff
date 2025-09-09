@@ -114,4 +114,60 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
+  it('does not warn on URL construction patterns with auth keywords', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'KEYCLOAK_BASE=\nREALM=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'auth.ts'),
+      `
+      // These should NOT be flagged as secrets - they're URL constructions
+      const baseURL = 'https://example.com/';
+      window.location.href = \`\${baseURL}auth/login\`;
+      
+      const keycloakBase = 'https://keycloak.example.com';
+      const realm = 'myrealm';
+      const authUrl = \`\${keycloakBase}/realms/\${realm}/protocol/openid-connect/auth?client_id=test\`;
+      const tokenUrl = \`\${keycloakBase}/realms/\${realm}/protocol/openid-connect/token\`;
+      const authUrl = \`\${keycloakBase}/realms/\${realm}/protocol/openid-connect/auth?response_type=code&client_id=\${clientId}\`;
+      const logoutUrl = \`\${keycloakBase}/realms/\${realm}/protocol/openid-connect/logout\`;
+      
+      // String concatenation should also not be flagged
+      const redirectUrl = 'https://api.example.com' + '/auth/callback';
+      const apiEndpoint = "https://service.com/api/auth/token";
+      
+      console.log(authUrl, redirectUrl, apiEndpoint);
+    `.trimStart()
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
+  it('still warns on actual secrets with auth keywords', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'secrets.ts'),
+      `
+      // These SHOULD be flagged as potential secrets
+      const auth_token = "sk_live_abcdefghijklmnopqrstuvwxyz123456";
+      const api_key = "AKIA1234567890ABCDEF";
+      const client_secret = "very_secret_key_that_should_be_flagged_123";
+      
+      // But this URL should NOT be flagged
+      const loginUrl = \`\${baseUrl}/auth/login\`;
+      
+      console.log(process.env.DUMMY);
+    `.trimStart()
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Potential secrets detected in codebase:');
+    expect(res.stdout).toContain('src/secrets.ts');
+    // Should contain warnings for the actual secrets but not the URL
+    expect(res.stdout).toMatch(/(auth_token|api_key|client_secret)/);
+  });
 });

@@ -1,6 +1,6 @@
 {
   "name": "dotenv-diff",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "type": "module",
   "description": "Scan your codebase to find environment variables in use.",
   "bin": {
@@ -55,7 +55,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "chalk": "^5.4.1",
+    "chalk": "5.4.1",
     "commander": "^14.0.0",
     "prompts": "^2.4.2"
   },
