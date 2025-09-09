@@ -25,6 +25,7 @@ const PROVIDER_PATTERNS: RegExp[] = [
   /\b[A-Za-z0-9_-]{21}:[A-Za-z0-9_-]{140}\b/, // Firebase token
   /\b0x[a-fA-F0-9]{40}\b/, // Ethereum address
   /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/, // JWT token
+  /\bAC[0-9a-fA-F]{32}\b/, // Twilio Account SID
 ];
 
 const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
