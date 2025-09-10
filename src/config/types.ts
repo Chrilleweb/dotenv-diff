@@ -36,6 +36,7 @@ export type Options = {
   files?: string[];
   noColor?: boolean;
   secrets: boolean;
+  strict: boolean | undefined;
 };
 
 /** Type representing the raw options for the comparison
@@ -62,6 +63,7 @@ export type RawOptions = {
   showStats?: boolean;
   files?: string | string[];
   secrets?: boolean;
+  strict?: boolean;
 };
 
 /**

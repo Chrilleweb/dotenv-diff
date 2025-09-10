@@ -28,6 +28,7 @@ export async function compareMany(
     collect?: (entry: CompareJsonEntry) => void;
     only?: Category[];
     showStats?: boolean;
+    strict?: boolean;
   },
 ) {
   let exitWithError = false;
@@ -213,7 +214,7 @@ export async function compareMany(
       if (!opts.json) {
         console.log(
           chalk.yellow(
-            `  ⚠️  Duplicate keys in ${exampleName} (last occurrence wins):`,
+            `⚠️  Duplicate keys in ${exampleName} (last occurrence wins):`,
           ),
         );
         dupsEx.forEach(({ key, count }) =>
@@ -343,6 +344,18 @@ export async function compareMany(
     }
 
     opts.collect?.(entry);
+    const warningsExist =
+  filtered.extra.length > 0 ||
+  filtered.empty.length > 0 ||
+  filtered.duplicatesEnv.length > 0 ||
+  filtered.duplicatesEx.length > 0 ||
+  filtered.mismatches.length > 0 ||
+  filtered.gitignoreUnsafe;
+
+if (opts.strict && warningsExist) {
+  exitWithError = true;
+}
+
   }
 
   return { exitWithError };

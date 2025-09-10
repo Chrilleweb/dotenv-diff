@@ -28,6 +28,7 @@ export interface ScanUsageOptions extends ScanOptions {
   isCiMode?: boolean;
   files?: string[];
   allowDuplicates?: boolean;
+  strict?: boolean;
 }
 
 /** Represents a single entry in the scan results. */
@@ -149,53 +150,54 @@ export async function scanUsage(
       comparedAgainst = compareFile.name;
 
       // Check for duplicates in the env file
-      if (!opts.allowDuplicates) {
-        dupsEnv = findDuplicateKeys(compareFile.path).filter(
-          ({ key }) =>
-            !opts.ignore.includes(key) &&
-            !opts.ignoreRegex.some((rx) => rx.test(key)),
-        );
+if (!opts.allowDuplicates) {
+  dupsEnv = findDuplicateKeys(compareFile.path).filter(
+    ({ key }) =>
+      !opts.ignore.includes(key) &&
+      !opts.ignoreRegex.some((rx) => rx.test(key)),
+  );
 
-        // Also check for duplicates in example file if it exists
-        if (opts.examplePath) {
-          const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
-          if (fs.existsSync(examplePath)) {
-            dupsExample = findDuplicateKeys(examplePath).filter(
-              ({ key }) =>
-                !opts.ignore.includes(key) &&
-                !opts.ignoreRegex.some((rx) => rx.test(key)),
-            );
-          }
-        }
+  // Also check for duplicates in example file if it exists AND is different from compareFile
+  if (opts.examplePath) {
+    const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
+    // Only check example file if it exists and is NOT the same as the comparison file
+    if (fs.existsSync(examplePath) && examplePath !== compareFile.path) {
+      dupsExample = findDuplicateKeys(examplePath).filter(
+        ({ key }) =>
+          !opts.ignore.includes(key) &&
+          !opts.ignoreRegex.some((rx) => rx.test(key)),
+      );
+    }
+  }
 
-        duplicatesFound = dupsEnv.length > 0 || dupsExample.length > 0;
+  duplicatesFound = dupsEnv.length > 0 || dupsExample.length > 0;
 
-        // Apply duplicate fixes if --fix is enabled (but don't show message yet)
-        if (opts.fix && (dupsEnv.length > 0 || dupsExample.length > 0)) {
-          const { changed, result } = applyFixes({
-            envPath: compareFile.path,
-            examplePath: opts.examplePath ? resolveFromCwd(opts.cwd, opts.examplePath) : '',
-            missingKeys: [],
-            duplicateKeys: dupsEnv.map((d) => d.key),
-          });
+  // Apply duplicate fixes if --fix is enabled (but don't show message yet)
+  if (opts.fix && (dupsEnv.length > 0 || dupsExample.length > 0)) {
+    const { changed, result } = applyFixes({
+      envPath: compareFile.path,
+      examplePath: opts.examplePath ? resolveFromCwd(opts.cwd, opts.examplePath) : '',
+      missingKeys: [],
+      duplicateKeys: dupsEnv.map((d) => d.key),
+    });
 
-          if (changed) {
-            fixApplied = true;
-            removedDuplicates = result.removedDuplicates;
-            // Clear duplicates after fix
-            duplicatesFound = false;
-            dupsEnv = [];
-            dupsExample = [];
-          }
-        }
+    if (changed) {
+      fixApplied = true;
+      removedDuplicates = result.removedDuplicates;
+      // Clear duplicates after fix
+      duplicatesFound = false;
+      dupsEnv = [];
+      dupsExample = [];
+    }
+  }
 
-        // Add to scan result for both JSON and console output (only if not fixed)
-        if ((dupsEnv.length > 0 || dupsExample.length > 0) && (!opts.fix || !fixApplied)) {
-          if (!scanResult.duplicates) scanResult.duplicates = {};
-          if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
-          if (dupsExample.length > 0) scanResult.duplicates.example = dupsExample;
-        }
-      }
+  // Add to scan result for both JSON and console output (only if not fixed)
+  if ((dupsEnv.length > 0 || dupsExample.length > 0) && (!opts.fix || !fixApplied)) {
+    if (!scanResult.duplicates) scanResult.duplicates = {};
+    if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
+    if (dupsExample.length > 0) scanResult.duplicates.example = dupsExample;
+  }
+}
     } catch (error) {
       const errorMessage = `⚠️  Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
 
@@ -265,7 +267,12 @@ export async function scanUsage(
       Object.keys(envVariables).length,
     );
     console.log(JSON.stringify(jsonOutput, null, 2));
-    return { exitWithError: scanResult.missing.length > 0 || duplicatesFound };
+    return { exitWithError: scanResult.missing.length > 0 || duplicatesFound || !!(opts.strict && (
+         scanResult.unused.length > 0 ||
+         (scanResult.duplicates?.env?.length ?? 0) > 0 ||
+         (scanResult.duplicates?.example?.length ?? 0) > 0 ||
+         (scanResult.secrets?.length ?? 0) > 0
+       ))};
   }
 
   // Console output
@@ -318,8 +325,16 @@ export async function scanUsage(
   }
 
   return { 
-    exitWithError: result.exitWithError || duplicatesFound 
-  };
+  exitWithError: result.exitWithError 
+    || duplicatesFound 
+    || !!(opts.strict && (
+         scanResult.unused.length > 0 ||
+         (scanResult.duplicates?.env?.length ?? 0) > 0 ||
+         (scanResult.duplicates?.example?.length ?? 0) > 0 ||
+         (scanResult.secrets?.length ?? 0) > 0
+       ))
+};
+
 }
 
 /**
