@@ -316,13 +316,18 @@ if (!opts.allowDuplicates) {
     }
   }
 
-  if (scanResult.missing.length > 0 && !opts.json && !opts.fix) {
+  if (!opts.json && !opts.fix) {
+  if (scanResult.missing.length > 0 && duplicatesFound) {
     console.log(chalk.gray('💡 Tip: Run with `--fix` to add missing keys and remove duplicates'));
     console.log();
-  } else if (duplicatesFound && !opts.json && !opts.fix) {
+  } else if (scanResult.missing.length > 0) {
+    console.log(chalk.gray('💡 Tip: Run with `--fix` to add missing keys'));
+    console.log();
+  } else if (duplicatesFound) {
     console.log(chalk.gray('💡 Tip: Run with `--fix` to remove duplicate keys'));
     console.log();
   }
+}
 
   return { 
   exitWithError: result.exitWithError 
