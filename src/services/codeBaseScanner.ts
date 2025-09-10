@@ -41,6 +41,10 @@ export interface ScanResult {
     uniqueVariables: number;
   };
   secrets: SecretFinding[];
+  duplicates: {
+    env?: Array<{ key: string; count: number }>;
+    example?: Array<{ key: string; count: number }>;
+  };
 }
 
 // Framework-specific patterns for finding environment variable usage
@@ -163,6 +167,10 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       filesScanned,
       totalUsages: filteredUsages.length,
       uniqueVariables: uniqueVariables.length,
+    },
+    duplicates: {
+      env: [],
+      example: [],
     },
   };
 }

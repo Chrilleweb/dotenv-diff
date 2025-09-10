@@ -28,6 +28,7 @@ export async function compareMany(
     collect?: (entry: CompareJsonEntry) => void;
     only?: Category[];
     showStats?: boolean;
+    strict?: boolean;
   },
 ) {
   let exitWithError = false;
@@ -52,9 +53,10 @@ export async function compareMany(
 
     if (!fs.existsSync(envPath) || !fs.existsSync(examplePath)) {
       if (!opts.json) {
-        console.log(chalk.bold(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
+        console.log();
+        console.log(chalk.blue(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
         console.log(
-          chalk.yellow('  ⚠️  Skipping: missing matching example file.'),
+          chalk.yellow('⚠️  Skipping: missing matching example file.'),
         );
         console.log();
       }
@@ -64,7 +66,9 @@ export async function compareMany(
     }
 
     if (!opts.json) {
-      console.log(chalk.bold(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
+      console.log();
+      console.log(chalk.blue(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
+      console.log();
     }
 
     // Git ignore hint (only when not JSON)
@@ -94,36 +98,6 @@ export async function compareMany(
           !opts.ignore.includes(key) &&
           !opts.ignoreRegex.some((rx) => rx.test(key)),
       );
-    }
-
-    if (dupsEnv.length || dupsEx.length) {
-      entry.duplicates = {};
-    }
-    if (dupsEnv.length) {
-      entry.duplicates!.env = dupsEnv;
-      if (!opts.json) {
-        console.log(
-          chalk.yellow(
-            `  ⚠️  Duplicate keys in ${envName} (last occurrence wins):`,
-          ),
-        );
-        dupsEnv.forEach(({ key, count }) =>
-          console.log(chalk.yellow(`      - ${key} (${count} occurrences)`)),
-        );
-      }
-    }
-    if (dupsEx.length) {
-      entry.duplicates!.example = dupsEx;
-      if (!opts.json) {
-        console.log(
-          chalk.yellow(
-            `  ⚠️  Duplicate keys in ${exampleName} (last occurrence wins):`,
-          ),
-        );
-        dupsEx.forEach(({ key, count }) =>
-          console.log(chalk.yellow(`      - ${key} (${count} occurrences)`)),
-        );
-      }
     }
 
     // Diff + empty
@@ -165,23 +139,7 @@ export async function compareMany(
       gitignoreUnsafe: run('gitignore') ? gitignoreUnsafe : false,
     };
 
-    const allOk =
-      filtered.missing.length === 0 &&
-      filtered.extra.length === 0 &&
-      filtered.empty.length === 0 &&
-      filtered.mismatches.length === 0;
-
-    if (allOk) {
-      entry.ok = true;
-      if (!opts.json) {
-        console.log(chalk.green('  ✅ All keys match.'));
-        console.log();
-      }
-      opts.collect?.(entry);
-      continue;
-    }
-
-    // --- Stats block for compare mode when --show-stats is active ---
+        // --- Stats block for compare mode when --show-stats is active ---
     if (opts.showStats && !opts.json) {
       const envCount = currentKeys.length;
       const exampleCount = exampleKeys.length;
@@ -199,22 +157,71 @@ export async function compareMany(
         ? filtered.mismatches.length
         : 0;
 
-      console.log(chalk.bold('  📊 Compare Statistics:'));
-      console.log(chalk.gray(`     Keys in ${envName}: ${envCount}`));
-      console.log(chalk.gray(`     Keys in ${exampleName}: ${exampleCount}`));
-      console.log(chalk.gray(`     Shared keys: ${sharedCount}`));
+      console.log(chalk.magenta('📊 Compare Statistics:'));
+      console.log(chalk.magenta.dim(`   Keys in ${envName}: ${envCount}`));
+      console.log(chalk.magenta.dim(`   Keys in ${exampleName}: ${exampleCount}`));
+      console.log(chalk.magenta.dim(`   Shared keys: ${sharedCount}`));
       console.log(
-        chalk.gray(`     Missing (in ${envName}): ${filtered.missing.length}`),
+        chalk.magenta.dim(`   Missing (in ${envName}): ${filtered.missing.length}`),
       );
       console.log(
-        chalk.gray(
-          `     Extra (not in ${exampleName}): ${filtered.extra.length}`,
-        ),
+        chalk.magenta.dim(`   Extra (not in ${exampleName}): ${filtered.extra.length}`),
       );
-      console.log(chalk.gray(`     Empty values: ${filtered.empty.length}`));
-      console.log(chalk.gray(`     Duplicate keys: ${duplicateCount}`));
-      console.log(chalk.gray(`     Value mismatches: ${valueMismatchCount}`));
+      console.log(chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`));
+      console.log(chalk.magenta.dim(`   Duplicate keys: ${duplicateCount}`));
+      console.log(chalk.magenta.dim(`   Value mismatches: ${valueMismatchCount}`));
       console.log();
+    }
+
+    const allOk =
+      filtered.missing.length === 0 &&
+      filtered.extra.length === 0 &&
+      filtered.empty.length === 0 &&
+      filtered.duplicatesEnv.length === 0 &&
+      filtered.duplicatesEx.length === 0 &&
+      filtered.mismatches.length === 0;
+
+    if (allOk) {
+      entry.ok = true;
+      if (!opts.json) {
+        console.log(chalk.green('✅ All keys match.'));
+        console.log();
+      }
+      opts.collect?.(entry);
+      continue;
+    }
+
+    // --- move duplicate logging AFTER stats ---
+    if (dupsEnv.length || dupsEx.length) {
+      entry.duplicates = {};
+    }
+    if (dupsEnv.length) {
+      entry.duplicates!.env = dupsEnv;
+      if (!opts.json) {
+        console.log(
+          chalk.yellow(
+            `⚠️  Duplicate keys in ${envName} (last occurrence wins):`,
+          ),
+        );
+        dupsEnv.forEach(({ key, count }) =>
+          console.log(chalk.yellow(`    - ${key} (${count} occurrences)`)),
+        );
+        console.log();
+      }
+    }
+    if (dupsEx.length) {
+      entry.duplicates!.example = dupsEx;
+      if (!opts.json) {
+        console.log(
+          chalk.yellow(
+            `⚠️  Duplicate keys in ${exampleName} (last occurrence wins):`,
+          ),
+        );
+        dupsEx.forEach(({ key, count }) =>
+          console.log(chalk.yellow(`   - ${key} (${count} occurrences)`)),
+        );
+        console.log();
+      }
     }
 
     if (filtered.missing.length) {
@@ -249,34 +256,37 @@ export async function compareMany(
 
     if (!opts.json) {
       if (filtered.missing.length && !opts.fix) {
-        console.log(chalk.red('  ❌ Missing keys:'));
+        console.log(chalk.red('❌ Missing keys:'));
         filtered.missing.forEach((key) =>
-          console.log(chalk.red(`      - ${key}`)),
+          console.log(chalk.red(`  - ${key}`)),
         );
+        console.log();
       }
       if (filtered.extra.length) {
-        console.log(chalk.yellow('  ⚠️  Extra keys (not in example):'));
+        console.log(chalk.yellow('⚠️  Extra keys (not in example):'));
         filtered.extra.forEach((key) =>
-          console.log(chalk.yellow(`      - ${key}`)),
+          console.log(chalk.yellow(`  - ${key}`)),
         );
+        console.log();
       }
       if (filtered.empty.length) {
-        console.log(chalk.yellow('  ⚠️  Empty values:'));
+        console.log(chalk.yellow('⚠️  Empty values:'));
         filtered.empty.forEach((key) =>
-          console.log(chalk.yellow(`      - ${key}`)),
+          console.log(chalk.yellow(`  - ${key}`)),
         );
+        console.log();
       }
       if (filtered.mismatches.length) {
-        console.log(chalk.yellow('  ⚠️  Value mismatches:'));
+        console.log(chalk.yellow('⚠️  Value mismatches:'));
         filtered.mismatches.forEach(({ key, expected, actual }) =>
           console.log(
             chalk.yellow(
-              `      - ${key}: expected '${expected}', but got '${actual}'`,
+              `  - ${key}: expected '${expected}', but got '${actual}'`,
             ),
           ),
         );
+        console.log();
       }
-      console.log();
     }
 
     if (!opts.json && !opts.fix) {
@@ -304,36 +314,48 @@ export async function compareMany(
 
       if (!opts.json) {
         if (changed) {
-          console.log(chalk.green('  ✅ Auto-fix applied:'));
+          console.log(chalk.green('✅ Auto-fix applied:'));
           if (result.removedDuplicates.length) {
             console.log(
               chalk.green(
-                `      - Removed ${result.removedDuplicates.length} duplicate keys from ${envName}: ${result.removedDuplicates.join(', ')}`,
+                `  - Removed ${result.removedDuplicates.length} duplicate keys from ${envName}: ${result.removedDuplicates.join(', ')}`,
               ),
             );
           }
           if (result.addedEnv.length) {
             console.log(
               chalk.green(
-                `      - Added ${result.addedEnv.length} missing keys to ${envName}: ${result.addedEnv.join(', ')}`,
+                `  - Added ${result.addedEnv.length} missing keys to ${envName}: ${result.addedEnv.join(', ')}`,
               ),
             );
           }
           if (result.addedExample.length) {
             console.log(
               chalk.green(
-                `      - Synced ${result.addedExample.length} keys to ${exampleName}: ${result.addedExample.join(', ')}`,
+                `  - Synced ${result.addedExample.length} keys to ${exampleName}: ${result.addedExample.join(', ')}`,
               ),
             );
           }
         } else {
-          console.log(chalk.green('  ✅ Auto-fix applied: no changes needed.'));
+          console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));
         }
         console.log();
       }
     }
 
     opts.collect?.(entry);
+    const warningsExist =
+  filtered.extra.length > 0 ||
+  filtered.empty.length > 0 ||
+  filtered.duplicatesEnv.length > 0 ||
+  filtered.duplicatesEx.length > 0 ||
+  filtered.mismatches.length > 0 ||
+  filtered.gitignoreUnsafe;
+
+if (opts.strict && warningsExist) {
+  exitWithError = true;
+}
+
   }
 
   return { exitWithError };

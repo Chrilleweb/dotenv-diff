@@ -12,6 +12,22 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.2.3] - 2025-09-08
+### Added
+- Warning for HTTPS URLs detected in codebase.
+- Added duplicate key detection to codebase scanner.
+- added `--strict` flag to enable strict mode (treat warnings as errors).
+- duplicate key detection for `.env.example` files.
+
+### Fixed
+- Fixed issue with false warnings on secrets in certain edge cases.
+- Updated README
+
+### Changed
+- No breaking changes.
+- `--compare` feature coloring improved for better readability.
+- added `duplicate` warnings to scan results.
+
 ## [2.2.2] - 2025-09-07
 ### Fixed
 - Fixed issue where it would give a false warning on secrets with process.env

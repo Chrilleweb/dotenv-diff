@@ -21,9 +21,16 @@ const PROVIDER_PATTERNS: RegExp[] = [
   /\bsk_live_[0-9a-zA-Z]{24,}\b/, // Stripe live secret
   /\bsk_test_[0-9a-zA-Z]{24,}\b/, // Stripe test secret
   /\bAIza[0-9A-Za-z\-_]{20,}\b/, // Google API key
+  /\bya29\.[0-9A-Za-z\-_]+\b/, // Google OAuth access token
+  /\b[A-Za-z0-9_-]{21}:[A-Za-z0-9_-]{140}\b/, // Firebase token
+  /\b0x[a-fA-F0-9]{40}\b/, // Ethereum address
+  /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/, // JWT token
+  /\bAC[0-9a-fA-F]{32}\b/, // Twilio Account SID
 ];
 
 const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
+
+const HTTPS_PATTERN = /["'`](https?:\/\/(?!localhost)[^"'`]*)["'`]/g;
 
 /**
  * Checks if a string looks like a harmless literal.
@@ -32,10 +39,36 @@ const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
  */
 function looksHarmlessLiteral(s: string): boolean {
   return (
-    /^https?:\/\//i.test(s) ||
+    // Remove localhost check from here - we want to flag localhost URLs now
+    /^https?:\/\/(?!localhost)/i.test(s) ||
     /\S+@\S+/.test(s) ||
+    /^data:[a-z]+\/[a-z0-9.+-]+;base64,/i.test(s) ||
     /^\.{0,2}\//.test(s) ||
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s) ||
+    /^[0-9a-f]{32,128}$/i.test(s) || // MD5, SHA1, SHA256, etc.
+    /^[A-Za-z0-9+/_\-]{16,20}={0,2}$/.test(s) ||
+    /^[A-Za-z0-9+/_\-]*(_PUBLIC|_PRIVATE|VITE_|NEXT_PUBLIC|VUE_)[A-Za-z0-9+/_\-]*={0,2}$/.test(s)
+  );
+}
+
+/**
+ * Checks if a line looks like a URL construction pattern.
+ * @param line - The line to check.
+ * @returns True if the line looks like URL construction, false otherwise.
+ */
+function looksLikeUrlConstruction(line: string): boolean {
+  // Check for template literals or string concatenation that looks like URLs
+  return (
+    // Template literals with URL-like patterns
+    /=\s*`[^`]*\$\{[^}]+\}[^`]*\/[^`]*`/.test(line) ||
+    // String concatenation with slashes
+    /=\s*["'][^"']*\/[^"']*["']\s*\+/.test(line) ||
+    // Contains common URL patterns
+    /=\s*["'`][^"'`]*\/[^"'`]*(auth|api|login|redirect|callback|protocol)[^"'`]*\/[^"'`]*["'`]/.test(
+      line,
+    ) ||
+    // Keycloak-specific patterns
+    /realms\/.*\/protocol\/openid-connect/.test(line)
   );
 }
 
@@ -53,7 +86,7 @@ function isProbablyTestPath(p: string): boolean {
 }
 
 // Threshold is the value between 0 and 1 that determines the sensitivity of the detection.
-const DEFAULT_SECRET_THRESHOLD = 0.9 as const;
+const DEFAULT_SECRET_THRESHOLD = 0.85 as const;
 
 /**
  * Optimized for sveltekit and vite env accessors
@@ -85,6 +118,25 @@ export function detectSecretsInSource(
     const lineNo = i + 1;
     const line = lines[i] || '';
 
+    // Skip comments
+    if (/^\s*\/\//.test(line)) continue;
+
+    // Check for HTTPS URLs
+    HTTPS_PATTERN.lastIndex = 0;
+    let httpsMatch: RegExpExecArray | null;
+    while ((httpsMatch = HTTPS_PATTERN.exec(line))) {
+      // Skip if it's already been flagged as localhost
+      if (!httpsMatch[1]?.includes('localhost')) {
+        findings.push({
+          file,
+          line: lineNo,
+          kind: 'pattern',
+          message: 'HTTPS URL detected - consider using environment variable',
+          snippet: line.trim().slice(0, 180),
+        });
+      }
+    }
+
     // 1) Suspicious key literal assignments
     if (SUSPICIOUS_KEYS.test(line)) {
       const m = line!.match(/=\s*["'`](.+?)["'`]/);
@@ -92,6 +144,7 @@ export function detectSecretsInSource(
         m &&
         m[1] &&
         !looksHarmlessLiteral(m[1]) &&
+        !looksLikeUrlConstruction(line) &&
         m[1].length >= 12 &&
         !isEnvAccessor(line)
       ) {
@@ -124,7 +177,7 @@ export function detectSecretsInSource(
     while ((lm = LONG_LITERAL.exec(line))) {
       const literal = lm[1] || '';
       if (looksHarmlessLiteral(literal)) continue;
-      if (literal.length < 32) continue; // ekstra støjfilter
+      if (literal.length < 32) continue;
       const ent = shannonEntropyNormalized(literal);
       if (ent >= threshold) {
         findings.push({
@@ -137,5 +190,14 @@ export function detectSecretsInSource(
       }
     }
   }
-  return findings;
+  const uniqueFindings = findings.filter(
+  (f, idx, arr) =>
+    idx === arr.findIndex(other =>
+      other.file === f.file &&
+      other.line === f.line &&
+      other.snippet === f.snippet
+    )
+);
+
+  return uniqueFindings;
 }

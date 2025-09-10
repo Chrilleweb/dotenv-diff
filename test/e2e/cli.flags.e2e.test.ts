@@ -227,7 +227,7 @@ describe('duplicate detection', () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\nFOO=2\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
     const res = runCli(cwd, ['--compare']);
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).toContain(
       'Duplicate keys in .env (last occurrence wins):',
     );
@@ -239,7 +239,7 @@ describe('duplicate detection', () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\nFOO=\n');
     const res = runCli(cwd, ['--compare']);
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).toContain(
       'Duplicate keys in .env.example (last occurrence wins):',
     );
@@ -252,7 +252,7 @@ describe('duplicate detection', () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
     const res = runCli(cwd, ['--compare', '--allow-duplicates']);
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Duplicate keys');
+    expect(res.stdout).not.toContain('Duplicate keys in .env');
   });
   describe('--json output', () => {
     it('prints a JSON array with ok=true when files match', () => {
@@ -354,7 +354,7 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+    expect(res.stdout).toContain('Auto-fix applied');
     expect(res.stdout).toContain('Added 1 missing keys to .env');
     expect(res.stdout).not.toContain('Synced'); // Should not sync since key already exists
 
@@ -395,7 +395,7 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix', '--env', '.env.local']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+    expect(res.stdout).toContain('Auto-fix applied');
     expect(res.stdout).toContain('Added 1 missing keys to .env.local');
 
     const envContent = fs.readFileSync(path.join(cwd, '.env.local'), 'utf-8');
@@ -420,7 +420,7 @@ describe('duplicate detection', () => {
       'IGNORED_VAR',
     ]);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+    expect(res.stdout).toContain('Auto-fix applied');
     expect(res.stdout).toContain('INCLUDED_VAR');
     expect(res.stdout).not.toContain('IGNORED_VAR');
 

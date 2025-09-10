@@ -43,6 +43,7 @@ export async function run(program: Command) {
       showStats: opts.showStats,
       isCiMode: opts.isCiMode,
       secrets: opts.secrets,
+      strict: opts.strict ?? false,
       ...(opts.files ? { files: opts.files } : {}),
     });
 
