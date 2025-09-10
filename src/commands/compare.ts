@@ -176,6 +176,8 @@ export async function compareMany(
       filtered.missing.length === 0 &&
       filtered.extra.length === 0 &&
       filtered.empty.length === 0 &&
+      filtered.duplicatesEnv.length === 0 &&
+      filtered.duplicatesEx.length === 0 &&
       filtered.mismatches.length === 0;
 
     if (allOk) {

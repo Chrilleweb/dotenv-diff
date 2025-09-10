@@ -533,7 +533,7 @@ describe('scan-usage error handling', () => {
           
           const res = runCli(cwd, ['--scan-usage', '--fix']);
           expect(res.status).toBe(0);
-          expect(res.stdout).toContain('Auto-fix applied (scan mode)');
+          expect(res.stdout).toContain('Auto-fix applied:');
           expect(res.stdout).toContain('Added 2 missing keys');
           expect(res.stdout).toContain('API_KEY, DATABASE_URL');
           

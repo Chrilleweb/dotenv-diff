@@ -264,6 +264,7 @@ export async function scanUsage(
       comparedAgainst,
       Object.keys(envVariables).length,
     );
+    console.log(JSON.stringify(jsonOutput, null, 2));
     return { exitWithError: scanResult.missing.length > 0 || duplicatesFound };
   }
 
