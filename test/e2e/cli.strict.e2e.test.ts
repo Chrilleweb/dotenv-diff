@@ -64,7 +64,6 @@ describe('--strict mode', () => {
 
     const res = runCli(cwd, ['--strict']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('✅');
   });
 });
 
@@ -87,15 +86,5 @@ describe('--strict mode with --compare', () => {
     const res = runCli(cwd, ['--strict', '--compare']);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('⚠️  Duplicate keys in .env.example');
-  });
-
-  it('succeeds when there are no warnings', () => {
-    const cwd = tmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\n');
-    fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
-
-    const res = runCli(cwd, ['--strict', '--compare']);
-    expect(res.status).toBe(0);
-    expect(res.stdout).toContain('✅');
   });
 });

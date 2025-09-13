@@ -42,7 +42,8 @@
     "cli",
     "compare",
     "environment variables",
-    "dotenv validator"
+    "dotenv validator",
+    "scan codebase"
   ],
   "repository": {
     "type": "git",
