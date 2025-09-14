@@ -17,7 +17,8 @@ export interface EnvUsage {
     | 'sveltekit'
     | 'deno'
     | 'next'
-    | 'nuxt';
+    | 'nuxt'
+    | 'php';
   context: string; // The actual line content
 }
 
@@ -79,6 +80,12 @@ const ENV_PATTERNS = [
     regex: /(?:\$config|useRuntimeConfig\(\))\.([A-Z_][A-Z0-9_]*)/g,
     frameworks: ['nuxt'],
   },
+{
+  name: 'php' as const,
+  regex: /(getenv\(['"`]([A-Z_][A-Z0-9_]*)['"`]\)|\$_ENV\[['"`]([A-Z_][A-Z0-9_]*)['"`]\])/g,
+  frameworks: ['php'],
+}
+
 ];
 
 const DEFAULT_INCLUDE_EXTENSIONS = [
@@ -366,7 +373,7 @@ function shouldInclude(
       return matchesGlobPattern(relativePath, pattern);
     } else {
       // Exact match or extension
-      return relativePath.includes(pattern) || fileName.endsWith(pattern);
+      return relativePath.endsWith(pattern) || fileName.endsWith(pattern);
     }
   });
 }
@@ -398,16 +405,21 @@ function shouldExclude(
 }
 
 function matchesGlobPattern(filePath: string, pattern: string): boolean {
-  // Convert simple glob patterns to regex
-  // This handles basic cases like *.js, **/*.ts, etc.
-  const regexPattern = pattern
-    .replace(/\*\*/g, '.*') // ** matches any path
-    .replace(/\*/g, '[^/]*') // * matches any filename chars (not path separators)
-    .replace(/\./g, '\\.') // Escape dots
-    .replace(/\//g, '[/\\\\]'); // Handle both forward and back slashes
+  const hasSep = /[\/\\]/.test(pattern);
+  const subject = hasSep ? filePath : path.basename(filePath);
 
-  const regex = new RegExp(`^${regexPattern}$`, 'i'); // Case insensitive
-  return regex.test(filePath.replace(/\\/g, '/')); // Normalize path separators
+  const normalized = subject.replace(/\\/g, '/');
+  let normalizedPattern = pattern.replace(/\\/g, '/');
+
+  let regexPattern = normalizedPattern
+    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    .replace(/\*\*/g, '___DOUBLESTAR___')
+    .replace(/\*/g, '[^/]*')
+    .replace(/___DOUBLESTAR___/g, '.*')
+    .replace(/\?/g, '[^/]');
+
+  const re = new RegExp(`^${regexPattern}$`, 'i');
+  return re.test(normalized);
 }
 
 async function scanFile(

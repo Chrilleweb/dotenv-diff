@@ -46,6 +46,7 @@ export async function ensureFilesOrPrompt(args: {
   // Case 2: missing .env but has .env.example
   if (!envExists && exampleExists) {
     if (!alreadyWarnedMissingEnv) {
+      console.log();
       console.log(chalk.yellow(`📄 ${path.basename(envPath)} file not found.`));
     }
     let createEnv = isYesMode

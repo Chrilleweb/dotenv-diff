@@ -102,9 +102,16 @@ export async function scanUsage(
   let scanResult = await scanCodebase(opts);
 
   scanResult.used = scanResult.used.filter(
-  (u: EnvUsage) =>
-    u.context && !/^\s*(\/\/|#)/.test(u.context.trim())
-);
+    (u: EnvUsage) => u.context && !/^\s*(\/\/|#)/.test(u.context.trim()),
+  );
+
+  // Recalculate stats after filtering out commented usages
+  const uniqueVariables = new Set(scanResult.used.map((u) => u.variable)).size;
+  scanResult.stats = {
+    filesScanned: scanResult.stats.filesScanned, // Keep original files scanned count
+    totalUsages: scanResult.used.length,
+    uniqueVariables: uniqueVariables,
+  };
 
   // If user explicitly passed --example but the file doesn't exist:
   if (opts.examplePath) {
@@ -150,54 +157,60 @@ export async function scanUsage(
       comparedAgainst = compareFile.name;
 
       // Check for duplicates in the env file
-if (!opts.allowDuplicates) {
-  dupsEnv = findDuplicateKeys(compareFile.path).filter(
-    ({ key }) =>
-      !opts.ignore.includes(key) &&
-      !opts.ignoreRegex.some((rx) => rx.test(key)),
-  );
+      if (!opts.allowDuplicates) {
+        dupsEnv = findDuplicateKeys(compareFile.path).filter(
+          ({ key }) =>
+            !opts.ignore.includes(key) &&
+            !opts.ignoreRegex.some((rx) => rx.test(key)),
+        );
 
-  // Also check for duplicates in example file if it exists AND is different from compareFile
-  if (opts.examplePath) {
-    const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
-    // Only check example file if it exists and is NOT the same as the comparison file
-    if (fs.existsSync(examplePath) && examplePath !== compareFile.path) {
-      dupsExample = findDuplicateKeys(examplePath).filter(
-        ({ key }) =>
-          !opts.ignore.includes(key) &&
-          !opts.ignoreRegex.some((rx) => rx.test(key)),
-      );
-    }
-  }
+        // Also check for duplicates in example file if it exists AND is different from compareFile
+        if (opts.examplePath) {
+          const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
+          // Only check example file if it exists and is NOT the same as the comparison file
+          if (fs.existsSync(examplePath) && examplePath !== compareFile.path) {
+            dupsExample = findDuplicateKeys(examplePath).filter(
+              ({ key }) =>
+                !opts.ignore.includes(key) &&
+                !opts.ignoreRegex.some((rx) => rx.test(key)),
+            );
+          }
+        }
 
-  duplicatesFound = dupsEnv.length > 0 || dupsExample.length > 0;
+        duplicatesFound = dupsEnv.length > 0 || dupsExample.length > 0;
 
-  // Apply duplicate fixes if --fix is enabled (but don't show message yet)
-  if (opts.fix && (dupsEnv.length > 0 || dupsExample.length > 0)) {
-    const { changed, result } = applyFixes({
-      envPath: compareFile.path,
-      examplePath: opts.examplePath ? resolveFromCwd(opts.cwd, opts.examplePath) : '',
-      missingKeys: [],
-      duplicateKeys: dupsEnv.map((d) => d.key),
-    });
+        // Apply duplicate fixes if --fix is enabled (but don't show message yet)
+        if (opts.fix && (dupsEnv.length > 0 || dupsExample.length > 0)) {
+          const { changed, result } = applyFixes({
+            envPath: compareFile.path,
+            examplePath: opts.examplePath
+              ? resolveFromCwd(opts.cwd, opts.examplePath)
+              : '',
+            missingKeys: [],
+            duplicateKeys: dupsEnv.map((d) => d.key),
+          });
 
-    if (changed) {
-      fixApplied = true;
-      removedDuplicates = result.removedDuplicates;
-      // Clear duplicates after fix
-      duplicatesFound = false;
-      dupsEnv = [];
-      dupsExample = [];
-    }
-  }
+          if (changed) {
+            fixApplied = true;
+            removedDuplicates = result.removedDuplicates;
+            // Clear duplicates after fix
+            duplicatesFound = false;
+            dupsEnv = [];
+            dupsExample = [];
+          }
+        }
 
-  // Add to scan result for both JSON and console output (only if not fixed)
-  if ((dupsEnv.length > 0 || dupsExample.length > 0) && (!opts.fix || !fixApplied)) {
-    if (!scanResult.duplicates) scanResult.duplicates = {};
-    if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
-    if (dupsExample.length > 0) scanResult.duplicates.example = dupsExample;
-  }
-}
+        // Add to scan result for both JSON and console output (only if not fixed)
+        if (
+          (dupsEnv.length > 0 || dupsExample.length > 0) &&
+          (!opts.fix || !fixApplied)
+        ) {
+          if (!scanResult.duplicates) scanResult.duplicates = {};
+          if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
+          if (dupsExample.length > 0)
+            scanResult.duplicates.example = dupsExample;
+        }
+      }
     } catch (error) {
       const errorMessage = `⚠️  Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
 
@@ -267,12 +280,18 @@ if (!opts.allowDuplicates) {
       Object.keys(envVariables).length,
     );
     console.log(JSON.stringify(jsonOutput, null, 2));
-    return { exitWithError: scanResult.missing.length > 0 || duplicatesFound || !!(opts.strict && (
-         scanResult.unused.length > 0 ||
-         (scanResult.duplicates?.env?.length ?? 0) > 0 ||
-         (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-         (scanResult.secrets?.length ?? 0) > 0
-       ))};
+    return {
+      exitWithError:
+        scanResult.missing.length > 0 ||
+        duplicatesFound ||
+        !!(
+          opts.strict &&
+          (scanResult.unused.length > 0 ||
+            (scanResult.duplicates?.env?.length ?? 0) > 0 ||
+            (scanResult.duplicates?.example?.length ?? 0) > 0 ||
+            (scanResult.secrets?.length ?? 0) > 0)
+        ),
+    };
   }
 
   // Console output
@@ -282,7 +301,7 @@ if (!opts.allowDuplicates) {
   if (opts.fix && !opts.json) {
     if (fixApplied) {
       console.log(chalk.green('✅ Auto-fix applied:'));
-      
+
       // Show removed duplicates
       if (removedDuplicates.length > 0) {
         console.log(
@@ -291,7 +310,7 @@ if (!opts.allowDuplicates) {
           ),
         );
       }
-      
+
       // Show added missing keys
       if (fixedKeys.length > 0) {
         console.log(
@@ -299,7 +318,7 @@ if (!opts.allowDuplicates) {
             `   - Added ${fixedKeys.length} missing keys to ${comparedAgainst}: ${fixedKeys.join(', ')}`,
           ),
         );
-        
+
         if (opts.examplePath) {
           console.log(
             chalk.green(
@@ -308,7 +327,7 @@ if (!opts.allowDuplicates) {
           );
         }
       }
-      
+
       console.log();
     } else {
       console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));
@@ -317,29 +336,36 @@ if (!opts.allowDuplicates) {
   }
 
   if (!opts.json && !opts.fix) {
-  if (scanResult.missing.length > 0 && duplicatesFound) {
-    console.log(chalk.gray('💡 Tip: Run with `--fix` to add missing keys and remove duplicates'));
-    console.log();
-  } else if (scanResult.missing.length > 0) {
-    console.log(chalk.gray('💡 Tip: Run with `--fix` to add missing keys'));
-    console.log();
-  } else if (duplicatesFound) {
-    console.log(chalk.gray('💡 Tip: Run with `--fix` to remove duplicate keys'));
-    console.log();
+    if (scanResult.missing.length > 0 && duplicatesFound) {
+      console.log(
+        chalk.gray(
+          '💡 Tip: Run with `--fix` to add missing keys and remove duplicates',
+        ),
+      );
+      console.log();
+    } else if (scanResult.missing.length > 0) {
+      console.log(chalk.gray('💡 Tip: Run with `--fix` to add missing keys'));
+      console.log();
+    } else if (duplicatesFound) {
+      console.log(
+        chalk.gray('💡 Tip: Run with `--fix` to remove duplicate keys'),
+      );
+      console.log();
+    }
   }
-}
 
-  return { 
-  exitWithError: result.exitWithError 
-    || duplicatesFound 
-    || !!(opts.strict && (
-         scanResult.unused.length > 0 ||
-         (scanResult.duplicates?.env?.length ?? 0) > 0 ||
-         (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-         (scanResult.secrets?.length ?? 0) > 0
-       ))
-};
-
+  return {
+    exitWithError:
+      result.exitWithError ||
+      duplicatesFound ||
+      !!(
+        opts.strict &&
+        (scanResult.unused.length > 0 ||
+          (scanResult.duplicates?.env?.length ?? 0) > 0 ||
+          (scanResult.duplicates?.example?.length ?? 0) > 0 ||
+          (scanResult.secrets?.length ?? 0) > 0)
+      ),
+  };
 }
 
 /**
@@ -486,7 +512,7 @@ function outputToConsole(
   }
 
   // Always show found variables when not comparing or when no missing variables
-  if (!comparedAgainst || scanResult.missing.length === 0) {
+  if (scanResult.stats.uniqueVariables > 0) {
     console.log(
       chalk.blue(
         `🌐 Found ${scanResult.stats.uniqueVariables} unique environment variables in use`,
@@ -646,7 +672,7 @@ function outputToConsole(
   }
 
   // Success message for env file comparison
-  if (comparedAgainst && scanResult.missing.length === 0) {
+  if (comparedAgainst && scanResult.missing.length === 0 && scanResult.secrets.length > 0) {
     console.log(
       chalk.green(
         `✅ All used environment variables are defined in ${comparedAgainst}`,

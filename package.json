@@ -1,6 +1,6 @@
 {
   "name": "dotenv-diff",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "type": "module",
   "description": "Scan your codebase to find environment variables in use.",
   "bin": {
@@ -42,13 +42,14 @@
     "cli",
     "compare",
     "environment variables",
-    "dotenv validator"
+    "dotenv validator",
+    "scan codebase"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Chrilleweb/dotenv-diff.git"
   },
-  "homepage": "https://github.com/Chrilleweb/dotenv-diff#readme",
+  "homepage": "https://dotenv-diff-docs.vercel.app/",
   "bugs": {
     "url": "https://github.com/Chrilleweb/dotenv-diff/issues"
   },

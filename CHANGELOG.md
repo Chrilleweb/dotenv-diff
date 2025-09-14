@@ -11,6 +11,14 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 -
+## [2.2.4] - 2025-09-13
+### Fixed
+- Fixed found variable count did not show when there were missing variables in .env
+- Will now not says "Found 2 unique environment variables in use" if there are found in commented out code.
+- Fixed bug where it would say "no unused variables" if there where no found variables at all.
+
+### Changed
+- No breaking changes.
 
 ## [2.2.3] - 2025-09-08
 ### Added
