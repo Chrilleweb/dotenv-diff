@@ -47,7 +47,12 @@ function looksHarmlessLiteral(s: string): boolean {
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s) ||
     /^[0-9a-f]{32,128}$/i.test(s) || // MD5, SHA1, SHA256, etc.
     /^[A-Za-z0-9+/_\-]{16,20}={0,2}$/.test(s) ||
-    /^[A-Za-z0-9+/_\-]*(_PUBLIC|_PRIVATE|VITE_|NEXT_PUBLIC|VUE_)[A-Za-z0-9+/_\-]*={0,2}$/.test(s)
+    /^[A-Za-z0-9+/_\-]*(_PUBLIC|_PRIVATE|VITE_|NEXT_PUBLIC|VUE_)[A-Za-z0-9+/_\-]*={0,2}$/.test(
+      s,
+    ) ||
+    /^[MmZzLlHhVvCcSsQqTtAa][0-9eE+.\- ,MmZzLlHhVvCcSsQqTtAa]*$/.test(s) ||
+    /<svg[\s\S]*?>[\s\S]*?<\/svg>/i.test(s) || // Ignore SVG markup
+    /xmlns=["']http:\/\/www\.w3\.org\/2000\/svg["']/i.test(s) // Ignore SVG namespace
   );
 }
 
@@ -125,8 +130,8 @@ export function detectSecretsInSource(
     HTTPS_PATTERN.lastIndex = 0;
     let httpsMatch: RegExpExecArray | null;
     while ((httpsMatch = HTTPS_PATTERN.exec(line))) {
-      // Skip if it's already been flagged as localhost
-      if (!httpsMatch[1]?.includes('localhost')) {
+      const url = httpsMatch[1];
+      if (!url?.includes('localhost') && url !== 'http://www.w3.org/2000/svg') {
         findings.push({
           file,
           line: lineNo,
@@ -191,13 +196,15 @@ export function detectSecretsInSource(
     }
   }
   const uniqueFindings = findings.filter(
-  (f, idx, arr) =>
-    idx === arr.findIndex(other =>
-      other.file === f.file &&
-      other.line === f.line &&
-      other.snippet === f.snippet
-    )
-);
+    (f, idx, arr) =>
+      idx ===
+      arr.findIndex(
+        (other) =>
+          other.file === f.file &&
+          other.line === f.line &&
+          other.snippet === f.snippet,
+      ),
+  );
 
   return uniqueFindings;
 }
