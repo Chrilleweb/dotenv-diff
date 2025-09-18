@@ -74,6 +74,14 @@ dotenv-diff --fix
 2. You run `dotenv-diff --fix`.
 3. The tool automatically adds `NEW_API_KEY=` to your `.env` file.
 
+## Strict mode - treat warnings as errors
+
+You can use the `--strict` flag to treat all warnings as errors. This is useful for CI environments where you want to ensure that no warnings are present in the codebase.
+
+```bash
+dotenv-diff --strict
+```
+
 ## Show unused variables
 
 As default, `dotenv-diff` will list variables that are defined in `.env` but never used in your codebase.

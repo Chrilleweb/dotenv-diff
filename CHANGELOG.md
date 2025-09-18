@@ -11,6 +11,17 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 -
+
+## [2.2.5] - 2025-09-18
+### Added
+- Updated README with `--strict` flag documentation.
+
+### Fixed
+- Fixed false positives for HTTPS URLs in SVG files and SVG namespace URLs.
+
+### Changed
+- No breaking changes.
+
 ## [2.2.4] - 2025-09-13
 ### Fixed
 - Fixed found variable count did not show when there were missing variables in .env

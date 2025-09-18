@@ -249,4 +249,23 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Potential secrets detected in codebase:');
   });
+  it('should not give warning on SVG content', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      // SVG content - should not be flagged
+      const svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
+
+      console.log(svgIcon);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
 });
