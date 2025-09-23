@@ -131,3 +131,60 @@ export interface ScanResult {
     example?: Array<{ key: string; count: number }>;
   };
 }
+
+/** Options for scanning the codebase for environment variable usage. */
+export interface ScanUsageOptions extends ScanOptions {
+  envPath?: string | undefined;
+  examplePath?: string | undefined;
+  fix?: boolean;
+  json: boolean;
+  showUnused: boolean;
+  showStats: boolean;
+  isCiMode?: boolean;
+  files?: string[];
+  allowDuplicates?: boolean;
+  strict?: boolean;
+}
+
+export interface ScanJsonEntry {
+  stats: {
+    filesScanned: number;
+    totalUsages: number;
+    uniqueVariables: number;
+  };
+  missing: Array<{
+    variable: string;
+    usages: Array<{
+      file: string;
+      line: number;
+      pattern: string;
+      context: string;
+    }>;
+  }>;
+  unused: string[];
+  allUsages?: Array<{
+    variable: string;
+    file: string;
+    line: number;
+    pattern: string;
+    context: string;
+  }>;
+  // Add comparison info
+  comparedAgainst?: string;
+  totalEnvVariables?: number;
+  secrets?: Array<{
+    file: string;
+    line: number;
+    message: string;
+    snippet: string;
+  }>;
+  duplicates?: {
+    env?: Array<{ key: string; count: number }>;
+    example?: Array<{ key: string; count: number }>;
+  };
+}
+
+// Type for grouped usages by variable
+export interface VariableUsages {
+  [variable: string]: EnvUsage[];
+}
