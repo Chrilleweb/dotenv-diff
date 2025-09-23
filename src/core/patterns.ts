@@ -38,6 +38,7 @@ export const ENV_PATTERNS = [
 
 ];
 
+// Default file extensions to include in scans
 export const DEFAULT_INCLUDE_EXTENSIONS = [
   '.js',
   '.ts',
@@ -49,6 +50,7 @@ export const DEFAULT_INCLUDE_EXTENSIONS = [
   '.cjs',
 ];
 
+// Default patterns to exclude from scans
 export const DEFAULT_EXCLUDE_PATTERNS = [
   'node_modules',
   '.sveltekit',

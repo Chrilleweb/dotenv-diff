@@ -1,5 +1,9 @@
 import { Command } from 'commander';
 
+/**
+ * Creates the command-line program for dotenv-diff.
+ * @returns The configured commander program instance
+ */
 export function createProgram() {
   return new Command()
     .name('dotenv-diff')

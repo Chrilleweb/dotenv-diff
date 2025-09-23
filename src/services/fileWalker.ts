@@ -13,7 +13,6 @@ import {
  * @param opts Options for include, exclude patterns and files override.
  * @returns A promise that resolves to an array of file paths.
  */
-
 export async function findFiles(
   rootDir: string,
   opts: { include: string[]; exclude: string[]; files?: string[] },

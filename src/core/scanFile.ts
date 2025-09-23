@@ -2,6 +2,13 @@ import path from 'path';
 import type { EnvUsage, ScanOptions } from '../config/types.js';
 import { ENV_PATTERNS } from './patterns.js';
 
+/**
+ * Scans a file for environment variable usage.
+ * @param filePath - The path to the file being scanned.
+ * @param content - The content of the file.
+ * @param opts - The scan options.
+ * @returns An array of environment variable usages found in the file.
+ */
 export async function scanFile(
   filePath: string,
   content: string,
