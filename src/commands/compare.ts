@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
-import { parseEnvFile } from '../lib/parseEnv.js';
-import { diffEnv } from '../lib/diffEnv.js';
+import { parseEnvFile } from '../core/parseEnv.js';
+import { diffEnv } from '../core/diffEnv.js';
 import { warnIfEnvNotIgnored } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
@@ -139,7 +139,7 @@ export async function compareMany(
       gitignoreUnsafe: run('gitignore') ? gitignoreUnsafe : false,
     };
 
-        // --- Stats block for compare mode when --show-stats is active ---
+    // --- Stats block for compare mode when --show-stats is active ---
     if (opts.showStats && !opts.json) {
       const envCount = currentKeys.length;
       const exampleCount = exampleKeys.length;
@@ -159,17 +159,27 @@ export async function compareMany(
 
       console.log(chalk.magenta('📊 Compare Statistics:'));
       console.log(chalk.magenta.dim(`   Keys in ${envName}: ${envCount}`));
-      console.log(chalk.magenta.dim(`   Keys in ${exampleName}: ${exampleCount}`));
+      console.log(
+        chalk.magenta.dim(`   Keys in ${exampleName}: ${exampleCount}`),
+      );
       console.log(chalk.magenta.dim(`   Shared keys: ${sharedCount}`));
       console.log(
-        chalk.magenta.dim(`   Missing (in ${envName}): ${filtered.missing.length}`),
+        chalk.magenta.dim(
+          `   Missing (in ${envName}): ${filtered.missing.length}`,
+        ),
       );
       console.log(
-        chalk.magenta.dim(`   Extra (not in ${exampleName}): ${filtered.extra.length}`),
+        chalk.magenta.dim(
+          `   Extra (not in ${exampleName}): ${filtered.extra.length}`,
+        ),
       );
-      console.log(chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`));
+      console.log(
+        chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`),
+      );
       console.log(chalk.magenta.dim(`   Duplicate keys: ${duplicateCount}`));
-      console.log(chalk.magenta.dim(`   Value mismatches: ${valueMismatchCount}`));
+      console.log(
+        chalk.magenta.dim(`   Value mismatches: ${valueMismatchCount}`),
+      );
       console.log();
     }
 
@@ -257,9 +267,7 @@ export async function compareMany(
     if (!opts.json) {
       if (filtered.missing.length && !opts.fix) {
         console.log(chalk.red('❌ Missing keys:'));
-        filtered.missing.forEach((key) =>
-          console.log(chalk.red(`  - ${key}`)),
-        );
+        filtered.missing.forEach((key) => console.log(chalk.red(`  - ${key}`)));
         console.log();
       }
       if (filtered.extra.length) {
@@ -345,17 +353,16 @@ export async function compareMany(
 
     opts.collect?.(entry);
     const warningsExist =
-  filtered.extra.length > 0 ||
-  filtered.empty.length > 0 ||
-  filtered.duplicatesEnv.length > 0 ||
-  filtered.duplicatesEx.length > 0 ||
-  filtered.mismatches.length > 0 ||
-  filtered.gitignoreUnsafe;
+      filtered.extra.length > 0 ||
+      filtered.empty.length > 0 ||
+      filtered.duplicatesEnv.length > 0 ||
+      filtered.duplicatesEx.length > 0 ||
+      filtered.mismatches.length > 0 ||
+      filtered.gitignoreUnsafe;
 
-if (opts.strict && warningsExist) {
-  exitWithError = true;
-}
-
+    if (opts.strict && warningsExist) {
+      exitWithError = true;
+    }
   }
 
   return { exitWithError };
