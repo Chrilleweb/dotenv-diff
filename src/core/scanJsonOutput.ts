@@ -1,4 +1,9 @@
-import type { ScanUsageOptions, ScanResult, EnvUsage, ScanJsonEntry } from '../config/types.js';
+import type {
+  ScanUsageOptions,
+  ScanResult,
+  EnvUsage,
+  ScanJsonEntry,
+} from '../config/types.js';
 
 /**
  * Creates a JSON output for the scan results.

@@ -30,12 +30,12 @@ export const ENV_PATTERNS = [
     regex: /(?:\$config|useRuntimeConfig\(\))\.([A-Z_][A-Z0-9_]*)/g,
     frameworks: ['nuxt'],
   },
-{
-  name: 'php' as const,
-  regex: /(getenv\(['"`]([A-Z_][A-Z0-9_]*)['"`]\)|\$_ENV\[['"`]([A-Z_][A-Z0-9_]*)['"`]\])/g,
-  frameworks: ['php'],
-}
-
+  {
+    name: 'php' as const,
+    regex:
+      /(getenv\(['"`]([A-Z_][A-Z0-9_]*)['"`]\)|\$_ENV\[['"`]([A-Z_][A-Z0-9_]*)['"`]\])/g,
+    frameworks: ['php'],
+  },
 ];
 
 // Default file extensions to include in scans
