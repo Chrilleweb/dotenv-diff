@@ -1,13 +1,9 @@
 import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
-import { parseEnvFile } from '../lib/parseEnv.js';
+import { parseEnvFile } from '../core/parseEnv.js';
 import { scanCodebase } from '../services/codeBaseScanner.js';
-import type {
-  ScanOptions,
-  ScanResult,
-  EnvUsage,
-} from '../config/types.js';
+import type { ScanOptions, ScanResult, EnvUsage } from '../config/types.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { compareWithEnvFiles } from '../core/compareScan.js';

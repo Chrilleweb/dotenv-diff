@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { diffEnv } from '../../src/lib/diffEnv.js';
+import { diffEnv } from '../../src/core/diffEnv.js';
 
 describe("diffEnv", () => {
   it("detects missing and extra keys (no value checking)", () => {

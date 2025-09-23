@@ -1,2 +1,2 @@
-export { parseEnvFile } from './lib/parseEnv.js';
-export { diffEnv, type DiffResult } from './lib/diffEnv.js';
+export { parseEnvFile } from './core/parseEnv.js';
+export { diffEnv, type DiffResult } from './core/diffEnv.js';
