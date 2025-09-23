@@ -2,15 +2,15 @@ import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
 import { parseEnvFile } from '../lib/parseEnv.js';
-import {
-  scanCodebase,
-  compareWithEnvFiles,
-  type ScanOptions,
-  type ScanResult,
-  type EnvUsage,
-} from '../services/codeBaseScanner.js';
+import { scanCodebase } from '../services/codeBaseScanner.js';
+import type {
+  ScanOptions,
+  ScanResult,
+  EnvUsage,
+} from '../config/types.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
+import { compareWithEnvFiles } from '../core/compareScan.js';
 import { applyFixes } from '../core/fixEnv.js';
 
 // Helper to resolve paths relative to cwd
@@ -639,10 +639,13 @@ function outputToConsole(
     console.log();
   }
 
-  if (scanResult.duplicates?.example && scanResult.duplicates.example.length > 0) {
+  if (
+    scanResult.duplicates?.example &&
+    scanResult.duplicates.example.length > 0
+  ) {
     console.log(
       chalk.yellow(
-        `⚠️  Duplicate keys in example file (last occurrence wins):`,
+        '⚠️  Duplicate keys in example file (last occurrence wins):',
       ),
     );
     scanResult.duplicates.example.forEach(({ key, count }) =>
@@ -672,7 +675,11 @@ function outputToConsole(
   }
 
   // Success message for env file comparison
-  if (comparedAgainst && scanResult.missing.length === 0 && scanResult.secrets.length > 0) {
+  if (
+    comparedAgainst &&
+    scanResult.missing.length === 0 &&
+    scanResult.secrets.length > 0
+  ) {
     console.log(
       chalk.green(
         `✅ All used environment variables are defined in ${comparedAgainst}`,

@@ -1,3 +1,5 @@
+import { type SecretFinding } from '../core/secretDetectors.js';
+
 // Allowed categories for comparison
 export const ALLOWED_CATEGORIES = [
   'missing',
@@ -84,3 +86,48 @@ export type CompareJsonEntry = {
   valueMismatches?: Array<{ key: string; expected: string; actual: string }>;
   ok?: boolean;
 };
+
+/**
+ * Represents a single usage of an environment variable in the codebase.
+ */
+export interface EnvUsage {
+  variable: string;
+  file: string;
+  line: number;
+  column: number;
+  pattern:
+    | 'process.env'
+    | 'import.meta.env'
+    | 'sveltekit'
+    | 'deno'
+    | 'next'
+    | 'nuxt'
+    | 'php';
+  context: string; // The actual line content
+}
+
+export interface ScanOptions {
+  cwd: string;
+  include: string[];
+  exclude: string[];
+  ignore: string[];
+  ignoreRegex: RegExp[];
+  files?: string[];
+  secrets?: boolean;
+}
+
+export interface ScanResult {
+  used: EnvUsage[];
+  missing: string[];
+  unused: string[];
+  stats: {
+    filesScanned: number;
+    totalUsages: number;
+    uniqueVariables: number;
+  };
+  secrets: SecretFinding[];
+  duplicates: {
+    env?: Array<{ key: string; count: number }>;
+    example?: Array<{ key: string; count: number }>;
+  };
+}
