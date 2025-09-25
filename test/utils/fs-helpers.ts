@@ -17,7 +17,7 @@ export function makeTmpDir(prefix = 'dotenv-diff-') {
  * @param content - The content to write to the file.
  * @returns void
  */
-export function touch(filePath: string, content = '') {
+export function touch(filePath: string, content = ''): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, content);
 }
@@ -27,6 +27,6 @@ export function touch(filePath: string, content = '') {
  * @param p - The path to remove.
  * @return void
  */
-export function rmrf(p: string) {
+export function rmrf(p: string): void {
   fs.rmSync(p, { recursive: true, force: true });
 }

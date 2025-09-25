@@ -13,7 +13,7 @@ let cliPath: string | null = null;
  * - Set the cliPath to point to the compiled CLI script within the build output directory.
  * @returns The build output directory and CLI path.
  */
-export function buildOnce() {
+export function buildOnce(): { distDir: string; cliPath: string } {
   if (distDir && cliPath) return { distDir, cliPath };
   distDir = fs.mkdtempSync(path.join(process.cwd(), 'dist-test-'));
   const tsc = path.join(process.cwd(), 'node_modules', '.bin', 'tsc');
@@ -39,7 +39,7 @@ export function runCli(cwd: string, args: string[]) {
  * - Reset distDir and cliPath to null.
  * @returns void
  */
-export function cleanupBuild() {
+export function cleanupBuild(): void {
   if (distDir) {
     fs.rmSync(distDir, { recursive: true, force: true });
     distDir = null;
