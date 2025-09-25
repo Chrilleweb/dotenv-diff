@@ -254,6 +254,7 @@ export function shouldExclude(
 
 /**
  * Checks if a file path matches a glob pattern.
+ * A glob pattern is a string that may contain special characters like '*', '**', and '?' to represent wildcards and variable parts of the path.
  * @param filePath The path of the file to check.
  * @param pattern The glob pattern to match against.
  * @returns True if the file path matches the pattern, false otherwise.

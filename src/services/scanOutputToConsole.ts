@@ -214,7 +214,8 @@ export function outputToConsole(
   if (
     comparedAgainst &&
     scanResult.missing.length === 0 &&
-    scanResult.secrets.length > 0
+    scanResult.secrets.length > 0 &&
+    scanResult.used.length > 0
   ) {
     console.log(
       chalk.green(
