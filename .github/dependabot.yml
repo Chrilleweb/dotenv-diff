@@ -9,6 +9,25 @@ updates:
     commit-message:
       prefix: 'bump'
       include: 'scope'
+    groups:
+      production-dependencies:
+        dependency-type: 'production'
+      dev-dependencies:
+        dependency-type: 'development'
+
+  # Security updates - daily check
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+    open-pull-requests-limit: 10
+    target-branch: main
+    commit-message:
+      prefix: 'security'
+      include: 'scope'
+    allow:
+      - dependency-type: 'all'
+        update-type: 'security'
 
   # Github actions up to date
   - package-ecosystem: 'github-actions'
