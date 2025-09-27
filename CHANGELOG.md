@@ -15,6 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ## [2.2.7] - 2025-09-27
 ### Added
 - Added warning on .env not ignored by .gitignore on default.
+- added `dotenv-diff-ignore` comment to ignore lines from secret detection.
 
 ### Fixed
 - Fixed `--strict` error output to console when no warnings are found.
