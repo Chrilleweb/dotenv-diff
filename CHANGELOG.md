@@ -12,6 +12,17 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.2.6] - 2025-09-25
+### Added
+- Added `placeholder`, `127.0.0.1`, and `example` to `looksHarmless` secret detection rule.
+- Added `HTTP URL detected` message to potential secrets output.
+
+### Fixed
+- Removed `All used environment variables are defined in {.env}` when there are no used variables found.
+
+### Changed
+- No breaking changes.
+
 ## [2.2.5] - 2025-09-18
 ### Added
 - Updated README with `--strict` flag documentation.

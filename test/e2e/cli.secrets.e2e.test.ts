@@ -237,9 +237,9 @@ describe('secrets detection (default scan mode)', () => {
     fs.writeFileSync(
       path.join(cwd, 'src', 'index.ts'),
       `
-      const service = 'https://example.com';
-      const service2 = "https://example.com/api";
-      const service3 = \`https://example.com:8080/path\`;
+      const service = 'https://hello.com';
+      const service2 = "https://hello.com/api";
+      const service3 = \`https://hello.com/path\`;
 
       console.log(service, service2, service3);
     `.trimStart(),
@@ -248,6 +248,28 @@ describe('secrets detection (default scan mode)', () => {
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Potential secrets detected in codebase:');
+        expect(res.stdout).toContain('HTTPS URL detected');
+  });
+    it('should warn about using http URLs in codebase', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      const service = 'http://hello.com';
+      const service2 = "http://thisIsASecret.com/api";
+      const service3 = \`http://yes.com/path\`;
+
+      console.log(service, service2, service3);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Potential secrets detected in codebase:');
+    expect(res.stdout).toContain('HTTP URL detected');
   });
   it('should not give warning on SVG content', () => {
     const cwd = tmpDir();
@@ -261,6 +283,26 @@ describe('secrets detection (default scan mode)', () => {
       const svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>';
 
       console.log(svgIcon);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
+  it('should ignore https://placerholder.com/ URLs', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      const placeholder1 = 'https://placeholder.com';
+      const placeholder2 = "https://placeholder.com/150";
+      const placeholder3 = \`http://placeholder.com/100x100\`;
+
+      console.log(placeholder1, placeholder2, placeholder3);
     `.trimStart(),
     );
 

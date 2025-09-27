@@ -32,12 +32,11 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       allUsages.push(...fileUsages);
       if (opts.secrets) {
         try {
-          // Brug relativ path i findings, så output matcher dine øvrige prints
           const relativePath = path.relative(opts.cwd, filePath);
           const sec = detectSecretsInSource(relativePath, content);
           if (sec.length) allSecrets.push(...sec);
         } catch {
-          // aldrig fail scannet pga. detector; bare fortsæt
+          // Ignore secret detection errors
         }
       }
       filesScanned++;

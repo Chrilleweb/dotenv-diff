@@ -32,6 +32,15 @@ const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
 
 const HTTPS_PATTERN = /["'`](https?:\/\/(?!localhost)[^"'`]*)["'`]/g;
 
+// List of harmless URL patterns to ignore
+const HARMLESS_URLS = [
+  /https?:\/\/(www\.)?placeholder\.com/i,
+  /https?:\/\/(www\.)?example\.com/i,
+  /https?:\/\/127\.0\.0\.1(:\d+)?/i,
+  /http:\/\/www\.w3\.org\/2000\/svg/i,
+  /xmlns=["']http:\/\/www\.w3\.org\/2000\/svg["']/i, // SVG namespace
+];
+
 /**
  * Checks if a string looks like a harmless literal.
  * @param s - The string to check.
@@ -39,20 +48,18 @@ const HTTPS_PATTERN = /["'`](https?:\/\/(?!localhost)[^"'`]*)["'`]/g;
  */
 function looksHarmlessLiteral(s: string): boolean {
   return (
-    // Remove localhost check from here - we want to flag localhost URLs now
-    /^https?:\/\/(?!localhost)/i.test(s) ||
-    /\S+@\S+/.test(s) ||
-    /^data:[a-z]+\/[a-z0-9.+-]+;base64,/i.test(s) ||
-    /^\.{0,2}\//.test(s) ||
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s) ||
+    /\S+@\S+/.test(s) || // emails
+    /^data:[a-z]+\/[a-z0-9.+-]+;base64,/i.test(s) || // data URIs
+    /^\.{0,2}\//.test(s) || // relative paths
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s) || // UUID
     /^[0-9a-f]{32,128}$/i.test(s) || // MD5, SHA1, SHA256, etc.
-    /^[A-Za-z0-9+/_\-]{16,20}={0,2}$/.test(s) ||
+    /^[A-Za-z0-9+/_\-]{16,20}={0,2}$/.test(s) || // short base64
     /^[A-Za-z0-9+/_\-]*(_PUBLIC|_PRIVATE|VITE_|NEXT_PUBLIC|VUE_)[A-Za-z0-9+/_\-]*={0,2}$/.test(
       s,
-    ) ||
-    /^[MmZzLlHhVvCcSsQqTtAa][0-9eE+.\- ,MmZzLlHhVvCcSsQqTtAa]*$/.test(s) ||
-    /<svg[\s\S]*?>[\s\S]*?<\/svg>/i.test(s) || // Ignore SVG markup
-    /xmlns=["']http:\/\/www\.w3\.org\/2000\/svg["']/i.test(s) // Ignore SVG namespace
+    ) || // env-like keys
+    /^[MmZzLlHhVvCcSsQqTtAa][0-9eE+.\- ,MmZzLlHhVvCcSsQqTtAa]*$/.test(s) || // SVG path data
+    /<svg[\s\S]*?>[\s\S]*?<\/svg>/i.test(s) || // SVG markup
+    HARMLESS_URLS.some((rx) => rx.test(s)) // Allowlisted URLs
   );
 }
 
@@ -130,13 +137,15 @@ export function detectSecretsInSource(
     HTTPS_PATTERN.lastIndex = 0;
     let httpsMatch: RegExpExecArray | null;
     while ((httpsMatch = HTTPS_PATTERN.exec(line))) {
-      const url = httpsMatch[1];
-      if (!url?.includes('localhost') && url !== 'http://www.w3.org/2000/svg') {
+      const url = httpsMatch[1] || '';
+      if (url && !looksHarmlessLiteral(url)) {
+        const protocol = url.startsWith('https') ? 'HTTPS' : 'HTTP';
+
         findings.push({
           file,
           line: lineNo,
           kind: 'pattern',
-          message: 'HTTPS URL detected - consider using environment variable',
+          message: `${protocol} URL detected – consider moving to an environment variable`,
           snippet: line.trim().slice(0, 180),
         });
       }
