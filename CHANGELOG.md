@@ -12,6 +12,13 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.2.7] - 2025-09-27
+### Fixed
+- Fixed `--strict` error output to console when no warnings are found.
+
+### Changed
+- No breaking changes.
+
 ## [2.2.6] - 2025-09-25
 ### Added
 - Added `placeholder`, `127.0.0.1`, and `example` to `looksHarmless` secret detection rule.

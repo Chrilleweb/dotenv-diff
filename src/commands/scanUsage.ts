@@ -292,16 +292,5 @@ export async function scanUsage(
     }
   }
 
-  return {
-    exitWithError:
-      result.exitWithError ||
-      duplicatesFound ||
-      !!(
-        opts.strict &&
-        (scanResult.unused.length > 0 ||
-          (scanResult.duplicates?.env?.length ?? 0) > 0 ||
-          (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-          (scanResult.secrets?.length ?? 0) > 0)
-      ),
-  };
+  return { exitWithError: result.exitWithError || duplicatesFound };
 }
