@@ -82,6 +82,17 @@ You can use the `--strict` flag to treat all warnings as errors. This is useful 
 dotenv-diff --strict
 ```
 
+## ignore specific warnings
+
+You can use the `dotenv-diff-ignore` comment to ignore specific lines from secret detection. For example:
+
+```js
+const secret ="https://thisurlshouldbeignored.com"; // dotenv-diff-ignore
+const ignoredEntropy = "AIzaSyA-1234567890abcdefgHIJKLMNOpqrstuv" // dotenv-diff-ignore;
+```
+
+This will prevent `dotenv-diff` from flagging the line as a potential secret.
+
 ## Show unused variables
 
 As default, `dotenv-diff` will list variables that are defined in `.env` but never used in your codebase.

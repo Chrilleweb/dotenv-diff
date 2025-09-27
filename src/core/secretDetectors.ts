@@ -42,6 +42,18 @@ const HARMLESS_URLS = [
 ];
 
 /**
+ * Checks if a line has an ignore comment
+ * @param line - The line to check
+ * @returns True if the line should be ignored
+ */
+function hasIgnoreComment(line: string): boolean {
+  return (
+    /\/\/\s*dotenv-diff-ignore/.test(line) ||
+    /\/\*\s*dotenv-diff-ignore\s*\*\//.test(line)
+  );
+}
+
+/**
  * Checks if a string looks like a harmless literal.
  * @param s - The string to check.
  * @returns True if the string looks harmless, false otherwise.
@@ -132,6 +144,9 @@ export function detectSecretsInSource(
 
     // Skip comments
     if (/^\s*\/\//.test(line)) continue;
+
+    // Check if line has ignore comment
+    if (hasIgnoreComment(line)) continue;
 
     // Check for HTTPS URLs
     HTTPS_PATTERN.lastIndex = 0;
