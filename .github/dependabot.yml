@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+    target-branch: main
+    commit-message:
+      prefix: 'bump'
+      include: 'scope'
+
+  # Github actions up to date
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+    target-branch: main
+    commit-message:
+      prefix: 'bump'
+      include: 'scope'
