@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { warnIfEnvNotIgnored, isEnvIgnoredByGit } from './git.js';
 import type {
   ScanUsageOptions,
   ScanResult,
@@ -229,12 +230,23 @@ export function outputToConsole(
     console.log();
   }
 
+  let envNotIgnored = false;
+  if (!opts.json) {
+    warnIfEnvNotIgnored({ cwd: opts.cwd, envFile: '.env' });
+
+    const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
+    if (ignored === false || ignored === null) {
+      envNotIgnored = true;
+    }
+  }
+
   if (opts.strict) {
     const hasWarnings =
       scanResult.unused.length > 0 ||
       (scanResult.duplicates?.env?.length ?? 0) > 0 ||
       (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-      (scanResult.secrets?.length ?? 0) > 0;
+      (scanResult.secrets?.length ?? 0) > 0 ||
+      envNotIgnored;
 
     if (hasWarnings) {
       exitWithError = true;
@@ -247,6 +259,7 @@ export function outputToConsole(
         warnings.push('duplicate keys in example');
       if ((scanResult.secrets?.length ?? 0) > 0)
         warnings.push('potential secrets');
+      if (envNotIgnored) warnings.push('.env not ignored by git');
 
       console.log(
         chalk.red(`💥 Strict mode: Error on warnings → ${warnings.join(', ')}`),

@@ -61,6 +61,7 @@ describe('--strict mode', () => {
   it('succeeds when there are no warnings', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), '');
+    fs.writeFileSync(path.join(cwd, '.gitignore'), '.env');
 
     const res = runCli(cwd, ['--strict']);
     expect(res.status).toBe(0);
