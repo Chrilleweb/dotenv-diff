@@ -229,5 +229,31 @@ export function outputToConsole(
     console.log();
   }
 
+  if (opts.strict) {
+    const hasWarnings =
+      scanResult.unused.length > 0 ||
+      (scanResult.duplicates?.env?.length ?? 0) > 0 ||
+      (scanResult.duplicates?.example?.length ?? 0) > 0 ||
+      (scanResult.secrets?.length ?? 0) > 0;
+
+    if (hasWarnings) {
+      exitWithError = true;
+
+      const warnings: string[] = [];
+      if (scanResult.unused.length > 0) warnings.push('unused variables');
+      if ((scanResult.duplicates?.env?.length ?? 0) > 0)
+        warnings.push('duplicate keys in env');
+      if ((scanResult.duplicates?.example?.length ?? 0) > 0)
+        warnings.push('duplicate keys in example');
+      if ((scanResult.secrets?.length ?? 0) > 0)
+        warnings.push('potential secrets');
+
+      console.log(
+        chalk.red(`💥 Strict mode: Error on warnings → ${warnings.join(', ')}`),
+      );
+      console.log();
+    }
+  }
+
   return { exitWithError };
 }
