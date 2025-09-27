@@ -21,6 +21,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 - No breaking changes.
+- Updated dependencies to latest versions.
 
 ## [2.2.6] - 2025-09-25
 ### Added
