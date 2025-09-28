@@ -6,7 +6,7 @@ import { diffEnv } from '../core/diffEnv.js';
 import { warnIfEnvNotIgnored, isEnvIgnoredByGit } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
-import type { Category, CompareJsonEntry } from '../config/types.js';
+import type { Category, CompareJsonEntry, ComparisonOptions, FilePair } from '../config/types.js';
 import { applyFixes } from '../core/fixEnv.js';
 
 /**
@@ -16,20 +16,8 @@ import { applyFixes } from '../core/fixEnv.js';
  * @returns An object indicating the overall comparison results.
  */
 export async function compareMany(
-  pairs: Array<{ envName: string; envPath: string; examplePath: string }>,
-  opts: {
-    checkValues: boolean;
-    cwd: string;
-    allowDuplicates?: boolean;
-    fix?: boolean;
-    json?: boolean;
-    ignore: string[];
-    ignoreRegex: RegExp[];
-    collect?: (entry: CompareJsonEntry) => void;
-    only?: Category[];
-    showStats?: boolean;
-    strict?: boolean;
-  },
+  pairs: FilePair[],
+  opts: ComparisonOptions,
 ) {
   let exitWithError = false;
 

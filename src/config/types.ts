@@ -188,3 +188,23 @@ export interface ScanJsonEntry {
 export interface VariableUsages {
   [variable: string]: EnvUsage[];
 }
+
+export interface ComparisonOptions {
+  checkValues: boolean;
+  cwd: string;
+  allowDuplicates?: boolean;
+  fix?: boolean;
+  json?: boolean;
+  ignore: string[];
+  ignoreRegex: RegExp[];
+  collect?: (entry: CompareJsonEntry) => void;
+  only?: Category[];
+  showStats?: boolean;
+  strict?: boolean;
+}
+
+export interface FilePair {
+  envName: string;
+  envPath: string;
+  examplePath: string;
+}
