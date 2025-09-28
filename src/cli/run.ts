@@ -6,9 +6,9 @@ import chalk from 'chalk';
 import { normalizeOptions } from '../config/options.js';
 import { discoverEnvFiles } from '../services/envDiscovery.js';
 import { pairWithExample } from '../services/envPairing.js';
-import { ensureFilesOrPrompt } from '../commands/init.js';
+import { ensureFilesOrPrompt } from '../services/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
-import type { CompareJsonEntry } from '../config/types.js';
+import { type CompareJsonEntry, type Options } from '../config/types.js';
 import { scanUsage } from '../commands/scanUsage.js';
 
 /**
@@ -17,134 +17,189 @@ import { scanUsage } from '../commands/scanUsage.js';
  */
 export async function run(program: Command) {
   program.parse(process.argv);
-  const raw = program.opts();
-  const opts = normalizeOptions(raw);
+  const opts = normalizeOptions(program.opts());
 
+  setupGlobalConfig(opts);
+
+  // Route to appropriate command
+  if (opts.compare) {
+    await runCompareMode(opts);
+  } else {
+    await runScanMode(opts);
+  }
+}
+
+/**
+ * Setup global configuration
+ */
+function setupGlobalConfig(opts: Options) {
   if (opts.noColor) {
     chalk.level = 0; // disable colors globally
   }
+}
 
-  // DEFAULT: scan-usage unless --compare is set
-  if (!opts.compare) {
-    const envPath =
-      opts.envFlag || (fs.existsSync('.env') ? '.env' : undefined);
+/**
+ * Run scan-usage mode (default behavior)
+ */
+async function runScanMode(opts: Options) {
+  const envPath = opts.envFlag || (fs.existsSync('.env') ? '.env' : undefined);
 
-    const { exitWithError } = await scanUsage({
-      cwd: opts.cwd,
-      include: opts.includeFiles,
-      exclude: opts.excludeFiles,
-      ignore: opts.ignore,
-      ignoreRegex: opts.ignoreRegex,
-      examplePath: opts.exampleFlag,
-      envPath,
-      fix: opts.fix,
-      json: opts.json,
-      showUnused: opts.showUnused,
-      showStats: opts.showStats,
-      isCiMode: opts.isCiMode,
-      secrets: opts.secrets,
-      strict: opts.strict ?? false,
-      ...(opts.files ? { files: opts.files } : {}),
-    });
+  const { exitWithError } = await scanUsage({
+    cwd: opts.cwd,
+    include: opts.includeFiles,
+    exclude: opts.excludeFiles,
+    ignore: opts.ignore,
+    ignoreRegex: opts.ignoreRegex,
+    examplePath: opts.exampleFlag,
+    envPath,
+    fix: opts.fix,
+    json: opts.json,
+    showUnused: opts.showUnused,
+    showStats: opts.showStats,
+    isCiMode: opts.isCiMode,
+    secrets: opts.secrets,
+    strict: opts.strict ?? false,
+    ...(opts.files ? { files: opts.files } : {}),
+  });
 
-    process.exit(exitWithError ? 1 : 0);
-  }
+  process.exit(exitWithError ? 1 : 0);
+}
 
-  // Special-case: both flags → direct comparison of exactly those two files
+/**
+ * Run compare mode
+ */
+async function runCompareMode(opts: Options) {
+  // Handle direct file comparison (both --env and --example specified)
   if (opts.envFlag && opts.exampleFlag) {
-    const envExists = fs.existsSync(opts.envFlag);
-    const exExists = fs.existsSync(opts.exampleFlag);
-
-    // Handle missing files with prompting (unless in CI mode)
-    if (!envExists || !exExists) {
-      // Check if we should prompt for file creation
-      if (!opts.isCiMode) {
-        const res = await ensureFilesOrPrompt({
-          cwd: opts.cwd,
-          primaryEnv: opts.envFlag,
-          primaryExample: opts.exampleFlag,
-          alreadyWarnedMissingEnv: false,
-          isYesMode: opts.isYesMode,
-          isCiMode: opts.isCiMode,
-        });
-
-        if (res.shouldExit) {
-          if (opts.json) console.log(JSON.stringify([], null, 2));
-          process.exit(res.exitCode);
-        }
-      } else {
-        // In CI mode, we just show errors and exit
-        if (!envExists) {
-          console.error(
-            chalk.red(
-              `❌ Error: --env file not found: ${path.basename(opts.envFlag)}`,
-            ),
-          );
-        }
-        if (!exExists) {
-          console.error(
-            chalk.red(
-              `❌ Error: --example file not found: ${path.basename(opts.exampleFlag)}`,
-            ),
-          );
-        }
-        process.exit(1);
-      }
-    }
-
-    const report: CompareJsonEntry[] = [];
-    const { exitWithError } = await compareMany(
-      [
-        {
-          envName: path.basename(opts.envFlag),
-          envPath: opts.envFlag,
-          examplePath: opts.exampleFlag,
-        },
-      ],
-      {
-        checkValues: opts.checkValues,
-        cwd: opts.cwd,
-        allowDuplicates: opts.allowDuplicates,
-        json: opts.json,
-        ignore: opts.ignore,
-        ignoreRegex: opts.ignoreRegex,
-        showStats: opts.showStats,
-        collect: (e) => report.push(e),
-        ...(opts.only ? { only: opts.only } : {}),
-      },
-    );
-
-    if (opts.json) {
-      console.log(JSON.stringify(report, null, 2));
-    }
-    process.exit(exitWithError ? 1 : 0);
+    await runDirectFileComparison(opts);
+    return;
   }
 
-  // Auto-discovery flow
-  const d = discoverEnvFiles({
+  // Handle auto-discovery comparison
+  await runAutoDiscoveryComparison(opts);
+}
+
+/**
+ * Compare two specific files directly
+ */
+async function runDirectFileComparison(opts: Options) {
+  const envExists = fs.existsSync(opts.envFlag!);
+  const exExists = fs.existsSync(opts.exampleFlag!);
+
+  // Handle missing files
+  if (!envExists || !exExists) {
+    const shouldExit = await handleMissingFiles(
+      opts,
+      opts.envFlag!,
+      opts.exampleFlag!,
+    );
+    if (shouldExit) return;
+  }
+
+  // Perform comparison
+  const report: CompareJsonEntry[] = [];
+  const { exitWithError } = await compareMany(
+    [
+      {
+        envName: path.basename(opts.envFlag!),
+        envPath: opts.envFlag!,
+        examplePath: opts.exampleFlag!,
+      },
+    ],
+    buildCompareOptions(opts, report),
+  );
+
+  outputResults(report, opts, exitWithError);
+}
+
+/**
+ * Compare using auto-discovery
+ */
+async function runAutoDiscoveryComparison(opts: Options) {
+  // Discover available env files
+  const discovery = discoverEnvFiles({
     cwd: opts.cwd,
     envFlag: opts.envFlag ?? null,
     exampleFlag: opts.exampleFlag ?? null,
   });
 
-  // Init cases (may create files or early-exit)
-  const res = await ensureFilesOrPrompt({
-    cwd: d.cwd,
-    primaryEnv: d.primaryEnv,
-    primaryExample: d.primaryExample,
-    alreadyWarnedMissingEnv: d.alreadyWarnedMissingEnv,
+  // Ensure required files exist or prompt to create them
+  const initResult = await ensureFilesOrPrompt({
+    cwd: discovery.cwd,
+    primaryEnv: discovery.primaryEnv,
+    primaryExample: discovery.primaryExample,
+    alreadyWarnedMissingEnv: discovery.alreadyWarnedMissingEnv,
     isYesMode: opts.isYesMode,
     isCiMode: opts.isCiMode,
   });
-  if (res.shouldExit) {
-    if (opts.json) console.log(JSON.stringify([], null, 2));
-    process.exit(res.exitCode);
+
+  if (initResult.shouldExit) {
+    outputResults([], opts, initResult.exitCode !== 0);
+    return;
   }
 
   // Compare all discovered pairs
-  const pairs = pairWithExample(d);
+  const pairs = pairWithExample(discovery);
   const report: CompareJsonEntry[] = [];
-  const { exitWithError } = await compareMany(pairs, {
+  const { exitWithError } = await compareMany(
+    pairs,
+    buildCompareOptions(opts, report),
+  );
+
+  outputResults(report, opts, exitWithError);
+}
+
+/**
+ * Handle missing files in CI vs interactive mode
+ */
+async function handleMissingFiles(
+  opts: Options,
+  envFlag: string,
+  exampleFlag: string,
+): Promise<boolean> {
+  const envExists = fs.existsSync(envFlag);
+  const exExists = fs.existsSync(exampleFlag);
+
+  if (opts.isCiMode) {
+    // In CI mode, just show errors and exit
+    if (!envExists) {
+      console.error(
+        chalk.red(`❌ Error: --env file not found: ${path.basename(envFlag)}`),
+      );
+    }
+    if (!exExists) {
+      console.error(
+        chalk.red(
+          `❌ Error: --example file not found: ${path.basename(exampleFlag)}`,
+        ),
+      );
+    }
+    process.exit(1);
+  } else {
+    // Interactive mode - try to prompt for file creation
+    const result = await ensureFilesOrPrompt({
+      cwd: opts.cwd,
+      primaryEnv: envFlag,
+      primaryExample: exampleFlag,
+      alreadyWarnedMissingEnv: false,
+      isYesMode: opts.isYesMode,
+      isCiMode: opts.isCiMode,
+    });
+
+    if (result.shouldExit) {
+      outputResults([], opts, result.exitCode !== 0);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Build options object for compareMany function
+ */
+function buildCompareOptions(opts: Options, report: CompareJsonEntry[]) {
+  return {
     checkValues: opts.checkValues,
     cwd: opts.cwd,
     allowDuplicates: opts.allowDuplicates,
@@ -153,13 +208,21 @@ export async function run(program: Command) {
     ignore: opts.ignore,
     ignoreRegex: opts.ignoreRegex,
     showStats: opts.showStats,
-    collect: (e) => report.push(e),
+    collect: (e: CompareJsonEntry) => report.push(e),
     ...(opts.only ? { only: opts.only } : {}),
-  });
+  };
+}
 
+/**
+ * Output results and exit with appropriate code
+ */
+function outputResults(
+  report: CompareJsonEntry[],
+  opts: Options,
+  exitWithError: boolean,
+) {
   if (opts.json) {
     console.log(JSON.stringify(report, null, 2));
   }
-
   process.exit(exitWithError ? 1 : 0);
 }
