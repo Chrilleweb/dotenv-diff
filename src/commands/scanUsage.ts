@@ -12,6 +12,7 @@ import { createJsonOutput } from '../core/scanJsonOutput.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { compareWithEnvFiles } from '../core/compareScan.js';
 import { applyFixes } from '../core/fixEnv.js';
+import { isEnvIgnoredByGit } from '../services/git.js';
 
 /**
  * Scans codebase for environment variable usage and compares with .env file
@@ -46,9 +47,9 @@ export async function scanUsage(
   // Recalculate stats after filtering out commented usages
   const uniqueVariables = new Set(scanResult.used.map((u) => u.variable)).size;
   scanResult.stats = {
-    filesScanned: scanResult.stats.filesScanned, // Keep original files scanned count
+    filesScanned: scanResult.stats.filesScanned,
     totalUsages: scanResult.used.length,
-    uniqueVariables: uniqueVariables,
+    uniqueVariables,
   };
 
   // If user explicitly passed --example but the file doesn't exist:
@@ -59,7 +60,6 @@ export async function scanUsage(
     if (missing) {
       const msg = `❌ Missing specified example file: ${opts.examplePath}`;
       if (opts.isCiMode) {
-        // IMPORTANT: stdout (console.log), not stderr, to satisfy the test
         console.log(chalk.red(msg));
         return { exitWithError: true };
       } else if (!opts.json) {
@@ -81,6 +81,7 @@ export async function scanUsage(
   let fixApplied = false;
   let fixedKeys: string[] = [];
   let removedDuplicates: string[] = [];
+  let gitignoreUpdated = false;
 
   if (compareFile) {
     try {
@@ -131,6 +132,7 @@ export async function scanUsage(
           if (changed) {
             fixApplied = true;
             removedDuplicates = result.removedDuplicates;
+            gitignoreUpdated = gitignoreUpdated || result.gitignoreUpdated;
             // Clear duplicates after fix
             duplicatesFound = false;
             dupsEnv = [];
@@ -138,7 +140,7 @@ export async function scanUsage(
           }
         }
 
-        // Add to scan result for both JSON and console output (only if not fixed)
+        // Keep duplicates for output if not fixed
         if (
           (dupsEnv.length > 0 || dupsExample.length > 0) &&
           (!opts.fix || !fixApplied)
@@ -151,65 +153,55 @@ export async function scanUsage(
       }
     } catch (error) {
       const errorMessage = `⚠️  Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
-
       if (opts.isCiMode) {
-        // In CI mode, exit with error if file doesn't exist
         console.log(chalk.red(`❌ ${errorMessage}`));
         return { exitWithError: true };
       }
-
-      if (!opts.json) {
-        console.log(chalk.yellow(errorMessage));
-      }
+      if (!opts.json) console.log(chalk.yellow(errorMessage));
     }
   }
 
-  // Apply missing keys fix if --fix is enabled (but don't show message yet)
+  // Apply missing keys fix with applyFixes (so gitignore is handled too)
   if (opts.fix && compareFile) {
     const missingKeys = scanResult.missing;
-
     if (missingKeys.length > 0) {
       const envFilePath = compareFile.path;
       const exampleFilePath = opts.examplePath
         ? resolveFromCwd(opts.cwd, opts.examplePath)
-        : null;
+        : '';
 
-      // Append missing keys to .env
-      const content = fs.readFileSync(envFilePath, 'utf-8');
-      const newContent =
-        content +
-        (content.endsWith('\n') ? '' : '\n') +
-        missingKeys.map((k) => `${k}=`).join('\n') +
-        '\n';
-      fs.writeFileSync(envFilePath, newContent);
+      const { changed, result } = applyFixes({
+        envPath: envFilePath,
+        examplePath: exampleFilePath,
+        missingKeys,
+        duplicateKeys: [],
+      });
 
-      // Append to .env.example if it exists
-      if (exampleFilePath && fs.existsSync(exampleFilePath)) {
-        const exContent = fs.readFileSync(exampleFilePath, 'utf-8');
-        const existingExKeys = new Set(
-          exContent
-            .split('\n')
-            .map((l) => l.trim().split('=')[0])
-            .filter(Boolean),
-        );
-        const newKeys = missingKeys.filter((k) => !existingExKeys.has(k));
-        if (newKeys.length) {
-          const newExContent =
-            exContent +
-            (exContent.endsWith('\n') ? '' : '\n') +
-            newKeys.join('\n') +
-            '\n';
-          fs.writeFileSync(exampleFilePath, newExContent);
-        }
+      if (changed) {
+        fixApplied = true;
+        fixedKeys = result.addedEnv;
+        gitignoreUpdated = gitignoreUpdated || result.gitignoreUpdated;
+        scanResult.missing = [];
       }
-
-      fixApplied = true;
-      fixedKeys = missingKeys;
-      scanResult.missing = [];
     }
   }
 
-  // Prepare JSON output
+    // Always run a gitignore-only fix when --fix is set (even if no missing/duplicates)
+  if (opts.fix && compareFile) {
+    const { result } = applyFixes({
+      envPath: compareFile.path,
+      examplePath: '',
+      missingKeys: [],
+      duplicateKeys: [],
+    });
+    if (result.gitignoreUpdated) {
+      fixApplied = true;
+      gitignoreUpdated = true;
+    }
+  }
+
+
+  // JSON output
   if (opts.json) {
     const jsonOutput = createJsonOutput(
       scanResult,
@@ -235,7 +227,7 @@ export async function scanUsage(
   // Console output
   const result = outputToConsole(scanResult, opts, comparedAgainst);
 
-  // Show consolidated fix message at the bottom (after all other output)
+  // Consolidated fix message
   if (opts.fix && !opts.json) {
     if (fixApplied) {
       console.log(chalk.green('✅ Auto-fix applied:'));
@@ -265,7 +257,9 @@ export async function scanUsage(
           );
         }
       }
-
+      if (gitignoreUpdated) {
+        console.log(chalk.green('   - Added .env ignore rules to .gitignore'));
+      }
       console.log();
     } else {
       console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));
@@ -274,6 +268,8 @@ export async function scanUsage(
   }
 
   if (!opts.json && !opts.fix) {
+    const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
+    const envNotIgnored = ignored === false || ignored === null;
     if (scanResult.missing.length > 0 && duplicatesFound) {
       console.log(
         chalk.gray(
@@ -287,6 +283,13 @@ export async function scanUsage(
     } else if (duplicatesFound) {
       console.log(
         chalk.gray('💡 Tip: Run with `--fix` to remove duplicate keys'),
+      );
+      console.log();
+    } else if (envNotIgnored) {
+      console.log(
+        chalk.gray(
+          '💡 Tip: Run with `--fix` to ensure .env is added to .gitignore',
+        ),
       );
       console.log();
     }

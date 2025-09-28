@@ -1,4 +1,6 @@
 import fs from 'fs';
+import path from 'path';
+import { isEnvIgnoredByGit, isGitRepo, findGitRoot } from '../services/git.js';
 
 /**
  * Applies fixes to the .env and .env.example files based on the detected issues.
@@ -23,6 +25,7 @@ export function applyFixes({
     removedDuplicates: [] as string[],
     addedEnv: [] as string[],
     addedExample: [] as string[],
+    gitignoreUpdated: false as boolean,
   };
 
   // --- Remove duplicates ---
@@ -44,7 +47,7 @@ export function applyFixes({
       newLines.unshift(line);
     }
     fs.writeFileSync(envPath, newLines.join('\n'));
-    result.removedDuplicates = duplicateKeys; // save all dupe keys
+    result.removedDuplicates = duplicateKeys;
   }
 
   // --- Add missing keys to .env ---
@@ -56,7 +59,7 @@ export function applyFixes({
       missingKeys.map((k) => `${k}=`).join('\n') +
       '\n';
     fs.writeFileSync(envPath, newContent);
-    result.addedEnv = missingKeys; // save all missing keys
+    result.addedEnv = missingKeys;
   }
 
   // --- Add missing keys to .env.example ---
@@ -76,14 +79,51 @@ export function applyFixes({
         newExampleKeys.join('\n') +
         '\n';
       fs.writeFileSync(examplePath, newExContent);
-      result.addedExample = newExampleKeys; // save all keys actually added
+      result.addedExample = newExampleKeys;
     }
+  }
+
+  // --- Ensure .env is ignored in gitignore (best-effort; write at git root) ---
+  try {
+    const startDir = path.dirname(envPath);
+    const gitRoot = findGitRoot(startDir);
+    if (gitRoot && isGitRepo(gitRoot)) {
+      const gitignorePath = path.join(gitRoot, '.gitignore');
+      // Check against the actual file name (".env" or custom)
+      const envFileName = path.basename(envPath);
+      const ignored = isEnvIgnoredByGit({ cwd: gitRoot, envFile: envFileName });
+
+      if (ignored === false || ignored === null) {
+        const entry = '.env\n.env.*\n';
+        if (fs.existsSync(gitignorePath)) {
+          const current = fs.readFileSync(gitignorePath, 'utf8');
+          // Avoid duplicate entries
+          const hasDotEnv = current.split(/\r?\n/).some((l) => l.trim() === '.env');
+          const hasDotEnvStar = current.split(/\r?\n/).some((l) => l.trim() === '.env.*');
+          const pieces: string[] = [];
+          if (!hasDotEnv) pieces.push('.env');
+          if (!hasDotEnvStar) pieces.push('.env.*');
+
+          if (pieces.length) {
+            const toAppend = `${current.endsWith('\n') ? '' : '\n'}${pieces.join('\n')}\n`;
+            fs.appendFileSync(gitignorePath, toAppend);
+            result.gitignoreUpdated = true;
+          }
+        } else {
+          fs.writeFileSync(gitignorePath, entry);
+          result.gitignoreUpdated = true;
+        }
+      }
+    }
+  } catch {
+    // ignore errors - non-blocking DX
   }
 
   const changed =
     result.removedDuplicates.length > 0 ||
     result.addedEnv.length > 0 ||
-    result.addedExample.length > 0;
+    result.addedExample.length > 0 ||
+    result.gitignoreUpdated;
 
   return { changed, result };
 }

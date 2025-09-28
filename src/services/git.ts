@@ -109,3 +109,16 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
     );
   }
 }
+
+/** Find the git repository root starting from startDir (walk up until ".git"). */
+export function findGitRoot(startDir: string): string | null {
+  let dir = path.resolve(startDir);
+  while (true) {
+    const gitDir = path.join(dir, '.git');
+    if (fs.existsSync(gitDir)) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) break; // reached filesystem root
+    dir = parent;
+  }
+  return null;
+}

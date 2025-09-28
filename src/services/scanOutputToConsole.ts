@@ -231,9 +231,9 @@ export function outputToConsole(
   }
 
   let envNotIgnored = false;
-  if (!opts.json) {
+  if (!opts.json && !opts.fix) {
+    // Kun vis advarsel i non-fix mode; i fix-mode har vi lige forsøgt at rette det.
     warnIfEnvNotIgnored({ cwd: opts.cwd, envFile: '.env' });
-
     const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
     if (ignored === false || ignored === null) {
       envNotIgnored = true;

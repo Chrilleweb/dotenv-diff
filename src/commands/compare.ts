@@ -3,7 +3,7 @@ import path from 'path';
 import chalk from 'chalk';
 import { parseEnvFile } from '../core/parseEnv.js';
 import { diffEnv } from '../core/diffEnv.js';
-import { warnIfEnvNotIgnored } from '../services/git.js';
+import { warnIfEnvNotIgnored, isEnvIgnoredByGit } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type { Category, CompareJsonEntry } from '../config/types.js';
@@ -73,13 +73,15 @@ export async function compareMany(
 
     // Git ignore hint (only when not JSON)
     let gitignoreUnsafe = false;
+    let gitignoreMsg: string | null = null;
+
     if (run('gitignore')) {
       warnIfEnvNotIgnored({
         cwd: opts.cwd,
         envFile: envName,
         log: (msg) => {
           gitignoreUnsafe = true;
-          if (!opts.json) console.log(msg.replace(/^/gm, '  '));
+          gitignoreMsg = msg;
         },
       });
     }
@@ -295,17 +297,61 @@ export async function compareMany(
         );
         console.log();
       }
+      if (gitignoreMsg && !opts.json) {
+        console.log((gitignoreMsg as string).replace(/^/gm, '  '));
+      }
     }
 
     if (!opts.json && !opts.fix) {
+      const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
+      const envNotIgnored = ignored === false || ignored === null;
       if (
-        filtered.missing.length ||
-        filtered.duplicatesEnv.length ||
-        filtered.duplicatesEx.length
+        filtered.missing.length > 0 &&
+        filtered.duplicatesEnv.length > 0 &&
+        envNotIgnored
       ) {
         console.log(
           chalk.gray(
-            '💡 Tip: Run with `--fix` to automatically add missing keys and remove duplicates.',
+            '💡 Tip: Run with `--fix` to add missing keys, remove duplicates and add .env to .gitignore',
+          ),
+        );
+        console.log();
+      } else if (
+        filtered.missing.length > 0 &&
+        filtered.duplicatesEnv.length > 0
+      ) {
+        console.log(
+          chalk.gray(
+            '💡 Tip: Run with `--fix` to add missing keys and remove duplicates',
+          ),
+        );
+        console.log();
+      } else if (filtered.duplicatesEnv.length > 0 && envNotIgnored) {
+        console.log(
+          chalk.gray(
+            '💡 Tip: Run with `--fix` to remove duplicate keys and add .env to .gitignore',
+          ),
+        );
+        console.log();
+      } else if (filtered.missing.length > 0 && envNotIgnored) {
+        console.log(
+          chalk.gray(
+            '💡 Tip: Run with `--fix` to add missing keys and add .env to .gitignore',
+          ),
+        );
+        console.log();
+      } else if (filtered.missing.length > 0) {
+        console.log(chalk.gray('💡 Tip: Run with `--fix` to add missing keys'));
+        console.log();
+      } else if (filtered.duplicatesEnv.length > 0) {
+        console.log(
+          chalk.gray('💡 Tip: Run with `--fix` to remove duplicate keys'),
+        );
+        console.log();
+      } else if (envNotIgnored) {
+        console.log(
+          chalk.gray(
+            '💡 Tip: Run with `--fix` to ensure .env is added to .gitignore',
           ),
         );
         console.log();

@@ -102,6 +102,7 @@ describe("applyFixes", () => {
     expect(result).toEqual({
       removedDuplicates: [],
       addedEnv: [],
+      gitignoreUpdated: false,
       addedExample: [],
     });
   });
