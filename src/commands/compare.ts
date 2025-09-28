@@ -6,7 +6,7 @@ import { diffEnv } from '../core/diffEnv.js';
 import { warnIfEnvNotIgnored, isEnvIgnoredByGit } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
-import type { Category, CompareJsonEntry, ComparisonOptions, FilePair } from '../config/types.js';
+import type { Category, CompareJsonEntry, ComparisonOptions, FilePair, ComparisonResult } from '../config/types.js';
 import { applyFixes } from '../core/fixEnv.js';
 
 /**
@@ -18,7 +18,7 @@ import { applyFixes } from '../core/fixEnv.js';
 export async function compareMany(
   pairs: FilePair[],
   opts: ComparisonOptions,
-) {
+): Promise<ComparisonResult> {
   let exitWithError = false;
 
   const onlySet: Set<Category> | undefined = opts.only?.length

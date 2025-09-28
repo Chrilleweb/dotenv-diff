@@ -208,3 +208,7 @@ export interface FilePair {
   envPath: string;
   examplePath: string;
 }
+
+export interface ComparisonResult {
+  exitWithError: boolean;
+}
