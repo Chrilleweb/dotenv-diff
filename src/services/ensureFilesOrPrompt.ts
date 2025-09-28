@@ -2,10 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import { confirmYesNo } from '../ui/prompts.js';
-import { warnIfEnvNotIgnored } from '../services/git.js';
+import { warnIfEnvNotIgnored } from './git.js';
 
 /**
  * Ensures that the necessary .env files exist or prompts the user to create them.
+ * This function handles only scenarios where the --compare flag is set
  * @param args - The arguments for the function.
  * @returns An object indicating whether a file was created or if the process should exit.
  */
