@@ -8,6 +8,7 @@ import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type { Category, CompareJsonEntry, ComparisonOptions, FilePair, ComparisonResult } from '../config/types.js';
 import { applyFixes } from '../core/fixEnv.js';
+import { printFixTips } from '../ui/compare/printFixTips.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -293,57 +294,7 @@ export async function compareMany(
     if (!opts.json && !opts.fix) {
       const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
       const envNotIgnored = ignored === false || ignored === null;
-      if (
-        filtered.missing.length > 0 &&
-        filtered.duplicatesEnv.length > 0 &&
-        envNotIgnored
-      ) {
-        console.log(
-          chalk.gray(
-            '💡 Tip: Run with `--fix` to add missing keys, remove duplicates and add .env to .gitignore',
-          ),
-        );
-        console.log();
-      } else if (
-        filtered.missing.length > 0 &&
-        filtered.duplicatesEnv.length > 0
-      ) {
-        console.log(
-          chalk.gray(
-            '💡 Tip: Run with `--fix` to add missing keys and remove duplicates',
-          ),
-        );
-        console.log();
-      } else if (filtered.duplicatesEnv.length > 0 && envNotIgnored) {
-        console.log(
-          chalk.gray(
-            '💡 Tip: Run with `--fix` to remove duplicate keys and add .env to .gitignore',
-          ),
-        );
-        console.log();
-      } else if (filtered.missing.length > 0 && envNotIgnored) {
-        console.log(
-          chalk.gray(
-            '💡 Tip: Run with `--fix` to add missing keys and add .env to .gitignore',
-          ),
-        );
-        console.log();
-      } else if (filtered.missing.length > 0) {
-        console.log(chalk.gray('💡 Tip: Run with `--fix` to add missing keys'));
-        console.log();
-      } else if (filtered.duplicatesEnv.length > 0) {
-        console.log(
-          chalk.gray('💡 Tip: Run with `--fix` to remove duplicate keys'),
-        );
-        console.log();
-      } else if (envNotIgnored) {
-        console.log(
-          chalk.gray(
-            '💡 Tip: Run with `--fix` to ensure .env is added to .gitignore',
-          ),
-        );
-        console.log();
-      }
+      printFixTips(filtered, envNotIgnored, opts.json ?? false, opts.fix);
     }
 
     if (opts.fix) {

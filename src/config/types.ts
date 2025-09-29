@@ -212,3 +212,35 @@ export interface FilePair {
 export interface ComparisonResult {
   exitWithError: boolean;
 }
+
+export type PairContext = {
+  envName: string;
+  envPath: string;
+  exampleName: string;
+  examplePath: string;
+  exists: { env: boolean; example: boolean };
+  currentFull?: Record<string, string>;
+  exampleFull?: Record<string, string>;
+  currentKeys?: string[];
+  exampleKeys?: string[];
+  current?: Record<string, string>;
+  example?: Record<string, string>;
+};
+
+export type Filtered = {
+  missing: string[];
+  extra: string[];
+  empty: string[];
+  mismatches: Array<{ key: string; expected: string; actual: string }>;
+  duplicatesEnv: Array<{ key: string; count: number }>;
+  duplicatesEx: Array<{ key: string; count: number }>;
+  gitignoreUnsafe: boolean;
+};
+
+export type CompareStats = {
+  envCount: number;
+  exampleCount: number;
+  sharedCount: number;
+  duplicateCount: number; // sum of (count - 1)
+  valueMismatchCount: number;
+};
