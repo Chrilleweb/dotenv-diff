@@ -6,11 +6,18 @@ import { diffEnv } from '../core/diffEnv.js';
 import { warnIfEnvNotIgnored, isEnvIgnoredByGit } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
-import type { Category, CompareJsonEntry, ComparisonOptions, FilePair, ComparisonResult } from '../config/types.js';
+import type {
+  Category,
+  CompareJsonEntry,
+  ComparisonOptions,
+  FilePair,
+  ComparisonResult,
+} from '../config/types.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/compare/printFixTips.js';
 import { printStats } from '../ui/compare/printStats.js';
 import { printDuplicates } from '../ui/compare/printDuplicates.js';
+import { printHeader } from '../ui/compare/printHeader.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -42,24 +49,16 @@ export async function compareMany(
     const exampleName = path.basename(examplePath);
     const entry: CompareJsonEntry = { env: envName, example: exampleName };
 
-    if (!fs.existsSync(envPath) || !fs.existsSync(examplePath)) {
-      if (!opts.json) {
-        console.log();
-        console.log(chalk.blue(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
-        console.log(
-          chalk.yellow('⚠️  Skipping: missing matching example file.'),
-        );
-        console.log();
-      }
+    const skipping = !fs.existsSync(envPath) || !fs.existsSync(examplePath);
+
+    if (skipping) {
+      printHeader(envName, exampleName, opts.json, skipping);
+      exitWithError = true;
       entry.skipped = { reason: 'missing file' };
       opts.collect?.(entry);
       continue;
-    }
-
-    if (!opts.json) {
-      console.log();
-      console.log(chalk.blue(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
-      console.log();
+    } else {
+      printHeader(envName, exampleName, opts.json, skipping);
     }
 
     // Git ignore hint (only when not JSON)
@@ -150,13 +149,20 @@ export async function compareMany(
         ? filtered.mismatches.length
         : 0;
 
-        printStats(envName, exampleName, {
+      printStats(
+        envName,
+        exampleName,
+        {
           envCount,
           exampleCount,
           sharedCount,
           duplicateCount,
           valueMismatchCount,
-        }, filtered, opts.json ?? false, opts.showStats);
+        },
+        filtered,
+        opts.json ?? false,
+        opts.showStats,
+      );
     }
 
     const allOk =
@@ -177,13 +183,7 @@ export async function compareMany(
       continue;
     }
 
-    printDuplicates(
-      envName,
-      exampleName,
-      dupsEnv,
-      dupsEx,
-      opts.json ?? false,
-    );
+    printDuplicates(envName, exampleName, dupsEnv, dupsEx, opts.json ?? false);
 
     if (filtered.missing.length) {
       entry.missing = filtered.missing;
