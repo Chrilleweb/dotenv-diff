@@ -18,6 +18,7 @@ import { printFixTips } from '../ui/compare/printFixTips.js';
 import { printStats } from '../ui/compare/printStats.js';
 import { printDuplicates } from '../ui/compare/printDuplicates.js';
 import { printHeader } from '../ui/compare/printHeader.js';
+import { printAutoFix } from '../ui/compare/printAutoFix.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -258,43 +259,15 @@ export async function compareMany(
     }
 
     if (opts.fix) {
-      const { changed, result } = applyFixes({
-        envPath,
-        examplePath,
-        missingKeys: filtered.missing,
-        duplicateKeys: dupsEnv.map((d) => d.key),
-      });
+  const { changed, result } = applyFixes({
+    envPath,
+    examplePath,
+    missingKeys: filtered.missing,
+    duplicateKeys: dupsEnv.map((d) => d.key),
+  });
 
-      if (!opts.json) {
-        if (changed) {
-          console.log(chalk.green('✅ Auto-fix applied:'));
-          if (result.removedDuplicates.length) {
-            console.log(
-              chalk.green(
-                `  - Removed ${result.removedDuplicates.length} duplicate keys from ${envName}: ${result.removedDuplicates.join(', ')}`,
-              ),
-            );
-          }
-          if (result.addedEnv.length) {
-            console.log(
-              chalk.green(
-                `  - Added ${result.addedEnv.length} missing keys to ${envName}: ${result.addedEnv.join(', ')}`,
-              ),
-            );
-          }
-          if (result.addedExample.length) {
-            console.log(
-              chalk.green(
-                `  - Synced ${result.addedExample.length} keys to ${exampleName}: ${result.addedExample.join(', ')}`,
-              ),
-            );
-          }
-        } else {
-          console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));
-        }
-        console.log();
-      }
-    }
+  printAutoFix(changed, result, envName, exampleName, opts.json);
+}
 
     opts.collect?.(entry);
     const warningsExist =
