@@ -236,11 +236,3 @@ export type Filtered = {
   duplicatesEx: Array<{ key: string; count: number }>;
   gitignoreUnsafe: boolean;
 };
-
-export type CompareStats = {
-  envCount: number;
-  exampleCount: number;
-  sharedCount: number;
-  duplicateCount: number; // sum of (count - 1)
-  valueMismatchCount: number;
-};

@@ -9,6 +9,7 @@ import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type { Category, CompareJsonEntry, ComparisonOptions, FilePair, ComparisonResult } from '../config/types.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/compare/printFixTips.js';
+import { printStats } from '../ui/compare/printStats.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -148,30 +149,13 @@ export async function compareMany(
         ? filtered.mismatches.length
         : 0;
 
-      console.log(chalk.magenta('📊 Compare Statistics:'));
-      console.log(chalk.magenta.dim(`   Keys in ${envName}: ${envCount}`));
-      console.log(
-        chalk.magenta.dim(`   Keys in ${exampleName}: ${exampleCount}`),
-      );
-      console.log(chalk.magenta.dim(`   Shared keys: ${sharedCount}`));
-      console.log(
-        chalk.magenta.dim(
-          `   Missing (in ${envName}): ${filtered.missing.length}`,
-        ),
-      );
-      console.log(
-        chalk.magenta.dim(
-          `   Extra (not in ${exampleName}): ${filtered.extra.length}`,
-        ),
-      );
-      console.log(
-        chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`),
-      );
-      console.log(chalk.magenta.dim(`   Duplicate keys: ${duplicateCount}`));
-      console.log(
-        chalk.magenta.dim(`   Value mismatches: ${valueMismatchCount}`),
-      );
-      console.log();
+        printStats(envName, exampleName, {
+          envCount,
+          exampleCount,
+          sharedCount,
+          duplicateCount,
+          valueMismatchCount,
+        }, filtered, opts.json ?? false, opts.showStats);
     }
 
     const allOk =
