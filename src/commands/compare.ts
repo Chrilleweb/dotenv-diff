@@ -10,6 +10,7 @@ import type { Category, CompareJsonEntry, ComparisonOptions, FilePair, Compariso
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/compare/printFixTips.js';
 import { printStats } from '../ui/compare/printStats.js';
+import { printDuplicates } from '../ui/compare/printDuplicates.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -176,38 +177,13 @@ export async function compareMany(
       continue;
     }
 
-    // --- move duplicate logging AFTER stats ---
-    if (dupsEnv.length || dupsEx.length) {
-      entry.duplicates = {};
-    }
-    if (dupsEnv.length) {
-      entry.duplicates!.env = dupsEnv;
-      if (!opts.json) {
-        console.log(
-          chalk.yellow(
-            `⚠️  Duplicate keys in ${envName} (last occurrence wins):`,
-          ),
-        );
-        dupsEnv.forEach(({ key, count }) =>
-          console.log(chalk.yellow(`    - ${key} (${count} occurrences)`)),
-        );
-        console.log();
-      }
-    }
-    if (dupsEx.length) {
-      entry.duplicates!.example = dupsEx;
-      if (!opts.json) {
-        console.log(
-          chalk.yellow(
-            `⚠️  Duplicate keys in ${exampleName} (last occurrence wins):`,
-          ),
-        );
-        dupsEx.forEach(({ key, count }) =>
-          console.log(chalk.yellow(`   - ${key} (${count} occurrences)`)),
-        );
-        console.log();
-      }
-    }
+    printDuplicates(
+      envName,
+      exampleName,
+      dupsEnv,
+      dupsEx,
+      opts.json ?? false,
+    );
 
     if (filtered.missing.length) {
       entry.missing = filtered.missing;
