@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 import { parseEnvFile } from '../core/parseEnv.js';
 import { diffEnv } from '../core/diffEnv.js';
 import { warnIfEnvNotIgnored, isEnvIgnoredByGit } from '../services/git.js';
@@ -20,6 +19,7 @@ import { printDuplicates } from '../ui/compare/printDuplicates.js';
 import { printHeader } from '../ui/compare/printHeader.js';
 import { printAutoFix } from '../ui/compare/printAutoFix.js';
 import { printIssues } from '../ui/compare/printIssues.js';
+import { printSuccess } from '../ui/compare/printSuccess.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -177,10 +177,7 @@ export async function compareMany(
 
     if (allOk) {
       entry.ok = true;
-      if (!opts.json) {
-        console.log(chalk.green('✅ All keys match.'));
-        console.log();
-      }
+      printSuccess(opts.json);
       opts.collect?.(entry);
       continue;
     }
