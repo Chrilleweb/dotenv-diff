@@ -33,11 +33,13 @@ export async function compareMany(
 ): Promise<ComparisonResult> {
   let exitWithError = false;
 
+  // For --only filtering
   const onlySet: Set<Category> | undefined = opts.only?.length
     ? new Set(opts.only)
     : undefined;
   const run = (cat: Category) => !onlySet || onlySet.has(cat);
 
+  // Overall totals (for --show-stats summary)
   const totals: Record<Category, number> = {
     missing: 0,
     extra: 0,
