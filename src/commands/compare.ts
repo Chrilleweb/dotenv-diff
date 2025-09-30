@@ -131,7 +131,7 @@ export async function compareMany(
       duplicatesEnv: run('duplicate') ? dupsEnv : [],
       duplicatesEx: run('duplicate') ? dupsEx : [],
       gitignoreUnsafe: run('gitignore') ? gitignoreUnsafe : false,
-      gitignoreMsg: run('gitignore') ? gitignoreMsg : null, 
+      gitignoreMsg: run('gitignore') ? gitignoreMsg : null,
     };
 
     // --- Stats block for compare mode when --show-stats is active ---
@@ -221,19 +221,24 @@ export async function compareMany(
     if (!opts.json && !opts.fix) {
       const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
       const envNotIgnored = ignored === false || ignored === null;
-      printFixTips(filtered, envNotIgnored, opts.json ?? false, opts.fix ?? false);
+      printFixTips(
+        filtered,
+        envNotIgnored,
+        opts.json ?? false,
+        opts.fix ?? false,
+      );
     }
 
     if (opts.fix) {
-  const { changed, result } = applyFixes({
-    envPath,
-    examplePath,
-    missingKeys: filtered.missing,
-    duplicateKeys: dupsEnv.map((d) => d.key),
-  });
+      const { changed, result } = applyFixes({
+        envPath,
+        examplePath,
+        missingKeys: filtered.missing,
+        duplicateKeys: dupsEnv.map((d) => d.key),
+      });
 
-  printAutoFix(changed, result, envName, exampleName, opts.json ?? false);
-}
+      printAutoFix(changed, result, envName, exampleName, opts.json ?? false);
+    }
 
     opts.collect?.(entry);
     const warningsExist =
