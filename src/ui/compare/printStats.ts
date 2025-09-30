@@ -25,7 +25,7 @@ export function printStats(
   s: CompareStats,
   filtered: Pick<Filtered, 'missing' | 'extra' | 'empty'>,
   json: boolean,
-  showStats: boolean | undefined,
+  showStats: boolean,
 ) {
   if (json || !showStats) return;
   console.log(chalk.magenta('📊 Compare Statistics:'));

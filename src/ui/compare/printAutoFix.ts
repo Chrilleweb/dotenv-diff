@@ -11,7 +11,7 @@ export function printAutoFix(
   result: AutoFixResult,
   envName: string,
   exampleName: string,
-  json: boolean | undefined,
+  json: boolean,
 ): void {
   if (json) return;
 

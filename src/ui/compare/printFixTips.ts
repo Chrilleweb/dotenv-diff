@@ -13,7 +13,7 @@ export function printFixTips(
   filtered: Filtered,
   envNotIgnored: boolean,
   json: boolean,
-  fix: boolean | undefined,
+  fix: boolean,
 ) {
   if (json || fix) return;
 

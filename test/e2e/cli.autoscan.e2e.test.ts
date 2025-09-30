@@ -64,6 +64,31 @@ describe('no-flag autoscan', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('.env is not ignored by Git');
   });
+
+    it('will warn about .env not ignored by .gitignore --compare flag', () => {
+      const cwd = tmpDir();
+  
+      fs.mkdirSync(path.join(cwd, '.git'));
+      fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=test\n');
+      fs.writeFileSync(path.join(cwd, '.env.example'), 'API_KEY=example\n');
+  
+      fs.writeFileSync(path.join(cwd, '.gitignore'), 'node_modules\n');
+  
+      fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+      fs.writeFileSync(
+        path.join(cwd, 'src', 'index.ts'),
+        `const apiKey = process.env.API_KEY;`.trimStart(),
+      );
+  
+      const res = runCli(cwd, ['--compare']);
+      console.log(res.stdout);
+      console.log('stdout:', res.stdout);
+      console.log('stderr:', res.stderr);
+  
+      expect(res.status).toBe(1);
+      expect(res.stdout).toContain('.env is not ignored by Git');
+    });
+
   it('will auto-fix .env not ignored by .gitignore with --fix', () => {
     const cwd = tmpDir();
 

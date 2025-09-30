@@ -9,7 +9,7 @@ import { type Filtered } from '../../config/types.js';
  */
 export function printIssues(
   filtered: Filtered,
-  json: boolean | undefined,
+  json: boolean,
 ) {
   if (json) return;
   if (filtered.missing.length) {
@@ -36,5 +36,8 @@ export function printIssues(
       ),
     );
     console.log();
+  }
+  if (filtered.gitignoreMsg) {
+    console.log(filtered.gitignoreMsg.replace(/^/gm, '  '));
   }
 }

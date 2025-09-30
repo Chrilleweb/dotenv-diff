@@ -54,13 +54,13 @@ export async function compareMany(
     const skipping = !fs.existsSync(envPath) || !fs.existsSync(examplePath);
 
     if (skipping) {
-      printHeader(envName, exampleName, opts.json, skipping);
+      printHeader(envName, exampleName, opts.json ?? false, skipping);
       exitWithError = true;
       entry.skipped = { reason: 'missing file' };
       opts.collect?.(entry);
       continue;
     } else {
-      printHeader(envName, exampleName, opts.json, skipping);
+      printHeader(envName, exampleName, opts.json ?? false, skipping);
     }
 
     // Git ignore hint (only when not JSON)
@@ -131,6 +131,7 @@ export async function compareMany(
       duplicatesEnv: run('duplicate') ? dupsEnv : [],
       duplicatesEx: run('duplicate') ? dupsEx : [],
       gitignoreUnsafe: run('gitignore') ? gitignoreUnsafe : false,
+      gitignoreMsg: run('gitignore') ? gitignoreMsg : null, 
     };
 
     // --- Stats block for compare mode when --show-stats is active ---
@@ -163,7 +164,7 @@ export async function compareMany(
         },
         filtered,
         opts.json ?? false,
-        opts.showStats,
+        opts.showStats ?? true,
       );
     }
 
@@ -173,11 +174,12 @@ export async function compareMany(
       filtered.empty.length === 0 &&
       filtered.duplicatesEnv.length === 0 &&
       filtered.duplicatesEx.length === 0 &&
-      filtered.mismatches.length === 0;
+      filtered.mismatches.length === 0 &&
+      !filtered.gitignoreUnsafe;
 
     if (allOk) {
       entry.ok = true;
-      printSuccess(opts.json);
+      printSuccess(opts.json ?? false);
       opts.collect?.(entry);
       continue;
     }
@@ -214,12 +216,12 @@ export async function compareMany(
       exitWithError = true;
     }
 
-    printIssues(filtered, opts.json);
+    printIssues(filtered, opts.json ?? false);
 
     if (!opts.json && !opts.fix) {
       const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
       const envNotIgnored = ignored === false || ignored === null;
-      printFixTips(filtered, envNotIgnored, opts.json ?? false, opts.fix);
+      printFixTips(filtered, envNotIgnored, opts.json ?? false, opts.fix ?? false);
     }
 
     if (opts.fix) {
@@ -230,7 +232,7 @@ export async function compareMany(
     duplicateKeys: dupsEnv.map((d) => d.key),
   });
 
-  printAutoFix(changed, result, envName, exampleName, opts.json);
+  printAutoFix(changed, result, envName, exampleName, opts.json ?? false);
 }
 
     opts.collect?.(entry);

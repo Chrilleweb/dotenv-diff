@@ -11,7 +11,7 @@ import chalk from 'chalk';
 export function printHeader(
   envName: string,
   exampleName: string,
-  json: boolean | undefined,
+  json: boolean,
   skipping: boolean,
 ) {
   if (json) return;

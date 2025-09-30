@@ -235,4 +235,5 @@ export type Filtered = {
   duplicatesEnv: Array<{ key: string; count: number }>;
   duplicatesEx: Array<{ key: string; count: number }>;
   gitignoreUnsafe: boolean;
+  gitignoreMsg?: string | null; 
 };
