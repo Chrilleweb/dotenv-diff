@@ -19,6 +19,7 @@ import { printStats } from '../ui/compare/printStats.js';
 import { printDuplicates } from '../ui/compare/printDuplicates.js';
 import { printHeader } from '../ui/compare/printHeader.js';
 import { printAutoFix } from '../ui/compare/printAutoFix.js';
+import { printIssues } from '../ui/compare/printIssues.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -216,41 +217,7 @@ export async function compareMany(
       exitWithError = true;
     }
 
-    if (!opts.json) {
-      if (filtered.missing.length && !opts.fix) {
-        console.log(chalk.red('❌ Missing keys:'));
-        filtered.missing.forEach((key) => console.log(chalk.red(`  - ${key}`)));
-        console.log();
-      }
-      if (filtered.extra.length) {
-        console.log(chalk.yellow('⚠️  Extra keys (not in example):'));
-        filtered.extra.forEach((key) =>
-          console.log(chalk.yellow(`  - ${key}`)),
-        );
-        console.log();
-      }
-      if (filtered.empty.length) {
-        console.log(chalk.yellow('⚠️  Empty values:'));
-        filtered.empty.forEach((key) =>
-          console.log(chalk.yellow(`  - ${key}`)),
-        );
-        console.log();
-      }
-      if (filtered.mismatches.length) {
-        console.log(chalk.yellow('⚠️  Value mismatches:'));
-        filtered.mismatches.forEach(({ key, expected, actual }) =>
-          console.log(
-            chalk.yellow(
-              `  - ${key}: expected '${expected}', but got '${actual}'`,
-            ),
-          ),
-        );
-        console.log();
-      }
-      if (gitignoreMsg && !opts.json) {
-        console.log((gitignoreMsg as string).replace(/^/gm, '  '));
-      }
-    }
+    printIssues(filtered, opts.json);
 
     if (!opts.json && !opts.fix) {
       const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
