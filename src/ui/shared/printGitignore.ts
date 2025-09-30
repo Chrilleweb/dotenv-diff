@@ -6,6 +6,11 @@ type GitignoreWarningOptions = {
   log?: (msg: string) => void;
 };
 
+/**
+ * Logs a warning about .env not being ignored by Git.
+ * @param options - Options for the gitignore warning.
+ * @returns void
+ */
 export function printGitignoreWarning(options: GitignoreWarningOptions): void {
   const { envFile, reason, log = console.log } = options;
 
