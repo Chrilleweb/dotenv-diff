@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { parseEnvFile } from '../core/parseEnv.js';
 import { diffEnv } from '../core/diffEnv.js';
-import { isEnvIgnoredByGit, checkGitignoreStatus } from '../services/git.js';
+import { checkGitignoreStatus } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type {
@@ -12,6 +12,7 @@ import type {
   FilePair,
   ComparisonResult,
 } from '../config/types.js';
+import { isAllOk } from '../core/helpers/isAllOk.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/compare/printFixTips.js';
 import { printStats } from '../ui/compare/printStats.js';
@@ -160,14 +161,7 @@ export async function compareMany(
     }
 
     // Check if all is OK
-    const allOk =
-      filtered.missing.length === 0 &&
-      filtered.extra.length === 0 &&
-      filtered.empty.length === 0 &&
-      filtered.duplicatesEnv.length === 0 &&
-      filtered.duplicatesEx.length === 0 &&
-      filtered.mismatches.length === 0 &&
-      !filtered.gitignoreIssue;
+    const allOk = isAllOk(filtered);
 
     if (allOk) {
       entry.ok = true;
@@ -215,8 +209,7 @@ export async function compareMany(
       });
     }
 
-    const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
-    const envNotIgnored = ignored === false || ignored === null;
+    const envNotIgnored = filtered.gitignoreIssue !== null;
 
       printFixTips(
         filtered,
