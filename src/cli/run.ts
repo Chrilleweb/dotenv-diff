@@ -1,7 +1,6 @@
 import type { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 
 import { normalizeOptions } from '../config/options.js';
 import { discoverEnvFiles } from '../services/envDiscovery.js';
@@ -10,33 +9,8 @@ import { ensureFilesOrPrompt } from '../services/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
 import { type CompareJsonEntry, type Options } from '../config/types.js';
 import { scanUsage } from '../commands/scanUsage.js';
-
-/**
- * Run the CLI program
- * @param program The commander program instance
- */
-export async function run(program: Command) {
-  program.parse(process.argv);
-  const opts = normalizeOptions(program.opts());
-
-  setupGlobalConfig(opts);
-
-  // Route to appropriate command
-  if (opts.compare) {
-    await runCompareMode(opts);
-  } else {
-    await runScanMode(opts);
-  }
-}
-
-/**
- * Setup global configuration
- */
-function setupGlobalConfig(opts: Options) {
-  if (opts.noColor) {
-    chalk.level = 0; // disable colors globally
-  }
-}
+import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
+import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';
 
 /**
  * Run scan-usage mode (default behavior)
@@ -162,18 +136,7 @@ async function handleMissingFiles(
 
   if (opts.isCiMode) {
     // In CI mode, just show errors and exit
-    if (!envExists) {
-      console.error(
-        chalk.red(`❌ Error: --env file not found: ${path.basename(envFlag)}`),
-      );
-    }
-    if (!exExists) {
-      console.error(
-        chalk.red(
-          `❌ Error: --example file not found: ${path.basename(exampleFlag)}`,
-        ),
-      );
-    }
+    printErrorNotFound(envExists, exExists, envFlag, exampleFlag);
     process.exit(1);
   } else {
     // Interactive mode - try to prompt for file creation
@@ -225,4 +188,22 @@ function outputResults(
     console.log(JSON.stringify(report, null, 2));
   }
   process.exit(exitWithError ? 1 : 0);
+}
+
+/**
+ * Run the CLI program
+ * @param program The commander program instance
+ */
+export async function run(program: Command) {
+  program.parse(process.argv);
+  const opts = normalizeOptions(program.opts());
+
+  setupGlobalConfig(opts);
+
+  // Route to appropriate command
+  if (opts.compare) {
+    await runCompareMode(opts);
+  } else {
+    await runScanMode(opts);
+  }
 }
