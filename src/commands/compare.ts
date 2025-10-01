@@ -215,17 +215,15 @@ export async function compareMany(
       });
     }
 
-    // Print fix tips if not in JSON mode and not auto-fixing
-    if (!opts.json && !opts.fix) {
-      const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
-      const envNotIgnored = ignored === false || ignored === null;
+    const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
+    const envNotIgnored = ignored === false || ignored === null;
+
       printFixTips(
         filtered,
         envNotIgnored,
         opts.json ?? false,
         opts.fix ?? false,
       );
-    }
 
     // Apply auto-fix if requested
     if (opts.fix) {
@@ -234,6 +232,7 @@ export async function compareMany(
         examplePath,
         missingKeys: filtered.missing,
         duplicateKeys: dupsEnv.map((d) => d.key),
+        ensureGitignore: envNotIgnored,
       });
 
       printAutoFix(changed, result, envName, exampleName, opts.json ?? false);

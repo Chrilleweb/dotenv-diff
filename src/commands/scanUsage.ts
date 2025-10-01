@@ -127,6 +127,7 @@ export async function scanUsage(
               : '',
             missingKeys: [],
             duplicateKeys: dupsEnv.map((d) => d.key),
+            ensureGitignore: true,
           });
 
           if (changed) {
@@ -175,6 +176,7 @@ export async function scanUsage(
         examplePath: exampleFilePath,
         missingKeys,
         duplicateKeys: [],
+        ensureGitignore: true,
       });
 
       if (changed) {
@@ -193,6 +195,7 @@ export async function scanUsage(
       examplePath: '',
       missingKeys: [],
       duplicateKeys: [],
+      ensureGitignore: true,
     });
     if (result.gitignoreUpdated) {
       fixApplied = true;
