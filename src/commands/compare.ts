@@ -11,8 +11,10 @@ import type {
   ComparisonOptions,
   FilePair,
   ComparisonResult,
+  Filtered,
 } from '../config/types.js';
 import { isAllOk } from '../core/helpers/isAllOk.js';
+import { updateTotals } from '../core/helpers/updateTotals.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/compare/printFixTips.js';
 import { printStats } from '../ui/compare/printStats.js';
@@ -115,7 +117,7 @@ export async function compareMany(
       : null;
 
     // Collect filtered results
-    const filtered = {
+    const filtered: Filtered = {
       missing: run('missing') ? diff.missing : [],
       extra: run('extra') ? diff.extra : [],
       empty: run('empty') ? emptyKeys : [],
@@ -173,29 +175,9 @@ export async function compareMany(
     printDuplicates(envName, exampleName, dupsEnv, dupsEx, opts.json ?? false);
 
     // Track errors and update totals
-    if (filtered.missing.length) {
-      entry.missing = filtered.missing;
-      totals.missing += filtered.missing.length;
+    const shouldExit = updateTotals(filtered, totals, entry);
+    if (shouldExit) {
       exitWithError = true;
-    }
-    if (filtered.extra.length) {
-      entry.extra = filtered.extra;
-      totals.extra += filtered.extra.length;
-    }
-    if (filtered.empty.length) {
-      entry.empty = filtered.empty;
-      totals.empty += filtered.empty.length;
-    }
-    if (filtered.mismatches.length) {
-      entry.valueMismatches = filtered.mismatches;
-      totals.mismatch += filtered.mismatches.length;
-    }
-    if (filtered.duplicatesEnv.length || filtered.duplicatesEx.length) {
-      totals.duplicate +=
-        filtered.duplicatesEnv.length + filtered.duplicatesEx.length;
-    }
-    if (filtered.gitignoreIssue) {
-      totals.gitignore += 1;
     }
 
     // Print all issues
@@ -208,11 +190,11 @@ export async function compareMany(
       });
     }
 
-    const envNotIgnored = filtered.gitignoreIssue !== null;
+    const hasGitignoreIssue: boolean = filtered.gitignoreIssue !== null;
 
     printFixTips(
       filtered,
-      envNotIgnored,
+      hasGitignoreIssue,
       opts.json ?? false,
       opts.fix ?? false,
     );
@@ -224,7 +206,7 @@ export async function compareMany(
         examplePath,
         missingKeys: filtered.missing,
         duplicateKeys: dupsEnv.map((d) => d.key),
-        ensureGitignore: envNotIgnored,
+        ensureGitignore: hasGitignoreIssue,
       });
 
       printAutoFix(changed, result, envName, exampleName, opts.json ?? false);
