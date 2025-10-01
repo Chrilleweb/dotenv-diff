@@ -234,6 +234,4 @@ export type Filtered = {
   mismatches: Array<{ key: string; expected: string; actual: string }>;
   duplicatesEnv: Array<{ key: string; count: number }>;
   duplicatesEx: Array<{ key: string; count: number }>;
-  gitignoreUnsafe: boolean;
-  gitignoreMsg?: string | null; 
 };

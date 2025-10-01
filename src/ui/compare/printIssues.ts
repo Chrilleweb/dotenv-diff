@@ -37,7 +37,4 @@ export function printIssues(
     );
     console.log();
   }
-  if (filtered.gitignoreMsg) {
-    console.log(filtered.gitignoreMsg.replace(/^/gm, '  '));
-  }
 }

@@ -109,6 +109,34 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
   }
 }
 
+
+/**
+ * Checks if .env file has gitignore issues.
+ * Returns null if no issue, otherwise returns the reason.
+ */
+export function checkGitignoreStatus(options: GitignoreCheckOptions = {}): {
+  reason: 'no-gitignore' | 'not-ignored';
+} | null {
+  const { cwd = process.cwd(), envFile = '.env' } = options;
+
+  const envPath = path.resolve(cwd, envFile);
+  if (!fs.existsSync(envPath)) return null;
+  if (!isGitRepo(cwd)) return null;
+
+  const gitignorePath = path.resolve(cwd, '.gitignore');
+
+  if (!fs.existsSync(gitignorePath)) {
+    return { reason: 'no-gitignore' };
+  }
+
+  const ignored = isEnvIgnoredByGit({ cwd, envFile });
+  if (ignored === false || ignored === null) {
+    return { reason: 'not-ignored' };
+  }
+
+  return null;
+}
+
 /** Find the git repository root starting from startDir (walk up until ".git"). */
 export function findGitRoot(startDir: string): string | null {
   let dir = path.resolve(startDir);

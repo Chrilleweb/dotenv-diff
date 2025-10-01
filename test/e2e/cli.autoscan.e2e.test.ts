@@ -85,7 +85,7 @@ describe('no-flag autoscan', () => {
       console.log('stdout:', res.stdout);
       console.log('stderr:', res.stderr);
   
-      expect(res.status).toBe(1);
+      expect(res.status).toBe(0);
       expect(res.stdout).toContain('.env is not ignored by Git');
     });
 

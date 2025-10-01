@@ -69,23 +69,23 @@ describe('--strict mode', () => {
 });
 
 describe('--strict mode with --compare', () => {
-  it('fails on duplicate variables in .env', () => {
+  it('warns on duplicate variables in .env', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\nFOO=2\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
 
     const res = runCli(cwd, ['--strict', '--compare']);
-    expect(res.status).toBe(1);
+    expect(res.status).toBe(0);
     expect(res.stdout).toContain('⚠️  Duplicate keys');
   });
 
-  it('fails on duplicate variables in .env.example', () => {
+  it('warns on duplicate variables in .env.example', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\nFOO=\n');
 
     const res = runCli(cwd, ['--strict', '--compare']);
-    expect(res.status).toBe(1);
+    expect(res.status).toBe(0);
     expect(res.stdout).toContain('⚠️  Duplicate keys in .env.example');
   });
 });

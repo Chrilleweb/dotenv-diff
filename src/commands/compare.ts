@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { parseEnvFile } from '../core/parseEnv.js';
 import { diffEnv } from '../core/diffEnv.js';
-import { warnIfEnvNotIgnored, isEnvIgnoredByGit } from '../services/git.js';
+import { isEnvIgnoredByGit, checkGitignoreStatus } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type {
@@ -20,6 +20,7 @@ import { printHeader } from '../ui/compare/printHeader.js';
 import { printAutoFix } from '../ui/compare/printAutoFix.js';
 import { printIssues } from '../ui/compare/printIssues.js';
 import { printSuccess } from '../ui/compare/printSuccess.js';
+import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -61,42 +62,11 @@ export async function compareMany(
       entry.skipped = { reason: 'missing file' };
       opts.collect?.(entry);
       continue;
-    } else {
-      printHeader(envName, exampleName, opts.json ?? false, skipping);
     }
 
-    // Git ignore hint (only when not JSON)
-    let gitignoreUnsafe = false;
-    let gitignoreMsg: string | null = null;
+    printHeader(envName, exampleName, opts.json ?? false, skipping);
 
-    if (run('gitignore')) {
-      warnIfEnvNotIgnored({
-        cwd: opts.cwd,
-        envFile: envName,
-        log: (msg) => {
-          gitignoreUnsafe = true;
-          gitignoreMsg = msg;
-        },
-      });
-    }
-
-    // Duplicate detection (skip entirely if --only excludes it)
-    let dupsEnv: Array<{ key: string; count: number }> = [];
-    let dupsEx: Array<{ key: string; count: number }> = [];
-    if (!opts.allowDuplicates && run('duplicate')) {
-      dupsEnv = findDuplicateKeys(envPath).filter(
-        ({ key }) =>
-          !opts.ignore.includes(key) &&
-          !opts.ignoreRegex.some((rx) => rx.test(key)),
-      );
-      dupsEx = findDuplicateKeys(examplePath).filter(
-        ({ key }) =>
-          !opts.ignore.includes(key) &&
-          !opts.ignoreRegex.some((rx) => rx.test(key)),
-      );
-    }
-
-    // Diff + empty
+    // Parse and filter env files
     const currentFull = parseEnvFile(envPath);
     const exampleFull = parseEnvFile(examplePath);
 
@@ -118,12 +88,33 @@ export async function compareMany(
       exampleKeys.map((k) => [k, exampleFull[k] ?? '']),
     );
 
+    // Run checks
     const diff = diffEnv(current, example, opts.checkValues);
 
     const emptyKeys = Object.entries(current)
       .filter(([, v]) => (v ?? '').trim() === '')
       .map(([k]) => k);
 
+    let dupsEnv: Array<{ key: string; count: number }> = [];
+    let dupsEx: Array<{ key: string; count: number }> = [];
+    if (!opts.allowDuplicates && run('duplicate')) {
+      dupsEnv = findDuplicateKeys(envPath).filter(
+        ({ key }) =>
+          !opts.ignore.includes(key) &&
+          !opts.ignoreRegex.some((rx) => rx.test(key)),
+      );
+      dupsEx = findDuplicateKeys(examplePath).filter(
+        ({ key }) =>
+          !opts.ignore.includes(key) &&
+          !opts.ignoreRegex.some((rx) => rx.test(key)),
+      );
+    }
+
+    const gitignoreIssue = run('gitignore')
+      ? checkGitignoreStatus({ cwd: opts.cwd, envFile: envName })
+      : null;
+
+    // Collect filtered results
     const filtered = {
       missing: run('missing') ? diff.missing : [],
       extra: run('extra') ? diff.extra : [],
@@ -132,11 +123,10 @@ export async function compareMany(
         run('mismatch') && opts.checkValues ? diff.valueMismatches : [],
       duplicatesEnv: run('duplicate') ? dupsEnv : [],
       duplicatesEx: run('duplicate') ? dupsEx : [],
-      gitignoreUnsafe: run('gitignore') ? gitignoreUnsafe : false,
-      gitignoreMsg: run('gitignore') ? gitignoreMsg : null,
+      gitignoreIssue,
     };
 
-    // --- Stats block for compare mode when --show-stats is active ---
+    // Print stats if requested
     if (opts.showStats && !opts.json) {
       const envCount = currentKeys.length;
       const exampleCount = exampleKeys.length;
@@ -144,7 +134,6 @@ export async function compareMany(
         currentKeys.filter((k) => exampleKeys.includes(k)),
       ).size;
 
-      // Duplicate "occurrences beyond the first", summed across both files
       const duplicateCount = [...dupsEnv, ...dupsEx].reduce(
         (acc, { count }) => acc + Math.max(0, count - 1),
         0,
@@ -170,6 +159,7 @@ export async function compareMany(
       );
     }
 
+    // Check if all is OK
     const allOk =
       filtered.missing.length === 0 &&
       filtered.extra.length === 0 &&
@@ -177,7 +167,7 @@ export async function compareMany(
       filtered.duplicatesEnv.length === 0 &&
       filtered.duplicatesEx.length === 0 &&
       filtered.mismatches.length === 0 &&
-      !filtered.gitignoreUnsafe;
+      !filtered.gitignoreIssue;
 
     if (allOk) {
       entry.ok = true;
@@ -186,40 +176,46 @@ export async function compareMany(
       continue;
     }
 
+    // Print duplicates
     printDuplicates(envName, exampleName, dupsEnv, dupsEx, opts.json ?? false);
 
+    // Track errors and update totals
     if (filtered.missing.length) {
       entry.missing = filtered.missing;
-      exitWithError = true;
       totals.missing += filtered.missing.length;
+      exitWithError = true;
     }
     if (filtered.extra.length) {
       entry.extra = filtered.extra;
-      exitWithError = true;
       totals.extra += filtered.extra.length;
     }
     if (filtered.empty.length) {
       entry.empty = filtered.empty;
-      exitWithError = true;
       totals.empty += filtered.empty.length;
     }
     if (filtered.mismatches.length) {
       entry.valueMismatches = filtered.mismatches;
       totals.mismatch += filtered.mismatches.length;
-      exitWithError = true;
     }
     if (filtered.duplicatesEnv.length || filtered.duplicatesEx.length) {
       totals.duplicate +=
         filtered.duplicatesEnv.length + filtered.duplicatesEx.length;
-      exitWithError = true;
     }
-    if (filtered.gitignoreUnsafe) {
+    if (filtered.gitignoreIssue) {
       totals.gitignore += 1;
-      exitWithError = true;
     }
 
+    // Print all issues
     printIssues(filtered, opts.json ?? false);
 
+    if (filtered.gitignoreIssue && !opts.json) {
+      printGitignoreWarning({
+        envFile: envName,
+        reason: filtered.gitignoreIssue.reason,
+      });
+    }
+
+    // Print fix tips if not in JSON mode and not auto-fixing
     if (!opts.json && !opts.fix) {
       const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
       const envNotIgnored = ignored === false || ignored === null;
@@ -231,6 +227,7 @@ export async function compareMany(
       );
     }
 
+    // Apply auto-fix if requested
     if (opts.fix) {
       const { changed, result } = applyFixes({
         envPath,
@@ -243,15 +240,9 @@ export async function compareMany(
     }
 
     opts.collect?.(entry);
-    const warningsExist =
-      filtered.extra.length > 0 ||
-      filtered.empty.length > 0 ||
-      filtered.duplicatesEnv.length > 0 ||
-      filtered.duplicatesEx.length > 0 ||
-      filtered.mismatches.length > 0 ||
-      filtered.gitignoreUnsafe;
 
-    if (opts.strict && warningsExist) {
+    // In strict mode, any issue (not just errors) causes exit with error
+    if (opts.strict && !allOk) {
       exitWithError = true;
     }
   }
