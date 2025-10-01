@@ -31,12 +31,42 @@ import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
  * @param opts Comparison options
  * @returns A function that filters categories
  */
-function onlyFiltering(opts: ComparisonOptions) {
+function createCategoryFilter(opts: ComparisonOptions) {
   const onlySet: Set<Category> | undefined = opts.only?.length
     ? new Set(opts.only)
     : undefined;
-  
+
   return (category: Category) => !onlySet || onlySet.has(category);
+}
+
+/**
+ * Finds duplicate keys in the environment and example files.
+ * @param envPath The path to the .env file
+ * @param examplePath The path to the .env.example file
+ * @param opts Comparison options
+ * @param run A function that determines if a category should be included
+ * @returns An object containing arrays of duplicate keys for both files
+ */
+function findDuplicates(
+  envPath: string,
+  examplePath: string,
+  opts: ComparisonOptions,
+  run: (cat: Category) => boolean,
+) {
+  if (opts.allowDuplicates || !run('duplicate'))
+    return { dupsEnv: [], dupsEx: [] };
+
+  const filterKey = (key: string) =>
+    !opts.ignore.includes(key) && !opts.ignoreRegex.some((rx) => rx.test(key));
+
+  const dupsEnv = findDuplicateKeys(envPath).filter(({ key }) =>
+    filterKey(key),
+  );
+  const dupsEx = findDuplicateKeys(examplePath).filter(({ key }) =>
+    filterKey(key),
+  );
+
+  return { dupsEnv, dupsEx };
 }
 
 /**
@@ -52,7 +82,7 @@ export async function compareMany(
   let exitWithError = false;
 
   // For --only filtering
-  const run = onlyFiltering(opts);
+  const run = createCategoryFilter(opts);
 
   // Overall totals (for --show-stats summary)
   const totals: Record<Category, number> = {
@@ -108,20 +138,8 @@ export async function compareMany(
       .filter(([, v]) => (v ?? '').trim() === '')
       .map(([k]) => k);
 
-    let dupsEnv: Array<{ key: string; count: number }> = [];
-    let dupsEx: Array<{ key: string; count: number }> = [];
-    if (!opts.allowDuplicates && run('duplicate')) {
-      dupsEnv = findDuplicateKeys(envPath).filter(
-        ({ key }) =>
-          !opts.ignore.includes(key) &&
-          !opts.ignoreRegex.some((rx) => rx.test(key)),
-      );
-      dupsEx = findDuplicateKeys(examplePath).filter(
-        ({ key }) =>
-          !opts.ignore.includes(key) &&
-          !opts.ignoreRegex.some((rx) => rx.test(key)),
-      );
-    }
+    // Find duplicates
+    const { dupsEnv, dupsEx } = findDuplicates(envPath, examplePath, opts, run);
 
     const gitignoreIssue = run('gitignore')
       ? checkGitignoreStatus({ cwd: opts.cwd, envFile: envName })
