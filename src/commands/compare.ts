@@ -57,15 +57,14 @@ export async function compareMany(
 
     const skipping = !fs.existsSync(envPath) || !fs.existsSync(examplePath);
 
+    printHeader(envName, exampleName, opts.json ?? false, skipping);
+
     if (skipping) {
-      printHeader(envName, exampleName, opts.json ?? false, skipping);
       exitWithError = true;
       entry.skipped = { reason: 'missing file' };
       opts.collect?.(entry);
       continue;
     }
-
-    printHeader(envName, exampleName, opts.json ?? false, skipping);
 
     // Parse and filter env files
     const currentFull = parseEnvFile(envPath);
@@ -211,12 +210,12 @@ export async function compareMany(
 
     const envNotIgnored = filtered.gitignoreIssue !== null;
 
-      printFixTips(
-        filtered,
-        envNotIgnored,
-        opts.json ?? false,
-        opts.fix ?? false,
-      );
+    printFixTips(
+      filtered,
+      envNotIgnored,
+      opts.json ?? false,
+      opts.fix ?? false,
+    );
 
     // Apply auto-fix if requested
     if (opts.fix) {

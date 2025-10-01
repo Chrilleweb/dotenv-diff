@@ -67,7 +67,7 @@ export async function ensureFilesOrPrompt(args: {
     fs.writeFileSync(envPath, exampleContent);
     console.log(
       chalk.green(
-        `✅ ${path.basename(envPath)} file created successfully from ${path.basename(examplePath)}.\n`,
+        `✅ ${path.basename(envPath)} file created successfully from ${path.basename(examplePath)}.`,
       ),
     );
     warnIfEnvNotIgnored({ envFile: path.basename(envPath) });
@@ -106,7 +106,7 @@ export async function ensureFilesOrPrompt(args: {
     fs.writeFileSync(examplePath, envContent);
     console.log(
       chalk.green(
-        `✅ ${path.basename(examplePath)} file created successfully from ${path.basename(envPath)}.\n`,
+        `✅ ${path.basename(examplePath)} file created successfully from ${path.basename(envPath)}.`,
       ),
     );
   }
