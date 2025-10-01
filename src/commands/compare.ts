@@ -40,6 +40,29 @@ function createCategoryFilter(opts: ComparisonOptions) {
 }
 
 /**
+ * Parses and filters the environment and example files.
+ * @param envPath The path to the .env file
+ * @param examplePath The path to the .env.example file
+ * @param opts Comparison options
+ * @returns An object containing the parsed and filtered environment variables
+ */
+function parseAndFilter(envPath: string, examplePath: string, opts: ComparisonOptions) {
+  const currentFull = parseEnvFile(envPath);
+  const exampleFull = parseEnvFile(examplePath);
+
+  const currentKeys = filterIgnoredKeys(Object.keys(currentFull), opts.ignore, opts.ignoreRegex);
+  const exampleKeys = filterIgnoredKeys(Object.keys(exampleFull), opts.ignore, opts.ignoreRegex);
+
+  return {
+    current: Object.fromEntries(currentKeys.map((k) => [k, currentFull[k] ?? ''])),
+    example: Object.fromEntries(exampleKeys.map((k) => [k, exampleFull[k] ?? ''])),
+    currentKeys,
+    exampleKeys,
+  };
+}
+
+
+/**
  * Finds duplicate keys in the environment and example files.
  * @param envPath The path to the .env file
  * @param examplePath The path to the .env.example file
@@ -110,26 +133,7 @@ export async function compareMany(
     }
 
     // Parse and filter env files
-    const currentFull = parseEnvFile(envPath);
-    const exampleFull = parseEnvFile(examplePath);
-
-    const currentKeys = filterIgnoredKeys(
-      Object.keys(currentFull),
-      opts.ignore,
-      opts.ignoreRegex,
-    );
-    const exampleKeys = filterIgnoredKeys(
-      Object.keys(exampleFull),
-      opts.ignore,
-      opts.ignoreRegex,
-    );
-
-    const current = Object.fromEntries(
-      currentKeys.map((k) => [k, currentFull[k] ?? '']),
-    );
-    const example = Object.fromEntries(
-      exampleKeys.map((k) => [k, exampleFull[k] ?? '']),
-    );
+    const { current, example, currentKeys, exampleKeys } = parseAndFilter(envPath, examplePath, opts);
 
     // Run checks
     const diff = diffEnv(current, example, opts.checkValues);
