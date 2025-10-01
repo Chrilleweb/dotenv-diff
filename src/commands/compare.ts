@@ -26,6 +26,20 @@ import { printSuccess } from '../ui/compare/printSuccess.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 
 /**
+ * Creates a category filter function based on options.
+ * fx: onlyFiltering({ only: ['missing', 'extra'] })
+ * @param opts Comparison options
+ * @returns A function that filters categories
+ */
+function onlyFiltering(opts: ComparisonOptions) {
+  const onlySet: Set<Category> | undefined = opts.only?.length
+    ? new Set(opts.only)
+    : undefined;
+  
+  return (category: Category) => !onlySet || onlySet.has(category);
+}
+
+/**
  * Compares multiple pairs of .env and .env.example files.
  * @param pairs - The pairs of environment files to compare.
  * @param opts - The comparison options.
@@ -38,10 +52,7 @@ export async function compareMany(
   let exitWithError = false;
 
   // For --only filtering
-  const onlySet: Set<Category> | undefined = opts.only?.length
-    ? new Set(opts.only)
-    : undefined;
-  const run = (cat: Category) => !onlySet || onlySet.has(cat);
+  const run = onlyFiltering(opts);
 
   // Overall totals (for --show-stats summary)
   const totals: Record<Category, number> = {
