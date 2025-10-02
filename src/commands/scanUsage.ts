@@ -18,13 +18,17 @@ import { printHeader } from '../ui/scan/printHeader.js';
 
 /**
  * Filters out commented usages from the list.
- * skipping comments: // process.env.API_URL
+ * Skipping comments:
+ *   // process.env.API_URL
+ *   # process.env.API_URL
+ *   /* process.env.API_URL
+ *   * process.env.API_URL
  * @param usages - List of environment variable usages
  * @returns Filtered list of environment variable usages
  */
 function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
   return usages.filter(
-    (u) => u.context && !/^\s*(\/\/|#)/.test(u.context.trim()),
+    (u) => u.context && !/^\s*(\/\/|#|\/\*|\*)/.test(u.context.trim()),
   );
 }
 
@@ -50,7 +54,7 @@ export async function scanUsage(
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
-  skipCommentedUsages(scanResult.used);
+  scanResult.used = skipCommentedUsages(scanResult.used);
 
   // Recalculate stats after filtering out commented usages
   const uniqueVariables = new Set(scanResult.used.map((u) => u.variable)).size;
