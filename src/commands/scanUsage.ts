@@ -14,6 +14,19 @@ import { compareWithEnvFiles } from '../core/compareScan.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { isEnvIgnoredByGit } from '../services/git.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
+import { printHeader } from '../ui/scan/printHeader.js';
+
+/**
+ * Filters out commented usages from the list.
+ * skipping comments: // process.env.API_URL
+ * @param usages - List of environment variable usages
+ * @returns Filtered list of environment variable usages
+ */
+function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
+  return usages.filter(
+    (u) => u.context && !/^\s*(\/\/|#)/.test(u.context.trim()),
+  );
+}
 
 /**
  * Scans codebase for environment variable usage and compares with .env file
@@ -31,19 +44,13 @@ export async function scanUsage(
   opts: ScanUsageOptions,
 ): Promise<{ exitWithError: boolean }> {
   if (!opts.json) {
-    console.log();
-    console.log(
-      chalk.blue('🔍 Scanning codebase for environment variable usage...'),
-    );
-    console.log();
+    printHeader();
   }
 
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
-  scanResult.used = scanResult.used.filter(
-    (u: EnvUsage) => u.context && !/^\s*(\/\/|#)/.test(u.context.trim()),
-  );
+  skipCommentedUsages(scanResult.used);
 
   // Recalculate stats after filtering out commented usages
   const uniqueVariables = new Set(scanResult.used.map((u) => u.variable)).size;
