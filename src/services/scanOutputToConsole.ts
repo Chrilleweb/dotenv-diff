@@ -6,6 +6,7 @@ import type {
   EnvUsage,
   VariableUsages,
 } from '../config/types.js';
+import { printHeader } from '../ui/scan/printHeader.js';
 
 /**
  * Outputs the scan results to the console.
@@ -21,13 +22,7 @@ export function outputToConsole(
 ): { exitWithError: boolean } {
   let exitWithError = false;
 
-  // Show what we're comparing against
-  if (comparedAgainst) {
-    console.log(
-      chalk.magenta(`📋 Comparing codebase usage against: ${comparedAgainst}`),
-    );
-    console.log();
-  }
+  printHeader(comparedAgainst);
 
   // Show stats if requested
   if (opts.showStats) {

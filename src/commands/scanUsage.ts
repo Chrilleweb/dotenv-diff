@@ -14,7 +14,6 @@ import { compareWithEnvFiles } from '../core/compareScan.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { isEnvIgnoredByGit } from '../services/git.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
-import { printHeader } from '../ui/scan/printHeader.js';
 
 /**
  * Filters out commented usages from the list.
@@ -47,9 +46,6 @@ function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
 export async function scanUsage(
   opts: ScanUsageOptions,
 ): Promise<{ exitWithError: boolean }> {
-  if (!opts.json) {
-    printHeader();
-  }
 
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
