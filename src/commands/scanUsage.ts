@@ -14,6 +14,7 @@ import { compareWithEnvFiles } from '../core/compareScan.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { isEnvIgnoredByGit } from '../services/git.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
+import { printMissingExample } from '../ui/scan/printMissingExample.js';
 
 /**
  * Filters out commented usages from the list.
@@ -75,22 +76,10 @@ export async function scanUsage(
   // Recalculate stats after filtering
   calculateStats(scanResult);
 
-  // If user explicitly passed --example but the file doesn't exist:
-  if (opts.examplePath) {
-    const exampleAbs = resolveFromCwd(opts.cwd, opts.examplePath);
-    const missing = !fs.existsSync(exampleAbs);
-
-    if (missing) {
-      const msg = `❌ Missing specified example file: ${opts.examplePath}`;
-      if (opts.isCiMode) {
-        console.log(chalk.red(msg));
-        return { exitWithError: true };
-      } else if (!opts.json) {
-        console.log(chalk.yellow(msg.replace('❌', '⚠️')));
-      }
-      // Non-CI: continue without comparison
-    }
-  }
+  // If user explicitly passed --example flag, but the file doesn't exist:
+  if (printMissingExample(opts)) {
+  return { exitWithError: true };
+}
 
   // Determine which file to compare against
   const compareFile = determineComparisonFile(opts);
