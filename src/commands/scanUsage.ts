@@ -122,44 +122,22 @@ export async function scanUsage(
     }
   }
 
-  // Apply missing keys fix with applyFixes (so gitignore is handled too)
   if (opts.fix && compareFile) {
-    const missingKeys = scanResult.missing;
-    if (missingKeys.length > 0) {
-      const envFilePath = compareFile.path;
-      const exampleFilePath = opts.examplePath
-        ? resolveFromCwd(opts.cwd, opts.examplePath)
-        : '';
-
-      const { changed, result } = applyFixes({
-        envPath: envFilePath,
-        examplePath: exampleFilePath,
-        missingKeys,
-        duplicateKeys: [],
-        ensureGitignore: true,
-      });
-
-      if (changed) {
-        fixApplied = true;
-        fixedKeys = result.addedEnv;
-        gitignoreUpdated = gitignoreUpdated || result.gitignoreUpdated;
-        scanResult.missing = [];
-      }
-    }
-  }
-
-  // Always run a gitignore-only fix when --fix is set (even if no missing/duplicates)
-  if (opts.fix && compareFile) {
-    const { result } = applyFixes({
+    const { changed, result } = applyFixes({
       envPath: compareFile.path,
-      examplePath: '',
-      missingKeys: [],
+      examplePath: opts.examplePath
+        ? resolveFromCwd(opts.cwd, opts.examplePath)
+        : '',
+      missingKeys: scanResult.missing,
       duplicateKeys: [],
       ensureGitignore: true,
     });
-    if (result.gitignoreUpdated) {
+
+    if (changed) {
       fixApplied = true;
-      gitignoreUpdated = true;
+      fixedKeys = result.addedEnv;
+      gitignoreUpdated = result.gitignoreUpdated;
+      scanResult.missing = [];
     }
   }
 
