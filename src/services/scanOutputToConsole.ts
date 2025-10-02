@@ -7,6 +7,7 @@ import type {
   VariableUsages,
 } from '../config/types.js';
 import { printHeader } from '../ui/scan/printHeader.js';
+import { printStats } from '../ui/scan/printStats.js';
 
 /**
  * Outputs the scan results to the console.
@@ -25,23 +26,7 @@ export function outputToConsole(
   printHeader(comparedAgainst);
 
   // Show stats if requested
-  if (opts.showStats) {
-    console.log(chalk.magenta('📊 Scan Statistics:'));
-    console.log(
-      chalk.magenta.dim(`   Files scanned: ${scanResult.stats.filesScanned}`),
-    );
-    console.log(
-      chalk.magenta.dim(
-        `   Total usages found: ${scanResult.stats.totalUsages}`,
-      ),
-    );
-    console.log(
-      chalk.magenta.dim(
-        `   Unique variables: ${scanResult.stats.uniqueVariables}`,
-      ),
-    );
-    console.log();
-  }
+  printStats(scanResult.stats, opts.json ?? false, opts.showStats ?? true);
 
   // Always show found variables when not comparing or when no missing variables
   if (scanResult.stats.uniqueVariables > 0) {

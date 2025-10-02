@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { parseEnvFile } from '../core/parseEnv.js';
 import { scanCodebase } from '../services/codeBaseScanner.js';
-import type { ScanUsageOptions, EnvUsage, Filtered } from '../config/types.js';
+import type { ScanUsageOptions, EnvUsage, Filtered, ScanResult } from '../config/types.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
@@ -32,6 +32,25 @@ function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
 }
 
 /**
+ * Recalculates statistics for a scan result after filtering usages.
+ * @param scanResult The current scan result
+ * @returns Updated scanResult with recalculated stats
+ */
+ function calculateStats(scanResult: ScanResult): ScanResult {
+  const uniqueVariables = new Set(
+    scanResult.used.map((u: EnvUsage) => u.variable),
+  ).size;
+
+  scanResult.stats = {
+    filesScanned: scanResult.stats.filesScanned,
+    totalUsages: scanResult.used.length,
+    uniqueVariables,
+  };
+
+  return scanResult;
+}
+
+/**
  * Scans codebase for environment variable usage and compares with .env file
  * @param {ScanUsageOptions} opts - Scan configuration options
  * @param {string} [opts.envPath] - Path to .env file for comparison
@@ -50,15 +69,11 @@ export async function scanUsage(
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
+  // Filter out commented usages
   scanResult.used = skipCommentedUsages(scanResult.used);
 
-  // Recalculate stats after filtering out commented usages
-  const uniqueVariables = new Set(scanResult.used.map((u) => u.variable)).size;
-  scanResult.stats = {
-    filesScanned: scanResult.stats.filesScanned,
-    totalUsages: scanResult.used.length,
-    uniqueVariables,
-  };
+  // Recalculate stats after filtering
+  calculateStats(scanResult);
 
   // If user explicitly passed --example but the file doesn't exist:
   if (opts.examplePath) {
