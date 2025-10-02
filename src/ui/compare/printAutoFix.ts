@@ -21,6 +21,7 @@ export function printAutoFix(
   envName: string,
   exampleName: string,
   json: boolean,
+  gitignoreUpdated: boolean,
 ): void {
   if (json) return;
 
@@ -45,6 +46,11 @@ export function printAutoFix(
         chalk.green(
           `  - Synced ${result.addedExample.length} keys to ${exampleName}: ${result.addedExample.join(', ')}`,
         ),
+      );
+    }
+    if (gitignoreUpdated) {
+      console.log(
+        chalk.green(`  - Added ${envName} to .gitignore`),
       );
     }
   } else {

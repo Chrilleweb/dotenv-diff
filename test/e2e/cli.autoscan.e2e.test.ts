@@ -58,9 +58,6 @@ describe('no-flag autoscan', () => {
     );
 
     const res = runCli(cwd, []);
-    console.log('stdout:', res.stdout);
-    console.log('stderr:', res.stderr);
-
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('.env is not ignored by Git');
   });
@@ -80,11 +77,7 @@ describe('no-flag autoscan', () => {
         `const apiKey = process.env.API_KEY;`.trimStart(),
       );
   
-      const res = runCli(cwd, ['--compare']);
-      console.log(res.stdout);
-      console.log('stdout:', res.stdout);
-      console.log('stderr:', res.stderr);
-  
+      const res = runCli(cwd, ['--compare']);  
       expect(res.status).toBe(0);
       expect(res.stdout).toContain('.env is not ignored by Git');
     });
@@ -104,12 +97,8 @@ describe('no-flag autoscan', () => {
     );
 
     const res = runCli(cwd, ['--fix']);
-    console.log();
-    console.log('stdout:', res.stdout);
-    console.log('stderr:', res.stderr);
-
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Added .env ignore rules to .gitignore');
+    expect(res.stdout).toContain('Added .env to .gitignore');
     
     const gitignore = fs.readFileSync(path.join(cwd, '.gitignore'), 'utf-8');
     expect(gitignore).toContain('.env');

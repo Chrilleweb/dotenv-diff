@@ -261,7 +261,7 @@ export async function compareMany(
         ensureGitignore: hasGitignoreIssue,
       });
 
-      printAutoFix(changed, result, envName, exampleName, opts.json ?? false);
+      printAutoFix(changed, result, envName, exampleName, opts.json ?? false, hasGitignoreIssue);
     }
 
     opts.collect?.(entry);

@@ -1,7 +1,12 @@
 import chalk from 'chalk';
 import path from 'path';
 import { scanCodebase } from '../services/codeBaseScanner.js';
-import type { ScanUsageOptions, EnvUsage, Filtered, ScanResult } from '../config/types.js';
+import type {
+  ScanUsageOptions,
+  EnvUsage,
+  Filtered,
+  ScanResult,
+} from '../config/types.js';
 import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
 import { outputToConsole } from '../services/scanOutputToConsole.js';
@@ -11,6 +16,8 @@ import { isEnvIgnoredByGit } from '../services/git.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../core/processComparisonFile.js';
+import { printAutoFix } from '../ui/compare/printAutoFix.js';
+import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 
 /**
  * Filters out commented usages from the list.
@@ -33,7 +40,7 @@ function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
  * @param scanResult The current scan result
  * @returns Updated scanResult with recalculated stats
  */
- function calculateStats(scanResult: ScanResult): ScanResult {
+function calculateStats(scanResult: ScanResult): ScanResult {
   const uniqueVariables = new Set(
     scanResult.used.map((u: EnvUsage) => u.variable),
   ).size;
@@ -62,7 +69,6 @@ function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
 export async function scanUsage(
   opts: ScanUsageOptions,
 ): Promise<{ exitWithError: boolean }> {
-
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
@@ -74,8 +80,8 @@ export async function scanUsage(
 
   // If user explicitly passed --example flag, but the file doesn't exist:
   if (printMissingExample(opts)) {
-  return { exitWithError: true };
-}
+    return { exitWithError: true };
+  }
 
   // Determine which file to compare against
   const compareFile = determineComparisonFile(opts);
@@ -92,29 +98,29 @@ export async function scanUsage(
   let gitignoreUpdated = false;
 
   if (compareFile) {
-  const result = processComparisonFile(scanResult, compareFile, opts);
-  
-  // Handle error if any
-  if (result.error) {
-    const errorMessage = `⚠️  ${result.error.message}`;
-    if (result.error.shouldExit) {
-      console.log(chalk.red(errorMessage.replace('⚠️', '❌')));
-      return { exitWithError: true };
+    const result = processComparisonFile(scanResult, compareFile, opts);
+
+    // Handle error if any
+    if (result.error) {
+      const errorMessage = `⚠️  ${result.error.message}`;
+      if (result.error.shouldExit) {
+        console.log(chalk.red(errorMessage.replace('⚠️', '❌')));
+        return { exitWithError: true };
+      }
+      if (!opts.json) console.log(chalk.yellow(errorMessage));
+    } else {
+      // Update all variables from result
+      scanResult = result.scanResult;
+      envVariables = result.envVariables;
+      comparedAgainst = result.comparedAgainst;
+      duplicatesFound = result.duplicatesFound;
+      dupsEnv = result.dupsEnv;
+      dupsExample = result.dupsExample;
+      fixApplied = result.fixApplied;
+      removedDuplicates = result.removedDuplicates;
+      gitignoreUpdated = result.gitignoreUpdated;
     }
-    if (!opts.json) console.log(chalk.yellow(errorMessage));
-  } else {
-    // Update all variables from result
-    scanResult = result.scanResult;
-    envVariables = result.envVariables;
-    comparedAgainst = result.comparedAgainst;
-    duplicatesFound = result.duplicatesFound;
-    dupsEnv = result.dupsEnv;
-    dupsExample = result.dupsExample;
-    fixApplied = result.fixApplied;
-    removedDuplicates = result.removedDuplicates;
-    gitignoreUpdated = result.gitignoreUpdated;
   }
-}
 
   // Apply missing keys fix with applyFixes (so gitignore is handled too)
   if (opts.fix && compareFile) {
@@ -196,42 +202,18 @@ export async function scanUsage(
 
   // Consolidated fix message
   if (opts.fix && !opts.json) {
-    if (fixApplied) {
-      console.log(chalk.green('✅ Auto-fix applied:'));
-
-      // Show removed duplicates
-      if (removedDuplicates.length > 0) {
-        console.log(
-          chalk.green(
-            `   - Removed ${removedDuplicates.length} duplicate keys from ${comparedAgainst}: ${removedDuplicates.join(', ')}`,
-          ),
-        );
-      }
-
-      // Show added missing keys
-      if (fixedKeys.length > 0) {
-        console.log(
-          chalk.green(
-            `   - Added ${fixedKeys.length} missing keys to ${comparedAgainst}: ${fixedKeys.join(', ')}`,
-          ),
-        );
-
-        if (opts.examplePath) {
-          console.log(
-            chalk.green(
-              `   - Synced ${fixedKeys.length} keys to ${path.basename(opts.examplePath)}`,
-            ),
-          );
-        }
-      }
-      if (gitignoreUpdated) {
-        console.log(chalk.green('   - Added .env ignore rules to .gitignore'));
-      }
-      console.log();
-    } else {
-      console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));
-      console.log();
-    }
+    printAutoFix(
+      fixApplied,
+      {
+        removedDuplicates,
+        addedEnv: fixedKeys,
+        addedExample: opts.examplePath ? fixedKeys : [],
+      },
+      comparedAgainst || '.env',
+      opts.examplePath ? path.basename(opts.examplePath) : 'example file',
+      opts.json ?? false,
+      gitignoreUpdated,
+    );
   }
 
   if (!opts.json && !opts.fix) {
