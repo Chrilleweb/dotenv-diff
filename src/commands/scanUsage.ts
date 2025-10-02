@@ -1,20 +1,16 @@
 import chalk from 'chalk';
-import fs from 'fs';
 import path from 'path';
-import { parseEnvFile } from '../core/parseEnv.js';
 import { scanCodebase } from '../services/codeBaseScanner.js';
 import type { ScanUsageOptions, EnvUsage, Filtered, ScanResult } from '../config/types.js';
-import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
 import { outputToConsole } from '../services/scanOutputToConsole.js';
 import { createJsonOutput } from '../core/scanJsonOutput.js';
-import { findDuplicateKeys } from '../services/duplicates.js';
-import { compareWithEnvFiles } from '../core/compareScan.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { isEnvIgnoredByGit } from '../services/git.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
+import { processComparisonFile } from '../core/processComparisonFile.js';
 
 /**
  * Filters out commented usages from the list.
@@ -96,83 +92,29 @@ export async function scanUsage(
   let gitignoreUpdated = false;
 
   if (compareFile) {
-    try {
-      const envFull = parseEnvFile(compareFile.path);
-      const envKeys = filterIgnoredKeys(
-        Object.keys(envFull),
-        opts.ignore,
-        opts.ignoreRegex,
-      );
-      envVariables = Object.fromEntries(envKeys.map((k) => [k, envFull[k]]));
-      scanResult = compareWithEnvFiles(scanResult, envVariables);
-      comparedAgainst = compareFile.name;
-
-      // Check for duplicates in the env file
-      if (!opts.allowDuplicates) {
-        dupsEnv = findDuplicateKeys(compareFile.path).filter(
-          ({ key }) =>
-            !opts.ignore.includes(key) &&
-            !opts.ignoreRegex.some((rx) => rx.test(key)),
-        );
-
-        // Also check for duplicates in example file if it exists AND is different from compareFile
-        if (opts.examplePath) {
-          const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
-          // Only check example file if it exists and is NOT the same as the comparison file
-          if (fs.existsSync(examplePath) && examplePath !== compareFile.path) {
-            dupsExample = findDuplicateKeys(examplePath).filter(
-              ({ key }) =>
-                !opts.ignore.includes(key) &&
-                !opts.ignoreRegex.some((rx) => rx.test(key)),
-            );
-          }
-        }
-
-        duplicatesFound = dupsEnv.length > 0 || dupsExample.length > 0;
-
-        // Apply duplicate fixes if --fix is enabled (but don't show message yet)
-        if (opts.fix && (dupsEnv.length > 0 || dupsExample.length > 0)) {
-          const { changed, result } = applyFixes({
-            envPath: compareFile.path,
-            examplePath: opts.examplePath
-              ? resolveFromCwd(opts.cwd, opts.examplePath)
-              : '',
-            missingKeys: [],
-            duplicateKeys: dupsEnv.map((d) => d.key),
-            ensureGitignore: true,
-          });
-
-          if (changed) {
-            fixApplied = true;
-            removedDuplicates = result.removedDuplicates;
-            gitignoreUpdated = gitignoreUpdated || result.gitignoreUpdated;
-            // Clear duplicates after fix
-            duplicatesFound = false;
-            dupsEnv = [];
-            dupsExample = [];
-          }
-        }
-
-        // Keep duplicates for output if not fixed
-        if (
-          (dupsEnv.length > 0 || dupsExample.length > 0) &&
-          (!opts.fix || !fixApplied)
-        ) {
-          if (!scanResult.duplicates) scanResult.duplicates = {};
-          if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
-          if (dupsExample.length > 0)
-            scanResult.duplicates.example = dupsExample;
-        }
-      }
-    } catch (error) {
-      const errorMessage = `⚠️  Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
-      if (opts.isCiMode) {
-        console.log(chalk.red(`❌ ${errorMessage}`));
-        return { exitWithError: true };
-      }
-      if (!opts.json) console.log(chalk.yellow(errorMessage));
+  const result = processComparisonFile(scanResult, compareFile, opts);
+  
+  // Handle error if any
+  if (result.error) {
+    const errorMessage = `⚠️  ${result.error.message}`;
+    if (result.error.shouldExit) {
+      console.log(chalk.red(errorMessage.replace('⚠️', '❌')));
+      return { exitWithError: true };
     }
+    if (!opts.json) console.log(chalk.yellow(errorMessage));
+  } else {
+    // Update all variables from result
+    scanResult = result.scanResult;
+    envVariables = result.envVariables;
+    comparedAgainst = result.comparedAgainst;
+    duplicatesFound = result.duplicatesFound;
+    dupsEnv = result.dupsEnv;
+    dupsExample = result.dupsExample;
+    fixApplied = result.fixApplied;
+    removedDuplicates = result.removedDuplicates;
+    gitignoreUpdated = result.gitignoreUpdated;
   }
+}
 
   // Apply missing keys fix with applyFixes (so gitignore is handled too)
   if (opts.fix && compareFile) {
