@@ -32,17 +32,17 @@ export function updateTotals(
     exitWithError = true;
   }
 
-  if (filtered.extra.length) {
+  if (filtered.extra?.length) {
     entry.extra = filtered.extra;
     totals.extra += filtered.extra.length;
   }
 
-  if (filtered.empty.length) {
+  if (filtered.empty?.length) {
     entry.empty = filtered.empty;
     totals.empty += filtered.empty.length;
   }
 
-  if (filtered.mismatches.length) {
+  if (filtered.mismatches?.length) {
     entry.valueMismatches = filtered.mismatches;
     totals.mismatch += filtered.mismatches.length;
   }

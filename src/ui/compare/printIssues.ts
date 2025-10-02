@@ -18,17 +18,17 @@ export function printIssues(
     filtered.missing.forEach((key) => console.log(chalk.red(`  - ${key}`)));
     console.log();
   }
-  if (filtered.extra.length) {
+  if (filtered.extra?.length) {
     console.log(chalk.yellow('⚠️  Extra keys (not in example):'));
     filtered.extra.forEach((key) => console.log(chalk.yellow(`  - ${key}`)));
     console.log();
   }
-  if (filtered.empty.length) {
+  if (filtered.empty?.length) {
     console.log(chalk.yellow('⚠️  Empty values:'));
     filtered.empty.forEach((key) => console.log(chalk.yellow(`  - ${key}`)));
     console.log();
   }
-  if (filtered.mismatches.length) {
+  if (filtered.mismatches?.length) {
     console.log(chalk.yellow('⚠️  Value mismatches:'));
     filtered.mismatches.forEach(({ key, expected, actual }) =>
       console.log(

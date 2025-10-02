@@ -9,11 +9,11 @@ import type { Filtered } from '../../config/types.js';
 export function isAllOk(filtered: Filtered): boolean {
   return (
     filtered.missing.length === 0 &&
-    filtered.extra.length === 0 &&
-    filtered.empty.length === 0 &&
+    filtered.extra?.length === 0 &&
+    filtered.empty?.length === 0 &&
     filtered.duplicatesEnv.length === 0 &&
     filtered.duplicatesEx.length === 0 &&
-    filtered.mismatches.length === 0 &&
+    filtered.mismatches?.length === 0 &&
     !filtered.gitignoreIssue
   );
 }

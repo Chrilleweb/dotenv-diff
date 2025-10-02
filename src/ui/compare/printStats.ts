@@ -37,12 +37,18 @@ export function printStats(
   console.log(
     chalk.magenta.dim(`   Missing (in ${envName}): ${filtered.missing.length}`),
   );
-  console.log(
-    chalk.magenta.dim(
-      `   Extra (not in ${exampleName}): ${filtered.extra.length}`,
-    ),
-  );
-  console.log(chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`));
+  if (filtered.extra?.length) {
+    console.log(
+      chalk.magenta.dim(
+        `   Extra (not in ${exampleName}): ${filtered.extra.length}`,
+      ),
+    );
+  }
+  if (filtered.empty?.length) {
+    console.log(
+      chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`),
+    );
+  }
   console.log(chalk.magenta.dim(`   Duplicate keys: ${s.duplicateCount}`));
   console.log(
     chalk.magenta.dim(`   Value mismatches: ${s.valueMismatchCount}`),

@@ -229,9 +229,9 @@ export type PairContext = {
 
 export type Filtered = {
   missing: string[];
-  extra: string[];
-  empty: string[];
-  mismatches: Array<{ key: string; expected: string; actual: string }>;
+  extra?: string[];
+  empty?: string[];
+  mismatches?: Array<{ key: string; expected: string; actual: string }>;
   duplicatesEnv: Array<{ key: string; count: number }>;
   duplicatesEx: Array<{ key: string; count: number }>;
   gitignoreIssue: { reason: 'no-gitignore' | 'not-ignored' } | null;

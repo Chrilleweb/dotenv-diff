@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { parseEnvFile } from '../core/parseEnv.js';
 import { scanCodebase } from '../services/codeBaseScanner.js';
-import type { ScanUsageOptions, EnvUsage } from '../config/types.js';
+import type { ScanUsageOptions, EnvUsage, Filtered } from '../config/types.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
@@ -13,6 +13,7 @@ import { findDuplicateKeys } from '../services/duplicates.js';
 import { compareWithEnvFiles } from '../core/compareScan.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { isEnvIgnoredByGit } from '../services/git.js';
+import { printFixTips } from '../ui/shared/printFixTips.js';
 
 /**
  * Scans codebase for environment variable usage and compares with .env file
@@ -188,7 +189,7 @@ export async function scanUsage(
     }
   }
 
-    // Always run a gitignore-only fix when --fix is set (even if no missing/duplicates)
+  // Always run a gitignore-only fix when --fix is set (even if no missing/duplicates)
   if (opts.fix && compareFile) {
     const { result } = applyFixes({
       envPath: compareFile.path,
@@ -202,7 +203,6 @@ export async function scanUsage(
       gitignoreUpdated = true;
     }
   }
-
 
   // JSON output
   if (opts.json) {
@@ -226,6 +226,17 @@ export async function scanUsage(
         ),
     };
   }
+
+  const filtered: Filtered = {
+    missing: scanResult.missing ?? [],
+    duplicatesEnv: dupsEnv,
+    duplicatesEx: dupsExample,
+    gitignoreIssue:
+      isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' }) === false ||
+      isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' }) === null
+        ? { reason: 'not-ignored' }
+        : null,
+  };
 
   // Console output
   const result = outputToConsole(scanResult, opts, comparedAgainst);
@@ -273,29 +284,13 @@ export async function scanUsage(
   if (!opts.json && !opts.fix) {
     const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
     const envNotIgnored = ignored === false || ignored === null;
-    if (scanResult.missing.length > 0 && duplicatesFound) {
-      console.log(
-        chalk.gray(
-          '💡 Tip: Run with `--fix` to add missing keys and remove duplicates',
-        ),
-      );
-      console.log();
-    } else if (scanResult.missing.length > 0) {
-      console.log(chalk.gray('💡 Tip: Run with `--fix` to add missing keys'));
-      console.log();
-    } else if (duplicatesFound) {
-      console.log(
-        chalk.gray('💡 Tip: Run with `--fix` to remove duplicate keys'),
-      );
-      console.log();
-    } else if (envNotIgnored) {
-      console.log(
-        chalk.gray(
-          '💡 Tip: Run with `--fix` to ensure .env is added to .gitignore',
-        ),
-      );
-      console.log();
-    }
+
+    printFixTips(
+      filtered,
+      envNotIgnored,
+      opts.json ?? false,
+      opts.fix ?? false,
+    );
   }
 
   return { exitWithError: result.exitWithError || duplicatesFound };
