@@ -8,6 +8,7 @@ import type {
 } from '../config/types.js';
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
+import { printUniqueVariables } from '../ui/scan/printUniqueVariables.js';
 
 /**
  * Outputs the scan results to the console.
@@ -30,12 +31,7 @@ export function outputToConsole(
 
   // Always show found variables when not comparing or when no missing variables
   if (scanResult.stats.uniqueVariables > 0) {
-    console.log(
-      chalk.blue(
-        `🌐 Found ${scanResult.stats.uniqueVariables} unique environment variables in use`,
-      ),
-    );
-    console.log();
+    printUniqueVariables(scanResult.stats.uniqueVariables);
 
     // List all variables found (if any)
     if (scanResult.stats.uniqueVariables > 0) {

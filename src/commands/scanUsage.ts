@@ -156,7 +156,6 @@ export async function scanUsage(
   const result = outputToConsole(scanResult, opts, comparedAgainst);
 
   // Consolidated fix message
-  if (opts.fix && !opts.json) {
     printAutoFix(
       fixApplied,
       {
@@ -169,9 +168,7 @@ export async function scanUsage(
       opts.json ?? false,
       gitignoreUpdated,
     );
-  }
 
-  if (!opts.json && !opts.fix) {
     const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
     const envNotIgnored = ignored === false || ignored === null;
 
@@ -181,7 +178,6 @@ export async function scanUsage(
       opts.json ?? false,
       opts.fix ?? false,
     );
-  }
 
   return { exitWithError: result.exitWithError || duplicatesFound };
 }
