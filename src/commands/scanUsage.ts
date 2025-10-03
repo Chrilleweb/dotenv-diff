@@ -156,6 +156,7 @@ export async function scanUsage(
   const result = outputToConsole(scanResult, opts, comparedAgainst);
 
   // Consolidated fix message
+  if (opts.fix) {
     printAutoFix(
       fixApplied,
       {
@@ -168,6 +169,7 @@ export async function scanUsage(
       opts.json ?? false,
       gitignoreUpdated,
     );
+  }
 
     const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
     const envNotIgnored = ignored === false || ignored === null;

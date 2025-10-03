@@ -9,6 +9,7 @@ import type {
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
 import { printUniqueVariables } from '../ui/scan/printUniqueVariables.js';
+import { printVariables } from '../ui/scan/printVariables.js';
 
 /**
  * Outputs the scan results to the console.
@@ -29,48 +30,12 @@ export function outputToConsole(
   // Show stats if requested
   printStats(scanResult.stats, opts.json ?? false, opts.showStats ?? true);
 
-  // Always show found variables when not comparing or when no missing variables
+  // Show used variables if any found
   if (scanResult.stats.uniqueVariables > 0) {
+    // Show unique variables found
     printUniqueVariables(scanResult.stats.uniqueVariables);
-
-    // List all variables found (if any)
-    if (scanResult.stats.uniqueVariables > 0) {
-      // Group by variable to get unique list
-      const variableUsages = scanResult.used.reduce(
-        (acc: VariableUsages, usage: EnvUsage) => {
-          if (!acc[usage.variable]) {
-            acc[usage.variable] = [];
-          }
-          acc[usage.variable]!.push(usage);
-          return acc;
-        },
-        {},
-      );
-
-      // Display each unique variable
-      for (const [variable, usages] of Object.entries(variableUsages)) {
-        console.log(chalk.blue(`   ${variable}`));
-
-        // Show usage details if stats are enabled
-        if (opts.showStats) {
-          const displayUsages = usages.slice(0, 2);
-          displayUsages.forEach((usage: EnvUsage) => {
-            console.log(
-              chalk.blue.dim(
-                `     Used in: ${usage.file}:${usage.line} (${usage.pattern})`,
-              ),
-            );
-          });
-
-          if (usages.length > 2) {
-            console.log(
-              chalk.gray(`     ... and ${usages.length - 2} more locations`),
-            );
-          }
-        }
-      }
-      console.log();
-    }
+    // Print used variables with locations
+    printVariables(scanResult.used, opts.showStats ?? false, opts.json ?? false);
   }
 
   // Missing variables (used in code but not in env file)
