@@ -14,6 +14,7 @@ import { printMissing } from '../ui/scan/printMissing.js';
 import { printUnused } from '../ui/scan/printUnused.js';
 import { printDuplicates } from '../ui/compare/printDuplicates.js';
 import { printSecrets } from '../ui/scan/printSecrets.js';
+import { printSuccess } from '../ui/compare/printSuccess.js';
 
 /**
  * Outputs the scan results to the console.
@@ -83,19 +84,16 @@ export function outputToConsole(
   if (
     comparedAgainst &&
     scanResult.missing.length === 0 &&
-    scanResult.secrets.length > 0 &&
+    (scanResult.secrets?.length ?? 0) === 0 &&
     scanResult.used.length > 0
   ) {
-    console.log(
-      chalk.green(
-        `✅ All used environment variables are defined in ${comparedAgainst}`,
-      ),
+    printSuccess(
+      opts.json ?? false,
+      'scan',
+      comparedAgainst,
+      scanResult.unused,
+      opts.showUnused ?? true,
     );
-
-    if (opts.showUnused && scanResult.unused.length === 0) {
-      console.log(chalk.green('✅ No unused environment variables found'));
-    }
-    console.log();
   }
 
   let envNotIgnored = false;

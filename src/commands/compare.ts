@@ -218,7 +218,7 @@ export async function compareMany(
 
     if (allOk) {
       entry.ok = true;
-      printSuccess(opts.json ?? false);
+      printSuccess(opts.json ?? false, 'compare');
       opts.collect?.(entry);
       continue;
     }
