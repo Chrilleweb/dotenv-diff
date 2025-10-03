@@ -1,11 +1,7 @@
 import chalk from 'chalk';
-import { warnIfEnvNotIgnored, isEnvIgnoredByGit } from './git.js';
-import type {
-  ScanUsageOptions,
-  ScanResult,
-  EnvUsage,
-  VariableUsages,
-} from '../config/types.js';
+import { checkGitignoreStatus } from './git.js';
+import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
+import type { ScanUsageOptions, ScanResult } from '../config/types.js';
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
 import { printUniqueVariables } from '../ui/scan/printUniqueVariables.js';
@@ -15,6 +11,7 @@ import { printUnused } from '../ui/scan/printUnused.js';
 import { printDuplicates } from '../ui/shared/printDuplicates.js';
 import { printSecrets } from '../ui/scan/printSecrets.js';
 import { printSuccess } from '../ui/shared/printSuccess.js';
+import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
 
 /**
  * Outputs the scan results to the console.
@@ -96,42 +93,34 @@ export function outputToConsole(
     );
   }
 
-  let envNotIgnored = false;
-  if (!opts.json && !opts.fix) {
-    // Kun vis advarsel i non-fix mode; i fix-mode har vi lige forsøgt at rette det.
-    warnIfEnvNotIgnored({ cwd: opts.cwd, envFile: '.env' });
-    const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
-    if (ignored === false || ignored === null) {
-      envNotIgnored = true;
-    }
+  // Gitignore check
+  const gitignoreIssue = checkGitignoreStatus({
+    cwd: opts.cwd,
+    envFile: '.env',
+  });
+
+  if (gitignoreIssue && !opts.json) {
+    printGitignoreWarning({
+      envFile: '.env',
+      reason: gitignoreIssue.reason,
+    });
   }
 
+  const hasGitignoreIssue = gitignoreIssue !== null;
+
   if (opts.strict) {
-    const hasWarnings =
-      scanResult.unused.length > 0 ||
-      (scanResult.duplicates?.env?.length ?? 0) > 0 ||
-      (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-      (scanResult.secrets?.length ?? 0) > 0 ||
-      envNotIgnored;
+    const exit = printStrictModeError(
+      {
+        unused: scanResult.unused.length,
+        duplicatesEnv: scanResult.duplicates?.env?.length ?? 0,
+        duplicatesEx: scanResult.duplicates?.example?.length ?? 0,
+        secrets: scanResult.secrets?.length ?? 0,
+        hasGitignoreIssue,
+      },
+      opts.json ?? false,
+    );
 
-    if (hasWarnings) {
-      exitWithError = true;
-
-      const warnings: string[] = [];
-      if (scanResult.unused.length > 0) warnings.push('unused variables');
-      if ((scanResult.duplicates?.env?.length ?? 0) > 0)
-        warnings.push('duplicate keys in env');
-      if ((scanResult.duplicates?.example?.length ?? 0) > 0)
-        warnings.push('duplicate keys in example');
-      if ((scanResult.secrets?.length ?? 0) > 0)
-        warnings.push('potential secrets');
-      if (envNotIgnored) warnings.push('.env not ignored by git');
-
-      console.log(
-        chalk.red(`💥 Strict mode: Error on warnings → ${warnings.join(', ')}`),
-      );
-      console.log();
-    }
+    if (exit) exitWithError = true;
   }
 
   return { exitWithError };
