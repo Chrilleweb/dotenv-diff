@@ -16,12 +16,14 @@ export interface ProcessComparisonResult {
   dupsExample: Array<{ key: string; count: number }>;
   fixApplied: boolean;
   removedDuplicates: string[];
+  addedEnv: string[];
+  addedExample: string[];
   gitignoreUpdated: boolean;
   error?: { message: string; shouldExit: boolean };
 }
 
 /**
- * Process comparison file: parse env, check duplicates, apply fixes
+ * Process comparison file: parse env, check duplicates, check missing keys, apply fixes
  * @param scanResult - Current scan result
  * @param compareFile - File to compare against
  * @param opts - Scan options
@@ -39,6 +41,8 @@ export function processComparisonFile(
   let dupsExample: Array<{ key: string; count: number }> = [];
   let fixApplied = false;
   let removedDuplicates: string[] = [];
+  let addedEnv: string[] = [];
+  let addedExample: string[] = [];
   let gitignoreUpdated = false;
 
   try {
@@ -53,32 +57,46 @@ export function processComparisonFile(
     scanResult = compareWithEnvFiles(scanResult, envVariables);
     comparedAgainst = compareFile.name;
 
-    // Check for duplicates if not allowed
+    // Find duplicates
     if (!opts.allowDuplicates) {
       const duplicateResults = checkDuplicates(compareFile, opts);
       dupsEnv = duplicateResults.dupsEnv;
       dupsExample = duplicateResults.dupsExample;
       duplicatesFound = dupsEnv.length > 0 || dupsExample.length > 0;
+    }
 
-      // Apply duplicate fixes if --fix is enabled
-      if (opts.fix && duplicatesFound) {
-        const fixResult = applyDuplicateFixes(compareFile, dupsEnv, opts);
-        if (fixResult.changed) {
-          fixApplied = true;
-          removedDuplicates = fixResult.result.removedDuplicates;
-          gitignoreUpdated = fixResult.result.gitignoreUpdated;
-          duplicatesFound = false;
-          dupsEnv = [];
-          dupsExample = [];
-        }
-      }
+    // 🔧 Apply fixes (both duplicates + missing keys + gitignore)
+    if (opts.fix && (duplicatesFound || scanResult.missing.length > 0 || true)) {
+      const { changed, result } = applyFixes({
+        envPath: compareFile.path,
+        examplePath: opts.examplePath
+          ? resolveFromCwd(opts.cwd, opts.examplePath)
+          : '',
+        missingKeys: scanResult.missing,
+        duplicateKeys: dupsEnv.map((d) => d.key),
+        ensureGitignore: true,
+      });
 
-      // Keep duplicates for output if not fixed
-      if (duplicatesFound && (!opts.fix || !fixApplied)) {
-        if (!scanResult.duplicates) scanResult.duplicates = {};
-        if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
-        if (dupsExample.length > 0) scanResult.duplicates.example = dupsExample;
+      if (changed) {
+        fixApplied = true;
+        removedDuplicates = result.removedDuplicates;
+        addedEnv = result.addedEnv;
+        addedExample = result.addedExample;
+        gitignoreUpdated = result.gitignoreUpdated;
+
+        // Rens op i scanResult efter fix
+        scanResult.missing = [];
+        dupsEnv = [];
+        dupsExample = [];
+        duplicatesFound = false;
       }
+    }
+
+    // Keep duplicates for output if not fixed
+    if (duplicatesFound && (!opts.fix || !fixApplied)) {
+      if (!scanResult.duplicates) scanResult.duplicates = {};
+      if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
+      if (dupsExample.length > 0) scanResult.duplicates.example = dupsExample;
     }
   } catch (error) {
     const errorMessage = `Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
@@ -91,6 +109,8 @@ export function processComparisonFile(
       dupsExample,
       fixApplied,
       removedDuplicates,
+      addedEnv,
+      addedExample,
       gitignoreUpdated,
       error: {
         message: errorMessage,
@@ -108,6 +128,8 @@ export function processComparisonFile(
     dupsExample,
     fixApplied,
     removedDuplicates,
+    addedEnv,
+    addedExample,
     gitignoreUpdated,
   };
 }
@@ -132,7 +154,6 @@ function checkDuplicates(
 
   if (opts.examplePath) {
     const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
-    // Only check example file if it exists and is NOT the same as comparison file
     if (fs.existsSync(examplePath) && examplePath !== compareFile.path) {
       dupsExample = findDuplicateKeys(examplePath).filter(
         ({ key }) =>
@@ -143,23 +164,4 @@ function checkDuplicates(
   }
 
   return { dupsEnv, dupsExample };
-}
-
-/**
- * Apply fixes for duplicate keys
- */
-function applyDuplicateFixes(
-  compareFile: { path: string; name: string },
-  dupsEnv: Array<{ key: string; count: number }>,
-  opts: ScanUsageOptions,
-) {
-  return applyFixes({
-    envPath: compareFile.path,
-    examplePath: opts.examplePath
-      ? resolveFromCwd(opts.cwd, opts.examplePath)
-      : '',
-    missingKeys: [],
-    duplicateKeys: dupsEnv.map((d) => d.key),
-    ensureGitignore: true,
-  });
 }

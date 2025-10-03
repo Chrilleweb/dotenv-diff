@@ -98,48 +98,29 @@ export async function scanUsage(
   let gitignoreUpdated = false;
 
   if (compareFile) {
-    const result = processComparisonFile(scanResult, compareFile, opts);
+  const result = processComparisonFile(scanResult, compareFile, opts);
 
-    // Handle error if any
-    if (result.error) {
-      const errorMessage = `⚠️  ${result.error.message}`;
-      if (result.error.shouldExit) {
-        console.log(chalk.red(errorMessage.replace('⚠️', '❌')));
-        return { exitWithError: true };
-      }
-      if (!opts.json) console.log(chalk.yellow(errorMessage));
-    } else {
-      // Update all variables from result
-      scanResult = result.scanResult;
-      envVariables = result.envVariables;
-      comparedAgainst = result.comparedAgainst;
-      duplicatesFound = result.duplicatesFound;
-      dupsEnv = result.dupsEnv;
-      dupsExample = result.dupsExample;
-      fixApplied = result.fixApplied;
-      removedDuplicates = result.removedDuplicates;
-      gitignoreUpdated = result.gitignoreUpdated;
+  if (result.error) {
+    const errorMessage = `⚠️  ${result.error.message}`;
+    if (result.error.shouldExit) {
+      console.log(chalk.red(errorMessage.replace('⚠️', '❌')));
+      return { exitWithError: true };
     }
+    if (!opts.json) console.log(chalk.yellow(errorMessage));
+  } else {
+    scanResult = result.scanResult;
+    envVariables = result.envVariables;
+    comparedAgainst = result.comparedAgainst;
+    duplicatesFound = result.duplicatesFound;
+    dupsEnv = result.dupsEnv;
+    dupsExample = result.dupsExample;
+    fixApplied = result.fixApplied;
+    removedDuplicates = result.removedDuplicates;
+    fixedKeys = result.addedEnv;
+    gitignoreUpdated = result.gitignoreUpdated;
   }
+}
 
-  if (opts.fix && compareFile) {
-    const { changed, result } = applyFixes({
-      envPath: compareFile.path,
-      examplePath: opts.examplePath
-        ? resolveFromCwd(opts.cwd, opts.examplePath)
-        : '',
-      missingKeys: scanResult.missing,
-      duplicateKeys: [],
-      ensureGitignore: true,
-    });
-
-    if (changed) {
-      fixApplied = true;
-      fixedKeys = result.addedEnv;
-      gitignoreUpdated = result.gitignoreUpdated;
-      scanResult.missing = [];
-    }
-  }
 
   // JSON output
   if (opts.json) {
