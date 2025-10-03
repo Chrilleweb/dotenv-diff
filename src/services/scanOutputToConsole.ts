@@ -13,6 +13,7 @@ import { printVariables } from '../ui/scan/printVariables.js';
 import { printMissing } from '../ui/scan/printMissing.js';
 import { printUnused } from '../ui/scan/printUnused.js';
 import { printDuplicates } from '../ui/compare/printDuplicates.js';
+import { printSecrets } from '../ui/scan/printSecrets.js';
 
 /**
  * Outputs the scan results to the console.
@@ -75,25 +76,8 @@ export function outputToConsole(
     opts.json ?? false,
   );
 
-  if (scanResult.secrets && scanResult.secrets.length > 0) {
-    console.log(chalk.yellow('🔒 Potential secrets detected in codebase:'));
-    const byFile = new Map<string, typeof scanResult.secrets>();
-    for (const f of scanResult.secrets) {
-      if (!byFile.has(f.file)) byFile.set(f.file, []);
-      byFile.get(f.file)!.push(f);
-    }
-    for (const [file, findings] of byFile) {
-      console.log(chalk.bold(`  ${file}`));
-      for (const f of findings) {
-        console.log(
-          chalk.yellow(
-            `   - Line ${f.line}: ${f.message}\n     ${chalk.dim(f.snippet)}`,
-          ),
-        );
-      }
-    }
-    console.log();
-  }
+  // Print potential secrets found
+  printSecrets(scanResult.secrets ?? [], opts.json ?? false);
 
   // Success message for env file comparison
   if (
