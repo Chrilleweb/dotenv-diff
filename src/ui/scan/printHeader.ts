@@ -10,8 +10,8 @@ export function printHeader(comparedAgainst?: string): void {
   console.log(
     chalk.blue('🔍 Scanning codebase for environment variable usage...'),
   );
-  console.log();
   if (comparedAgainst) {
+    console.log();
     console.log(
       chalk.magenta(`📋 Comparing codebase usage against: ${comparedAgainst}`),
     );

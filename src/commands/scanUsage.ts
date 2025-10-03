@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import path from 'path';
 import { scanCodebase } from '../services/codeBaseScanner.js';
 import type {
@@ -7,17 +6,15 @@ import type {
   Filtered,
   ScanResult,
 } from '../config/types.js';
-import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
 import { outputToConsole } from '../services/scanOutputToConsole.js';
 import { createJsonOutput } from '../core/scanJsonOutput.js';
-import { applyFixes } from '../core/fixEnv.js';
 import { isEnvIgnoredByGit } from '../services/git.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../core/processComparisonFile.js';
 import { printAutoFix } from '../ui/compare/printAutoFix.js';
-import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
+import { printComparisonError } from '../ui/scan/printComparisonError.js';
 
 /**
  * Filters out commented usages from the list.
@@ -98,29 +95,28 @@ export async function scanUsage(
   let gitignoreUpdated = false;
 
   if (compareFile) {
-  const result = processComparisonFile(scanResult, compareFile, opts);
+    const result = processComparisonFile(scanResult, compareFile, opts);
 
-  if (result.error) {
-    const errorMessage = `⚠️  ${result.error.message}`;
-    if (result.error.shouldExit) {
-      console.log(chalk.red(errorMessage.replace('⚠️', '❌')));
-      return { exitWithError: true };
+    if (result.error) {
+      const { exit } = printComparisonError(
+        result.error.message,
+        result.error.shouldExit,
+        opts.json ?? false,
+      );
+      if (exit) return { exitWithError: true };
+    } else {
+      scanResult = result.scanResult;
+      envVariables = result.envVariables;
+      comparedAgainst = result.comparedAgainst;
+      duplicatesFound = result.duplicatesFound;
+      dupsEnv = result.dupsEnv;
+      dupsExample = result.dupsExample;
+      fixApplied = result.fixApplied;
+      removedDuplicates = result.removedDuplicates;
+      fixedKeys = result.addedEnv;
+      gitignoreUpdated = result.gitignoreUpdated;
     }
-    if (!opts.json) console.log(chalk.yellow(errorMessage));
-  } else {
-    scanResult = result.scanResult;
-    envVariables = result.envVariables;
-    comparedAgainst = result.comparedAgainst;
-    duplicatesFound = result.duplicatesFound;
-    dupsEnv = result.dupsEnv;
-    dupsExample = result.dupsExample;
-    fixApplied = result.fixApplied;
-    removedDuplicates = result.removedDuplicates;
-    fixedKeys = result.addedEnv;
-    gitignoreUpdated = result.gitignoreUpdated;
   }
-}
-
 
   // JSON output
   if (opts.json) {
