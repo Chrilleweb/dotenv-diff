@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { checkGitignoreStatus } from './git.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import type { ScanUsageOptions, ScanResult } from '../config/types.js';
