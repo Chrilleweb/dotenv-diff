@@ -18,11 +18,11 @@ import { updateTotals } from '../core/helpers/updateTotals.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printStats } from '../ui/compare/printStats.js';
-import { printDuplicates } from '../ui/compare/printDuplicates.js';
+import { printDuplicates } from '../ui/shared/printDuplicates.js';
 import { printHeader } from '../ui/compare/printHeader.js';
 import { printAutoFix } from '../ui/compare/printAutoFix.js';
 import { printIssues } from '../ui/compare/printIssues.js';
-import { printSuccess } from '../ui/compare/printSuccess.js';
+import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 
 /**
@@ -261,7 +261,14 @@ export async function compareMany(
         ensureGitignore: hasGitignoreIssue,
       });
 
-      printAutoFix(changed, result, envName, exampleName, opts.json ?? false, hasGitignoreIssue);
+      printAutoFix(
+        changed,
+        result,
+        envName,
+        exampleName,
+        opts.json ?? false,
+        hasGitignoreIssue,
+      );
     }
 
     opts.collect?.(entry);

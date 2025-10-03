@@ -12,9 +12,9 @@ import { printUniqueVariables } from '../ui/scan/printUniqueVariables.js';
 import { printVariables } from '../ui/scan/printVariables.js';
 import { printMissing } from '../ui/scan/printMissing.js';
 import { printUnused } from '../ui/scan/printUnused.js';
-import { printDuplicates } from '../ui/compare/printDuplicates.js';
+import { printDuplicates } from '../ui/shared/printDuplicates.js';
 import { printSecrets } from '../ui/scan/printSecrets.js';
-import { printSuccess } from '../ui/compare/printSuccess.js';
+import { printSuccess } from '../ui/shared/printSuccess.js';
 
 /**
  * Outputs the scan results to the console.
