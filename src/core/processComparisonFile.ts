@@ -65,7 +65,7 @@ export function processComparisonFile(
       duplicatesFound = dupsEnv.length > 0 || dupsExample.length > 0;
     }
 
-    // 🔧 Apply fixes (both duplicates + missing keys + gitignore)
+    // Apply fixes (both duplicates + missing keys + gitignore)
     if (opts.fix && (duplicatesFound || scanResult.missing.length > 0 || true)) {
       const { changed, result } = applyFixes({
         envPath: compareFile.path,
@@ -84,7 +84,6 @@ export function processComparisonFile(
         addedExample = result.addedExample;
         gitignoreUpdated = result.gitignoreUpdated;
 
-        // Rens op i scanResult efter fix
         scanResult.missing = [];
         dupsEnv = [];
         dupsExample = [];
