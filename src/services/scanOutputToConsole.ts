@@ -10,6 +10,7 @@ import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
 import { printUniqueVariables } from '../ui/scan/printUniqueVariables.js';
 import { printVariables } from '../ui/scan/printVariables.js';
+import { printMissing } from '../ui/scan/printMissing.js';
 
 /**
  * Outputs the scan results to the console.
@@ -35,61 +36,24 @@ export function outputToConsole(
     // Show unique variables found
     printUniqueVariables(scanResult.stats.uniqueVariables);
     // Print used variables with locations
-    printVariables(scanResult.used, opts.showStats ?? false, opts.json ?? false);
+    printVariables(
+      scanResult.used,
+      opts.showStats ?? false,
+      opts.json ?? false,
+    );
   }
 
   // Missing variables (used in code but not in env file)
-  if (scanResult.missing.length > 0) {
+  if (
+    printMissing(
+      scanResult.missing,
+      scanResult.used,
+      comparedAgainst,
+      opts.isCiMode ?? false,
+      opts.json ?? false,
+    )
+  ) {
     exitWithError = true;
-    const fileType = comparedAgainst || 'environment file';
-    console.log(chalk.red(`❌ Missing in ${fileType}:`));
-
-    const grouped = scanResult.missing.reduce(
-      (acc: VariableUsages, variable: string) => {
-        const usages = scanResult.used.filter(
-          (u: EnvUsage) => u.variable === variable,
-        );
-        acc[variable] = usages;
-        return acc;
-      },
-      {},
-    );
-
-    for (const [variable, usages] of Object.entries(grouped)) {
-      console.log(chalk.red(`   - ${variable}`));
-
-      // Show first few usages
-      const maxShow = 3;
-      usages.slice(0, maxShow).forEach((usage: EnvUsage) => {
-        console.log(
-          chalk.red.dim(
-            `     Used in: ${usage.file}:${usage.line} (${usage.pattern})`,
-          ),
-        );
-      });
-
-      if (usages.length > maxShow) {
-        console.log(
-          chalk.gray(`     ... and ${usages.length - maxShow} more locations`),
-        );
-      }
-    }
-    console.log();
-
-    // CI mode specific message
-    if (opts.isCiMode) {
-      console.log(
-        chalk.red(
-          `💥 Found ${scanResult.missing.length} missing environment variable(s).`,
-        ),
-      );
-      console.log(
-        chalk.red(
-          `   Add these variables to ${comparedAgainst || 'your environment file'} to fix this error.`,
-        ),
-      );
-      console.log();
-    }
   }
 
   // Unused variables (in env file but not used in code)
