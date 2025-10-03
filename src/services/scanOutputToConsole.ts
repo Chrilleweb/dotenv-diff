@@ -11,6 +11,8 @@ import { printStats } from '../ui/scan/printStats.js';
 import { printUniqueVariables } from '../ui/scan/printUniqueVariables.js';
 import { printVariables } from '../ui/scan/printVariables.js';
 import { printMissing } from '../ui/scan/printMissing.js';
+import { printUnused } from '../ui/scan/printUnused.js';
+import { printDuplicates } from '../ui/compare/printDuplicates.js';
 
 /**
  * Outputs the scan results to the console.
@@ -56,45 +58,22 @@ export function outputToConsole(
     exitWithError = true;
   }
 
-  // Unused variables (in env file but not used in code)
-  if (opts.showUnused && scanResult.unused.length > 0) {
-    const fileType = comparedAgainst || 'environment file';
-    console.log(
-      chalk.yellow(`⚠️  Unused in codebase (defined in ${fileType}):`),
-    );
-    scanResult.unused.forEach((variable: string) => {
-      console.log(chalk.yellow(`   - ${variable}`));
-    });
-    console.log();
-  }
+  // Unused
+  printUnused(
+    scanResult.unused,
+    comparedAgainst,
+    opts.showUnused ?? false,
+    opts.json ?? false,
+  );
 
-  // Show duplicates if found - NOW AFTER UNUSED VARIABLES
-  if (scanResult.duplicates?.env && scanResult.duplicates.env.length > 0) {
-    console.log(
-      chalk.yellow(
-        `⚠️  Duplicate keys in ${comparedAgainst} (last occurrence wins):`,
-      ),
-    );
-    scanResult.duplicates.env.forEach(({ key, count }) =>
-      console.log(chalk.yellow(`   - ${key} (${count} occurrences)`)),
-    );
-    console.log();
-  }
-
-  if (
-    scanResult.duplicates?.example &&
-    scanResult.duplicates.example.length > 0
-  ) {
-    console.log(
-      chalk.yellow(
-        '⚠️  Duplicate keys in example file (last occurrence wins):',
-      ),
-    );
-    scanResult.duplicates.example.forEach(({ key, count }) =>
-      console.log(chalk.yellow(`   - ${key} (${count} occurrences)`)),
-    );
-    console.log();
-  }
+  // Duplicates
+  printDuplicates(
+    comparedAgainst || '.env',
+    'example file',
+    scanResult.duplicates?.env ?? [],
+    scanResult.duplicates?.example ?? [],
+    opts.json ?? false,
+  );
 
   if (scanResult.secrets && scanResult.secrets.length > 0) {
     console.log(chalk.yellow('🔒 Potential secrets detected in codebase:'));
