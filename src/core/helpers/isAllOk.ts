@@ -1,4 +1,3 @@
-// src/core/helpers/isAllOk.ts
 import type { Filtered } from '../../config/types.js';
 
 /**

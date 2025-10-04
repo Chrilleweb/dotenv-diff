@@ -1,4 +1,3 @@
-// src/core/helpers/updateTotals.ts
 import type { CompareJsonEntry } from '../../config/types.js';
 import type { Filtered } from '../../config/types.js';
 
