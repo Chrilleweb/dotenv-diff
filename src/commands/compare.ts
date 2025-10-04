@@ -20,7 +20,7 @@ import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printStats } from '../ui/compare/printStats.js';
 import { printDuplicates } from '../ui/shared/printDuplicates.js';
 import { printHeader } from '../ui/compare/printHeader.js';
-import { printAutoFix } from '../ui/compare/printAutoFix.js';
+import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printIssues } from '../ui/compare/printIssues.js';
 import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
