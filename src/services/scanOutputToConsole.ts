@@ -36,10 +36,13 @@ export function outputToConsole(
 ): { exitWithError: boolean } {
   let exitWithError = false;
 
+  // Determine if output should be in JSON format
+  const isJson = opts.json ?? false;
+
   printHeader(comparedAgainst);
 
   // Show stats if requested
-  printStats(scanResult.stats, opts.json ?? false, opts.showStats ?? true);
+  printStats(scanResult.stats, isJson, opts.showStats ?? true);
 
   // Show used variables if any found
   if (scanResult.stats.uniqueVariables > 0) {
@@ -49,7 +52,7 @@ export function outputToConsole(
     printVariables(
       scanResult.used,
       opts.showStats ?? false,
-      opts.json ?? false,
+      isJson,
     );
   }
 
@@ -60,7 +63,7 @@ export function outputToConsole(
       scanResult.used,
       comparedAgainst,
       opts.isCiMode ?? false,
-      opts.json ?? false,
+      isJson,
     )
   ) {
     exitWithError = true;
@@ -71,7 +74,7 @@ export function outputToConsole(
     scanResult.unused,
     comparedAgainst,
     opts.showUnused ?? false,
-    opts.json ?? false,
+    isJson,
   );
 
   // Duplicates
@@ -80,11 +83,11 @@ export function outputToConsole(
     'example file',
     scanResult.duplicates?.env ?? [],
     scanResult.duplicates?.example ?? [],
-    opts.json ?? false,
+    isJson,
   );
 
   // Print potential secrets found
-  printSecrets(scanResult.secrets ?? [], opts.json ?? false);
+  printSecrets(scanResult.secrets ?? [], isJson);
 
   // Success message for env file comparison
   if (
@@ -94,7 +97,7 @@ export function outputToConsole(
     scanResult.used.length > 0
   ) {
     printSuccess(
-      opts.json ?? false,
+      isJson,
       'scan',
       comparedAgainst,
       scanResult.unused,
@@ -126,7 +129,7 @@ export function outputToConsole(
         secrets: scanResult.secrets?.length ?? 0,
         hasGitignoreIssue,
       },
-      opts.json ?? false,
+      isJson,
     );
 
     if (exit) exitWithError = true;
@@ -142,7 +145,7 @@ export function outputToConsole(
       },
       comparedAgainst || '.env',
       opts.examplePath ? path.basename(opts.examplePath) : 'example file',
-      opts.json ?? false,
+      isJson,
       fixContext.gitignoreUpdated,
     );
   }
@@ -158,7 +161,7 @@ export function outputToConsole(
   printFixTips(
     filtered,
     hasGitignoreIssue,
-    opts.json ?? false,
+    isJson,
     opts.fix ?? false,
   );
 
