@@ -50,11 +50,11 @@ export async function ensureFilesOrPrompt(args: {
     const createEnv = isYesMode
       ? true
       : isCiMode
-      ? false
-      : await confirmYesNo(
-          `❓ Do you want to create a new ${path.basename(envPath)} file from ${path.basename(examplePath)}?`,
-          { isCiMode, isYesMode },
-        );
+        ? false
+        : await confirmYesNo(
+            `❓ Do you want to create a new ${path.basename(envPath)} file from ${path.basename(examplePath)}?`,
+            { isCiMode, isYesMode },
+          );
 
     if (!createEnv) {
       printPrompt.skipCreation('.env');
@@ -75,11 +75,11 @@ export async function ensureFilesOrPrompt(args: {
     const createExample = isYesMode
       ? true
       : isCiMode
-      ? false
-      : await confirmYesNo(
-          `❓ Do you want to create a new ${path.basename(examplePath)} file from ${path.basename(envPath)}?`,
-          { isCiMode, isYesMode },
-        );
+        ? false
+        : await confirmYesNo(
+            `❓ Do you want to create a new ${path.basename(examplePath)} file from ${path.basename(envPath)}?`,
+            { isCiMode, isYesMode },
+          );
 
     if (!createExample) {
       printPrompt.skipCreation('.env.example');

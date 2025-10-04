@@ -49,9 +49,7 @@ export function printAutoFix(
       );
     }
     if (gitignoreUpdated) {
-      console.log(
-        chalk.green(`  - Added ${envName} to .gitignore`),
-      );
+      console.log(chalk.green(`  - Added ${envName} to .gitignore`));
     }
   } else {
     console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));

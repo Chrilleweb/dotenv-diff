@@ -3,7 +3,7 @@ import type { EnvUsage, VariableUsages } from '../../config/types.js';
 
 /**
  * Print all unique variables and their usage locations.
- * 
+ *
  * @param usages - Array of environment variable usages
  * @param showStats - Whether to show usage details (files/lines)
  * @param json - Whether to output in JSON format

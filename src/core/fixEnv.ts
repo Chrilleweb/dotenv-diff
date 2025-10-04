@@ -19,13 +19,13 @@ export type FixResult = {
 
 /**
  * Applies fixes to the .env and .env.example files based on the detected issues.
- * 
+ *
  * This function will:
  * - Remove duplicate keys from .env (keeping the last occurrence)
  * - Add missing keys to .env with empty values
  * - Add missing keys to .env.example (if not already present)
  * - Ensure .env is ignored in .gitignore (if in a git repo and ensureGitignore is true)
- * 
+ *
  * @param options - Fix options including file paths and keys to fix
  * @returns An object indicating whether changes were made and details of the changes
  */
@@ -33,13 +33,8 @@ export function applyFixes(options: ApplyFixesOptions): {
   changed: boolean;
   result: FixResult;
 } {
-  const {
-    envPath,
-    examplePath,
-    missingKeys,
-    duplicateKeys,
-    ensureGitignore,
-  } = options;
+  const { envPath, examplePath, missingKeys, duplicateKeys, ensureGitignore } =
+    options;
 
   const result: FixResult = {
     removedDuplicates: [],
@@ -53,12 +48,12 @@ export function applyFixes(options: ApplyFixesOptions): {
     const lines = fs.readFileSync(envPath, 'utf-8').split('\n');
     const seen = new Set<string>();
     const newLines: string[] = [];
-    
+
     // Process from bottom to top, keeping last occurrence
     for (let i = lines.length - 1; i >= 0; i--) {
       const line = lines[i];
       if (line === undefined) continue;
-      
+
       const match = line.match(/^\s*([\w.-]+)\s*=/);
       if (match) {
         const key = match[1] || '';
@@ -69,7 +64,7 @@ export function applyFixes(options: ApplyFixesOptions): {
       }
       newLines.unshift(line);
     }
-    
+
     fs.writeFileSync(envPath, newLines.join('\n'));
     result.removedDuplicates = duplicateKeys;
   }
@@ -96,7 +91,7 @@ export function applyFixes(options: ApplyFixesOptions): {
         .filter(Boolean),
     );
     const newExampleKeys = missingKeys.filter((k) => !existingExKeys.has(k));
-    
+
     if (newExampleKeys.length) {
       const newExContent =
         exContent +
@@ -125,7 +120,7 @@ export function applyFixes(options: ApplyFixesOptions): {
 /**
  * Ensures .env patterns are present in .gitignore at the git repository root.
  * This is a best-effort operation and will not throw errors.
- * 
+ *
  * @param envPath - Path to the .env file to check gitignore for
  * @returns true if .gitignore was updated, false otherwise
  */
@@ -133,7 +128,7 @@ function updateGitignoreForEnv(envPath: string): boolean {
   try {
     const startDir = path.dirname(envPath);
     const gitRoot = findGitRoot(startDir);
-    
+
     if (!gitRoot || !isGitRepo(gitRoot)) {
       return false;
     }
@@ -149,18 +144,17 @@ function updateGitignoreForEnv(envPath: string): boolean {
 
     // Need to add patterns
     const patterns = ['.env', '.env.*'];
-    
+
     if (fs.existsSync(gitignorePath)) {
       const current = fs.readFileSync(gitignorePath, 'utf8');
       const existingLines = current.split(/\r?\n/).map((l) => l.trim());
-      
+
       const missingPatterns = patterns.filter(
-        (pattern) => !existingLines.includes(pattern)
+        (pattern) => !existingLines.includes(pattern),
       );
 
       if (missingPatterns.length) {
-        const toAppend =
-          `${current.endsWith('\n') ? '' : '\n'}${missingPatterns.join('\n')}\n`;
+        const toAppend = `${current.endsWith('\n') ? '' : '\n'}${missingPatterns.join('\n')}\n`;
         fs.appendFileSync(gitignorePath, toAppend);
         return true;
       }

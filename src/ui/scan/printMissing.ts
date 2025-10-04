@@ -25,14 +25,11 @@ export function printMissing(
   console.log(chalk.red(`❌ Missing in ${fileType}:`));
 
   // Group by variable → find their usages
-  const grouped = missing.reduce(
-    (acc: VariableUsages, variable: string) => {
-      const usages = used.filter((u: EnvUsage) => u.variable === variable);
-      acc[variable] = usages;
-      return acc;
-    },
-    {},
-  );
+  const grouped = missing.reduce((acc: VariableUsages, variable: string) => {
+    const usages = used.filter((u: EnvUsage) => u.variable === variable);
+    acc[variable] = usages;
+    return acc;
+  }, {});
 
   for (const [variable, usages] of Object.entries(grouped)) {
     console.log(chalk.red(`   - ${variable}`));
@@ -56,14 +53,10 @@ export function printMissing(
 
   if (isCiMode) {
     console.log(
-      chalk.red(
-        `💥 Found ${missing.length} missing environment variable(s).`,
-      ),
+      chalk.red(`💥 Found ${missing.length} missing environment variable(s).`),
     );
     console.log(
-      chalk.red(
-        `   Add these variables to ${fileType} to fix this error.`,
-      ),
+      chalk.red(`   Add these variables to ${fileType} to fix this error.`),
     );
     console.log();
   }

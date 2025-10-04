@@ -21,7 +21,9 @@ export function printErrorNotFound(
   }
   if (!exExists) {
     console.error(
-      chalk.red(`❌ Error: --example file not found: ${path.basename(exampleFlag)}`),
+      chalk.red(
+        `❌ Error: --example file not found: ${path.basename(exampleFlag)}`,
+      ),
     );
   }
 }
