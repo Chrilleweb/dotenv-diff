@@ -13,7 +13,7 @@ import { printSecrets } from '../ui/scan/printSecrets.js';
 import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
-import { printAutoFix } from '../ui/compare/printAutoFix.js';
+import { printAutoFix } from '../ui/shared/printAutoFix.js';
 
 /**
  * Outputs the scan results to the console.
