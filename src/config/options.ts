@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import path from 'path';
 import {
   ALLOWED_CATEGORIES,
@@ -6,6 +5,11 @@ import {
   type Options,
   type RawOptions,
 } from './types.js';
+import {
+  printInvalidCategory,
+  printInvalidRegex,
+  printCiYesWarning,
+} from '../ui/shared/printOptionErrors.js';
 
 /**
  * Parses a comma-separated list of strings into an array of strings.
@@ -26,18 +30,35 @@ function parseList(val?: string | string[]): string[] {
  * @param flagName - The name of the flag being parsed (for error messages).
  * @returns An array of categories.
  */
-function parseCategories(val?: string | string[], flagName = ''): Category[] {
+function parseCategories(val?: string | string[], flagName = '--only'): Category[] {
   const raw = parseList(val);
   const bad = raw.filter((c) => !ALLOWED_CATEGORIES.includes(c as Category));
   if (bad.length) {
-    console.error(
-      chalk.red(
-        `❌ Error: invalid ${flagName} value(s): ${bad.join(', ')}. Allowed: ${ALLOWED_CATEGORIES.join(', ')}`,
-      ),
-    );
-    process.exit(1);
+    printInvalidCategory(flagName, bad, ALLOWED_CATEGORIES);
   }
   return raw as Category[];
+}
+
+/**
+ * Parses regex patterns safely, exiting on invalid syntax.
+ */
+function parseRegexList(val?: string | string[]): RegExp[] {
+  const regexList: RegExp[] = [];
+  for (const pattern of parseList(val)) {
+    try {
+      regexList.push(new RegExp(pattern));
+    } catch {
+      printInvalidRegex(pattern);
+    }
+  }
+  return regexList;
+}
+
+/**
+ * Converts flag value to boolean.
+ */
+function toBool(value: unknown): boolean {
+  return value === true || value === 'true';
 }
 
 /**
@@ -46,52 +67,36 @@ function parseCategories(val?: string | string[], flagName = ''): Category[] {
  * @returns The normalized options.
  */
 export function normalizeOptions(raw: RawOptions): Options {
-  const checkValues = raw.checkValues ?? false;
-  const isCiMode = Boolean(raw.ci);
-  const isYesMode = Boolean(raw.yes);
-  const allowDuplicates = Boolean(raw.allowDuplicates);
-  const fix = Boolean(raw.fix);
-  const json = Boolean(raw.json);
-  const onlyParsed = parseCategories(raw.only, '--only');
-  const only = onlyParsed.length ? onlyParsed : [];
-  const noColor = Boolean(raw.noColor);
-  const compare = Boolean(raw.compare);
+  const checkValues = toBool(raw.checkValues);
+  const isCiMode = toBool(raw.ci);
+  const isYesMode = toBool(raw.yes);
+  const allowDuplicates = toBool(raw.allowDuplicates);
+  const fix = toBool(raw.fix);
+  const json = toBool(raw.json);
+  const noColor = toBool(raw.noColor);
+  const compare = toBool(raw.compare);
+  const strict = toBool(raw.strict);
   const scanUsage = raw.scanUsage ?? !compare;
+
+  const showUnused = raw.showUnused !== false;
+  const showStats = raw.showStats !== false;
+  const secrets = raw.secrets !== false;
+
+  const only = parseCategories(raw.only);
+  const ignore = parseList(raw.ignore);
+  const ignoreRegex = parseRegexList(raw.ignoreRegex);
   const includeFiles = parseList(raw.includeFiles);
   const excludeFiles = parseList(raw.excludeFiles);
-  const showUnused = raw.showUnused === false ? false : true;
-  const showStats = raw.showStats === false ? false : true;
   const files = parseList(raw.files);
-  const secrets = raw.secrets === false ? false : true;
-  const strict = Boolean(raw.strict);
-
-  const ignore = parseList(raw.ignore);
-  const ignoreRegex: RegExp[] = [];
-  for (const pattern of parseList(raw.ignoreRegex)) {
-    try {
-      ignoreRegex.push(new RegExp(pattern));
-    } catch {
-      console.error(
-        chalk.red(`❌ Error: invalid --ignore-regex pattern: ${pattern}`),
-      );
-      process.exit(1);
-    }
-  }
-
-  if (isCiMode && isYesMode) {
-    console.log(
-      chalk.yellow('⚠️  Both --ci and --yes provided; proceeding with --yes.'),
-    );
-  }
 
   const cwd = process.cwd();
-
-  const envFlag =
-    typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : undefined;
+  const envFlag = typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : undefined;
   const exampleFlag =
-    typeof raw.example === 'string'
-      ? path.resolve(cwd, raw.example)
-      : undefined;
+    typeof raw.example === 'string' ? path.resolve(cwd, raw.example) : undefined;
+
+  if (isCiMode && isYesMode) {
+    printCiYesWarning();
+  }
 
   return {
     checkValues,
