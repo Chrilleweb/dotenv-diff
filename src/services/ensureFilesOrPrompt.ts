@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 import { confirmYesNo } from '../ui/prompts.js';
 import { warnIfEnvNotIgnored } from './git.js';
+import { printPrompt } from '../ui/compare/printPrompt.js';
 
 /**
  * Ensures that the necessary .env files exist or prompts the user to create them.
@@ -26,6 +26,7 @@ export async function ensureFilesOrPrompt(args: {
     isYesMode,
     isCiMode,
   } = args;
+
   const envPath = path.resolve(cwd, primaryEnv);
   const examplePath = path.resolve(cwd, primaryExample);
   const envExists = fs.existsSync(envPath);
@@ -35,11 +36,7 @@ export async function ensureFilesOrPrompt(args: {
   if (!envExists && !exampleExists) {
     const hasAnyEnv = fs.readdirSync(cwd).some((f) => f.startsWith('.env'));
     if (!hasAnyEnv) {
-      console.log(
-        chalk.yellow(
-          '⚠️  No .env* or .env.example file found. Skipping comparison.',
-        ),
-      );
+      printPrompt.noEnvFound();
       return { didCreate: false, shouldExit: true, exitCode: 0 };
     }
   }
@@ -47,48 +44,45 @@ export async function ensureFilesOrPrompt(args: {
   // Case 2: missing .env but has .env.example
   if (!envExists && exampleExists) {
     if (!alreadyWarnedMissingEnv) {
-      console.log();
-      console.log(chalk.yellow(`📄 ${path.basename(envPath)} file not found.`));
+      printPrompt.missingEnv(envPath);
     }
-    let createEnv = isYesMode
+
+    const createEnv = isYesMode
       ? true
       : isCiMode
-        ? false
-        : await confirmYesNo(
-            `❓ Do you want to create a new ${path.basename(envPath)} file from ${path.basename(examplePath)}?`,
-            { isCiMode, isYesMode },
-          );
+      ? false
+      : await confirmYesNo(
+          `❓ Do you want to create a new ${path.basename(envPath)} file from ${path.basename(examplePath)}?`,
+          { isCiMode, isYesMode },
+        );
 
     if (!createEnv) {
-      console.log(chalk.gray('🚫 Skipping .env creation.'));
+      printPrompt.skipCreation('.env');
       return { didCreate: false, shouldExit: true, exitCode: 0 };
     }
+
     const exampleContent = fs.readFileSync(examplePath, 'utf-8');
     fs.writeFileSync(envPath, exampleContent);
-    console.log(
-      chalk.green(
-        `✅ ${path.basename(envPath)} file created successfully from ${path.basename(examplePath)}.`,
-      ),
-    );
+    printPrompt.envCreated(envPath, examplePath);
+
     warnIfEnvNotIgnored({ envFile: path.basename(envPath) });
   }
 
   // Case 3: has .env but is missing .env.example
   if (envExists && !exampleExists) {
-    console.log(
-      chalk.yellow(`📄 ${path.basename(examplePath)} file not found.`),
-    );
-    let createExample = isYesMode
+    printPrompt.missingEnv(examplePath);
+
+    const createExample = isYesMode
       ? true
       : isCiMode
-        ? false
-        : await confirmYesNo(
-            `❓ Do you want to create a new ${path.basename(examplePath)} file from ${path.basename(envPath)}?`,
-            { isCiMode, isYesMode },
-          );
+      ? false
+      : await confirmYesNo(
+          `❓ Do you want to create a new ${path.basename(examplePath)} file from ${path.basename(envPath)}?`,
+          { isCiMode, isYesMode },
+        );
 
     if (!createExample) {
-      console.log(chalk.gray('🚫 Skipping .env.example creation.'));
+      printPrompt.skipCreation('.env.example');
       return { didCreate: false, shouldExit: true, exitCode: 0 };
     }
 
@@ -104,11 +98,7 @@ export async function ensureFilesOrPrompt(args: {
       .join('\n');
 
     fs.writeFileSync(examplePath, envContent);
-    console.log(
-      chalk.green(
-        `✅ ${path.basename(examplePath)} file created successfully from ${path.basename(envPath)}.`,
-      ),
-    );
+    printPrompt.exampleCreated(examplePath, envPath);
   }
 
   return { didCreate: true, shouldExit: false, exitCode: 0 };
