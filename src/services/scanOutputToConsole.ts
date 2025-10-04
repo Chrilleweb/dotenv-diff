@@ -151,19 +151,17 @@ export function outputToConsole(
   }
 
   // Filtered results for fix tips
-  const filtered: Filtered = {
+  printFixTips(
+  {
     missing: scanResult.missing,
     duplicatesEnv: scanResult.duplicates?.env ?? [],
     duplicatesEx: scanResult.duplicates?.example ?? [],
     gitignoreIssue: hasGitignoreIssue ? { reason: 'not-ignored' } : null,
-  };
-
-  printFixTips(
-    filtered,
-    hasGitignoreIssue,
-    isJson,
-    opts.fix ?? false,
-  );
+  },
+  hasGitignoreIssue,
+  isJson,
+  opts.fix ?? false,
+);
 
   return { exitWithError };
 }
