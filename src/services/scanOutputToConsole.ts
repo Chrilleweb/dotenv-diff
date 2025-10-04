@@ -1,11 +1,19 @@
-import chalk from 'chalk';
-import { warnIfEnvNotIgnored, isEnvIgnoredByGit } from './git.js';
-import type {
-  ScanUsageOptions,
-  ScanResult,
-  EnvUsage,
-  VariableUsages,
-} from '../config/types.js';
+import path from 'path';
+import { checkGitignoreStatus } from './git.js';
+import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
+import type { ScanUsageOptions, ScanResult } from '../config/types.js';
+import { printHeader } from '../ui/scan/printHeader.js';
+import { printStats } from '../ui/scan/printStats.js';
+import { printUniqueVariables } from '../ui/scan/printUniqueVariables.js';
+import { printVariables } from '../ui/scan/printVariables.js';
+import { printMissing } from '../ui/scan/printMissing.js';
+import { printUnused } from '../ui/scan/printUnused.js';
+import { printDuplicates } from '../ui/shared/printDuplicates.js';
+import { printSecrets } from '../ui/scan/printSecrets.js';
+import { printSuccess } from '../ui/shared/printSuccess.js';
+import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
+import { printFixTips } from '../ui/shared/printFixTips.js';
+import { printAutoFix } from '../ui/compare/printAutoFix.js';
 
 /**
  * Outputs the scan results to the console.
@@ -18,255 +26,141 @@ export function outputToConsole(
   scanResult: ScanResult,
   opts: ScanUsageOptions,
   comparedAgainst: string,
+  fixContext?: {
+    fixApplied: boolean;
+    removedDuplicates: string[];
+    addedEnv: string[];
+    gitignoreUpdated: boolean;
+  },
 ): { exitWithError: boolean } {
   let exitWithError = false;
 
-  // Show what we're comparing against
-  if (comparedAgainst) {
-    console.log(
-      chalk.magenta(`📋 Comparing codebase usage against: ${comparedAgainst}`),
-    );
-    console.log();
-  }
+  // Determine if output should be in JSON format
+  const isJson = opts.json ?? false;
+
+  printHeader(comparedAgainst);
 
   // Show stats if requested
-  if (opts.showStats) {
-    console.log(chalk.magenta('📊 Scan Statistics:'));
-    console.log(
-      chalk.magenta.dim(`   Files scanned: ${scanResult.stats.filesScanned}`),
-    );
-    console.log(
-      chalk.magenta.dim(
-        `   Total usages found: ${scanResult.stats.totalUsages}`,
-      ),
-    );
-    console.log(
-      chalk.magenta.dim(
-        `   Unique variables: ${scanResult.stats.uniqueVariables}`,
-      ),
-    );
-    console.log();
-  }
+  printStats(scanResult.stats, isJson, opts.showStats ?? true);
 
-  // Always show found variables when not comparing or when no missing variables
+  // Show used variables if any found
   if (scanResult.stats.uniqueVariables > 0) {
-    console.log(
-      chalk.blue(
-        `🌐 Found ${scanResult.stats.uniqueVariables} unique environment variables in use`,
-      ),
+    // Show unique variables found
+    printUniqueVariables(scanResult.stats.uniqueVariables);
+    // Print used variables with locations
+    printVariables(
+      scanResult.used,
+      opts.showStats ?? false,
+      isJson,
     );
-    console.log();
-
-    // List all variables found (if any)
-    if (scanResult.stats.uniqueVariables > 0) {
-      // Group by variable to get unique list
-      const variableUsages = scanResult.used.reduce(
-        (acc: VariableUsages, usage: EnvUsage) => {
-          if (!acc[usage.variable]) {
-            acc[usage.variable] = [];
-          }
-          acc[usage.variable]!.push(usage);
-          return acc;
-        },
-        {},
-      );
-
-      // Display each unique variable
-      for (const [variable, usages] of Object.entries(variableUsages)) {
-        console.log(chalk.blue(`   ${variable}`));
-
-        // Show usage details if stats are enabled
-        if (opts.showStats) {
-          const displayUsages = usages.slice(0, 2);
-          displayUsages.forEach((usage: EnvUsage) => {
-            console.log(
-              chalk.blue.dim(
-                `     Used in: ${usage.file}:${usage.line} (${usage.pattern})`,
-              ),
-            );
-          });
-
-          if (usages.length > 2) {
-            console.log(
-              chalk.gray(`     ... and ${usages.length - 2} more locations`),
-            );
-          }
-        }
-      }
-      console.log();
-    }
   }
 
   // Missing variables (used in code but not in env file)
-  if (scanResult.missing.length > 0) {
-    exitWithError = true;
-    const fileType = comparedAgainst || 'environment file';
-    console.log(chalk.red(`❌ Missing in ${fileType}:`));
-
-    const grouped = scanResult.missing.reduce(
-      (acc: VariableUsages, variable: string) => {
-        const usages = scanResult.used.filter(
-          (u: EnvUsage) => u.variable === variable,
-        );
-        acc[variable] = usages;
-        return acc;
-      },
-      {},
-    );
-
-    for (const [variable, usages] of Object.entries(grouped)) {
-      console.log(chalk.red(`   - ${variable}`));
-
-      // Show first few usages
-      const maxShow = 3;
-      usages.slice(0, maxShow).forEach((usage: EnvUsage) => {
-        console.log(
-          chalk.red.dim(
-            `     Used in: ${usage.file}:${usage.line} (${usage.pattern})`,
-          ),
-        );
-      });
-
-      if (usages.length > maxShow) {
-        console.log(
-          chalk.gray(`     ... and ${usages.length - maxShow} more locations`),
-        );
-      }
-    }
-    console.log();
-
-    // CI mode specific message
-    if (opts.isCiMode) {
-      console.log(
-        chalk.red(
-          `💥 Found ${scanResult.missing.length} missing environment variable(s).`,
-        ),
-      );
-      console.log(
-        chalk.red(
-          `   Add these variables to ${comparedAgainst || 'your environment file'} to fix this error.`,
-        ),
-      );
-      console.log();
-    }
-  }
-
-  // Unused variables (in env file but not used in code)
-  if (opts.showUnused && scanResult.unused.length > 0) {
-    const fileType = comparedAgainst || 'environment file';
-    console.log(
-      chalk.yellow(`⚠️  Unused in codebase (defined in ${fileType}):`),
-    );
-    scanResult.unused.forEach((variable: string) => {
-      console.log(chalk.yellow(`   - ${variable}`));
-    });
-    console.log();
-  }
-
-  // Show duplicates if found - NOW AFTER UNUSED VARIABLES
-  if (scanResult.duplicates?.env && scanResult.duplicates.env.length > 0) {
-    console.log(
-      chalk.yellow(
-        `⚠️  Duplicate keys in ${comparedAgainst} (last occurrence wins):`,
-      ),
-    );
-    scanResult.duplicates.env.forEach(({ key, count }) =>
-      console.log(chalk.yellow(`   - ${key} (${count} occurrences)`)),
-    );
-    console.log();
-  }
-
   if (
-    scanResult.duplicates?.example &&
-    scanResult.duplicates.example.length > 0
+    printMissing(
+      scanResult.missing,
+      scanResult.used,
+      comparedAgainst,
+      opts.isCiMode ?? false,
+      isJson,
+    )
   ) {
-    console.log(
-      chalk.yellow(
-        '⚠️  Duplicate keys in example file (last occurrence wins):',
-      ),
-    );
-    scanResult.duplicates.example.forEach(({ key, count }) =>
-      console.log(chalk.yellow(`   - ${key} (${count} occurrences)`)),
-    );
-    console.log();
+    exitWithError = true;
   }
 
-  if (scanResult.secrets && scanResult.secrets.length > 0) {
-    console.log(chalk.yellow('🔒 Potential secrets detected in codebase:'));
-    const byFile = new Map<string, typeof scanResult.secrets>();
-    for (const f of scanResult.secrets) {
-      if (!byFile.has(f.file)) byFile.set(f.file, []);
-      byFile.get(f.file)!.push(f);
-    }
-    for (const [file, findings] of byFile) {
-      console.log(chalk.bold(`  ${file}`));
-      for (const f of findings) {
-        console.log(
-          chalk.yellow(
-            `   - Line ${f.line}: ${f.message}\n     ${chalk.dim(f.snippet)}`,
-          ),
-        );
-      }
-    }
-    console.log();
-  }
+  // Unused
+  printUnused(
+    scanResult.unused,
+    comparedAgainst,
+    opts.showUnused ?? false,
+    isJson,
+  );
+
+  // Duplicates
+  printDuplicates(
+    comparedAgainst || '.env',
+    'example file',
+    scanResult.duplicates?.env ?? [],
+    scanResult.duplicates?.example ?? [],
+    isJson,
+  );
+
+  // Print potential secrets found
+  printSecrets(scanResult.secrets ?? [], isJson);
 
   // Success message for env file comparison
   if (
     comparedAgainst &&
     scanResult.missing.length === 0 &&
-    scanResult.secrets.length > 0 &&
+    (scanResult.secrets?.length ?? 0) === 0 &&
     scanResult.used.length > 0
   ) {
-    console.log(
-      chalk.green(
-        `✅ All used environment variables are defined in ${comparedAgainst}`,
-      ),
+    printSuccess(
+      isJson,
+      'scan',
+      comparedAgainst,
+      scanResult.unused,
+      opts.showUnused ?? true,
     );
-
-    if (opts.showUnused && scanResult.unused.length === 0) {
-      console.log(chalk.green('✅ No unused environment variables found'));
-    }
-    console.log();
   }
 
-  let envNotIgnored = false;
-  if (!opts.json) {
-    warnIfEnvNotIgnored({ cwd: opts.cwd, envFile: '.env' });
+  // Gitignore check
+  const gitignoreIssue = checkGitignoreStatus({
+    cwd: opts.cwd,
+    envFile: '.env',
+  });
 
-    const ignored = isEnvIgnoredByGit({ cwd: opts.cwd, envFile: '.env' });
-    if (ignored === false || ignored === null) {
-      envNotIgnored = true;
-    }
+  if (gitignoreIssue && !opts.json) {
+    printGitignoreWarning({
+      envFile: '.env',
+      reason: gitignoreIssue.reason,
+    });
   }
+
+  const hasGitignoreIssue = gitignoreIssue !== null;
 
   if (opts.strict) {
-    const hasWarnings =
-      scanResult.unused.length > 0 ||
-      (scanResult.duplicates?.env?.length ?? 0) > 0 ||
-      (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-      (scanResult.secrets?.length ?? 0) > 0 ||
-      envNotIgnored;
+    const exit = printStrictModeError(
+      {
+        unused: scanResult.unused.length,
+        duplicatesEnv: scanResult.duplicates?.env?.length ?? 0,
+        duplicatesEx: scanResult.duplicates?.example?.length ?? 0,
+        secrets: scanResult.secrets?.length ?? 0,
+        hasGitignoreIssue,
+      },
+      isJson,
+    );
 
-    if (hasWarnings) {
-      exitWithError = true;
-
-      const warnings: string[] = [];
-      if (scanResult.unused.length > 0) warnings.push('unused variables');
-      if ((scanResult.duplicates?.env?.length ?? 0) > 0)
-        warnings.push('duplicate keys in env');
-      if ((scanResult.duplicates?.example?.length ?? 0) > 0)
-        warnings.push('duplicate keys in example');
-      if ((scanResult.secrets?.length ?? 0) > 0)
-        warnings.push('potential secrets');
-      if (envNotIgnored) warnings.push('.env not ignored by git');
-
-      console.log(
-        chalk.red(`💥 Strict mode: Error on warnings → ${warnings.join(', ')}`),
-      );
-      console.log();
-    }
+    if (exit) exitWithError = true;
   }
+
+  if (opts.fix && fixContext) {
+    printAutoFix(
+      fixContext.fixApplied,
+      {
+        removedDuplicates: fixContext.removedDuplicates,
+        addedEnv: fixContext.addedEnv,
+        addedExample: opts.examplePath ? fixContext.addedEnv : [],
+      },
+      comparedAgainst || '.env',
+      opts.examplePath ? path.basename(opts.examplePath) : 'example file',
+      isJson,
+      fixContext.gitignoreUpdated,
+    );
+  }
+
+  // Filtered results for fix tips
+  printFixTips(
+  {
+    missing: scanResult.missing,
+    duplicatesEnv: scanResult.duplicates?.env ?? [],
+    duplicatesEx: scanResult.duplicates?.example ?? [],
+    gitignoreIssue: hasGitignoreIssue ? { reason: 'not-ignored' } : null,
+  },
+  hasGitignoreIssue,
+  isJson,
+  opts.fix ?? false,
+);
 
   return { exitWithError };
 }

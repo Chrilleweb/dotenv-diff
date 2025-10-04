@@ -43,6 +43,7 @@ const HARMLESS_URLS = [
 
 /**
  * Checks if a line has an ignore comment
+ * fx: // dotenv-diff-ignore or /* dotenv-diff-ignore
  * @param line - The line to check
  * @returns True if the line should be ignored
  */

@@ -1,17 +1,50 @@
-import chalk from 'chalk';
-import fs from 'fs';
-import path from 'path';
-import { parseEnvFile } from '../core/parseEnv.js';
 import { scanCodebase } from '../services/codeBaseScanner.js';
-import type { ScanUsageOptions, EnvUsage } from '../config/types.js';
-import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
-import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
+import type {
+  ScanUsageOptions,
+  EnvUsage,
+  ScanResult,
+} from '../config/types.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
 import { outputToConsole } from '../services/scanOutputToConsole.js';
 import { createJsonOutput } from '../core/scanJsonOutput.js';
-import { findDuplicateKeys } from '../services/duplicates.js';
-import { compareWithEnvFiles } from '../core/compareScan.js';
-import { applyFixes } from '../core/fixEnv.js';
+import { printMissingExample } from '../ui/scan/printMissingExample.js';
+import { processComparisonFile } from '../core/processComparisonFile.js';
+import { printComparisonError } from '../ui/scan/printComparisonError.js';
+
+/**
+ * Filters out commented usages from the list.
+ * Skipping comments:
+ *   // process.env.API_URL
+ *   # process.env.API_URL
+ *   /* process.env.API_URL
+ *   * process.env.API_URL
+ * @param usages - List of environment variable usages
+ * @returns Filtered list of environment variable usages
+ */
+function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
+  return usages.filter(
+    (u) => u.context && !/^\s*(\/\/|#|\/\*|\*)/.test(u.context.trim()),
+  );
+}
+
+/**
+ * Recalculates statistics for a scan result after filtering usages.
+ * @param scanResult The current scan result
+ * @returns Updated scanResult with recalculated stats
+ */
+function calculateStats(scanResult: ScanResult): ScanResult {
+  const uniqueVariables = new Set(
+    scanResult.used.map((u: EnvUsage) => u.variable),
+  ).size;
+
+  scanResult.stats = {
+    filesScanned: scanResult.stats.filesScanned,
+    totalUsages: scanResult.used.length,
+    uniqueVariables,
+  };
+
+  return scanResult;
+}
 
 /**
  * Scans codebase for environment variable usage and compares with .env file
@@ -28,45 +61,18 @@ import { applyFixes } from '../core/fixEnv.js';
 export async function scanUsage(
   opts: ScanUsageOptions,
 ): Promise<{ exitWithError: boolean }> {
-  if (!opts.json) {
-    console.log();
-    console.log(
-      chalk.blue('🔍 Scanning codebase for environment variable usage...'),
-    );
-    console.log();
-  }
-
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
-  scanResult.used = scanResult.used.filter(
-    (u: EnvUsage) => u.context && !/^\s*(\/\/|#)/.test(u.context.trim()),
-  );
+  // Filter out commented usages
+  scanResult.used = skipCommentedUsages(scanResult.used);
 
-  // Recalculate stats after filtering out commented usages
-  const uniqueVariables = new Set(scanResult.used.map((u) => u.variable)).size;
-  scanResult.stats = {
-    filesScanned: scanResult.stats.filesScanned, // Keep original files scanned count
-    totalUsages: scanResult.used.length,
-    uniqueVariables: uniqueVariables,
-  };
+  // Recalculate stats after filtering
+  calculateStats(scanResult);
 
-  // If user explicitly passed --example but the file doesn't exist:
-  if (opts.examplePath) {
-    const exampleAbs = resolveFromCwd(opts.cwd, opts.examplePath);
-    const missing = !fs.existsSync(exampleAbs);
-
-    if (missing) {
-      const msg = `❌ Missing specified example file: ${opts.examplePath}`;
-      if (opts.isCiMode) {
-        // IMPORTANT: stdout (console.log), not stderr, to satisfy the test
-        console.log(chalk.red(msg));
-        return { exitWithError: true };
-      } else if (!opts.json) {
-        console.log(chalk.yellow(msg.replace('❌', '⚠️')));
-      }
-      // Non-CI: continue without comparison
-    }
+  // If user explicitly passed --example flag, but the file doesn't exist:
+  if (printMissingExample(opts)) {
+    return { exitWithError: true };
   }
 
   // Determine which file to compare against
@@ -81,135 +87,35 @@ export async function scanUsage(
   let fixApplied = false;
   let fixedKeys: string[] = [];
   let removedDuplicates: string[] = [];
+  let gitignoreUpdated = false;
 
+  // If comparing against a file, process it
+  // fx: if the scan is comparing against .env.example, it will check for missing keys there
   if (compareFile) {
-    try {
-      const envFull = parseEnvFile(compareFile.path);
-      const envKeys = filterIgnoredKeys(
-        Object.keys(envFull),
-        opts.ignore,
-        opts.ignoreRegex,
+    const result = processComparisonFile(scanResult, compareFile, opts);
+
+    if (result.error) {
+      const { exit } = printComparisonError(
+        result.error.message,
+        result.error.shouldExit,
+        opts.json ?? false,
       );
-      envVariables = Object.fromEntries(envKeys.map((k) => [k, envFull[k]]));
-      scanResult = compareWithEnvFiles(scanResult, envVariables);
-      comparedAgainst = compareFile.name;
-
-      // Check for duplicates in the env file
-      if (!opts.allowDuplicates) {
-        dupsEnv = findDuplicateKeys(compareFile.path).filter(
-          ({ key }) =>
-            !opts.ignore.includes(key) &&
-            !opts.ignoreRegex.some((rx) => rx.test(key)),
-        );
-
-        // Also check for duplicates in example file if it exists AND is different from compareFile
-        if (opts.examplePath) {
-          const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
-          // Only check example file if it exists and is NOT the same as the comparison file
-          if (fs.existsSync(examplePath) && examplePath !== compareFile.path) {
-            dupsExample = findDuplicateKeys(examplePath).filter(
-              ({ key }) =>
-                !opts.ignore.includes(key) &&
-                !opts.ignoreRegex.some((rx) => rx.test(key)),
-            );
-          }
-        }
-
-        duplicatesFound = dupsEnv.length > 0 || dupsExample.length > 0;
-
-        // Apply duplicate fixes if --fix is enabled (but don't show message yet)
-        if (opts.fix && (dupsEnv.length > 0 || dupsExample.length > 0)) {
-          const { changed, result } = applyFixes({
-            envPath: compareFile.path,
-            examplePath: opts.examplePath
-              ? resolveFromCwd(opts.cwd, opts.examplePath)
-              : '',
-            missingKeys: [],
-            duplicateKeys: dupsEnv.map((d) => d.key),
-          });
-
-          if (changed) {
-            fixApplied = true;
-            removedDuplicates = result.removedDuplicates;
-            // Clear duplicates after fix
-            duplicatesFound = false;
-            dupsEnv = [];
-            dupsExample = [];
-          }
-        }
-
-        // Add to scan result for both JSON and console output (only if not fixed)
-        if (
-          (dupsEnv.length > 0 || dupsExample.length > 0) &&
-          (!opts.fix || !fixApplied)
-        ) {
-          if (!scanResult.duplicates) scanResult.duplicates = {};
-          if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
-          if (dupsExample.length > 0)
-            scanResult.duplicates.example = dupsExample;
-        }
-      }
-    } catch (error) {
-      const errorMessage = `⚠️  Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
-
-      if (opts.isCiMode) {
-        // In CI mode, exit with error if file doesn't exist
-        console.log(chalk.red(`❌ ${errorMessage}`));
-        return { exitWithError: true };
-      }
-
-      if (!opts.json) {
-        console.log(chalk.yellow(errorMessage));
-      }
+      if (exit) return { exitWithError: true };
+    } else {
+      scanResult = result.scanResult;
+      envVariables = result.envVariables;
+      comparedAgainst = result.comparedAgainst;
+      duplicatesFound = result.duplicatesFound;
+      dupsEnv = result.dupsEnv;
+      dupsExample = result.dupsExample;
+      fixApplied = result.fixApplied;
+      removedDuplicates = result.removedDuplicates;
+      fixedKeys = result.addedEnv;
+      gitignoreUpdated = result.gitignoreUpdated;
     }
   }
 
-  // Apply missing keys fix if --fix is enabled (but don't show message yet)
-  if (opts.fix && compareFile) {
-    const missingKeys = scanResult.missing;
-
-    if (missingKeys.length > 0) {
-      const envFilePath = compareFile.path;
-      const exampleFilePath = opts.examplePath
-        ? resolveFromCwd(opts.cwd, opts.examplePath)
-        : null;
-
-      // Append missing keys to .env
-      const content = fs.readFileSync(envFilePath, 'utf-8');
-      const newContent =
-        content +
-        (content.endsWith('\n') ? '' : '\n') +
-        missingKeys.map((k) => `${k}=`).join('\n') +
-        '\n';
-      fs.writeFileSync(envFilePath, newContent);
-
-      // Append to .env.example if it exists
-      if (exampleFilePath && fs.existsSync(exampleFilePath)) {
-        const exContent = fs.readFileSync(exampleFilePath, 'utf-8');
-        const existingExKeys = new Set(
-          exContent
-            .split('\n')
-            .map((l) => l.trim().split('=')[0])
-            .filter(Boolean),
-        );
-        const newKeys = missingKeys.filter((k) => !existingExKeys.has(k));
-        if (newKeys.length) {
-          const newExContent =
-            exContent +
-            (exContent.endsWith('\n') ? '' : '\n') +
-            newKeys.join('\n') +
-            '\n';
-          fs.writeFileSync(exampleFilePath, newExContent);
-        }
-      }
-
-      fixApplied = true;
-      fixedKeys = missingKeys;
-      scanResult.missing = [];
-    }
-  }
-
-  // Prepare JSON output
+  // JSON output
   if (opts.json) {
     const jsonOutput = createJsonOutput(
       scanResult,
@@ -233,64 +139,12 @@ export async function scanUsage(
   }
 
   // Console output
-  const result = outputToConsole(scanResult, opts, comparedAgainst);
-
-  // Show consolidated fix message at the bottom (after all other output)
-  if (opts.fix && !opts.json) {
-    if (fixApplied) {
-      console.log(chalk.green('✅ Auto-fix applied:'));
-
-      // Show removed duplicates
-      if (removedDuplicates.length > 0) {
-        console.log(
-          chalk.green(
-            `   - Removed ${removedDuplicates.length} duplicate keys from ${comparedAgainst}: ${removedDuplicates.join(', ')}`,
-          ),
-        );
-      }
-
-      // Show added missing keys
-      if (fixedKeys.length > 0) {
-        console.log(
-          chalk.green(
-            `   - Added ${fixedKeys.length} missing keys to ${comparedAgainst}: ${fixedKeys.join(', ')}`,
-          ),
-        );
-
-        if (opts.examplePath) {
-          console.log(
-            chalk.green(
-              `   - Synced ${fixedKeys.length} keys to ${path.basename(opts.examplePath)}`,
-            ),
-          );
-        }
-      }
-
-      console.log();
-    } else {
-      console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));
-      console.log();
-    }
-  }
-
-  if (!opts.json && !opts.fix) {
-    if (scanResult.missing.length > 0 && duplicatesFound) {
-      console.log(
-        chalk.gray(
-          '💡 Tip: Run with `--fix` to add missing keys and remove duplicates',
-        ),
-      );
-      console.log();
-    } else if (scanResult.missing.length > 0) {
-      console.log(chalk.gray('💡 Tip: Run with `--fix` to add missing keys'));
-      console.log();
-    } else if (duplicatesFound) {
-      console.log(
-        chalk.gray('💡 Tip: Run with `--fix` to remove duplicate keys'),
-      );
-      console.log();
-    }
-  }
+  const result = outputToConsole(scanResult, opts, comparedAgainst, {
+    fixApplied,
+    removedDuplicates,
+    addedEnv: fixedKeys,
+    gitignoreUpdated,
+  });
 
   return { exitWithError: result.exitWithError || duplicatesFound };
 }

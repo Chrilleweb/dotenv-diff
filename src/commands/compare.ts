@@ -1,13 +1,111 @@
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 import { parseEnvFile } from '../core/parseEnv.js';
 import { diffEnv } from '../core/diffEnv.js';
-import { warnIfEnvNotIgnored } from '../services/git.js';
+import { checkGitignoreStatus } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
-import type { Category, CompareJsonEntry } from '../config/types.js';
+import type {
+  Category,
+  CompareJsonEntry,
+  ComparisonOptions,
+  FilePair,
+  ComparisonResult,
+  Filtered,
+} from '../config/types.js';
+import { isAllOk } from '../core/helpers/isAllOk.js';
+import { updateTotals } from '../core/helpers/updateTotals.js';
 import { applyFixes } from '../core/fixEnv.js';
+import { printFixTips } from '../ui/shared/printFixTips.js';
+import { printStats } from '../ui/compare/printStats.js';
+import { printDuplicates } from '../ui/shared/printDuplicates.js';
+import { printHeader } from '../ui/compare/printHeader.js';
+import { printAutoFix } from '../ui/compare/printAutoFix.js';
+import { printIssues } from '../ui/compare/printIssues.js';
+import { printSuccess } from '../ui/shared/printSuccess.js';
+import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
+
+/**
+ * Creates a category filter function based on options.
+ * fx: onlyFiltering({ only: ['missing', 'extra'] })
+ * @param opts Comparison options
+ * @returns A function that filters categories
+ */
+function createCategoryFilter(opts: ComparisonOptions) {
+  const onlySet: Set<Category> | undefined = opts.only?.length
+    ? new Set(opts.only)
+    : undefined;
+
+  return (category: Category) => !onlySet || onlySet.has(category);
+}
+
+/**
+ * Parses and filters the environment and example files.
+ * @param envPath The path to the .env file
+ * @param examplePath The path to the .env.example file
+ * @param opts Comparison options
+ * @returns An object containing the parsed and filtered environment variables
+ */
+function parseAndFilter(
+  envPath: string,
+  examplePath: string,
+  opts: ComparisonOptions,
+) {
+  const currentFull = parseEnvFile(envPath);
+  const exampleFull = parseEnvFile(examplePath);
+
+  const currentKeys = filterIgnoredKeys(
+    Object.keys(currentFull),
+    opts.ignore,
+    opts.ignoreRegex,
+  );
+  const exampleKeys = filterIgnoredKeys(
+    Object.keys(exampleFull),
+    opts.ignore,
+    opts.ignoreRegex,
+  );
+
+  return {
+    current: Object.fromEntries(
+      currentKeys.map((k) => [k, currentFull[k] ?? '']),
+    ),
+    example: Object.fromEntries(
+      exampleKeys.map((k) => [k, exampleFull[k] ?? '']),
+    ),
+    currentKeys,
+    exampleKeys,
+  };
+}
+
+/**
+ * Finds duplicate keys in the environment and example files.
+ * @param envPath The path to the .env file
+ * @param examplePath The path to the .env.example file
+ * @param opts Comparison options
+ * @param run A function that determines if a category should be included
+ * @returns An object containing arrays of duplicate keys for both files
+ */
+function findDuplicates(
+  envPath: string,
+  examplePath: string,
+  opts: ComparisonOptions,
+  run: (cat: Category) => boolean,
+) {
+  if (opts.allowDuplicates || !run('duplicate'))
+    return { dupsEnv: [], dupsEx: [] };
+
+  const filterKey = (key: string) =>
+    !opts.ignore.includes(key) && !opts.ignoreRegex.some((rx) => rx.test(key));
+
+  const dupsEnv = findDuplicateKeys(envPath).filter(({ key }) =>
+    filterKey(key),
+  );
+  const dupsEx = findDuplicateKeys(examplePath).filter(({ key }) =>
+    filterKey(key),
+  );
+
+  return { dupsEnv, dupsEx };
+}
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -16,28 +114,15 @@ import { applyFixes } from '../core/fixEnv.js';
  * @returns An object indicating the overall comparison results.
  */
 export async function compareMany(
-  pairs: Array<{ envName: string; envPath: string; examplePath: string }>,
-  opts: {
-    checkValues: boolean;
-    cwd: string;
-    allowDuplicates?: boolean;
-    fix?: boolean;
-    json?: boolean;
-    ignore: string[];
-    ignoreRegex: RegExp[];
-    collect?: (entry: CompareJsonEntry) => void;
-    only?: Category[];
-    showStats?: boolean;
-    strict?: boolean;
-  },
-) {
+  pairs: FilePair[],
+  opts: ComparisonOptions,
+): Promise<ComparisonResult> {
   let exitWithError = false;
 
-  const onlySet: Set<Category> | undefined = opts.only?.length
-    ? new Set(opts.only)
-    : undefined;
-  const run = (cat: Category) => !onlySet || onlySet.has(cat);
+  // For --only filtering
+  const run = createCategoryFilter(opts);
 
+  // Overall totals (for --show-stats summary)
   const totals: Record<Category, number> = {
     missing: 0,
     extra: 0,
@@ -51,84 +136,40 @@ export async function compareMany(
     const exampleName = path.basename(examplePath);
     const entry: CompareJsonEntry = { env: envName, example: exampleName };
 
-    if (!fs.existsSync(envPath) || !fs.existsSync(examplePath)) {
-      if (!opts.json) {
-        console.log();
-        console.log(chalk.blue(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
-        console.log(
-          chalk.yellow('⚠️  Skipping: missing matching example file.'),
-        );
-        console.log();
-      }
+    const skipping = !fs.existsSync(envPath) || !fs.existsSync(examplePath);
+
+    printHeader(envName, exampleName, opts.json ?? false, skipping);
+
+    if (skipping) {
+      exitWithError = true;
       entry.skipped = { reason: 'missing file' };
       opts.collect?.(entry);
       continue;
     }
 
-    if (!opts.json) {
-      console.log();
-      console.log(chalk.blue(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
-      console.log();
-    }
-
-    // Git ignore hint (only when not JSON)
-    let gitignoreUnsafe = false;
-    if (run('gitignore')) {
-      warnIfEnvNotIgnored({
-        cwd: opts.cwd,
-        envFile: envName,
-        log: (msg) => {
-          gitignoreUnsafe = true;
-          if (!opts.json) console.log(msg.replace(/^/gm, '  '));
-        },
-      });
-    }
-
-    // Duplicate detection (skip entirely if --only excludes it)
-    let dupsEnv: Array<{ key: string; count: number }> = [];
-    let dupsEx: Array<{ key: string; count: number }> = [];
-    if (!opts.allowDuplicates && run('duplicate')) {
-      dupsEnv = findDuplicateKeys(envPath).filter(
-        ({ key }) =>
-          !opts.ignore.includes(key) &&
-          !opts.ignoreRegex.some((rx) => rx.test(key)),
-      );
-      dupsEx = findDuplicateKeys(examplePath).filter(
-        ({ key }) =>
-          !opts.ignore.includes(key) &&
-          !opts.ignoreRegex.some((rx) => rx.test(key)),
-      );
-    }
-
-    // Diff + empty
-    const currentFull = parseEnvFile(envPath);
-    const exampleFull = parseEnvFile(examplePath);
-
-    const currentKeys = filterIgnoredKeys(
-      Object.keys(currentFull),
-      opts.ignore,
-      opts.ignoreRegex,
-    );
-    const exampleKeys = filterIgnoredKeys(
-      Object.keys(exampleFull),
-      opts.ignore,
-      opts.ignoreRegex,
+    // Parse and filter env files
+    const { current, example, currentKeys, exampleKeys } = parseAndFilter(
+      envPath,
+      examplePath,
+      opts,
     );
 
-    const current = Object.fromEntries(
-      currentKeys.map((k) => [k, currentFull[k] ?? '']),
-    );
-    const example = Object.fromEntries(
-      exampleKeys.map((k) => [k, exampleFull[k] ?? '']),
-    );
-
+    // Run checks
     const diff = diffEnv(current, example, opts.checkValues);
 
     const emptyKeys = Object.entries(current)
       .filter(([, v]) => (v ?? '').trim() === '')
       .map(([k]) => k);
 
-    const filtered = {
+    // Find duplicates
+    const { dupsEnv, dupsEx } = findDuplicates(envPath, examplePath, opts, run);
+
+    const gitignoreIssue = run('gitignore')
+      ? checkGitignoreStatus({ cwd: opts.cwd, envFile: envName })
+      : null;
+
+    // Collect filtered results
+    const filtered: Filtered = {
       missing: run('missing') ? diff.missing : [],
       extra: run('extra') ? diff.extra : [],
       empty: run('empty') ? emptyKeys : [],
@@ -136,10 +177,10 @@ export async function compareMany(
         run('mismatch') && opts.checkValues ? diff.valueMismatches : [],
       duplicatesEnv: run('duplicate') ? dupsEnv : [],
       duplicatesEx: run('duplicate') ? dupsEx : [],
-      gitignoreUnsafe: run('gitignore') ? gitignoreUnsafe : false,
+      gitignoreIssue,
     };
 
-    // --- Stats block for compare mode when --show-stats is active ---
+    // Print stats if requested
     if (opts.showStats && !opts.json) {
       const envCount = currentKeys.length;
       const exampleCount = exampleKeys.length;
@@ -147,220 +188,93 @@ export async function compareMany(
         currentKeys.filter((k) => exampleKeys.includes(k)),
       ).size;
 
-      // Duplicate "occurrences beyond the first", summed across both files
       const duplicateCount = [...dupsEnv, ...dupsEx].reduce(
         (acc, { count }) => acc + Math.max(0, count - 1),
         0,
       );
 
       const valueMismatchCount = opts.checkValues
-        ? filtered.mismatches.length
+        ? (filtered.mismatches?.length ?? 0)
         : 0;
 
-      console.log(chalk.magenta('📊 Compare Statistics:'));
-      console.log(chalk.magenta.dim(`   Keys in ${envName}: ${envCount}`));
-      console.log(
-        chalk.magenta.dim(`   Keys in ${exampleName}: ${exampleCount}`),
+      printStats(
+        envName,
+        exampleName,
+        {
+          envCount,
+          exampleCount,
+          sharedCount,
+          duplicateCount,
+          valueMismatchCount,
+        },
+        filtered,
+        opts.json ?? false,
+        opts.showStats ?? true,
       );
-      console.log(chalk.magenta.dim(`   Shared keys: ${sharedCount}`));
-      console.log(
-        chalk.magenta.dim(
-          `   Missing (in ${envName}): ${filtered.missing.length}`,
-        ),
-      );
-      console.log(
-        chalk.magenta.dim(
-          `   Extra (not in ${exampleName}): ${filtered.extra.length}`,
-        ),
-      );
-      console.log(
-        chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`),
-      );
-      console.log(chalk.magenta.dim(`   Duplicate keys: ${duplicateCount}`));
-      console.log(
-        chalk.magenta.dim(`   Value mismatches: ${valueMismatchCount}`),
-      );
-      console.log();
     }
 
-    const allOk =
-      filtered.missing.length === 0 &&
-      filtered.extra.length === 0 &&
-      filtered.empty.length === 0 &&
-      filtered.duplicatesEnv.length === 0 &&
-      filtered.duplicatesEx.length === 0 &&
-      filtered.mismatches.length === 0;
+    // Check if all is OK
+    const allOk = isAllOk(filtered);
 
     if (allOk) {
       entry.ok = true;
-      if (!opts.json) {
-        console.log(chalk.green('✅ All keys match.'));
-        console.log();
-      }
+      printSuccess(opts.json ?? false, 'compare');
       opts.collect?.(entry);
       continue;
     }
 
-    // --- move duplicate logging AFTER stats ---
-    if (dupsEnv.length || dupsEx.length) {
-      entry.duplicates = {};
-    }
-    if (dupsEnv.length) {
-      entry.duplicates!.env = dupsEnv;
-      if (!opts.json) {
-        console.log(
-          chalk.yellow(
-            `⚠️  Duplicate keys in ${envName} (last occurrence wins):`,
-          ),
-        );
-        dupsEnv.forEach(({ key, count }) =>
-          console.log(chalk.yellow(`    - ${key} (${count} occurrences)`)),
-        );
-        console.log();
-      }
-    }
-    if (dupsEx.length) {
-      entry.duplicates!.example = dupsEx;
-      if (!opts.json) {
-        console.log(
-          chalk.yellow(
-            `⚠️  Duplicate keys in ${exampleName} (last occurrence wins):`,
-          ),
-        );
-        dupsEx.forEach(({ key, count }) =>
-          console.log(chalk.yellow(`   - ${key} (${count} occurrences)`)),
-        );
-        console.log();
-      }
-    }
+    // Print duplicates
+    printDuplicates(envName, exampleName, dupsEnv, dupsEx, opts.json ?? false);
 
-    if (filtered.missing.length) {
-      entry.missing = filtered.missing;
-      exitWithError = true;
-      totals.missing += filtered.missing.length;
-    }
-    if (filtered.extra.length) {
-      entry.extra = filtered.extra;
-      exitWithError = true;
-      totals.extra += filtered.extra.length;
-    }
-    if (filtered.empty.length) {
-      entry.empty = filtered.empty;
-      exitWithError = true;
-      totals.empty += filtered.empty.length;
-    }
-    if (filtered.mismatches.length) {
-      entry.valueMismatches = filtered.mismatches;
-      totals.mismatch += filtered.mismatches.length;
-      exitWithError = true;
-    }
-    if (filtered.duplicatesEnv.length || filtered.duplicatesEx.length) {
-      totals.duplicate +=
-        filtered.duplicatesEnv.length + filtered.duplicatesEx.length;
-      exitWithError = true;
-    }
-    if (filtered.gitignoreUnsafe) {
-      totals.gitignore += 1;
+    // Track errors and update totals
+    const shouldExit = updateTotals(filtered, totals, entry);
+    if (shouldExit) {
       exitWithError = true;
     }
 
-    if (!opts.json) {
-      if (filtered.missing.length && !opts.fix) {
-        console.log(chalk.red('❌ Missing keys:'));
-        filtered.missing.forEach((key) => console.log(chalk.red(`  - ${key}`)));
-        console.log();
-      }
-      if (filtered.extra.length) {
-        console.log(chalk.yellow('⚠️  Extra keys (not in example):'));
-        filtered.extra.forEach((key) =>
-          console.log(chalk.yellow(`  - ${key}`)),
-        );
-        console.log();
-      }
-      if (filtered.empty.length) {
-        console.log(chalk.yellow('⚠️  Empty values:'));
-        filtered.empty.forEach((key) =>
-          console.log(chalk.yellow(`  - ${key}`)),
-        );
-        console.log();
-      }
-      if (filtered.mismatches.length) {
-        console.log(chalk.yellow('⚠️  Value mismatches:'));
-        filtered.mismatches.forEach(({ key, expected, actual }) =>
-          console.log(
-            chalk.yellow(
-              `  - ${key}: expected '${expected}', but got '${actual}'`,
-            ),
-          ),
-        );
-        console.log();
-      }
+    // Print all issues
+    printIssues(filtered, opts.json ?? false);
+
+    if (filtered.gitignoreIssue && !opts.json) {
+      printGitignoreWarning({
+        envFile: envName,
+        reason: filtered.gitignoreIssue.reason,
+      });
     }
 
-    if (!opts.json && !opts.fix) {
-      if (
-        filtered.missing.length ||
-        filtered.duplicatesEnv.length ||
-        filtered.duplicatesEx.length
-      ) {
-        console.log(
-          chalk.gray(
-            '💡 Tip: Run with `--fix` to automatically add missing keys and remove duplicates.',
-          ),
-        );
-        console.log();
-      }
-    }
+    const hasGitignoreIssue: boolean = filtered.gitignoreIssue !== null;
 
+    printFixTips(
+      filtered,
+      hasGitignoreIssue,
+      opts.json ?? false,
+      opts.fix ?? false,
+    );
+
+    // Apply auto-fix if requested
     if (opts.fix) {
       const { changed, result } = applyFixes({
         envPath,
         examplePath,
         missingKeys: filtered.missing,
         duplicateKeys: dupsEnv.map((d) => d.key),
+        ensureGitignore: hasGitignoreIssue,
       });
 
-      if (!opts.json) {
-        if (changed) {
-          console.log(chalk.green('✅ Auto-fix applied:'));
-          if (result.removedDuplicates.length) {
-            console.log(
-              chalk.green(
-                `  - Removed ${result.removedDuplicates.length} duplicate keys from ${envName}: ${result.removedDuplicates.join(', ')}`,
-              ),
-            );
-          }
-          if (result.addedEnv.length) {
-            console.log(
-              chalk.green(
-                `  - Added ${result.addedEnv.length} missing keys to ${envName}: ${result.addedEnv.join(', ')}`,
-              ),
-            );
-          }
-          if (result.addedExample.length) {
-            console.log(
-              chalk.green(
-                `  - Synced ${result.addedExample.length} keys to ${exampleName}: ${result.addedExample.join(', ')}`,
-              ),
-            );
-          }
-        } else {
-          console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));
-        }
-        console.log();
-      }
+      printAutoFix(
+        changed,
+        result,
+        envName,
+        exampleName,
+        opts.json ?? false,
+        hasGitignoreIssue,
+      );
     }
 
     opts.collect?.(entry);
-    const warningsExist =
-      filtered.extra.length > 0 ||
-      filtered.empty.length > 0 ||
-      filtered.duplicatesEnv.length > 0 ||
-      filtered.duplicatesEx.length > 0 ||
-      filtered.mismatches.length > 0 ||
-      filtered.gitignoreUnsafe;
 
-    if (opts.strict && warningsExist) {
+    // In strict mode, any issue (not just errors) causes exit with error
+    if (opts.strict && !allOk) {
       exitWithError = true;
     }
   }

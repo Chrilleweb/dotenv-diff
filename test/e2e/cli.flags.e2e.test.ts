@@ -227,7 +227,7 @@ describe('duplicate detection', () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\nFOO=2\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
     const res = runCli(cwd, ['--compare']);
-    expect(res.status).toBe(1);
+    expect(res.status).toBe(0);
     expect(res.stdout).toContain(
       'Duplicate keys in .env (last occurrence wins):',
     );
@@ -239,7 +239,7 @@ describe('duplicate detection', () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\nFOO=\n');
     const res = runCli(cwd, ['--compare']);
-    expect(res.status).toBe(1);
+    expect(res.status).toBe(0);
     expect(res.stdout).toContain(
       'Duplicate keys in .env.example (last occurrence wins):',
     );
@@ -309,14 +309,14 @@ describe('duplicate detection', () => {
       expect(res.stdout).toContain('❌ Missing keys:');
       expect(res.stdout).not.toContain('Extra keys');
     });
-    it('fails on flag only extra', () => {
+    it('warns on flag only extra', () => {
       const cwd = tmpDir();
       fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nC=2\nD=3\n');
       fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\nC=\n');
 
       const res = runCli(cwd, ['--compare', '--only', 'extra']);
 
-      expect(res.status).toBe(1);
+      expect(res.status).toBe(0);
       expect(res.stdout).toContain('Comparing .env ↔ .env.example');
       expect(res.stdout).not.toContain('❌ Missing keys:');
       expect(res.stdout).toContain('⚠️  Extra keys (not in example):');

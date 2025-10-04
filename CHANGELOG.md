@@ -12,6 +12,16 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.2.8] - 2025-09-30
+### Added
+- Fix .env is not ignored by git when using --fix flag.
+
+### Changed
+- No breaking changes.
+
+### Fixed
+- Refactored codebase for better maintainability.
+
 ## [2.2.7] - 2025-09-28
 ### Added
 - Added warning on .env not ignored by .gitignore on default.

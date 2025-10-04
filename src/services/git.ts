@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
+import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 
 export type GitignoreCheckOptions = {
   /** Project root directory (default: process.cwd()) */
@@ -86,26 +86,66 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
 
   const envPath = path.resolve(cwd, envFile);
   if (!fs.existsSync(envPath)) return; // No .env file → nothing to warn about
-
   if (!isGitRepo(cwd)) return; // Not a git repo → skip
 
   const gitignorePath = path.resolve(cwd, '.gitignore');
 
   if (!fs.existsSync(gitignorePath)) {
-    log(
-      chalk.yellow(
-        `⚠️  No .gitignore found – your ${envFile} may be committed.\n   Add:\n   ${envFile}\n   ${envFile}.*\n`,
-      ),
-    );
+    printGitignoreWarning({
+      envFile,
+      reason: 'no-gitignore',
+      log,
+    });
     return;
   }
 
   const ignored = isEnvIgnoredByGit({ cwd, envFile });
   if (ignored === false || ignored === null) {
-    log(
-      chalk.yellow(
-        `⚠️  ${envFile} is not ignored by Git (.gitignore).\n   Consider adding:\n   ${envFile}\n   ${envFile}.*\n`,
-      ),
-    );
+    printGitignoreWarning({
+      envFile,
+      reason: 'not-ignored',
+      log,
+    });
   }
+}
+
+
+/**
+ * Checks if .env file has gitignore issues.
+ * Returns null if no issue, otherwise returns the reason.
+ */
+export function checkGitignoreStatus(options: GitignoreCheckOptions = {}): {
+  reason: 'no-gitignore' | 'not-ignored';
+} | null {
+  const { cwd = process.cwd(), envFile = '.env' } = options;
+
+  const envPath = path.resolve(cwd, envFile);
+  if (!fs.existsSync(envPath)) return null;
+  if (!isGitRepo(cwd)) return null;
+
+  const gitignorePath = path.resolve(cwd, '.gitignore');
+
+  if (!fs.existsSync(gitignorePath)) {
+    return { reason: 'no-gitignore' };
+  }
+
+  const ignored = isEnvIgnoredByGit({ cwd, envFile });
+  if (ignored === false || ignored === null) {
+    return { reason: 'not-ignored' };
+  }
+
+  return null;
+}
+
+/** Find the git repository root starting from startDir (walk up until ".git"). */
+export function findGitRoot(startDir: string): string | null {
+  let dir = path.resolve(startDir);
+  while (true) {
+    const gitDir = path.join(dir, '.git');
+    if (fs.existsSync(gitDir)) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) break; // reached filesystem root
+    dir = parent;
+  }
+  return null;
 }
