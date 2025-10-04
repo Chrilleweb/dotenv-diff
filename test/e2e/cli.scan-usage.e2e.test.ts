@@ -563,4 +563,18 @@ describe('scan-usage error handling', () => {
       expect(envContent).toContain('DATABASE_URL=');
     });
   });
+  it('will tip --fix flag if missing .env in .gitignore', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=secret\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src/app.js'),
+      'const api = process.env.API_KEY;',
+    );
+
+    const res = runCli(cwd, ['--scan-usage']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Tip: Run with `--fix` to ensure .env is added to .gitignore');
+  });
 });

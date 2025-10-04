@@ -44,8 +44,6 @@ describe('added .env to gitignore with --compare and --fix', () => {
       );
   
       const res = runCli(cwd, ['--compare', '--fix']);
-      console.log('stdout:', res.stdout);
-      console.log('stderr:', res.stderr);
   
       expect(res.status).toBe(0);
       expect(res.stdout).toContain('Auto-fix applied:');
