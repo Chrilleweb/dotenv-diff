@@ -80,8 +80,6 @@ export async function scanUsage(
   let envVariables: Record<string, string | undefined> = {};
   let comparedAgainst = '';
   let duplicatesFound = false;
-  let dupsEnv: Array<{ key: string; count: number }> = [];
-  let dupsExample: Array<{ key: string; count: number }> = [];
 
   // Store fix information for consolidated display
   let fixApplied = false;
@@ -106,8 +104,6 @@ export async function scanUsage(
       envVariables = result.envVariables;
       comparedAgainst = result.comparedAgainst;
       duplicatesFound = result.duplicatesFound;
-      dupsEnv = result.dupsEnv;
-      dupsExample = result.dupsExample;
       fixApplied = result.fixApplied;
       removedDuplicates = result.removedDuplicates;
       fixedKeys = result.addedEnv;
