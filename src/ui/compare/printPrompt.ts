@@ -7,7 +7,9 @@ import path from 'path';
 export const printPrompt = {
   noEnvFound() {
     console.log(
-      chalk.yellow('⚠️  No .env* or .env.example file found. Skipping comparison.'),
+      chalk.yellow(
+        '⚠️  No .env* or .env.example file found. Skipping comparison.',
+      ),
     );
   },
 

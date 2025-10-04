@@ -109,7 +109,6 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
   }
 }
 
-
 /**
  * Checks if .env file has gitignore issues.
  * Returns null if no issue, otherwise returns the reason.

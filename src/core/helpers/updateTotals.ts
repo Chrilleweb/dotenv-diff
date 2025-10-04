@@ -8,7 +8,7 @@ export interface Totals {
   mismatch: number;
   duplicate: number;
   gitignore: number;
-};
+}
 
 /**
  * Update totals and entry fields based on filtered issues.

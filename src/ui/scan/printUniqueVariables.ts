@@ -11,9 +11,7 @@ export function printUniqueVariables(variables: number): void {
   }
 
   console.log(
-      chalk.blue(
-        `🌐 Found ${variables} unique environment variables in use`,
-      ),
-    );
-    console.log();
+    chalk.blue(`🌐 Found ${variables} unique environment variables in use`),
+  );
+  console.log();
 }

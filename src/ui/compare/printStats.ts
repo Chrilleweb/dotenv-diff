@@ -7,7 +7,7 @@ export interface CompareStats {
   sharedCount: number;
   duplicateCount: number; // sum of (count - 1)
   valueMismatchCount: number;
-};
+}
 
 /**
  * Print comparison statistics between two environment files.
@@ -17,7 +17,6 @@ export interface CompareStats {
  * @param filtered The filtered keys.
  * @param json Whether to output in JSON format.
  * @param showStats Whether to show statistics.
- * @returns 
  */
 export function printStats(
   envName: string,
@@ -45,9 +44,7 @@ export function printStats(
     );
   }
   if (filtered.empty?.length) {
-    console.log(
-      chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`),
-    );
+    console.log(chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`));
   }
   console.log(chalk.magenta.dim(`   Duplicate keys: ${s.duplicateCount}`));
   console.log(

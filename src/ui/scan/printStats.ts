@@ -1,4 +1,4 @@
-import chalk from "chalk";
+import chalk from 'chalk';
 
 export interface ScanStats {
   filesScanned: number;
@@ -15,12 +15,14 @@ export interface ScanStats {
 export function printStats(
   stats: ScanStats,
   json: boolean,
-  showStats: boolean
+  showStats: boolean,
 ) {
   if (json || !showStats) return;
-  console.log(chalk.magenta("📊 Scan Statistics:"));
+  console.log(chalk.magenta('📊 Scan Statistics:'));
   console.log(chalk.magenta.dim(`   Files scanned: ${stats.filesScanned}`));
   console.log(chalk.magenta.dim(`   Total usages found: ${stats.totalUsages}`));
-  console.log(chalk.magenta.dim(`   Unique variables: ${stats.uniqueVariables}`));
+  console.log(
+    chalk.magenta.dim(`   Unique variables: ${stats.uniqueVariables}`),
+  );
   console.log();
 }

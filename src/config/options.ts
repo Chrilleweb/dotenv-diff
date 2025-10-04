@@ -30,7 +30,10 @@ function parseList(val?: string | string[]): string[] {
  * @param flagName - The name of the flag being parsed (for error messages).
  * @returns An array of categories.
  */
-function parseCategories(val?: string | string[], flagName = '--only'): Category[] {
+function parseCategories(
+  val?: string | string[],
+  flagName = '--only',
+): Category[] {
   const raw = parseList(val);
   const bad = raw.filter((c) => !ALLOWED_CATEGORIES.includes(c as Category));
   if (bad.length) {
@@ -90,9 +93,12 @@ export function normalizeOptions(raw: RawOptions): Options {
   const files = parseList(raw.files);
 
   const cwd = process.cwd();
-  const envFlag = typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : undefined;
+  const envFlag =
+    typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : undefined;
   const exampleFlag =
-    typeof raw.example === 'string' ? path.resolve(cwd, raw.example) : undefined;
+    typeof raw.example === 'string'
+      ? path.resolve(cwd, raw.example)
+      : undefined;
 
   if (isCiMode && isYesMode) {
     printCiYesWarning();

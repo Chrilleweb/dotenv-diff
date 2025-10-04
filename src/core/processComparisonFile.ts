@@ -66,7 +66,10 @@ export function processComparisonFile(
     }
 
     // Apply fixes (both duplicates + missing keys + gitignore)
-    if (opts.fix && (duplicatesFound || scanResult.missing.length > 0 || true)) {
+    if (
+      opts.fix &&
+      (duplicatesFound || scanResult.missing.length > 0 || true)
+    ) {
       const { changed, result } = applyFixes({
         envPath: compareFile.path,
         examplePath: opts.examplePath

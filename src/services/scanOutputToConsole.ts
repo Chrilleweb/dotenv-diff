@@ -48,11 +48,7 @@ export function outputToConsole(
     // Show unique variables found
     printUniqueVariables(scanResult.stats.uniqueVariables);
     // Print used variables with locations
-    printVariables(
-      scanResult.used,
-      opts.showStats ?? false,
-      isJson,
-    );
+    printVariables(scanResult.used, opts.showStats ?? false, isJson);
   }
 
   // Missing variables (used in code but not in env file)
@@ -151,16 +147,16 @@ export function outputToConsole(
 
   // Filtered results for fix tips
   printFixTips(
-  {
-    missing: scanResult.missing,
-    duplicatesEnv: scanResult.duplicates?.env ?? [],
-    duplicatesEx: scanResult.duplicates?.example ?? [],
-    gitignoreIssue: hasGitignoreIssue ? { reason: 'not-ignored' } : null,
-  },
-  hasGitignoreIssue,
-  isJson,
-  opts.fix ?? false,
-);
+    {
+      missing: scanResult.missing,
+      duplicatesEnv: scanResult.duplicates?.env ?? [],
+      duplicatesEx: scanResult.duplicates?.example ?? [],
+      gitignoreIssue: hasGitignoreIssue ? { reason: 'not-ignored' } : null,
+    },
+    hasGitignoreIssue,
+    isJson,
+    opts.fix ?? false,
+  );
 
   return { exitWithError };
 }

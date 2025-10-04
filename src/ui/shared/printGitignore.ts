@@ -18,19 +18,19 @@ export function printGitignoreWarning(options: GitignoreWarningOptions): void {
     log(
       chalk.yellow(
         `⚠️  No .gitignore found – your ${envFile} may be committed.\n` +
-        `   Add:\n` +
-        `     ${envFile}\n` +
-        `     ${envFile}.*\n`
-      )
+          `   Add:\n` +
+          `     ${envFile}\n` +
+          `     ${envFile}.*\n`,
+      ),
     );
   } else {
     log(
       chalk.yellow(
         `⚠️  ${envFile} is not ignored by Git (.gitignore).\n` +
-        `   Consider adding:\n` +
-        `     ${envFile}\n` +
-        `     ${envFile}.*\n`
-      )
+          `   Consider adding:\n` +
+          `     ${envFile}\n` +
+          `     ${envFile}.*\n`,
+      ),
     );
   }
 }
