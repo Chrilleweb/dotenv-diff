@@ -1,3 +1,4 @@
+import path from 'path';
 import { checkGitignoreStatus } from './git.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import type { ScanUsageOptions, ScanResult } from '../config/types.js';
@@ -11,6 +12,9 @@ import { printDuplicates } from '../ui/shared/printDuplicates.js';
 import { printSecrets } from '../ui/scan/printSecrets.js';
 import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
+import type { Filtered } from '../config/types.js';
+import { printFixTips } from '../ui/shared/printFixTips.js';
+import { printAutoFix } from '../ui/compare/printAutoFix.js';
 
 /**
  * Outputs the scan results to the console.
@@ -23,6 +27,12 @@ export function outputToConsole(
   scanResult: ScanResult,
   opts: ScanUsageOptions,
   comparedAgainst: string,
+  fixContext?: {
+    fixApplied: boolean;
+    removedDuplicates: string[];
+    addedEnv: string[];
+    gitignoreUpdated: boolean;
+  },
 ): { exitWithError: boolean } {
   let exitWithError = false;
 
@@ -121,6 +131,36 @@ export function outputToConsole(
 
     if (exit) exitWithError = true;
   }
+
+  if (opts.fix && fixContext) {
+    printAutoFix(
+      fixContext.fixApplied,
+      {
+        removedDuplicates: fixContext.removedDuplicates,
+        addedEnv: fixContext.addedEnv,
+        addedExample: opts.examplePath ? fixContext.addedEnv : [],
+      },
+      comparedAgainst || '.env',
+      opts.examplePath ? path.basename(opts.examplePath) : 'example file',
+      opts.json ?? false,
+      fixContext.gitignoreUpdated,
+    );
+  }
+
+  // Filtered results for fix tips
+  const filtered: Filtered = {
+    missing: scanResult.missing,
+    duplicatesEnv: scanResult.duplicates?.env ?? [],
+    duplicatesEx: scanResult.duplicates?.example ?? [],
+    gitignoreIssue: hasGitignoreIssue ? { reason: 'not-ignored' } : null,
+  };
+
+  printFixTips(
+    filtered,
+    hasGitignoreIssue,
+    opts.json ?? false,
+    opts.fix ?? false,
+  );
 
   return { exitWithError };
 }
