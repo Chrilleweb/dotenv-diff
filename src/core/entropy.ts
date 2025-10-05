@@ -14,7 +14,7 @@ export function shannonEntropyNormalized(s: string): number {
     const p = c / len;
     H += -p * Math.log2(p);
   }
-  // Antag alfabet ~72 tegn (A-Za-z0-9+/_- mv.)
+  // Normalize by the maximum possible entropy for the character set (assuming 72 possible characters)
   const maxH = Math.log2(72);
   return Math.min(1, H / maxH);
 }

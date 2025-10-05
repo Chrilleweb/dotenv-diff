@@ -6,5 +6,5 @@ import path from 'path';
  * @param p - Path to resolve
  * @returns Resolved absolute path
  */
-export const resolveFromCwd = (cwd: string, p: string) =>
+export const resolveFromCwd = (cwd: string, p: string): string =>
   path.isAbsolute(p) ? p : path.resolve(cwd, p);
