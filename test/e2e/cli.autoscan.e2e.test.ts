@@ -132,4 +132,33 @@ it('will ignore <!-- dotenv-diff-ignore --> and block comments in .env files', (
   expect(res.status).toBe(0);
   expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
 });
+it('will respect ignoreUrls from dotenv-diff.config.json and skip matching HTTPS warnings', () => {
+  const cwd = tmpDir();
+
+  fs.writeFileSync(
+    path.join(cwd, 'dotenv-diff.config.json'),
+    JSON.stringify(
+      {
+        strict: false,
+        example: '.env.example',
+        ignore: ['NODE_ENV'],
+        ignoreUrls: ['https://ingenfejl.com'],
+      },
+      null,
+      2,
+    ),
+  );
+
+  fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, 'src', 'index.ts'),
+    `const url = "https://ingenfejl.com";`,
+  );
+
+  const res = runCli(cwd, []);
+
+  expect(res.status).toBe(0);
+  expect(res.stdout).not.toContain('Potential secrets detected in codebase');
+  expect(res.stdout).not.toContain('https://ingenfejl.com');
+});
 });

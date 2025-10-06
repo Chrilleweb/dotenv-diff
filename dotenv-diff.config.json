@@ -1,0 +1,6 @@
+{
+  "strict": false,
+  "example": ".env.example",
+  "ignore": ["VITE_MODE", "NODE_ENV"],
+  "ignoreUrls": ["https://ingenfejl.com"]
+}

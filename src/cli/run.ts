@@ -11,6 +11,7 @@ import { type CompareJsonEntry, type Options } from '../config/types.js';
 import { scanUsage } from '../commands/scanUsage.js';
 import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';
+import { loadConfig } from '../config/loadConfig.js';
 
 /**
  * Run scan-usage mode (default behavior)
@@ -33,6 +34,7 @@ async function runScanMode(opts: Options) {
     isCiMode: opts.isCiMode,
     secrets: opts.secrets,
     strict: opts.strict ?? false,
+    ignoreUrls: opts.ignoreUrls ?? [],
     ...(opts.files ? { files: opts.files } : {}),
   });
 
@@ -196,7 +198,15 @@ function outputResults(
  */
 export async function run(program: Command) {
   program.parse(process.argv);
-  const opts = normalizeOptions(program.opts());
+
+  // Load and normalize options
+  const cliOptions = program.opts();
+
+  // Merge CLI options with config file options
+  const mergedRawOptions = loadConfig(cliOptions);
+
+  // Normalize merged options
+  const opts = normalizeOptions(mergedRawOptions);
 
   setupGlobalConfig(opts);
 

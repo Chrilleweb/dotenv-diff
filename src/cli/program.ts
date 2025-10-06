@@ -52,5 +52,6 @@ export function createProgram() {
     .option(
       '--no-secrets',
       'Disable secret detection during scan (enabled by default)',
-    );
+    )
+    .option('--ignore-urls <list>', 'Comma-separated URLs to ignore in secret scan');
 }

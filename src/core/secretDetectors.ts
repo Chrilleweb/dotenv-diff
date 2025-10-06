@@ -60,6 +60,22 @@ export function hasIgnoreComment(line: string): boolean {
 }
 
 /**
+ * Checks if a URL should be ignored based on ignoreUrls from config.
+ * @param url - The URL that might be a potential secret
+ * @param ignoreUrls - List of URLs to ignore (from config)
+ * @returns true if the URL matches any ignore pattern
+ */
+function ignoreUrlsMatch(url: string, ignoreUrls?: string[]): boolean {
+  if (!ignoreUrls?.length) return false;
+
+  // case-insensitive substring match
+  return ignoreUrls.some((pattern) =>
+    url.toLowerCase().includes(pattern.toLowerCase()),
+  );
+}
+
+
+/**
  * Checks if a string looks like a harmless literal.
  * @param s - The string to check.
  * @returns True if the string looks harmless, false otherwise.
@@ -138,6 +154,7 @@ function isEnvAccessor(line: string): boolean {
 export function detectSecretsInSource(
   file: string,
   source: string,
+  opts?: { ignoreUrls?: string[] },
 ): SecretFinding[] {
   const threshold = isProbablyTestPath(file) ? 0.95 : DEFAULT_SECRET_THRESHOLD;
 
@@ -175,6 +192,7 @@ export function detectSecretsInSource(
     while ((httpsMatch = HTTPS_PATTERN.exec(line))) {
       const url = httpsMatch[1] || '';
       if (url && !looksHarmlessLiteral(url)) {
+        if (ignoreUrlsMatch(url, opts?.ignoreUrls)) continue;
         const protocol = url.startsWith('https') ? 'HTTPS' : 'HTTP';
 
         findings.push({
