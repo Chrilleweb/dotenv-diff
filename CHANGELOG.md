@@ -18,6 +18,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 - HTML comments to ignore secret detection in HTML lines (e.g. `<!-- dotenv-diff-ignore -->`).
+- Also ignore html sections with `<!-- dotenv-diff-ignore-start -->` and `<!-- dotenv-diff-ignore-end -->`.
 
 ## [2.2.8] - 2025-09-30
 ### Added
