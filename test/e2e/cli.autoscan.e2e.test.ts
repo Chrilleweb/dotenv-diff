@@ -102,6 +102,5 @@ describe('no-flag autoscan', () => {
     
     const gitignore = fs.readFileSync(path.join(cwd, '.gitignore'), 'utf-8');
     expect(gitignore).toContain('.env');
-    expect(gitignore).toContain('.env.*');
   });
 });

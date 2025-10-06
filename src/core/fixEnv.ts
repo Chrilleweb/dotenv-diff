@@ -143,7 +143,7 @@ function updateGitignoreForEnv(envPath: string): boolean {
     }
 
     // Need to add patterns
-    const patterns = ['.env', '.env.*'];
+    const patterns = ['.env'];
 
     if (fs.existsSync(gitignorePath)) {
       const current = fs.readFileSync(gitignorePath, 'utf8');

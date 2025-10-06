@@ -12,6 +12,10 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.2.9] - 2025-10-01
+### Fixed
+- Fixed issue where .env.example would be ignored by git when using --fix flag.
+
 ## [2.2.8] - 2025-09-30
 ### Added
 - Fix .env is not ignored by git when using --fix flag.
