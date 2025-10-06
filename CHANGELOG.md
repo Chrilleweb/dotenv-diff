@@ -16,6 +16,9 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 - Fixed issue where .env.example would be ignored by git when using --fix flag.
 
+### Added
+- HTML comments to ignore secret detection in HTML lines (e.g. `<!-- dotenv-diff-ignore -->`).
+
 ## [2.2.8] - 2025-09-30
 ### Added
 - Fix .env is not ignored by git when using --fix flag.

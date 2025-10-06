@@ -103,4 +103,33 @@ describe('no-flag autoscan', () => {
     const gitignore = fs.readFileSync(path.join(cwd, '.gitignore'), 'utf-8');
     expect(gitignore).toContain('.env');
   });
+it('will ignore <!-- dotenv-diff-ignore --> and block comments in .env files', () => {
+  const cwd = tmpDir();
+
+  fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+
+  // Skriv +page.svelte med både inline og blok-ignore
+  fs.writeFileSync(
+    path.join(cwd, 'src', '+page.svelte'),
+    `
+      // Inline ignore test
+      const apiKey = process.env.API_KEY; <!-- dotEnv- difF-   igNore -->
+      const secret = process.env.SECRET; // should be detected
+
+      // Block ignore test
+      <!-- dotenv-diff-ignore-start -->
+      <p>Environment: "https://thisissecrethttpslasdasdasdasdasd.com"</p>
+      <!-- dotenv-diff-ignore-end -->
+
+      <p>Environment: "https://thisissecrethttpslasdasdasdasdasd.com"</p> <!-- dotenv-diff-ignore -->
+
+      const visible = process.env.VISIBLE; // should be detected
+    `.trim(),
+  );
+
+  const res = runCli(cwd, []);
+
+  expect(res.status).toBe(0);
+  expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+});
 });

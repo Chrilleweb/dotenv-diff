@@ -43,14 +43,19 @@ const HARMLESS_URLS = [
 
 /**
  * Checks if a line has an ignore comment
- * fx: // dotenv-diff-ignore or /* dotenv-diff-ignore
+ * fx: // dotenv-diff-ignore or /* dotenv-diff-ignore *\/ or <!-- dotenv-diff-ignore -->
  * @param line - The line to check
  * @returns True if the line should be ignored
  */
-function hasIgnoreComment(line: string): boolean {
+export function hasIgnoreComment(line: string): boolean {
+  const normalized = line.trim();
+
+  // Allow mixed casing, extra spaces, and optional dashes
   return (
-    /\/\/\s*dotenv-diff-ignore/.test(line) ||
-    /\/\*\s*dotenv-diff-ignore\s*\*\//.test(line)
+    /\/\/.*dotenv[\s-]*diff[\s-]*ignore/i.test(normalized) ||
+    /\/\*.*dotenv[\s-]*diff[\s-]*ignore.*\*\//i.test(normalized) ||
+    /<!--.*dotenv[\s-]*diff[\s-]*ignore.*-->/i.test(normalized) ||
+    /\bdotenv[\s-]*diff[\s-]*ignore\b/i.test(normalized)
   );
 }
 
@@ -139,9 +144,24 @@ export function detectSecretsInSource(
   const findings: SecretFinding[] = [];
   const lines = source.split(/\r?\n/);
 
+  let insideIgnoreBlock = false;
+
   for (let i = 0; i < lines.length; i++) {
     const lineNo = i + 1;
     const line = lines[i] || '';
+
+    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*start\s*-->/i.test(line)) {
+      insideIgnoreBlock = true;
+      continue;
+    }
+
+    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*end\s*-->/i.test(line)) {
+      insideIgnoreBlock = false;
+      continue;
+    }
+
+    // Skip if inside ignore block
+    if (insideIgnoreBlock) continue;
 
     // Skip comments
     if (/^\s*\/\//.test(line)) continue;
