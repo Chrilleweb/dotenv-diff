@@ -12,6 +12,18 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.0] - 2025-10-01
+### Fixed
+- Fixed issue where .env.example would be ignored by git when using --fix flag.
+
+### Added
+- HTML comments to ignore secret detection in HTML lines (e.g. `<!-- dotenv-diff-ignore -->`).
+- Also ignore html sections with `<!-- dotenv-diff-ignore-start -->` and `<!-- dotenv-diff-ignore-end -->`.
+- Added option to have a dotenv-diff.config.json file for configuration.
+- ignoreUrls option to ignore specific URLs in secret detection. (e.g. `https://nomistake.com`).
+- Added `--init` flag to create a sample config file.
+- --no-compare flag to disable comparison mode in scan usage. and noCompare option in config file.
+
 ## [2.2.8] - 2025-09-30
 ### Added
 - Fix .env is not ignored by git when using --fix flag.

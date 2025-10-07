@@ -7,10 +7,11 @@ import { discoverEnvFiles } from '../services/envDiscovery.js';
 import { pairWithExample } from '../services/envPairing.js';
 import { ensureFilesOrPrompt } from '../services/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
-import { type CompareJsonEntry, type Options } from '../config/types.js';
+import { type CompareJsonEntry, type Options, type RawOptions } from '../config/types.js';
 import { scanUsage } from '../commands/scanUsage.js';
 import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';
+import { loadConfig } from '../config/loadConfig.js';
 
 /**
  * Run scan-usage mode (default behavior)
@@ -33,6 +34,8 @@ async function runScanMode(opts: Options) {
     isCiMode: opts.isCiMode,
     secrets: opts.secrets,
     strict: opts.strict ?? false,
+    ignoreUrls: opts.ignoreUrls ?? [],
+    noCompare: opts.noCompare ?? false,
     ...(opts.files ? { files: opts.files } : {}),
   });
 
@@ -177,6 +180,19 @@ function buildCompareOptions(opts: Options, report: CompareJsonEntry[]) {
 }
 
 /**
+ * Handle the --init flag to create a sample config file
+ * @param cliOptions - The CLI options parsed by commander
+ */
+async function handleInitFlag(cliOptions: RawOptions): Promise<boolean> {
+  if (cliOptions.init) {
+    const { runInit } = await import('../commands/init.js');
+    await runInit();
+    return true;
+  }
+  return false;
+}
+
+/**
  * Output results and exit with appropriate code
  */
 function outputResults(
@@ -196,7 +212,18 @@ function outputResults(
  */
 export async function run(program: Command) {
   program.parse(process.argv);
-  const opts = normalizeOptions(program.opts());
+
+  // Load and normalize options
+  const cliOptions = program.opts();
+
+  // Handle --init flag
+  if (await handleInitFlag(cliOptions)) return;
+
+  // Merge CLI options with config file options
+  const mergedRawOptions = loadConfig(cliOptions);
+
+  // Normalize merged options
+  const opts = normalizeOptions(mergedRawOptions);
 
   setupGlobalConfig(opts);
 

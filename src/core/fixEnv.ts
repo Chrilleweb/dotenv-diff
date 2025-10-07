@@ -2,20 +2,20 @@ import fs from 'fs';
 import path from 'path';
 import { isEnvIgnoredByGit, isGitRepo, findGitRoot } from '../services/git.js';
 
-export type ApplyFixesOptions = {
+interface ApplyFixesOptions {
   envPath: string;
   examplePath: string;
   missingKeys: string[];
   duplicateKeys: string[];
   ensureGitignore?: boolean;
-};
+}
 
-export type FixResult = {
+interface FixResult {
   removedDuplicates: string[];
   addedEnv: string[];
   addedExample: string[];
   gitignoreUpdated: boolean;
-};
+}
 
 /**
  * Applies fixes to the .env and .env.example files based on the detected issues.
@@ -33,7 +33,7 @@ export function applyFixes(options: ApplyFixesOptions): {
   changed: boolean;
   result: FixResult;
 } {
-  const { envPath, examplePath, missingKeys, duplicateKeys, ensureGitignore } =
+  const { envPath, examplePath, missingKeys = [], duplicateKeys = [], ensureGitignore = false } =
     options;
 
   const result: FixResult = {
@@ -143,7 +143,7 @@ function updateGitignoreForEnv(envPath: string): boolean {
     }
 
     // Need to add patterns
-    const patterns = ['.env', '.env.*'];
+    const patterns = ['.env'];
 
     if (fs.existsSync(gitignorePath)) {
       const current = fs.readFileSync(gitignorePath, 'utf8');

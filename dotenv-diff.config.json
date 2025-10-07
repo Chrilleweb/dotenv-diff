@@ -1,0 +1,11 @@
+{
+  "strict": false,
+  "example": ".env.example",
+  "ignore": [
+    "NODE_ENV",
+    "VITE_MODE"
+  ],
+  "ignoreUrls": [
+    "https://example.com"
+  ]
+}

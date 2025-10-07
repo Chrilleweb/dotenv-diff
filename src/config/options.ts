@@ -92,6 +92,10 @@ export function normalizeOptions(raw: RawOptions): Options {
   const excludeFiles = parseList(raw.excludeFiles);
   const files = parseList(raw.files);
 
+  const noCompare = toBool(raw.noCompare);
+
+  const ignoreUrls = parseList(raw.ignoreUrls);
+
   const cwd = process.cwd();
   const envFlag =
     typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : undefined;
@@ -127,5 +131,7 @@ export function normalizeOptions(raw: RawOptions): Options {
     files,
     secrets,
     strict,
+    ignoreUrls,
+    noCompare
   };
 }

@@ -10,6 +10,7 @@ import { createJsonOutput } from '../core/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../core/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
+import { hasIgnoreComment } from '../core/secretDetectors.js';
 
 /**
  * Filters out commented usages from the list.
@@ -18,14 +19,44 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
  *   # process.env.API_URL
  *   /* process.env.API_URL
  *   * process.env.API_URL
+ *   <!-- process.env.API_URL -->
  * @param usages - List of environment variable usages
  * @returns Filtered list of environment variable usages
  */
 function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
-  return usages.filter(
-    (u) => u.context && !/^\s*(\/\/|#|\/\*|\*)/.test(u.context.trim()),
-  );
+  let insideHtmlComment = false;
+  let insideIgnoreBlock = false;
+
+  return usages.filter((u) => {
+    if (!u.context) return true;
+    const line = u.context.trim();
+
+    if (line.includes('<!--')) insideHtmlComment = true;
+    if (line.includes('-->')) {
+      insideHtmlComment = false;
+      return false;
+    }
+
+    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*start\s*-->/i.test(line)) {
+      insideIgnoreBlock = true;
+      return false;
+    }
+
+    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*end\s*-->/i.test(line)) {
+      insideIgnoreBlock = false;
+      return false;
+    }
+
+    if (insideIgnoreBlock) return false;
+
+    return (
+      !insideHtmlComment &&
+      !/^\s*(\/\/|#|\/\*|\*|<!--|-->)/.test(line) &&
+      !hasIgnoreComment(line)
+    );
+  });
 }
+
 
 /**
  * Recalculates statistics for a scan result after filtering usages.

@@ -152,6 +152,34 @@ dotenv-diff --ignore API_KEY --ignore-regex '^SECRET_'
 
 Ignored keys are removed from all warnings and do not affect the exit code.
 
+## Create a sample config file with --init
+
+You can create a sample `dotenv-diff.config.json` file in your current directory using the `--init` flag:
+
+```bash
+dotenv-diff --init
+```
+
+This will generate a `dotenv-diff.config.json` file with default settings. If the file already exists, it will notify you and do nothing.
+
+The generated config file could look like this:
+
+```json
+{
+  "strict": false,
+  "example": ".env.example",
+  "ignore": [
+    "NODE_ENV",
+    "VITE_MODE"
+  ],
+  "ignoreUrls": [
+    "https://example.com"
+  ]
+}
+```
+
+This allows you to customize the behavior of `dotenv-diff` without needing to pass all options via the command line.
+
 ## Output format in JSON
 
 You can output the results in JSON format using the `--json` option:
