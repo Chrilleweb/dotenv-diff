@@ -68,6 +68,7 @@ export type RawOptions = {
   secrets?: boolean;
   strict?: boolean;
   ignoreUrls?: string[];
+  init?: boolean;
 };
 
 /**

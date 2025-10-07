@@ -21,6 +21,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 - Also ignore html sections with `<!-- dotenv-diff-ignore-start -->` and `<!-- dotenv-diff-ignore-end -->`.
 - Added option to have a dotenv-diff.config.json file for configuration.
 - ignoreUrls option to ignore specific URLs in secret detection. (e.g. `https://nomistake.com`).
+- Added `--init` flag to create a sample config file.
 
 ## [2.2.8] - 2025-09-30
 ### Added
