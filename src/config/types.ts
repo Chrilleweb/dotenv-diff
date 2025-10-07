@@ -40,6 +40,7 @@ export type Options = {
   secrets: boolean;
   strict: boolean | undefined;
   ignoreUrls?: string[];
+  noCompare: boolean;
 };
 
 /** Type representing the raw options for the comparison
@@ -68,6 +69,7 @@ export type RawOptions = {
   secrets?: boolean;
   strict?: boolean;
   ignoreUrls?: string[];
+  noCompare?: boolean;
   init?: boolean;
 };
 
@@ -118,6 +120,7 @@ export interface ScanOptions {
   files?: string[];
   secrets?: boolean;
   ignoreUrls?: string[];
+  noCompare?: boolean;
 }
 
 export interface ScanResult {

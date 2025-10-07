@@ -35,6 +35,7 @@ async function runScanMode(opts: Options) {
     secrets: opts.secrets,
     strict: opts.strict ?? false,
     ignoreUrls: opts.ignoreUrls ?? [],
+    noCompare: opts.noCompare ?? false,
     ...(opts.files ? { files: opts.files } : {}),
   });
 

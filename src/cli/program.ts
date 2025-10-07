@@ -54,5 +54,6 @@ export function createProgram() {
       'Disable secret detection during scan (enabled by default)',
     )
     .option('--ignore-urls <list>', 'Comma-separated URLs to ignore in secret scan')
+    .option('--no-compare', 'Scan codebase without comparing against any .env files')
     .option('--init', 'Create a sample dotenv-diff.config.json file');
 }

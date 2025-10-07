@@ -192,4 +192,56 @@ describe('no-flag autoscan', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('dotenv-diff.config.json already exists');
   });
+  it('will apply all options from dotenv-diff.config.json correctly', () => {
+  const cwd = tmpDir();
+
+  fs.writeFileSync(
+    path.join(cwd, 'dotenv-diff.config.json'),
+    JSON.stringify(
+      {
+        checkValues: true,
+        ci: true,
+        yes: true,
+        allowDuplicates: true,
+        fix: true,
+        json: false,
+        env: '.env',
+        noCompare: false,
+        example: '.env.example',
+        ignore: ['NODE_ENV', 'VITE_MODE', 'SECRET_KEY'],
+        ignoreRegex: ['^TEST_'],
+        only: ['missing', 'extra'],
+        compare: false,
+        noColor: true,
+        scanUsage: false,
+        includeFiles: ['src/**/*.ts'],
+        excludeFiles: ['**/*.spec.ts'],
+        showUnused: false,
+        showStats: false,
+        files: ['src/specific.ts'],
+        secrets: false,
+        strict: true,
+        ignoreUrls: ['https://ignoreme.com'],
+      },
+      null,
+      2,
+    ),
+  );
+
+  fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=test\nSECRET_KEY=123\n');
+  fs.writeFileSync(path.join(cwd, '.env.example'), 'API_KEY=\nSECRET_KEY=\n');
+
+  fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, 'src', 'specific.ts'),
+    `const url = "https://ignoreme.com";
+     const api = process.env.API_KEY;
+     const test = process.env.TEST_SHOULD_BE_IGNORED;`,
+  );
+
+  const res = runCli(cwd, []);
+  expect(res.status).toBe(0);
+  expect(res.stdout).toContain('Loaded');
+});
+
 });
