@@ -12,7 +12,11 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
-## [2.3.0] - 2025-10-01
+## [2.3.1] - 2025-10-08
+### Fixed
+- Fixed dotenv-diff.config.json not found in monorepo root when running from apps.
+
+## [2.3.0] - 2025-10-07
 ### Fixed
 - Fixed issue where .env.example would be ignored by git when using --fix flag.
 
