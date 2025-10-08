@@ -5,6 +5,7 @@ import { printConfigLoaded, printConfigLoadError } from "../ui/shared/printConfi
 
 /**
  * Loads dotenv-diff.config.json (if present)
+ * Searches upward for config
  * and merges it with CLI flags.
  * CLI options always take precedence.
  * @param cliOptions - Options provided via CLI
@@ -12,15 +13,26 @@ import { printConfigLoaded, printConfigLoadError } from "../ui/shared/printConfi
  */
 export function loadConfig(cliOptions: Partial<RawOptions>): RawOptions {
   const cwd = process.cwd();
-  const configPath = path.join(cwd, "dotenv-diff.config.json");
+
+  // Recursive search upwards for dotenv-diff.config.json
+  function findConfigFile(dir: string): string | null {
+    const configPath = path.join(dir, "dotenv-diff.config.json");
+    if (fs.existsSync(configPath)) return configPath;
+
+    const parent = path.dirname(dir);
+    if (parent !== dir) return findConfigFile(parent);
+    return null;
+  }
+
+  const foundPath = findConfigFile(cwd);
 
   let fileConfig: Partial<RawOptions> = {};
 
-  if (fs.existsSync(configPath)) {
+  if (foundPath) {
     try {
-      const raw = fs.readFileSync(configPath, "utf8");
+      const raw = fs.readFileSync(foundPath, "utf8");
       fileConfig = JSON.parse(raw);
-      printConfigLoaded(configPath);
+      printConfigLoaded(foundPath);
     } catch (err) {
       printConfigLoadError(err);
     }
