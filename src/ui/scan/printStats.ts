@@ -16,6 +16,7 @@ export function printStats(
   stats: ScanStats,
   json: boolean,
   showStats: boolean,
+  duration: number,
 ) {
   if (json || !showStats) return;
   console.log(chalk.magenta('📊 Scan Statistics:'));
@@ -24,5 +25,6 @@ export function printStats(
   console.log(
     chalk.magenta.dim(`   Unique variables: ${stats.uniqueVariables}`),
   );
+  console.log(chalk.magenta.dim(`   Scan duration: ${duration.toFixed(2)}s`));
   console.log();
 }

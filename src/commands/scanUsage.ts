@@ -92,11 +92,19 @@ function calculateStats(scanResult: ScanResult): ScanResult {
 export async function scanUsage(
   opts: ScanUsageOptions,
 ): Promise<{ exitWithError: boolean }> {
+
+  // Start timing the scan
+  const startTime = performance.now();
+
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
   // Filter out commented usages
   scanResult.used = skipCommentedUsages(scanResult.used);
+
+  // Measure duration
+  const endTime = performance.now();
+  scanResult.duration = (endTime - startTime) / 1000; // Convert to seconds
 
   // Recalculate stats after filtering
   calculateStats(scanResult);

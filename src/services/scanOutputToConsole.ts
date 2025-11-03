@@ -41,7 +41,7 @@ export function outputToConsole(
   printHeader(comparedAgainst);
 
   // Show stats if requested
-  printStats(scanResult.stats, isJson, opts.showStats ?? true);
+  printStats(scanResult.stats, isJson, opts.showStats ?? true, scanResult.duration);
 
   // Show used variables if any found
   if (scanResult.stats.uniqueVariables > 0) {

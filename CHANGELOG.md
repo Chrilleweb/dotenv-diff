@@ -12,6 +12,15 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.2] - 2025-11-01
+### Added
+- Added duration output to scan statistics.
+
+### Changed
+- Updated dependencies to latest versions.
+- Improved README documentation for clarity.
+- No breaking changes.
+
 ## [2.3.1] - 2025-10-08
 ### Fixed
 - Fixed dotenv-diff.config.json not found in monorepo root when running from apps.

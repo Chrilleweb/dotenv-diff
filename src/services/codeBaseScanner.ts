@@ -69,5 +69,6 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       env: [],
       example: [],
     },
+    duration: 0,
   };
 }
