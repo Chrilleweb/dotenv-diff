@@ -84,6 +84,15 @@ export function outputToConsole(
   // Print potential secrets found
   printSecrets(scanResult.secrets ?? [], isJson);
 
+  // Check for high severity secrets - ALWAYS exit with error
+  const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
+    s => s.severity === 'high'
+  );
+  
+  if (hasHighSeveritySecrets) {
+    exitWithError = true;
+  }
+
   // Success message for env file comparison
   if (
     comparedAgainst &&

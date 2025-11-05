@@ -159,10 +159,17 @@ export async function scanUsage(
       Object.keys(envVariables).length,
     );
     console.log(JSON.stringify(jsonOutput, null, 2));
+
+    // Check for high severity secrets
+  const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
+    s => s.severity === 'high'
+  );
+
     return {
       exitWithError:
         scanResult.missing.length > 0 ||
         duplicatesFound ||
+        hasHighSeveritySecrets ||
         !!(
           opts.strict &&
           (scanResult.unused.length > 0 ||

@@ -15,6 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ## [2.3.2] - 2025-11-01
 ### Added
 - Added duration output to scan statistics.
+- Severity levels for secret findings: high, medium, low.
 
 ### Changed
 - Updated dependencies to latest versions.
