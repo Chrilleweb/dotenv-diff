@@ -49,12 +49,13 @@ describe('secrets detection (default scan mode)', () => {
     );
 
     const local = runCli(cwd, []);
-    expect(local.status).toBe(0);
+    expect(local.status).toBe(1);
     expect(local.stdout).toContain('Potential secrets detected in codebase:');
+    expect(local.stdout).toContain('HIGH');
     expect(local.stdout).toContain('src/index.ts');
 
     const ci = runCli(cwd, ['--ci']);
-    expect(ci.status).toBe(0);
+    expect(ci.status).toBe(1);
     expect(ci.stdout).toContain('Potential secrets detected in codebase:');
   });
 
@@ -141,8 +142,9 @@ describe('secrets detection (default scan mode)', () => {
     );
 
     const res = runCli(cwd, []);
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).toContain('Potential secrets detected in codebase:');
+    expect(res.stdout).toContain('HIGH');
     expect(res.stdout).toContain('src/secrets.ts');
     // Should contain warnings for the actual secrets but not the URL
     expect(res.stdout).toMatch(/(auth_token|api_key|client_secret)/);
@@ -336,10 +338,11 @@ describe('secrets detection (default scan mode)', () => {
     );
 
     const res = runCli(cwd, []);
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).toContain('Potential secrets detected in codebase:');
     
     // Should warn about the non-ignored ones
+    expect(res.stdout).toContain('HIGH');
     expect(res.stdout).toContain('shouldwarn.com');
     expect(res.stdout).toContain('sk_live_abcdefghijklmnopqrstuvwx');
     

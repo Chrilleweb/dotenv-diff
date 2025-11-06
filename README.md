@@ -5,7 +5,7 @@
 Scan your codebase to detect which environment variables are used in your code.
 
 Optimized for SvelteKit. </br>
-Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js, Next.js, Nuxt, and Vue — or any other setup where you want reliable .env file comparison.
+Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js, Next.js, Nuxt, and Vue — or any other setup where you want reliable .env file comparison / scanning.
 
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)

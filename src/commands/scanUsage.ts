@@ -92,11 +92,19 @@ function calculateStats(scanResult: ScanResult): ScanResult {
 export async function scanUsage(
   opts: ScanUsageOptions,
 ): Promise<{ exitWithError: boolean }> {
+
+  // Start timing the scan
+  const startTime = performance.now();
+
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
 
   // Filter out commented usages
   scanResult.used = skipCommentedUsages(scanResult.used);
+
+  // Measure duration
+  const endTime = performance.now();
+  scanResult.duration = (endTime - startTime) / 1000; // Convert to seconds
 
   // Recalculate stats after filtering
   calculateStats(scanResult);
@@ -151,10 +159,17 @@ export async function scanUsage(
       Object.keys(envVariables).length,
     );
     console.log(JSON.stringify(jsonOutput, null, 2));
+
+    // Check for high severity secrets
+  const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
+    s => s.severity === 'high'
+  );
+
     return {
       exitWithError:
         scanResult.missing.length > 0 ||
         duplicatesFound ||
+        hasHighSeveritySecrets ||
         !!(
           opts.strict &&
           (scanResult.unused.length > 0 ||

@@ -1,5 +1,7 @@
 import { shannonEntropyNormalized } from './entropy.js';
 
+export type SecretSeverity = 'high' | 'medium' | 'low';
+
 // Represents a secret finding in the source code.
 export type SecretFinding = {
   file: string;
@@ -7,6 +9,7 @@ export type SecretFinding = {
   kind: 'pattern' | 'entropy';
   message: string;
   snippet: string;
+  severity: SecretSeverity;
 };
 
 // Regular expressions for detecting suspicious keys and provider patterns
@@ -40,6 +43,52 @@ const HARMLESS_URLS = [
   /http:\/\/www\.w3\.org\/2000\/svg/i,
   /xmlns=["']http:\/\/www\.w3\.org\/2000\/svg["']/i, // SVG namespace
 ];
+
+/**
+ * Determines the severity of a secret finding.
+ * @param kind 'pattern' | 'entropy'
+ * @param message The message describing the finding
+ * @param literalLength The length of the literal string (if applicable)
+ * @returns The severity level of the secret finding
+ */
+function determineSeverity(
+  kind: 'pattern' | 'entropy',
+  message: string,
+  literalLength?: number,
+): SecretSeverity {
+  // HIGH: Known provider key patterns
+  if (message.includes('known provider key pattern')) {
+    return 'high';
+  }
+
+  // HIGH: Very high-entropy long strings
+  if (kind === 'entropy' && literalLength && literalLength >= 48) {
+    return 'high';
+  }
+
+  // MEDIUM: Password/secret/token patterns
+  if (message.includes('password/secret/token-like')) {
+    return 'medium';
+  }
+
+  // MEDIUM: Medium high-entropy strings
+  if (kind === 'entropy' && literalLength && literalLength >= 32) {
+    return 'medium';
+  }
+
+  // MEDIUM: HTTP URLs
+  if (message.includes('HTTP URL detected')) {
+    return 'medium';
+  }
+
+  // LOW: HTTPS URLs
+  if (message.includes('HTTPS URL detected')) {
+    return 'low';
+  }
+
+  // Default to medium if we can't determine
+  return 'medium';
+}
 
 /**
  * Checks if a line has an ignore comment
@@ -201,6 +250,7 @@ export function detectSecretsInSource(
           kind: 'pattern',
           message: `${protocol} URL detected – consider moving to an environment variable`,
           snippet: line.trim().slice(0, 180),
+          severity: protocol === 'HTTP' ? 'medium' : 'low',
         });
       }
     }
@@ -222,6 +272,7 @@ export function detectSecretsInSource(
           kind: 'pattern',
           message: 'matches password/secret/token-like literal assignment',
           snippet: line.trim().slice(0, 180),
+          severity: 'medium',
         });
       }
     }
@@ -235,6 +286,7 @@ export function detectSecretsInSource(
           kind: 'pattern',
           message: 'matches known provider key pattern',
           snippet: line.trim().slice(0, 180),
+          severity: 'high',
         });
       }
     }
@@ -248,12 +300,14 @@ export function detectSecretsInSource(
       if (literal.length < 32) continue;
       const ent = shannonEntropyNormalized(literal);
       if (ent >= threshold) {
+        const message = `found high-entropy string (len ${literal.length}, H≈${ent.toFixed(2)})`;
         findings.push({
           file,
           line: lineNo,
           kind: 'entropy',
-          message: `found high-entropy string (len ${literal.length}, H≈${ent.toFixed(2)})`,
+          message,
           snippet: line.trim().slice(0, 180),
+          severity: determineSeverity('entropy', message, literal.length),
         });
       }
     }

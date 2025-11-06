@@ -1,7 +1,6 @@
 import type { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
-
 import { normalizeOptions } from '../config/options.js';
 import { discoverEnvFiles } from '../services/envDiscovery.js';
 import { pairWithExample } from '../services/envPairing.js';

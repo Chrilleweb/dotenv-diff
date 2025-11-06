@@ -137,6 +137,7 @@ export interface ScanResult {
     env?: Array<{ key: string; count: number }>;
     example?: Array<{ key: string; count: number }>;
   };
+  duration: number;
 }
 
 /** Options for scanning the codebase for environment variable usage. */
