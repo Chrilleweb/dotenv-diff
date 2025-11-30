@@ -14,6 +14,7 @@ import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
+import { printCspWarning } from '../ui/scan/printCspWarning.js';
 
 /**
  * Outputs the scan results to the console.
@@ -83,6 +84,9 @@ export function outputToConsole(
 
   // Print potential secrets found
   printSecrets(scanResult.secrets ?? [], isJson);
+
+  // CSP warning
+  printCspWarning(scanResult.hasCsp, isJson);
 
   // Check for high severity secrets - ALWAYS exit with error
   const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(

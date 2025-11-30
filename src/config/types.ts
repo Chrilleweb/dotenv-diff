@@ -138,6 +138,7 @@ export interface ScanResult {
     example?: Array<{ key: string; count: number }>;
   };
   duration: number;
+  hasCsp?: boolean;
 }
 
 /** Options for scanning the codebase for environment variable usage. */
@@ -190,6 +191,7 @@ export interface ScanJsonEntry {
     env?: Array<{ key: string; count: number }>;
     example?: Array<{ key: string; count: number }>;
   };
+  hasCsp?: boolean;
 }
 
 // Type for grouped usages by variable
