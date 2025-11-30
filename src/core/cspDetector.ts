@@ -13,12 +13,28 @@ const HELMET_CSP_PATTERN = /\bcontentSecurityPolicy\b/;
  * in a realistic pattern, we treat CSP as present.
  */
 export function hasCspInSource(source: string): boolean {
+  // 1. META tag
   if (META_CSP_PATTERN.test(source)) return true;
+
+  // 2. Node header setters
   if (HEADER_CSP_PATTERN.test(source)) return true;
+
+  // 3. Helmet or similar middleware
   if (HELMET_CSP_PATTERN.test(source)) return true;
 
-  // Fallback: plain token match – good enough for "CSP exists somewhere"
+  // 4. Plain fallback
   if (/Content-Security-Policy/i.test(source)) return true;
+
+  // 5. SvelteKit kit.csp
+  if (/kit\s*:\s*{[^}]*csp\s*:/s.test(source)) return true;
+
+  // 6. A variable named <something>Csp or cspConfig or sharedCsp
+  if (/\b(shared|global|site|app)[A-Z]?Csp\b/.test(source)) return true;
+  if (/\bcspConfig\b/i.test(source)) return true;
+  if (/\bcsp\s*:\s*{[^}]*['"]default-src['"]:/i.test(source)) return true;
+
+  // 7. Directives object pattern (strong indicator)
+  if (/directives\s*:\s*{[^}]*['"]default-src['"]:/is.test(source)) return true;
 
   return false;
 }
