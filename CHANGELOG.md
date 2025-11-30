@@ -12,6 +12,10 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.4] - 2025-11-05
+### Fixed
+- Fixed issue where CSP detection was not working as expected in some file types.
+
 ## [2.3.3] - 2025-11-30
 ### Added
 - Added Content-Security-Policy (CSP) detection to codebase scanner.
