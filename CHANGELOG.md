@@ -12,6 +12,14 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.3] - 2025-11-30
+### Added
+- Added Content-Security-Policy (CSP) detection to codebase scanner.
+- Warns if no CSP is found in HTML/JS/TS files.
+
+### Changed
+- No breaking changes.
+
 ## [2.3.2] - 2025-11-01
 ### Added
 - Added duration output to scan statistics.

@@ -5,6 +5,7 @@ import {
   detectSecretsInSource,
   type SecretFinding,
 } from '../core/secretDetectors.js';
+import { hasCspInSource } from '../core/cspDetector.js';
 import { DEFAULT_EXCLUDE_PATTERNS } from '../core/patterns.js';
 import { scanFile } from '../core/scanFile.js';
 import { findFiles } from './fileWalker.js';
@@ -25,9 +26,16 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   let filesScanned = 0;
   const allSecrets: SecretFinding[] = [];
 
+  let hasCsp = false;
+
   for (const filePath of files) {
     try {
       const content = await fs.readFile(filePath, 'utf-8');
+
+      if (!hasCsp && hasCspInSource(content)) {
+        hasCsp = true;
+      }
+
       const fileUsages = await scanFile(filePath, content, opts);
       allUsages.push(...fileUsages);
       if (opts.secrets) {
@@ -70,5 +78,6 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       example: [],
     },
     duration: 0,
+    hasCsp: hasCsp,
   };
 }
