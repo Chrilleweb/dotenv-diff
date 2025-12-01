@@ -19,6 +19,7 @@ export interface ProcessComparisonResult {
   addedEnv: string[];
   addedExample: string[];
   gitignoreUpdated: boolean;
+  exampleFull?: Record<string, string> | undefined;
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -44,8 +45,17 @@ export function processComparisonFile(
   let addedEnv: string[] = [];
   let addedExample: string[] = [];
   let gitignoreUpdated = false;
+  let exampleFull: Record<string, string> | undefined = undefined;
 
   try {
+    // Load .env.example (if exists)
+    if (opts.examplePath) {
+      const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
+      if (fs.existsSync(examplePath)) {
+        exampleFull = parseEnvFile(examplePath);
+      }
+    }
+    
     // Parse and filter env file
     const envFull = parseEnvFile(compareFile.path);
     const envKeys = filterIgnoredKeys(
@@ -114,6 +124,7 @@ export function processComparisonFile(
       addedEnv,
       addedExample,
       gitignoreUpdated,
+      exampleFull,
       error: {
         message: errorMessage,
         shouldExit: opts.isCiMode ?? false,
@@ -133,6 +144,7 @@ export function processComparisonFile(
     addedEnv,
     addedExample,
     gitignoreUpdated,
+    exampleFull
   };
 }
 

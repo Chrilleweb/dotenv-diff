@@ -13,11 +13,11 @@ export type SecretFinding = {
 };
 
 // Regular expressions for detecting suspicious keys and provider patterns
-const SUSPICIOUS_KEYS =
+export const SUSPICIOUS_KEYS =
   /\b(pass(word)?|secret|token|apikey|api_key|key|auth|bearer|private|client_secret|access[_-]?token)\b/i;
 
 // Regular expressions for detecting provider patterns
-const PROVIDER_PATTERNS: RegExp[] = [
+export const PROVIDER_PATTERNS: RegExp[] = [
   /\bAKIA[0-9A-Z]{16}\b/, // AWS access key id
   /\bASIA[0-9A-Z]{16}\b/, // AWS temp key
   /\bghp_[0-9A-Za-z]{30,}\b/, // GitHub token

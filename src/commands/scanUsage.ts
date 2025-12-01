@@ -12,6 +12,7 @@ import { processComparisonFile } from '../core/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/secretDetectors.js';
 import { validateEnvRules } from '../core/envValidator.js';
+import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
 
 /**
  * Filters out commented usages from the list.
@@ -152,6 +153,10 @@ export async function scanUsage(
       removedDuplicates = result.removedDuplicates;
       fixedKeys = result.addedEnv;
       gitignoreUpdated = result.gitignoreUpdated;
+
+      if (result.exampleFull && result.comparedAgainst === '.env.example') {
+        scanResult.exampleWarnings = detectSecretsInExample(result.exampleFull);
+      }
     }
   }
 
@@ -170,17 +175,24 @@ export async function scanUsage(
       (s) => s.severity === 'high',
     );
 
+    // Check for high potential secrets in example warnings
+    const hasHighSeverityExampleWarnings = (scanResult.exampleWarnings ?? []).some(
+      (w) => w.severity === 'high',
+    );
+
     return {
       exitWithError:
         scanResult.missing.length > 0 ||
         duplicatesFound ||
         hasHighSeveritySecrets ||
+        hasHighSeverityExampleWarnings ||
         !!(
           opts.strict &&
           (scanResult.unused.length > 0 ||
             (scanResult.duplicates?.env?.length ?? 0) > 0 ||
             (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-            (scanResult.secrets?.length ?? 0) > 0)
+            (scanResult.secrets?.length ?? 0) > 0) ||
+            (scanResult.exampleWarnings?.length ?? 0) > 0
         ),
     };
   }

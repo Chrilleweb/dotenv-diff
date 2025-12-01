@@ -12,6 +12,14 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.5] - 2025-12-01
+### Added
+- Added more sveltekit specific warnings to codebase scanner.
+- Added warning for potential secrets in .env.example file.
+
+### Fixed
+- Duration refactored for better code maintainability.
+
 ## [2.3.4] - 2025-11-05
 ### Fixed
 - Fixed issue where CSP detection was not working as expected in some file types.

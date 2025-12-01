@@ -16,6 +16,7 @@ import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printCspWarning } from '../ui/scan/printCspWarning.js';
 import { printEnvWarnings } from '../ui/scan/printEnvWarnings.js';
+import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
 
 /**
  * Outputs the scan results to the console.
@@ -70,6 +71,8 @@ export function outputToConsole(
     printEnvWarnings(scanResult.envWarnings, isJson);
   }
 
+  printExampleWarnings(scanResult.exampleWarnings ?? [], isJson);
+
   // Unused
   printUnused(
     scanResult.unused,
@@ -101,6 +104,14 @@ export function outputToConsole(
   if (hasHighSeveritySecrets) {
     exitWithError = true;
   }
+
+  // Check for high severity example secrets - ALWAYS exit with error
+const hasHighSeverityExampleSecrets = (scanResult.exampleWarnings ?? [])
+  .some((w) => w.severity === 'high');
+
+if (hasHighSeverityExampleSecrets) {
+  exitWithError = true;
+}
 
   // Success message for env file comparison
   if (
@@ -140,6 +151,7 @@ export function outputToConsole(
         duplicatesEnv: scanResult.duplicates?.env?.length ?? 0,
         duplicatesEx: scanResult.duplicates?.example?.length ?? 0,
         secrets: scanResult.secrets?.length ?? 0,
+        exampleSecrets: scanResult.exampleWarnings?.length ?? 0,
         hasGitignoreIssue,
       },
       isJson,
