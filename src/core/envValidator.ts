@@ -34,14 +34,26 @@ export function validateEnvRules(usages: EnvUsage[]): EnvWarning[] {
           line: u.line,
         });
       }
+
+      // Check for .svelte files here (before continue)
+      if (u.file.endsWith('.svelte')) {
+        warnings.push({
+          variable: u.variable,
+          reason: `Avoid using process.env inside Svelte files — use $env/static/private or $env/static/public`,
+          file: u.file,
+          line: u.line,
+        });
+      }
+
       continue;
     }
 
-    // $env/static/private/*
+    // $env/static/private/* - ALL checks together
     if (
       u.pattern === 'sveltekit' &&
       u.context.includes('$env/static/private')
     ) {
+      // Check 1: VITE_ prefix
       if (u.variable.startsWith('VITE_')) {
         warnings.push({
           variable: u.variable,
@@ -50,6 +62,37 @@ export function validateEnvRules(usages: EnvUsage[]): EnvWarning[] {
           line: u.line,
         });
       }
+
+      // Check 2: Usage in .svelte files
+      if (u.file.match(/\.svelte$/)) {
+        warnings.push({
+          variable: u.variable,
+          reason: `Private environment variables cannot be used in Svelte components (.svelte files)`,
+          file: u.file,
+          line: u.line,
+        });
+      }
+
+      // Check 3: Usage in +page.ts or +layout.ts
+      if (u.file.match(/\+page\.ts$|\+layout\.ts$/)) {
+        warnings.push({
+          variable: u.variable,
+          reason: `Private env vars should only be used in +page.server.ts or +layout.server.ts`,
+          file: u.file,
+          line: u.line,
+        });
+      }
+
+      // Check 4: PUBLIC_ prefix in private imports
+      if (u.variable.startsWith('PUBLIC_')) {
+        warnings.push({
+          variable: u.variable,
+          reason: `Variables starting with PUBLIC_ may never be used in private env imports`,
+          file: u.file,
+          line: u.line,
+        });
+      }
+
       continue;
     }
 
@@ -64,6 +107,19 @@ export function validateEnvRules(usages: EnvUsage[]): EnvWarning[] {
         });
       }
       continue;
+    }
+
+    // $env/dynamic/public usage warning
+    if (
+      u.pattern === 'sveltekit' &&
+      u.context.includes('$env/dynamic/public')
+    ) {
+      warnings.push({
+        variable: u.variable,
+        reason: `$env/dynamic/public is strongly discouraged — use $env/static/public instead for build-time safety`,
+        file: u.file,
+        line: u.line,
+      });
     }
   }
 
