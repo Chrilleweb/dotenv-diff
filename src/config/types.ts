@@ -1,4 +1,6 @@
 import { type SecretFinding } from '../core/secretDetectors.js';
+import { type EnvWarning } from '../core/envValidator.js';
+import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
 // Allowed categories for comparison
 export const ALLOWED_CATEGORIES = [
@@ -131,14 +133,16 @@ export interface ScanResult {
     filesScanned: number;
     totalUsages: number;
     uniqueVariables: number;
+    duration: number;
   };
   secrets: SecretFinding[];
   duplicates: {
     env?: Array<{ key: string; count: number }>;
     example?: Array<{ key: string; count: number }>;
   };
-  duration: number;
   hasCsp?: boolean;
+  envWarnings?: EnvWarning[];
+  exampleWarnings?: ExampleSecretWarning[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */
@@ -160,6 +164,7 @@ export interface ScanJsonEntry {
     filesScanned: number;
     totalUsages: number;
     uniqueVariables: number;
+    duration: number;
   };
   missing: Array<{
     variable: string;

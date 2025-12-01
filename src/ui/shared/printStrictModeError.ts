@@ -5,6 +5,7 @@ export interface StrictModeContext {
   duplicatesEnv: number;
   duplicatesEx: number;
   secrets: number;
+  exampleSecrets: number;
   hasGitignoreIssue: boolean;
 }
 
@@ -27,6 +28,7 @@ export function printStrictModeError(
   if (ctx.duplicatesEnv > 0) warnings.push('duplicate keys in env');
   if (ctx.duplicatesEx > 0) warnings.push('duplicate keys in example');
   if (ctx.secrets > 0) warnings.push('potential secrets');
+  if (ctx.exampleSecrets > 0) warnings.push('secrets in .env.example');
   if (ctx.hasGitignoreIssue) warnings.push('.env not ignored by git');
 
   if (warnings.length === 0) return false;

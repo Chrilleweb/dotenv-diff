@@ -82,6 +82,34 @@ You can use the `--strict` flag to treat all warnings as errors. This is useful 
 dotenv-diff --strict
 ```
 
+## Sveltekit specific warnings
+
+When scanning a SvelteKit project, `dotenv-diff` will warn you about environment variables that are used wrong in sveltekit.
+
+for example, if you have `const key = import.meta.env.API_KEY` in a +page.svelte file, you will get a warning to use `VITE_` prefix for client-side usage.
+
+You would likely see this waring:
+
+```bash
+Environment variable usage issues:
+   - PUBLIC_URL (src\routes\+page.ts:1) → Variables accessed through import.meta.env must start with "VITE_"
+```
+
+This will help you avoid runtime errors due to misconfigured environment variables in SvelteKit projects.
+
+## Detect potential secrets in your .env.example file 
+
+When you run `dotenv-diff` it will also scan your `.env.example` file for potential secrets, such as API keys or passwords.
+
+for example: 
+
+```bash
+Potential real secrets found in .env.example:
+   - API_KEY = "sk_test_4eC39HqLyjWDarjtT1zdp7dc" → Value in .env.example matches a known provider key pattern [high]
+```
+
+This helps you avoid accidentally committing sensitive information through your example files.
+
 ## ignore specific warnings
 
 You can use the `dotenv-diff-ignore` comment to ignore specific lines from secret detection. For example:

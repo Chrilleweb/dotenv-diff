@@ -52,7 +52,7 @@ describe('secrets detection (default scan mode)', () => {
     expect(local.status).toBe(1);
     expect(local.stdout).toContain('Potential secrets detected in codebase:');
     expect(local.stdout).toContain('HIGH');
-    expect(local.stdout).toContain('src/index.ts');
+    expect(local.stdout).toMatch(/src[\/\\]index\.ts/);
 
     const ci = runCli(cwd, ['--ci']);
     expect(ci.status).toBe(1);
@@ -145,7 +145,7 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('Potential secrets detected in codebase:');
     expect(res.stdout).toContain('HIGH');
-    expect(res.stdout).toContain('src/secrets.ts');
+    expect(res.stdout).toMatch(/src[\/\\]secrets\.ts/);
     // Should contain warnings for the actual secrets but not the URL
     expect(res.stdout).toMatch(/(auth_token|api_key|client_secret)/);
   });

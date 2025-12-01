@@ -72,12 +72,12 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       filesScanned,
       totalUsages: filteredUsages.length,
       uniqueVariables: uniqueVariables.length,
+      duration: 0,
     },
     duplicates: {
       env: [],
       example: [],
     },
-    duration: 0,
     hasCsp: hasCsp,
   };
 }

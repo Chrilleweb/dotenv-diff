@@ -220,7 +220,7 @@ describe('no-flag autoscan', () => {
           showStats: false,
           files: ['src/specific.ts'],
           secrets: false,
-          strict: true,
+          strict: false,
           ignoreUrls: ['https://ignoreme.com'],
         },
         null,
@@ -274,5 +274,65 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('CSP is missing');
+  });
+  it('should warn about potential secret foound i .env.example', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.js'),
+      `const key = proccess.env.API_KEY`,
+    );
+
+    fs.writeFileSync(
+      path.join(cwd, '.env.example'),
+      'API_KEY=sk_test_4eC39HqLyjWDarjtT1zdp7dc\n',
+    );
+
+    const res = runCli(cwd, ['--example', '.env.example', '--strict']);
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain(
+      'Potential real secrets found in .env.example:',
+    );
+    expect(res.stdout).toContain('API_KEY');
+  });
+  it('should not warn about potential secret found in .env.example', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.js'),
+      `console.log('hello');`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'API_KEY=EXAMPLE_KEY\n');
+
+    const res = runCli(cwd, ['--example', '.env.example']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain(
+      'Potential real secrets found in .env.example:',
+    );
+  });
+
+  it('exit code if potential real secrets found in .env.example is high', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.js'),
+      `const key = proccess.env.API_KEY`,
+    );
+
+    fs.writeFileSync(
+      path.join(cwd, '.env.example'),
+      'API_KEY=sk_test_4eC39HqLyjWDarjtT1zdp7dc\n',
+    );
+
+    const res = runCli(cwd, ['--example', '.env.example']);
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain(
+      'Potential real secrets found in .env.example:',
+    );
+    expect(res.stdout).toContain('[high]');
   });
 });
