@@ -72,6 +72,7 @@ function calculateStats(scanResult: ScanResult): ScanResult {
     filesScanned: scanResult.stats.filesScanned,
     totalUsages: scanResult.used.length,
     uniqueVariables,
+    duration: scanResult.stats.duration,
   };
 
   return scanResult;
@@ -104,7 +105,7 @@ export async function scanUsage(
 
   // Measure duration
   const endTime = performance.now();
-  scanResult.duration = (endTime - startTime) / 1000; // Convert to seconds
+  scanResult.stats.duration = (endTime - startTime) / 1000; // Convert to seconds
 
   // Recalculate stats after filtering
   calculateStats(scanResult);

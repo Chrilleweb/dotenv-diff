@@ -131,13 +131,13 @@ export interface ScanResult {
     filesScanned: number;
     totalUsages: number;
     uniqueVariables: number;
+    duration: number;
   };
   secrets: SecretFinding[];
   duplicates: {
     env?: Array<{ key: string; count: number }>;
     example?: Array<{ key: string; count: number }>;
   };
-  duration: number;
   hasCsp?: boolean;
 }
 
@@ -160,6 +160,7 @@ export interface ScanJsonEntry {
     filesScanned: number;
     totalUsages: number;
     uniqueVariables: number;
+    duration: number;
   };
   missing: Array<{
     variable: string;

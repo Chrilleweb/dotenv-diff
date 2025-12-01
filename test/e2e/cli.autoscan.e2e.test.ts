@@ -220,7 +220,7 @@ describe('no-flag autoscan', () => {
           showStats: false,
           files: ['src/specific.ts'],
           secrets: false,
-          strict: true,
+          strict: false,
           ignoreUrls: ['https://ignoreme.com'],
         },
         null,
