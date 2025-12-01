@@ -15,6 +15,7 @@ import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printCspWarning } from '../ui/scan/printCspWarning.js';
+import { printEnvWarnings } from '../ui/scan/printEnvWarnings.js';
 
 /**
  * Outputs the scan results to the console.
@@ -65,6 +66,10 @@ export function outputToConsole(
     exitWithError = true;
   }
 
+  if (scanResult.envWarnings && scanResult.envWarnings.length > 0) {
+    printEnvWarnings(scanResult.envWarnings, isJson);
+  }
+
   // Unused
   printUnused(
     scanResult.unused,
@@ -90,9 +95,9 @@ export function outputToConsole(
 
   // Check for high severity secrets - ALWAYS exit with error
   const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
-    s => s.severity === 'high'
+    (s) => s.severity === 'high',
   );
-  
+
   if (hasHighSeveritySecrets) {
     exitWithError = true;
   }

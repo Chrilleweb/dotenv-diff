@@ -1,4 +1,5 @@
 import { type SecretFinding } from '../core/secretDetectors.js';
+import { type EnvWarning } from '../core/envValidator.js';
 
 // Allowed categories for comparison
 export const ALLOWED_CATEGORIES = [
@@ -139,6 +140,7 @@ export interface ScanResult {
     example?: Array<{ key: string; count: number }>;
   };
   hasCsp?: boolean;
+  envWarnings?: EnvWarning[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */

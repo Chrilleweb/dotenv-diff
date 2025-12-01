@@ -11,6 +11,7 @@ import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../core/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/secretDetectors.js';
+import { validateEnvRules } from '../core/envValidator.js';
 
 /**
  * Filters out commented usages from the list.
@@ -57,7 +58,6 @@ function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
   });
 }
 
-
 /**
  * Recalculates statistics for a scan result after filtering usages.
  * @param scanResult The current scan result
@@ -93,7 +93,6 @@ function calculateStats(scanResult: ScanResult): ScanResult {
 export async function scanUsage(
   opts: ScanUsageOptions,
 ): Promise<{ exitWithError: boolean }> {
-
   // Start timing the scan
   const startTime = performance.now();
 
@@ -113,6 +112,11 @@ export async function scanUsage(
   // If user explicitly passed --example flag, but the file doesn't exist:
   if (printMissingExample(opts)) {
     return { exitWithError: true };
+  }
+
+  const envWarnings = validateEnvRules(scanResult.used);
+  if (envWarnings.length > 0) {
+    scanResult.envWarnings = envWarnings;
   }
 
   // Determine which file to compare against
@@ -162,9 +166,9 @@ export async function scanUsage(
     console.log(JSON.stringify(jsonOutput, null, 2));
 
     // Check for high severity secrets
-  const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
-    s => s.severity === 'high'
-  );
+    const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
+      (s) => s.severity === 'high',
+    );
 
     return {
       exitWithError:
