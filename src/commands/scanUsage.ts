@@ -115,7 +115,7 @@ export async function scanUsage(
     return { exitWithError: true };
   }
 
-  const frameworkWarnings = frameworkValidator(scanResult.used);
+  const frameworkWarnings = frameworkValidator(scanResult.used, opts.cwd);
   if (frameworkWarnings.length > 0) {
     scanResult.frameworkWarnings = frameworkWarnings;
   }

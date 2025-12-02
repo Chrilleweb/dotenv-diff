@@ -106,6 +106,7 @@ export interface EnvUsage {
     | 'process.env'
     | 'import.meta.env'
     | 'sveltekit'
+    | 'angular'
     | 'deno'
     | 'next'
     | 'nuxt'
