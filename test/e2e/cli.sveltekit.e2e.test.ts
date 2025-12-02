@@ -185,4 +185,23 @@ describe('SvelteKit environment variable usage rules', () => {
     expect(res.stdout).toContain('Variables starting with PUBLIC_ may never be used in private env imports');
     expect(res.stdout).toContain('PUBLIC_TOKEN');
   });
+
+  it('Will exit code 1 on strict mode when warnings are present', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src/routes'), { recursive: true });
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/routes/+page.ts'),
+      `console.log(import.meta.env.PUBLIC_URL);`
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), `PUBLIC_URL=123`);
+
+    const res = runCli(cwd, ['--scan-usage', '--strict']);
+
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain('Variables accessed through import.meta.env must start with "VITE_"');
+    expect(res.stdout).toContain('PUBLIC_URL');
+  });
 });

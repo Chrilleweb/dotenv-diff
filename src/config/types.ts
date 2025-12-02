@@ -1,5 +1,5 @@
 import { type SecretFinding } from '../core/secretDetectors.js';
-import { type EnvWarning } from '../core/envValidator.js';
+import { type EnvWarning } from '../core/frameworkValidator.js';
 import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
 // Allowed categories for comparison

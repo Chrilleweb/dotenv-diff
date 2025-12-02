@@ -153,6 +153,7 @@ if (hasHighSeverityExampleSecrets) {
         secrets: scanResult.secrets?.length ?? 0,
         exampleSecrets: scanResult.exampleWarnings?.length ?? 0,
         hasGitignoreIssue,
+        hasEnvWarnings: scanResult.envWarnings?.length ?? 0,
       },
       isJson,
     );

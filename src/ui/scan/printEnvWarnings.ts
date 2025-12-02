@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { EnvWarning } from '../../core/envValidator.js';
+import type { EnvWarning } from '../../core/frameworkValidator.js';
 
 /**
  * Prints environment variable usage warnings to the console.

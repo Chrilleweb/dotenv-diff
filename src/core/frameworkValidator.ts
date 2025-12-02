@@ -7,7 +7,7 @@ export interface EnvWarning {
   line: number;
 }
 
-export function validateEnvRules(usages: EnvUsage[]): EnvWarning[] {
+export function frameworkValidator(usages: EnvUsage[]): EnvWarning[] {
   const warnings: EnvWarning[] = [];
 
   for (const u of usages) {
