@@ -1,6 +1,11 @@
 import type { EnvUsage } from '../../config/types.js';
 import type { frameworkWarning } from '../frameworkValidator.js';
 
+/**
+ * Applies SvelteKit specific rules to environment variable usage
+ * @param u - The environment variable usage information
+ * @param warnings - The array to push warnings into
+ */
 export function applySvelteKitRules(u: EnvUsage, warnings: frameworkWarning[]) {
   if (u.pattern === 'import.meta.env') {
     if (!u.variable.startsWith('VITE_')) {

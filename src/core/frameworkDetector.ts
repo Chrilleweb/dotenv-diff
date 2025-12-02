@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export type Framework = 'sveltekit' | 'angular' | 'unknown';
+export type Framework = 'sveltekit' | 'next' | 'unknown';
 
 export interface FrameworkDetection {
   framework: Framework;
@@ -34,11 +34,11 @@ export function detectFramework(cwd: string): FrameworkDetection {
       };
     }
 
-    // Check for Angular
-    if (deps['@angular/core']) {
+    // Check for Next.js
+    if (deps['next']) {
       return {
-        framework: 'angular',
-        version: deps['@angular/core'],
+        framework: 'next',
+        version: deps['next'],
       };
     }
 

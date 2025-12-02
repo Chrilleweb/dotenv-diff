@@ -1,2 +1,2 @@
 export { applySvelteKitRules } from "./sveltekitRules.js";
-export { applyAngularRules } from "./angularRules.js";
+export { applyNextJsRules } from "./nextJsRules.js";
