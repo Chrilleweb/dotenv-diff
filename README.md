@@ -4,8 +4,8 @@
 
 Scan your codebase to detect which environment variables are used in your code.
 
-Optimized for SvelteKit. </br>
-Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js, Next.js, Nuxt, and Vue — or any other setup where you want reliable .env file comparison / scanning.
+Optimized for SvelteKit and Next.js. </br>
+Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js, Nuxt, and Vue — or any other setup where you want reliable .env file comparison / scanning.
 
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
@@ -82,9 +82,9 @@ You can use the `--strict` flag to treat all warnings as errors. This is useful 
 dotenv-diff --strict
 ```
 
-## Sveltekit specific warnings
+## Sveltekit and Next.js specific warnings
 
-When scanning a SvelteKit project, `dotenv-diff` will warn you about environment variables that are used wrong in sveltekit.
+When scanning a SvelteKit project, `dotenv-diff` will warn you about environment variables that are used wrong in sveltekit or Next.js depending on which framework is detected.
 
 for example, if you have `const key = import.meta.env.API_KEY` in a +page.svelte file, you will get a warning to use `VITE_` prefix for client-side usage.
 
@@ -95,7 +95,7 @@ Environment variable usage issues:
    - PUBLIC_URL (src\routes\+page.ts:1) → Variables accessed through import.meta.env must start with "VITE_"
 ```
 
-This will help you avoid runtime errors due to misconfigured environment variables in SvelteKit projects.
+This will help you avoid runtime errors due to misconfigured environment variables in SvelteKit and Next.js projects.
 
 ## Detect potential secrets in your .env.example file 
 
