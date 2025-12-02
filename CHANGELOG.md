@@ -15,6 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ## [2.3.6] - 2025-12-02
 ### Added
 - Added strict mode handling for framework specific warnings.
+- Added Next.js specific warnings to framework validator.
 
 ### Fixed
 - Nameing convention fix in frameworkValidator.ts
