@@ -7,7 +7,7 @@ export interface StrictModeContext {
   secrets: number;
   exampleSecrets: number;
   hasGitignoreIssue: boolean;
-  hasEnvWarnings: number;
+  frameworkWarnings: number;
 }
 
 /**
@@ -31,7 +31,7 @@ export function printStrictModeError(
   if (ctx.secrets > 0) warnings.push('potential secrets');
   if (ctx.exampleSecrets > 0) warnings.push('secrets in .env.example');
   if (ctx.hasGitignoreIssue) warnings.push('.env not ignored by git');
-  if (ctx.hasEnvWarnings > 0) warnings.push('framework specific warnings');
+  if (ctx.frameworkWarnings > 0) warnings.push('framework specific warnings');
 
   if (warnings.length === 0) return false;
 

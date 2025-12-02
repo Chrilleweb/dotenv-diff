@@ -1,14 +1,14 @@
 import type { EnvUsage } from '../config/types.js';
 
-export interface EnvWarning {
+export interface frameworkWarning {
   variable: string;
   reason: string;
   file: string;
   line: number;
 }
 
-export function frameworkValidator(usages: EnvUsage[]): EnvWarning[] {
-  const warnings: EnvWarning[] = [];
+export function frameworkValidator(usages: EnvUsage[]): frameworkWarning[] {
+  const warnings: frameworkWarning[] = [];
 
   for (const u of usages) {
     // import.meta.env needs to start with VITE_

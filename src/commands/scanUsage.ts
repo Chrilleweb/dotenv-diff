@@ -115,9 +115,9 @@ export async function scanUsage(
     return { exitWithError: true };
   }
 
-  const envWarnings = frameworkValidator(scanResult.used);
-  if (envWarnings.length > 0) {
-    scanResult.envWarnings = envWarnings;
+  const frameworkWarnings = frameworkValidator(scanResult.used);
+  if (frameworkWarnings.length > 0) {
+    scanResult.frameworkWarnings = frameworkWarnings;
   }
 
   // Determine which file to compare against
@@ -193,7 +193,7 @@ export async function scanUsage(
               (scanResult.duplicates?.example?.length ?? 0) > 0 ||
               (scanResult.secrets?.length ?? 0) > 0)) ||
           (scanResult.exampleWarnings?.length ?? 0) > 0 ||
-          (scanResult.envWarnings?.length ?? 0) > 0
+          (scanResult.frameworkWarnings?.length ?? 0) > 0
         ),
     };
   }

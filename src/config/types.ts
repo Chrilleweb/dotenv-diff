@@ -1,5 +1,5 @@
 import { type SecretFinding } from '../core/secretDetectors.js';
-import { type EnvWarning } from '../core/frameworkValidator.js';
+import { type frameworkWarning } from '../core/frameworkValidator.js';
 import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
 // Allowed categories for comparison
@@ -141,7 +141,7 @@ export interface ScanResult {
     example?: Array<{ key: string; count: number }>;
   };
   hasCsp?: boolean;
-  envWarnings?: EnvWarning[];
+  frameworkWarnings?: frameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
 }
 
