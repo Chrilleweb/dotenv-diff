@@ -12,6 +12,13 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.6] - 2025-12-02
+### Added
+- Added strict mode handling for framework specific warnings.
+
+### Fixed
+- Nameing convention fix in frameworkValidator.ts
+
 ## [2.3.5] - 2025-12-01
 ### Added
 - Added more sveltekit specific warnings to codebase scanner.

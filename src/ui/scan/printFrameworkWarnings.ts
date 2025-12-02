@@ -1,16 +1,19 @@
 import chalk from 'chalk';
-import type { EnvWarning } from '../../core/envValidator.js';
+import type { frameworkWarning } from '../../core/frameworkValidator.js';
 
 /**
  * Prints environment variable usage warnings to the console.
  * @param warnings - List of environment variable warnings
  * @param json - Whether to output in JSON format
  */
-export function printEnvWarnings(warnings: EnvWarning[], json: boolean) {
+export function printFrameworkWarnings(
+  warnings: frameworkWarning[],
+  json: boolean,
+) {
   if (!warnings || warnings.length === 0) return;
 
   if (json) {
-    console.log(JSON.stringify({ envWarnings: warnings }, null, 2));
+    console.log(JSON.stringify({ frameworkWarnings: warnings }, null, 2));
     return;
   }
 

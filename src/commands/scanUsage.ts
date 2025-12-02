@@ -11,7 +11,7 @@ import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../core/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/secretDetectors.js';
-import { validateEnvRules } from '../core/envValidator.js';
+import { frameworkValidator } from '../core/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
 
 /**
@@ -115,9 +115,9 @@ export async function scanUsage(
     return { exitWithError: true };
   }
 
-  const envWarnings = validateEnvRules(scanResult.used);
-  if (envWarnings.length > 0) {
-    scanResult.envWarnings = envWarnings;
+  const frameworkWarnings = frameworkValidator(scanResult.used, opts.cwd);
+  if (frameworkWarnings.length > 0) {
+    scanResult.frameworkWarnings = frameworkWarnings;
   }
 
   // Determine which file to compare against
@@ -176,9 +176,9 @@ export async function scanUsage(
     );
 
     // Check for high potential secrets in example warnings
-    const hasHighSeverityExampleWarnings = (scanResult.exampleWarnings ?? []).some(
-      (w) => w.severity === 'high',
-    );
+    const hasHighSeverityExampleWarnings = (
+      scanResult.exampleWarnings ?? []
+    ).some((w) => w.severity === 'high');
 
     return {
       exitWithError:
@@ -187,12 +187,13 @@ export async function scanUsage(
         hasHighSeveritySecrets ||
         hasHighSeverityExampleWarnings ||
         !!(
-          opts.strict &&
-          (scanResult.unused.length > 0 ||
-            (scanResult.duplicates?.env?.length ?? 0) > 0 ||
-            (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-            (scanResult.secrets?.length ?? 0) > 0) ||
-            (scanResult.exampleWarnings?.length ?? 0) > 0
+          (opts.strict &&
+            (scanResult.unused.length > 0 ||
+              (scanResult.duplicates?.env?.length ?? 0) > 0 ||
+              (scanResult.duplicates?.example?.length ?? 0) > 0 ||
+              (scanResult.secrets?.length ?? 0) > 0)) ||
+          (scanResult.exampleWarnings?.length ?? 0) > 0 ||
+          (scanResult.frameworkWarnings?.length ?? 0) > 0
         ),
     };
   }

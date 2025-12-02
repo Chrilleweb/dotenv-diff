@@ -15,7 +15,7 @@ import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printCspWarning } from '../ui/scan/printCspWarning.js';
-import { printEnvWarnings } from '../ui/scan/printEnvWarnings.js';
+import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
 import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
 
 /**
@@ -67,8 +67,8 @@ export function outputToConsole(
     exitWithError = true;
   }
 
-  if (scanResult.envWarnings && scanResult.envWarnings.length > 0) {
-    printEnvWarnings(scanResult.envWarnings, isJson);
+  if (scanResult.frameworkWarnings && scanResult.frameworkWarnings.length > 0) {
+    printFrameworkWarnings(scanResult.frameworkWarnings, isJson);
   }
 
   printExampleWarnings(scanResult.exampleWarnings ?? [], isJson);
@@ -106,12 +106,13 @@ export function outputToConsole(
   }
 
   // Check for high severity example secrets - ALWAYS exit with error
-const hasHighSeverityExampleSecrets = (scanResult.exampleWarnings ?? [])
-  .some((w) => w.severity === 'high');
+  const hasHighSeverityExampleSecrets = (scanResult.exampleWarnings ?? []).some(
+    (w) => w.severity === 'high',
+  );
 
-if (hasHighSeverityExampleSecrets) {
-  exitWithError = true;
-}
+  if (hasHighSeverityExampleSecrets) {
+    exitWithError = true;
+  }
 
   // Success message for env file comparison
   if (
@@ -153,6 +154,7 @@ if (hasHighSeverityExampleSecrets) {
         secrets: scanResult.secrets?.length ?? 0,
         exampleSecrets: scanResult.exampleWarnings?.length ?? 0,
         hasGitignoreIssue,
+        frameworkWarnings: scanResult.frameworkWarnings?.length ?? 0,
       },
       isJson,
     );
