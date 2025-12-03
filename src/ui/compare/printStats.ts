@@ -25,7 +25,7 @@ export function printStats(
   filtered: Pick<Filtered, 'missing' | 'extra' | 'empty'>,
   json: boolean,
   showStats: boolean,
-) {
+): void {
   if (json || !showStats) return;
   console.log(chalk.magenta('📊 Compare Statistics:'));
   console.log(chalk.magenta.dim(`   Keys in ${envName}: ${s.envCount}`));

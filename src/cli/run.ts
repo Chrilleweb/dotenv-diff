@@ -6,7 +6,11 @@ import { discoverEnvFiles } from '../services/envDiscovery.js';
 import { pairWithExample } from '../services/envPairing.js';
 import { ensureFilesOrPrompt } from '../services/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
-import { type CompareJsonEntry, type Options, type RawOptions } from '../config/types.js';
+import {
+  type CompareJsonEntry,
+  type Options,
+  type RawOptions,
+} from '../config/types.js';
 import { scanUsage } from '../commands/scanUsage.js';
 import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';

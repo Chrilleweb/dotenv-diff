@@ -1,7 +1,10 @@
-import fs from "fs";
-import path from "path";
-import type { RawOptions } from "./types.js";
-import { printConfigLoaded, printConfigLoadError } from "../ui/shared/printConfigStatus.js";
+import fs from 'fs';
+import path from 'path';
+import type { RawOptions } from './types.js';
+import {
+  printConfigLoaded,
+  printConfigLoadError,
+} from '../ui/shared/printConfigStatus.js';
 
 /**
  * Loads dotenv-diff.config.json (if present)
@@ -16,7 +19,7 @@ export function loadConfig(cliOptions: Partial<RawOptions>): RawOptions {
 
   // Recursive search upwards for dotenv-diff.config.json
   function findConfigFile(dir: string): string | null {
-    const configPath = path.join(dir, "dotenv-diff.config.json");
+    const configPath = path.join(dir, 'dotenv-diff.config.json');
     if (fs.existsSync(configPath)) return configPath;
 
     const parent = path.dirname(dir);
@@ -30,7 +33,7 @@ export function loadConfig(cliOptions: Partial<RawOptions>): RawOptions {
 
   if (foundPath) {
     try {
-      const raw = fs.readFileSync(foundPath, "utf8");
+      const raw = fs.readFileSync(foundPath, 'utf8');
       fileConfig = JSON.parse(raw);
       printConfigLoaded(foundPath);
     } catch (err) {

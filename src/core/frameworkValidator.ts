@@ -1,9 +1,6 @@
 import type { EnvUsage } from '../config/types.js';
 import { detectFramework, type Framework } from './frameworkDetector.js';
-import {
-  applySvelteKitRules,
-  applyNextJsRules,
-} from './frameworks/index.js';
+import { applySvelteKitRules, applyNextJsRules } from './frameworks/index.js';
 
 export interface frameworkWarning {
   variable: string;

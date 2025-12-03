@@ -132,6 +132,6 @@ export function normalizeOptions(raw: RawOptions): Options {
     secrets,
     strict,
     ignoreUrls,
-    noCompare
+    noCompare,
   };
 }

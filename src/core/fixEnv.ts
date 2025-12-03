@@ -33,8 +33,13 @@ export function applyFixes(options: ApplyFixesOptions): {
   changed: boolean;
   result: FixResult;
 } {
-  const { envPath, examplePath, missingKeys = [], duplicateKeys = [], ensureGitignore = false } =
-    options;
+  const {
+    envPath,
+    examplePath,
+    missingKeys = [],
+    duplicateKeys = [],
+    ensureGitignore = false,
+  } = options;
 
   const result: FixResult = {
     removedDuplicates: [],

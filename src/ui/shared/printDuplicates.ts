@@ -15,7 +15,7 @@ export function printDuplicates(
   dEnv: Array<{ key: string; count: number }>,
   dEx: Array<{ key: string; count: number }>,
   json: boolean,
-) {
+): void {
   if (json) return;
   if (dEnv.length) {
     console.log(

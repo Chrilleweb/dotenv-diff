@@ -9,7 +9,7 @@ import type { ExampleSecretWarning } from '../../core/exampleSecretDetector';
 export function printExampleWarnings(
   warnings: ExampleSecretWarning[],
   json: boolean,
-) {
+): void {
   if (!warnings || warnings.length === 0) return;
 
   if (json) {
@@ -20,7 +20,9 @@ export function printExampleWarnings(
   console.log(chalk.yellow('🚨 Potential real secrets found in .env.example:'));
   for (const w of warnings) {
     console.log(
-      chalk.yellow(`   - ${w.key} = "${w.value}" → ${w.reason} [${w.severity}]`),
+      chalk.yellow(
+        `   - ${w.key} = "${w.value}" → ${w.reason} [${w.severity}]`,
+      ),
     );
   }
   console.log();

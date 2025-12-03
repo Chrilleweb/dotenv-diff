@@ -14,7 +14,7 @@ export function printFixTips(
   envNotIgnored: boolean,
   json: boolean,
   fix: boolean,
-) {
+): void {
   if (json || fix) return;
 
   const hasMissing = filtered.missing.length > 0;

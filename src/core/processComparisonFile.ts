@@ -55,7 +55,7 @@ export function processComparisonFile(
         exampleFull = parseEnvFile(examplePath);
       }
     }
-    
+
     // Parse and filter env file
     const envFull = parseEnvFile(compareFile.path);
     const envKeys = filterIgnoredKeys(
@@ -144,7 +144,7 @@ export function processComparisonFile(
     addedEnv,
     addedExample,
     gitignoreUpdated,
-    exampleFull
+    exampleFull,
   };
 }
 
