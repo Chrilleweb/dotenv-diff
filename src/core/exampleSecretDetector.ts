@@ -1,17 +1,16 @@
-import {
-  PROVIDER_PATTERNS,
-  SUSPICIOUS_KEYS
-} from "./secretDetectors.js";
-import { shannonEntropyNormalized } from "./entropy.js";
+import { PROVIDER_PATTERNS, SUSPICIOUS_KEYS } from './secretDetectors.js';
+import { shannonEntropyNormalized } from './entropy.js';
 
 export interface ExampleSecretWarning {
   key: string;
   value: string;
   reason: string;
-  severity: "high" | "medium" | "low";
+  severity: 'high' | 'medium' | 'low';
 }
 
-export function detectSecretsInExample(env: Record<string, string>): ExampleSecretWarning[] {
+export function detectSecretsInExample(
+  env: Record<string, string>,
+): ExampleSecretWarning[] {
   const warnings: ExampleSecretWarning[] = [];
 
   for (const [key, rawValue] of Object.entries(env)) {
@@ -21,12 +20,12 @@ export function detectSecretsInExample(env: Record<string, string>): ExampleSecr
 
     // 1 — Skip placeholders
     if (
-      value === "" ||
-      value.toLowerCase() === "example" ||
-      value.toLowerCase() === "placeholder" ||
-      value.includes("your_") ||
-      value.includes("<") ||
-      value.includes("CHANGE_ME")
+      value === '' ||
+      value.toLowerCase() === 'example' ||
+      value.toLowerCase() === 'placeholder' ||
+      value.includes('your_') ||
+      value.includes('<') ||
+      value.includes('CHANGE_ME')
     ) {
       continue;
     }
@@ -37,8 +36,8 @@ export function detectSecretsInExample(env: Record<string, string>): ExampleSecr
         warnings.push({
           key,
           value,
-          reason: "Value in .env.example matches a known provider key pattern",
-          severity: "high"
+          reason: 'Value in .env.example matches a known provider key pattern',
+          severity: 'high',
         });
         continue;
       }
@@ -50,8 +49,8 @@ export function detectSecretsInExample(env: Record<string, string>): ExampleSecr
         warnings.push({
           key,
           value,
-          reason: "Suspicious key name combined with a non-placeholder value",
-          severity: "medium"
+          reason: 'Suspicious key name combined with a non-placeholder value',
+          severity: 'medium',
         });
       }
     }
@@ -59,12 +58,12 @@ export function detectSecretsInExample(env: Record<string, string>): ExampleSecr
     // 4 — Check entropy (high randomness → real secret)
     if (value.length >= 24) {
       const entropy = shannonEntropyNormalized(value);
-      if (entropy > 0.80) {
+      if (entropy > 0.8) {
         warnings.push({
           key,
           value,
           reason: `High entropy value in .env.example (≈${entropy.toFixed(2)})`,
-          severity: entropy > 0.92 ? "high" : "medium"
+          severity: entropy > 0.92 ? 'high' : 'medium',
         });
       }
     }

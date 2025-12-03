@@ -11,11 +11,13 @@ export interface FrameworkDetection {
 /**
  * Detects the framework being used in the project
  * by checking package.json and file structure
+ * @param cwd The current working directory of the project
+ * @returns Detected framework and its version (if applicable)
  */
 export function detectFramework(cwd: string): FrameworkDetection {
   try {
     const packageJsonPath = path.join(cwd, 'package.json');
-    
+
     if (!fs.existsSync(packageJsonPath)) {
       return { framework: 'unknown' };
     }
@@ -43,7 +45,7 @@ export function detectFramework(cwd: string): FrameworkDetection {
     }
 
     return { framework: 'unknown' };
-  } catch (error) {
+  } catch {
     return { framework: 'unknown' };
   }
 }

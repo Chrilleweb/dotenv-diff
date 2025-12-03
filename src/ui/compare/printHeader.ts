@@ -13,7 +13,7 @@ export function printHeader(
   exampleName: string,
   json: boolean,
   skipping: boolean,
-) {
+): void {
   if (json) return;
   console.log();
   console.log(chalk.blue(`🔍 Comparing ${envName} ↔ ${exampleName}...`));

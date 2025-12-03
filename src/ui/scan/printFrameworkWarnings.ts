@@ -9,7 +9,7 @@ import type { frameworkWarning } from '../../core/frameworkValidator.js';
 export function printFrameworkWarnings(
   warnings: frameworkWarning[],
   json: boolean,
-) {
+): void {
   if (!warnings || warnings.length === 0) return;
 
   if (json) {

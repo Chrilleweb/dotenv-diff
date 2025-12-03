@@ -19,7 +19,7 @@ export function printGitignoreWarning(options: GitignoreWarningOptions): void {
       chalk.yellow(
         `⚠️  No .gitignore found – your ${envFile} may be committed.\n` +
           `   Add:\n` +
-          `     ${envFile}\n`
+          `     ${envFile}\n`,
       ),
     );
   } else {
@@ -27,7 +27,7 @@ export function printGitignoreWarning(options: GitignoreWarningOptions): void {
       chalk.yellow(
         `⚠️  ${envFile} is not ignored by Git (.gitignore).\n` +
           `   Consider adding:\n` +
-          `     ${envFile}\n`
+          `     ${envFile}\n`,
       ),
     );
   }

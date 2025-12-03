@@ -13,7 +13,7 @@ export function determineComparisonFile(
 ): { path: string; name: string } | undefined {
   // Priority: explicit flags first, then auto-discovery
 
-  if( opts.noCompare ) {
+  if (opts.noCompare) {
     return undefined;
   }
   if (opts.examplePath) {

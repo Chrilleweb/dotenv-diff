@@ -7,7 +7,7 @@ import { type Filtered } from '../../config/types.js';
  * @param json Whether to output in JSON format.
  * @returns void
  */
-export function printIssues(filtered: Filtered, json: boolean) {
+export function printIssues(filtered: Filtered, json: boolean): void {
   if (json) return;
   if (filtered.missing.length) {
     const header = chalk.red('❌ Missing keys:');

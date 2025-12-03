@@ -17,7 +17,7 @@ export function printStats(
   stats: ScanStats,
   json: boolean,
   showStats: boolean,
-) {
+): void {
   if (json || !showStats) return;
   console.log(chalk.magenta('📊 Scan Statistics:'));
   console.log(chalk.magenta.dim(`   Files scanned: ${stats.filesScanned}`));
@@ -25,6 +25,8 @@ export function printStats(
   console.log(
     chalk.magenta.dim(`   Unique variables: ${stats.uniqueVariables}`),
   );
-  console.log(chalk.magenta.dim(`   Scan duration: ${stats.duration.toFixed(2)}s`));
+  console.log(
+    chalk.magenta.dim(`   Scan duration: ${stats.duration.toFixed(2)}s`),
+  );
   console.log();
 }

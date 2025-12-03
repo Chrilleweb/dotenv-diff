@@ -123,7 +123,6 @@ function ignoreUrlsMatch(url: string, ignoreUrls?: string[]): boolean {
   );
 }
 
-
 /**
  * Checks if a string looks like a harmless literal.
  * @param s - The string to check.
