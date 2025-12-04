@@ -17,6 +17,7 @@ import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printCspWarning } from '../ui/scan/printCspWarning.js';
 import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
 import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
+import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
 
 /**
  * Outputs the scan results to the console.
@@ -93,6 +94,9 @@ export function outputToConsole(
   // Print potential secrets found
   printSecrets(scanResult.secrets ?? [], isJson);
 
+  // Console log usage warning
+  printConsolelogWarning(scanResult.logged ?? [], isJson);
+
   // CSP warning
   printCspWarning(scanResult.hasCsp, isJson);
 
@@ -155,6 +159,7 @@ export function outputToConsole(
         exampleSecrets: scanResult.exampleWarnings?.length ?? 0,
         hasGitignoreIssue,
         frameworkWarnings: scanResult.frameworkWarnings?.length ?? 0,
+        logged: scanResult.logged?.length ?? 0,
       },
       isJson,
     );

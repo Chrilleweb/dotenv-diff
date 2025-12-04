@@ -193,7 +193,8 @@ export async function scanUsage(
               (scanResult.duplicates?.example?.length ?? 0) > 0 ||
               (scanResult.secrets?.length ?? 0) > 0)) ||
           (scanResult.exampleWarnings?.length ?? 0) > 0 ||
-          (scanResult.frameworkWarnings?.length ?? 0) > 0
+          (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
+          (scanResult.logged?.length ?? 0) > 0
         ),
     };
   }

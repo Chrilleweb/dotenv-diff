@@ -1,6 +1,7 @@
 import path from 'path';
 import type { EnvUsage, ScanOptions } from '../config/types.js';
 import { ENV_PATTERNS } from './patterns.js';
+import { hasIgnoreComment } from '../core/secretDetectors.js';
 
 /**
  * Scans a file for environment variable usage.
@@ -36,6 +37,20 @@ export async function scanFile(
       // Get the context (the actual line)
       const contextLine = lines[lineNumber - 1]?.trim() || '';
 
+      // Determine previous line for ignore detection
+      const prevLine = lines[lineNumber - 2]?.trim() || '';
+
+      const isIgnored =
+        hasIgnoreComment(contextLine) || hasIgnoreComment(prevLine);
+
+      // If usage is ignored, skip it entirely
+      if (isIgnored) continue;
+
+      // Check if console.log
+      const isLogged = /console\.(log|error|warn|info|debug)\(/.test(
+        contextLine,
+      );
+
       usages.push({
         variable,
         file: relativePath,
@@ -43,6 +58,7 @@ export async function scanFile(
         column,
         pattern: pattern.name,
         context: contextLine,
+        isLogged,
       });
     }
   }

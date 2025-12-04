@@ -112,6 +112,7 @@ export interface EnvUsage {
     | 'nuxt'
     | 'php';
   context: string; // The actual line content
+  isLogged?: boolean; // Whether this usage is logged to console
 }
 
 export interface ScanOptions {
@@ -144,6 +145,7 @@ export interface ScanResult {
   hasCsp?: boolean;
   frameworkWarnings?: frameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
+  logged: EnvUsage[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */
@@ -198,6 +200,12 @@ export interface ScanJsonEntry {
     example?: Array<{ key: string; count: number }>;
   };
   hasCsp?: boolean;
+  logged?: Array<{
+    variable: string;
+    file: string;
+    line: number;
+    context: string;
+  }>;
 }
 
 // Type for grouped usages by variable

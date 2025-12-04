@@ -63,6 +63,8 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
 
   const uniqueVariables = [...new Set(filteredUsages.map((u) => u.variable))];
 
+  const loggedVariables = filteredUsages.filter(u => u.isLogged);
+
   return {
     used: filteredUsages,
     missing: [],
@@ -79,5 +81,6 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       example: [],
     },
     hasCsp: hasCsp,
+    logged: loggedVariables,
   };
 }
