@@ -6,7 +6,10 @@ import type { frameworkWarning } from '../frameworkValidator.js';
  * @param u - The environment variable usage information
  * @param warnings - The array to push warnings into
  */
-export function applyNextJsRules(u: EnvUsage, warnings: frameworkWarning[]) {
+export function applyNextJsRules(
+  u: EnvUsage,
+  warnings: frameworkWarning[],
+): void {
   const isServerOnlyFile =
     u.file.includes('app/api/') ||
     u.file.endsWith('.server.ts') ||

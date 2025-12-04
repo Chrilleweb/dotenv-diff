@@ -6,7 +6,7 @@ import path from 'path';
  * Contains information about the current working directory, found environment files,
  * and the primary environment and example files.
  */
-export type Discovery = {
+export interface Discovery {
   cwd: string;
   envFiles: string[];
   primaryEnv: string;
@@ -14,7 +14,16 @@ export type Discovery = {
   envFlag: string | null;
   exampleFlag: string | null;
   alreadyWarnedMissingEnv: boolean;
-};
+}
+
+/**
+ * Arguments for the discoverEnvFiles function.
+ */
+interface DiscoverEnvFilesArgs {
+  cwd: string;
+  envFlag: string | null;
+  exampleFlag: string | null;
+}
 
 /**
  * Discovers environment files in the specified directory.
@@ -27,11 +36,7 @@ export function discoverEnvFiles({
   cwd,
   envFlag,
   exampleFlag,
-}: {
-  cwd: string;
-  envFlag: string | null;
-  exampleFlag: string | null;
-}): Discovery {
+}: DiscoverEnvFilesArgs): Discovery {
   // Find all .env* files in the current directory except .env.example*
   const envFiles = fs
     .readdirSync(cwd)

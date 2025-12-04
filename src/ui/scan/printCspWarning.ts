@@ -3,6 +3,9 @@ import chalk from 'chalk';
 /**
  * Prints a warning if no CSP was detected.
  * Does NOT affect exit code – soft security warning only.
+ * @param hasCsp Whether a Content-Security-Policy was detected (boolean or undefined)
+ * @param json Whether to output in JSON format
+ * @returns void
  */
 export function printCspWarning(
   hasCsp: boolean | undefined,

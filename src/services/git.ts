@@ -2,14 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 
-export type GitignoreCheckOptions = {
+interface GitignoreCheckOptions {
   /** Project root directory (default: process.cwd()) */
   cwd?: string;
   /** Name of the env file (default: ".env") */
   envFile?: string;
   /** Custom logger (default: console.log) */
   log?: (msg: string) => void;
-};
+}
 
 /** Are we in a git repo? (checks for .git directory in cwd) */
 export function isGitRepo(cwd = process.cwd()): boolean {
@@ -50,7 +50,11 @@ export function isEnvIgnoredByGit(
   return lines.some((line) => candidates.has(line));
 }
 
-/** Our simple candidate patterns that typically cover env files in the root and subfolders */
+/** Our simple candidate patterns that typically cover env files in the root and subfolders
+ * (e.g., ".env", ".env.local", "subdir/.env.test", etc.)
+ * @param envFile - The env file name (default: ".env")
+ * @returns A set of candidate patterns
+ */
 function getCandidatePatterns(envFile = '.env'): Set<string> {
   const base = envFile; // ".env"
   const star = `${base}*`; // ".env*"
@@ -69,7 +73,12 @@ function getCandidatePatterns(envFile = '.env'): Set<string> {
   ]);
 }
 
-// Matches only against our own candidate patterns (intentionally simple)
+/**
+ * Checks if a given pattern matches any of the candidate patterns for the env file.
+ * @param pattern - The pattern to check
+ * @param envFile - The env file name (default: ".env")
+ * @returns True if the pattern matches a candidate, false otherwise
+ */
 function matchesCandidate(pattern: string, envFile: string): boolean {
   return getCandidatePatterns(envFile).has(pattern);
 }
@@ -112,6 +121,8 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
 /**
  * Checks if .env file has gitignore issues.
  * Returns null if no issue, otherwise returns the reason.
+ * @param options - Options for the gitignore check.
+ * @returns Null if no issue, otherwise the reason for the issue.
  */
 export function checkGitignoreStatus(options: GitignoreCheckOptions = {}): {
   reason: 'no-gitignore' | 'not-ignored';
@@ -136,7 +147,10 @@ export function checkGitignoreStatus(options: GitignoreCheckOptions = {}): {
   return null;
 }
 
-/** Find the git repository root starting from startDir (walk up until ".git"). */
+/** Find the git repository root starting from startDir (walk up until ".git").
+ * @param startDir The directory to start searching from
+ * @returns The git root directory path, or null if not found
+ */
 export function findGitRoot(startDir: string): string | null {
   let dir = path.resolve(startDir);
   while (true) {

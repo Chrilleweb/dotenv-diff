@@ -10,6 +10,12 @@ export interface frameworkWarning {
   framework: Framework;
 }
 
+/**
+ * Validates environment variable usages against framework-specific rules
+ * @param usages - Array of environment variable usages
+ * @param cwd - Current working directory to detect framework
+ * @returns Array of framework-specific warnings
+ */
 export function frameworkValidator(
   usages: EnvUsage[],
   cwd: string,

@@ -19,7 +19,7 @@ export function loadConfig(cliOptions: Partial<RawOptions>): RawOptions {
 
   // Recursive search upwards for dotenv-diff.config.json
   function findConfigFile(dir: string): string | null {
-    const configPath = path.join(dir, 'dotenv-diff.config.json');
+    const configPath = path.resolve(dir, 'dotenv-diff.config.json');
     if (fs.existsSync(configPath)) return configPath;
 
     const parent = path.dirname(dir);
@@ -34,7 +34,7 @@ export function loadConfig(cliOptions: Partial<RawOptions>): RawOptions {
   if (foundPath) {
     try {
       const raw = fs.readFileSync(foundPath, 'utf8');
-      fileConfig = JSON.parse(raw);
+      fileConfig = JSON.parse(raw) satisfies Partial<RawOptions>;
       printConfigLoaded(foundPath);
     } catch (err) {
       printConfigLoadError(err);

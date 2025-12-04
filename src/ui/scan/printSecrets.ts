@@ -1,6 +1,11 @@
 import chalk from 'chalk';
 import { type SecretFinding } from '../../core/secretDetectors.js';
 
+/**
+ * Get the icon representing the severity level.
+ * @param severity - The severity level of the secret finding.
+ * @returns The corresponding icon as a string.
+ */
 function getSeverityIcon(severity: SecretFinding['severity']): string {
   switch (severity) {
     case 'high':
@@ -9,10 +14,18 @@ function getSeverityIcon(severity: SecretFinding['severity']): string {
       return '🟡';
     case 'low':
       return '🟢';
+    default:
+      return '🔵';
   }
 }
 
-function getSeverityColor(severity: 'high' | 'medium' | 'low') {
+/** Get the color function for the severity level.
+ * @param severity - The severity level of the secret finding.
+ * @returns The corresponding chalk color function.
+ */
+function getSeverityColor(
+  severity: SecretFinding['severity'],
+): (text: string) => string {
   switch (severity) {
     case 'high':
       return chalk.red;
@@ -20,15 +33,24 @@ function getSeverityColor(severity: 'high' | 'medium' | 'low') {
       return chalk.yellow;
     case 'low':
       return chalk.green;
+    default:
+      return chalk.blue;
   }
 }
 
-function getSeverityLabel(severity: 'high' | 'medium' | 'low'): string {
+/** Get the label for the severity level.
+ * @param severity - The severity level of the secret finding.
+ * @returns The corresponding label as a string.
+ */
+function getSeverityLabel(severity: SecretFinding['severity']): string {
   return severity.toUpperCase();
 }
 
 /**
  * Print potential secrets detected in the codebase.
+ * @param secrets - List of secret findings
+ * @param json - Whether to output in JSON format
+ * @returns void
  */
 export function printSecrets(secrets: SecretFinding[], json: boolean): void {
   if (json) return;

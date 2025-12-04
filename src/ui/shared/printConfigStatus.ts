@@ -3,6 +3,7 @@ import chalk from 'chalk';
 /**
  * Prints message when dotenv-diff.config.json is successfully loaded.
  * @param path Path to the config file
+ * @returns void
  */
 export function printConfigLoaded(path: string): void {
   console.log();
@@ -12,6 +13,7 @@ export function printConfigLoaded(path: string): void {
 /**
  * Prints message when dotenv-diff.config.json fails to parse.
  * @param error The thrown error
+ * @returns void
  */
 export function printConfigLoadError(error: unknown): void {
   console.error(chalk.red('❌ Failed to parse dotenv-diff.config.json:'));

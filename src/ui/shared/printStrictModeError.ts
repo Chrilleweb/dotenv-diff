@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-export interface StrictModeContext {
+interface StrictModeContext {
   unused: number;
   duplicatesEnv: number;
   duplicatesEx: number;
@@ -8,6 +8,7 @@ export interface StrictModeContext {
   exampleSecrets: number;
   hasGitignoreIssue: boolean;
   frameworkWarnings: number;
+  logged: number;
 }
 
 /**
@@ -32,6 +33,7 @@ export function printStrictModeError(
   if (ctx.exampleSecrets > 0) warnings.push('secrets in .env.example');
   if (ctx.hasGitignoreIssue) warnings.push('.env not ignored by git');
   if (ctx.frameworkWarnings > 0) warnings.push('framework specific warnings');
+  if (ctx.logged > 0) warnings.push('console logged environment variables');
 
   if (warnings.length === 0) return false;
 

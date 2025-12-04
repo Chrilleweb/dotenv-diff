@@ -8,10 +8,10 @@ import {
 /**
  * Creates a default dotenv-diff.config.json in the current directory if it doesn't exist.
  * If the file already exists, it notifies the user and does nothing.
+ * @returns void
  */
-export async function runInit() {
-  const cwd = process.cwd();
-  const configPath = path.join(cwd, 'dotenv-diff.config.json');
+export async function runInit(): Promise<void> {
+  const configPath = path.resolve('dotenv-diff.config.json');
 
   if (fs.existsSync(configPath)) {
     printInitExists(configPath);
@@ -25,6 +25,15 @@ export async function runInit() {
     ignoreUrls: ['https://example.com'],
   };
 
-  fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
-  printInitSuccess(configPath);
+  try {
+    await fs.promises.writeFile(
+      configPath,
+      JSON.stringify(defaultConfig, null, 2),
+      'utf8',
+    );
+
+    printInitSuccess(configPath);
+  } catch (err) {
+    console.error('Failed to create dotenv-diff.config.json:', err);
+  }
 }

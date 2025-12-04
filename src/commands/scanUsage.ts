@@ -80,16 +80,21 @@ function calculateStats(scanResult: ScanResult): ScanResult {
 }
 
 /**
- * Scans codebase for environment variable usage and compares with .env file
+ * Scans the codebase for environment variable usage and compares it with
+ * the selected environment file (.env or .env.example).
+ *
+ * This function performs the following:
+ *  - Scans the codebase for used environment variables
+ *  - Strips out usages found in commented code
+ *  - Detects missing variables, unused variables, duplicates, and secrets
+ *  - Determines which file to compare against based on CLI flags and config
+ *  - Optionally auto-fixes missing keys, duplicate keys, and .gitignore entries
+ *  - Validates usage patterns for specific frameworks (Next.js, Vite, etc.)
+ *  - Outputs results in JSON or console format
+ *  - Returns a boolean indicating whether the process should exit with an error
+ *
  * @param {ScanUsageOptions} opts - Scan configuration options
- * @param {string} [opts.envPath] - Path to .env file for comparison
- * @param {string} [opts.examplePath] - Path to .env.example file for comparison
- * @param {boolean} opts.json - Output as JSON instead of console
- * @param {boolean} opts.showUnused - Show unused variables from .env
- * @param {boolean} opts.showStats - Show detailed statistics
- * @param {boolean} [opts.isCiMode] - Run in CI mode (exit with error code)
- * @param {boolean} [opts.allowDuplicates] - Allow duplicate keys without warning
- * @returns {Promise<{exitWithError: boolean}>} Returns true if missing variables found
+ * @returns {Promise<{exitWithError: boolean}>} Whether the caller should exit with a non-zero code.
  */
 export async function scanUsage(
   opts: ScanUsageOptions,
@@ -193,7 +198,8 @@ export async function scanUsage(
               (scanResult.duplicates?.example?.length ?? 0) > 0 ||
               (scanResult.secrets?.length ?? 0) > 0)) ||
           (scanResult.exampleWarnings?.length ?? 0) > 0 ||
-          (scanResult.frameworkWarnings?.length ?? 0) > 0
+          (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
+          (scanResult.logged?.length ?? 0) > 0
         ),
     };
   }

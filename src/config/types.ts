@@ -2,6 +2,15 @@ import { type SecretFinding } from '../core/secretDetectors.js';
 import { type frameworkWarning } from '../core/frameworkValidator.js';
 import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
+// Type representing a duplicate entry
+export type Duplicate = { key: string; count: number };
+
+// Type representing the result of duplicate detection
+export interface DuplicateResult {
+  dupsEnv: Duplicate[];
+  dupsEx: Duplicate[];
+}
+
 // Allowed categories for comparison
 export const ALLOWED_CATEGORIES = [
   'missing',
@@ -112,6 +121,7 @@ export interface EnvUsage {
     | 'nuxt'
     | 'php';
   context: string; // The actual line content
+  isLogged?: boolean; // Whether this usage is logged to console
 }
 
 export interface ScanOptions {
@@ -144,6 +154,7 @@ export interface ScanResult {
   hasCsp?: boolean;
   frameworkWarnings?: frameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
+  logged: EnvUsage[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */
@@ -184,7 +195,6 @@ export interface ScanJsonEntry {
     pattern: string;
     context: string;
   }>;
-  // Add comparison info
   comparedAgainst?: string;
   totalEnvVariables?: number;
   secrets?: Array<{
@@ -198,6 +208,12 @@ export interface ScanJsonEntry {
     example?: Array<{ key: string; count: number }>;
   };
   hasCsp?: boolean;
+  logged?: Array<{
+    variable: string;
+    file: string;
+    line: number;
+    context: string;
+  }>;
 }
 
 // Type for grouped usages by variable

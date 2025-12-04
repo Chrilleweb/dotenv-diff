@@ -8,6 +8,7 @@ import { ensureFilesOrPrompt } from '../services/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
 import {
   type CompareJsonEntry,
+  type ComparisonOptions,
   type Options,
   type RawOptions,
 } from '../config/types.js';
@@ -18,8 +19,10 @@ import { loadConfig } from '../config/loadConfig.js';
 
 /**
  * Run scan-usage mode (default behavior)
+ * @param opts - Normalized options
+ * @returns void
  */
-async function runScanMode(opts: Options) {
+async function runScanMode(opts: Options): Promise<void> {
   const envPath = opts.envFlag || (fs.existsSync('.env') ? '.env' : undefined);
 
   const { exitWithError } = await scanUsage({
@@ -47,8 +50,10 @@ async function runScanMode(opts: Options) {
 
 /**
  * Run compare mode
+ * @param opts - Normalized options
+ * @returns void
  */
-async function runCompareMode(opts: Options) {
+async function runCompareMode(opts: Options): Promise<void> {
   // Handle direct file comparison (both --env and --example specified)
   if (opts.envFlag && opts.exampleFlag) {
     await runDirectFileComparison(opts);
@@ -61,8 +66,10 @@ async function runCompareMode(opts: Options) {
 
 /**
  * Compare two specific files directly
+ * @param opts - Normalized options
+ * @returns void
  */
-async function runDirectFileComparison(opts: Options) {
+async function runDirectFileComparison(opts: Options): Promise<void> {
   const envExists = fs.existsSync(opts.envFlag!);
   const exExists = fs.existsSync(opts.exampleFlag!);
 
@@ -94,8 +101,10 @@ async function runDirectFileComparison(opts: Options) {
 
 /**
  * Compare using auto-discovery
+ * @param opts - Normalized options
+ * @returns void
  */
-async function runAutoDiscoveryComparison(opts: Options) {
+async function runAutoDiscoveryComparison(opts: Options): Promise<void> {
   // Discover available env files
   const discovery = discoverEnvFiles({
     cwd: opts.cwd,
@@ -131,6 +140,10 @@ async function runAutoDiscoveryComparison(opts: Options) {
 
 /**
  * Handle missing files in CI vs interactive mode
+ * @param opts - Normalized options
+ * @param envFlag - Path to the .env file
+ * @param exampleFlag - Path to the example file
+ * @returns Whether the process should exit after handling missing files
  */
 async function handleMissingFiles(
   opts: Options,
@@ -166,8 +179,14 @@ async function handleMissingFiles(
 
 /**
  * Build options object for compareMany function
+ * @param opts - Normalized options
+ * @param report - Array to collect JSON report entries
+ * @returns ComparisonOptions object
  */
-function buildCompareOptions(opts: Options, report: CompareJsonEntry[]) {
+function buildCompareOptions(
+  opts: Options,
+  report: CompareJsonEntry[],
+): ComparisonOptions {
   return {
     checkValues: opts.checkValues,
     cwd: opts.cwd,
@@ -185,6 +204,7 @@ function buildCompareOptions(opts: Options, report: CompareJsonEntry[]) {
 /**
  * Handle the --init flag to create a sample config file
  * @param cliOptions - The CLI options parsed by commander
+ * @returns Whether the init process was handled
  */
 async function handleInitFlag(cliOptions: RawOptions): Promise<boolean> {
   if (cliOptions.init) {
@@ -197,12 +217,15 @@ async function handleInitFlag(cliOptions: RawOptions): Promise<boolean> {
 
 /**
  * Output results and exit with appropriate code
+ * @param report - The comparison report entries
+ * @param opts - Normalized options
+ * @param exitWithError - Whether to exit with an error code
  */
 function outputResults(
   report: CompareJsonEntry[],
   opts: Options,
   exitWithError: boolean,
-) {
+): void {
   if (opts.json) {
     console.log(JSON.stringify(report, null, 2));
   }
@@ -212,8 +235,9 @@ function outputResults(
 /**
  * Run the CLI program
  * @param program The commander program instance
+ * @returns void
  */
-export async function run(program: Command) {
+export async function run(program: Command): Promise<void> {
   program.parse(process.argv);
 
   // Load and normalize options

@@ -44,6 +44,8 @@ function parseCategories(
 
 /**
  * Parses regex patterns safely, exiting on invalid syntax.
+ * @param val - The input value, which can be a string, an array of strings, or undefined.
+ * @returns An array of RegExp objects.
  */
 function parseRegexList(val?: string | string[]): RegExp[] {
   const regexList: RegExp[] = [];
@@ -59,6 +61,8 @@ function parseRegexList(val?: string | string[]): RegExp[] {
 
 /**
  * Converts flag value to boolean.
+ * @param value - The input value.
+ * @returns The boolean representation.
  */
 function toBool(value: unknown): boolean {
   return value === true || value === 'true';
