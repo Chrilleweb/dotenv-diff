@@ -31,10 +31,9 @@ export function printConsolelogWarning(
 
     usages.slice(0, maxShow).forEach((usage) => {
       console.log(
-        chalk.yellow.dim(
-          `     Logged at: ${usage.file}:${usage.line} (${usage.pattern})`,
-        ),
+        chalk.yellow.dim(`     Logged at: ${usage.file}:${usage.line}`),
       );
+      console.log(chalk.gray(`       ${usage.context.trim()}`));
     });
 
     if (usages.length > maxShow) {
