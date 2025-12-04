@@ -35,12 +35,9 @@ export function printMissing(
     console.log(chalk.red(`   - ${variable}`));
 
     const maxShow = 3;
-    usages.slice(0, maxShow).forEach((usage: EnvUsage) => {
-      console.log(
-        chalk.red.dim(
-          `     Used in: ${usage.file}:${usage.line} (${usage.pattern})`,
-        ),
-      );
+    usages.slice(0, maxShow).forEach((usage) => {
+      console.log(chalk.red.dim(`     Used in: ${usage.file}:${usage.line}`));
+      console.log(chalk.gray(`       ${usage.context.trim()}`));
     });
 
     if (usages.length > maxShow) {
