@@ -164,8 +164,7 @@ function checkDuplicates(
   opts: ScanUsageOptions,
 ): DuplicateResult {
   const isIgnored = (key: string) =>
-    !opts.ignore.includes(key) &&
-    !opts.ignoreRegex.some((rx) => rx.test(key));
+    !opts.ignore.includes(key) && !opts.ignoreRegex.some((rx) => rx.test(key));
 
   // Duplicates in main env file
   const dupsEnv = findDuplicateKeys(compareFile.path).filter(({ key }) =>

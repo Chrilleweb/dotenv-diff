@@ -4,20 +4,29 @@ import { confirmYesNo } from '../ui/prompts.js';
 import { warnIfEnvNotIgnored } from './git.js';
 import { printPrompt } from '../ui/compare/printPrompt.js';
 
-/**
- * Ensures that the necessary .env files exist or prompts the user to create them.
- * This function handles only scenarios where the --compare flag is set
- * @param args - The arguments for the function.
- * @returns An object indicating whether a file was created or if the process should exit.
- */
-export async function ensureFilesOrPrompt(args: {
+interface EnsureFilesResult {
+  didCreate: boolean;
+  shouldExit: boolean;
+  exitCode: number;
+}
+
+interface EnsureFilesArgs {
   cwd: string;
   primaryEnv: string;
   primaryExample: string;
   alreadyWarnedMissingEnv: boolean;
   isYesMode: boolean;
   isCiMode: boolean;
-}) {
+}
+/**
+ * Ensures that the necessary .env files exist or prompts the user to create them.
+ * This function handles only scenarios where the --compare flag is set
+ * @param args - The arguments for the function.
+ * @returns An object indicating whether a file was created or if the process should exit.
+ */
+export async function ensureFilesOrPrompt(
+  args: EnsureFilesArgs,
+): Promise<EnsureFilesResult> {
   const {
     cwd,
     primaryEnv,
