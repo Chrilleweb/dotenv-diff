@@ -8,6 +8,7 @@ import { ensureFilesOrPrompt } from '../services/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
 import {
   type CompareJsonEntry,
+  type ComparisonOptions,
   type Options,
   type RawOptions,
 } from '../config/types.js';
@@ -21,7 +22,7 @@ import { loadConfig } from '../config/loadConfig.js';
  * @param opts - Normalized options
  * @returns void
  */
-async function runScanMode(opts: Options) {
+async function runScanMode(opts: Options): Promise<void> {
   const envPath = opts.envFlag || (fs.existsSync('.env') ? '.env' : undefined);
 
   const { exitWithError } = await scanUsage({
@@ -52,7 +53,7 @@ async function runScanMode(opts: Options) {
  * @param opts - Normalized options
  * @returns void
  */
-async function runCompareMode(opts: Options) {
+async function runCompareMode(opts: Options): Promise<void> {
   // Handle direct file comparison (both --env and --example specified)
   if (opts.envFlag && opts.exampleFlag) {
     await runDirectFileComparison(opts);
@@ -68,7 +69,7 @@ async function runCompareMode(opts: Options) {
  * @param opts - Normalized options
  * @returns void
  */
-async function runDirectFileComparison(opts: Options) {
+async function runDirectFileComparison(opts: Options): Promise<void> {
   const envExists = fs.existsSync(opts.envFlag!);
   const exExists = fs.existsSync(opts.exampleFlag!);
 
@@ -103,7 +104,7 @@ async function runDirectFileComparison(opts: Options) {
  * @param opts - Normalized options
  * @returns void
  */
-async function runAutoDiscoveryComparison(opts: Options) {
+async function runAutoDiscoveryComparison(opts: Options): Promise<void> {
   // Discover available env files
   const discovery = discoverEnvFiles({
     cwd: opts.cwd,
@@ -182,7 +183,10 @@ async function handleMissingFiles(
  * @param report - Array to collect JSON report entries
  * @returns ComparisonOptions object
  */
-function buildCompareOptions(opts: Options, report: CompareJsonEntry[]) {
+function buildCompareOptions(
+  opts: Options,
+  report: CompareJsonEntry[],
+): ComparisonOptions {
   return {
     checkValues: opts.checkValues,
     cwd: opts.cwd,
@@ -221,7 +225,7 @@ function outputResults(
   report: CompareJsonEntry[],
   opts: Options,
   exitWithError: boolean,
-) {
+): void {
   if (opts.json) {
     console.log(JSON.stringify(report, null, 2));
   }
@@ -233,7 +237,7 @@ function outputResults(
  * @param program The commander program instance
  * @returns void
  */
-export async function run(program: Command) {
+export async function run(program: Command): Promise<void> {
   program.parse(process.argv);
 
   // Load and normalize options
