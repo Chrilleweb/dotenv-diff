@@ -19,6 +19,10 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Changed
 - Updated dependencies to latest versions.
 
+### Fixed
+- Updated jsDocs for better code documentation.
+- Updated some functions for better type safety.
+
 ## [2.3.6] - 2025-12-02
 ### Added
 - Added strict mode handling for framework specific warnings.
