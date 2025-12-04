@@ -5,7 +5,12 @@ import { compareWithEnvFiles } from './compareScan.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { applyFixes } from './fixEnv.js';
 import { resolveFromCwd } from './helpers/resolveFromCwd.js';
-import type { ScanUsageOptions, ScanResult } from '../config/types.js';
+import type {
+  ScanUsageOptions,
+  ScanResult,
+  DuplicateResult,
+  Duplicate,
+} from '../config/types.js';
 
 export interface ProcessComparisonResult {
   scanResult: ScanResult;
@@ -13,7 +18,7 @@ export interface ProcessComparisonResult {
   comparedAgainst: string;
   duplicatesFound: boolean;
   dupsEnv: Array<{ key: string; count: number }>;
-  dupsExample: Array<{ key: string; count: number }>;
+  dupsEx: Array<{ key: string; count: number }>;
   fixApplied: boolean;
   removedDuplicates: string[];
   addedEnv: string[];
@@ -39,7 +44,7 @@ export function processComparisonFile(
   let comparedAgainst = '';
   let duplicatesFound = false;
   let dupsEnv: Array<{ key: string; count: number }> = [];
-  let dupsExample: Array<{ key: string; count: number }> = [];
+  let dupsEx: Array<{ key: string; count: number }> = [];
   let fixApplied = false;
   let removedDuplicates: string[] = [];
   let addedEnv: string[] = [];
@@ -71,8 +76,8 @@ export function processComparisonFile(
     if (!opts.allowDuplicates) {
       const duplicateResults = checkDuplicates(compareFile, opts);
       dupsEnv = duplicateResults.dupsEnv;
-      dupsExample = duplicateResults.dupsExample;
-      duplicatesFound = dupsEnv.length > 0 || dupsExample.length > 0;
+      dupsEx = duplicateResults.dupsEx;
+      duplicatesFound = dupsEnv.length > 0 || dupsEx.length > 0;
     }
 
     // Apply fixes (both duplicates + missing keys + gitignore)
@@ -99,7 +104,7 @@ export function processComparisonFile(
 
         scanResult.missing = [];
         dupsEnv = [];
-        dupsExample = [];
+        dupsEx = [];
         duplicatesFound = false;
       }
     }
@@ -108,7 +113,7 @@ export function processComparisonFile(
     if (duplicatesFound && (!opts.fix || !fixApplied)) {
       if (!scanResult.duplicates) scanResult.duplicates = {};
       if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
-      if (dupsExample.length > 0) scanResult.duplicates.example = dupsExample;
+      if (dupsEx.length > 0) scanResult.duplicates.example = dupsEx;
     }
   } catch (error) {
     const errorMessage = `Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
@@ -118,7 +123,7 @@ export function processComparisonFile(
       comparedAgainst,
       duplicatesFound,
       dupsEnv,
-      dupsExample,
+      dupsEx,
       fixApplied,
       removedDuplicates,
       addedEnv,
@@ -138,7 +143,7 @@ export function processComparisonFile(
     comparedAgainst,
     duplicatesFound,
     dupsEnv,
-    dupsExample,
+    dupsEx,
     fixApplied,
     removedDuplicates,
     addedEnv,
@@ -150,32 +155,38 @@ export function processComparisonFile(
 
 /**
  * Check for duplicate keys in env and example files
+ * @param compareFile - The file to compare against
+ * @param opts - Scan options
+ * @returns Object containing duplicate keys in env and example files
  */
 function checkDuplicates(
   compareFile: { path: string; name: string },
   opts: ScanUsageOptions,
-): {
-  dupsEnv: Array<{ key: string; count: number }>;
-  dupsExample: Array<{ key: string; count: number }>;
-} {
-  const dupsEnv = findDuplicateKeys(compareFile.path).filter(
-    ({ key }) =>
-      !opts.ignore.includes(key) &&
-      !opts.ignoreRegex.some((rx) => rx.test(key)),
+): DuplicateResult {
+  const isIgnored = (key: string) =>
+    !opts.ignore.includes(key) &&
+    !opts.ignoreRegex.some((rx) => rx.test(key));
+
+  // Duplicates in main env file
+  const dupsEnv = findDuplicateKeys(compareFile.path).filter(({ key }) =>
+    isIgnored(key),
   );
 
-  let dupsExample: Array<{ key: string; count: number }> = [];
+  // Duplicates in example file
+  let dupsEx: Duplicate[] = [];
 
   if (opts.examplePath) {
     const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
-    if (fs.existsSync(examplePath) && examplePath !== compareFile.path) {
-      dupsExample = findDuplicateKeys(examplePath).filter(
-        ({ key }) =>
-          !opts.ignore.includes(key) &&
-          !opts.ignoreRegex.some((rx) => rx.test(key)),
+
+    const exampleIsDifferentFile =
+      fs.existsSync(examplePath) && examplePath !== compareFile.path;
+
+    if (exampleIsDifferentFile) {
+      dupsEx = findDuplicateKeys(examplePath).filter(({ key }) =>
+        isIgnored(key),
       );
     }
   }
 
-  return { dupsEnv, dupsExample };
+  return { dupsEnv, dupsEx } satisfies DuplicateResult;
 }

@@ -3,7 +3,7 @@ import { type frameworkWarning } from '../core/frameworkValidator.js';
 import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
 // Type representing a duplicate entry
-type Duplicate = { key: string; count: number };
+export type Duplicate = { key: string; count: number };
 
 // Type representing the result of duplicate detection
 export interface DuplicateResult {
@@ -195,7 +195,6 @@ export interface ScanJsonEntry {
     pattern: string;
     context: string;
   }>;
-  // Add comparison info
   comparedAgainst?: string;
   totalEnvVariables?: number;
   secrets?: Array<{

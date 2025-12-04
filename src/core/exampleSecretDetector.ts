@@ -8,6 +8,11 @@ export interface ExampleSecretWarning {
   severity: 'high' | 'medium' | 'low';
 }
 
+/**
+ * Detects potential secrets in a .env.example file.
+ * @param env - An object representing the `.env.example` file (key-value pairs).
+ * @returns An array of warnings about potential secrets.
+ */
 export function detectSecretsInExample(
   env: Record<string, string>,
 ): ExampleSecretWarning[] {
