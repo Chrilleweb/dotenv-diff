@@ -12,6 +12,7 @@ import type {
   FilePair,
   ComparisonResult,
   Filtered,
+  DuplicateResult,
 } from '../config/types.js';
 import { isAllOk } from '../core/helpers/isAllOk.js';
 import { updateTotals } from '../core/helpers/updateTotals.js';
@@ -31,7 +32,9 @@ import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
  * @param opts Comparison options
  * @returns A function that filters categories
  */
-function createCategoryFilter(opts: ComparisonOptions) {
+function createCategoryFilter(
+  opts: ComparisonOptions,
+): (category: Category) => boolean {
   const onlySet: Set<Category> | undefined = opts.only?.length
     ? new Set(opts.only)
     : undefined;
@@ -90,12 +93,15 @@ function findDuplicates(
   examplePath: string,
   opts: ComparisonOptions,
   run: (cat: Category) => boolean,
-) {
+): DuplicateResult {
   if (opts.allowDuplicates || !run('duplicate'))
     return { dupsEnv: [], dupsEx: [] };
 
+  const ignoreSet = new Set(opts.ignore);
+  const regexList = opts.ignoreRegex;
+
   const filterKey = (key: string) =>
-    !opts.ignore.includes(key) && !opts.ignoreRegex.some((rx) => rx.test(key));
+    !ignoreSet.has(key) && !regexList.some((rx) => rx.test(key));
 
   const dupsEnv = findDuplicateKeys(envPath).filter(({ key }) =>
     filterKey(key),
@@ -104,7 +110,7 @@ function findDuplicates(
     filterKey(key),
   );
 
-  return { dupsEnv, dupsEx };
+  return { dupsEnv, dupsEx } satisfies DuplicateResult;
 }
 
 /**

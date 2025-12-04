@@ -2,6 +2,16 @@ import { type SecretFinding } from '../core/secretDetectors.js';
 import { type frameworkWarning } from '../core/frameworkValidator.js';
 import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
+// Type representing a duplicate entry
+type Duplicate = { key: string; count: number };
+
+// Type representing the result of duplicate detection
+export interface DuplicateResult {
+  dupsEnv: Duplicate[];
+  dupsEx: Duplicate[];
+}
+
+
 // Allowed categories for comparison
 export const ALLOWED_CATEGORIES = [
   'missing',
