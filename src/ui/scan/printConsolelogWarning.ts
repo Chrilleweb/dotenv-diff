@@ -39,9 +39,7 @@ export function printConsolelogWarning(
 
     if (usages.length > maxShow) {
       console.log(
-        chalk.gray(
-          `     ... and ${usages.length - maxShow} more locations`,
-        ),
+        chalk.gray(`     ... and ${usages.length - maxShow} more locations`),
       );
     }
   }

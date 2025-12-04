@@ -11,7 +11,6 @@ export interface DuplicateResult {
   dupsEx: Duplicate[];
 }
 
-
 // Allowed categories for comparison
 export const ALLOWED_CATEGORIES = [
   'missing',
