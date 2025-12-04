@@ -18,6 +18,8 @@ import { loadConfig } from '../config/loadConfig.js';
 
 /**
  * Run scan-usage mode (default behavior)
+ * @param opts - Normalized options
+ * @returns void
  */
 async function runScanMode(opts: Options) {
   const envPath = opts.envFlag || (fs.existsSync('.env') ? '.env' : undefined);
@@ -47,6 +49,8 @@ async function runScanMode(opts: Options) {
 
 /**
  * Run compare mode
+ * @param opts - Normalized options
+ * @returns void
  */
 async function runCompareMode(opts: Options) {
   // Handle direct file comparison (both --env and --example specified)
@@ -61,6 +65,8 @@ async function runCompareMode(opts: Options) {
 
 /**
  * Compare two specific files directly
+ * @param opts - Normalized options
+ * @returns void
  */
 async function runDirectFileComparison(opts: Options) {
   const envExists = fs.existsSync(opts.envFlag!);
@@ -94,6 +100,8 @@ async function runDirectFileComparison(opts: Options) {
 
 /**
  * Compare using auto-discovery
+ * @param opts - Normalized options
+ * @returns void
  */
 async function runAutoDiscoveryComparison(opts: Options) {
   // Discover available env files
@@ -131,6 +139,10 @@ async function runAutoDiscoveryComparison(opts: Options) {
 
 /**
  * Handle missing files in CI vs interactive mode
+ * @param opts - Normalized options
+ * @param envFlag - Path to the .env file
+ * @param exampleFlag - Path to the example file
+ * @returns Whether the process should exit after handling missing files
  */
 async function handleMissingFiles(
   opts: Options,
@@ -166,6 +178,9 @@ async function handleMissingFiles(
 
 /**
  * Build options object for compareMany function
+ * @param opts - Normalized options
+ * @param report - Array to collect JSON report entries
+ * @returns ComparisonOptions object
  */
 function buildCompareOptions(opts: Options, report: CompareJsonEntry[]) {
   return {
@@ -185,6 +200,7 @@ function buildCompareOptions(opts: Options, report: CompareJsonEntry[]) {
 /**
  * Handle the --init flag to create a sample config file
  * @param cliOptions - The CLI options parsed by commander
+ * @returns Whether the init process was handled
  */
 async function handleInitFlag(cliOptions: RawOptions): Promise<boolean> {
   if (cliOptions.init) {
@@ -197,6 +213,9 @@ async function handleInitFlag(cliOptions: RawOptions): Promise<boolean> {
 
 /**
  * Output results and exit with appropriate code
+ * @param report - The comparison report entries
+ * @param opts - Normalized options
+ * @param exitWithError - Whether to exit with an error code
  */
 function outputResults(
   report: CompareJsonEntry[],
@@ -212,6 +231,7 @@ function outputResults(
 /**
  * Run the CLI program
  * @param program The commander program instance
+ * @returns void
  */
 export async function run(program: Command) {
   program.parse(process.argv);
