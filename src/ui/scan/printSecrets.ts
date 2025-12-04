@@ -1,6 +1,11 @@
 import chalk from 'chalk';
 import { type SecretFinding } from '../../core/secretDetectors.js';
 
+/**
+ * Get the icon representing the severity level.
+ * @param severity - The severity level of the secret finding.
+ * @returns The corresponding icon as a string.
+ */
 function getSeverityIcon(severity: SecretFinding['severity']): string {
   switch (severity) {
     case 'high':
@@ -9,10 +14,16 @@ function getSeverityIcon(severity: SecretFinding['severity']): string {
       return '🟡';
     case 'low':
       return '🟢';
+    default:
+      return '🔵';
   }
 }
 
-function getSeverityColor(severity: 'high' | 'medium' | 'low') {
+/** Get the color function for the severity level.
+ * @param severity - The severity level of the secret finding.
+ * @returns The corresponding chalk color function.
+ */
+function getSeverityColor(severity: SecretFinding['severity']): (text: string) => string {
   switch (severity) {
     case 'high':
       return chalk.red;
@@ -20,6 +31,8 @@ function getSeverityColor(severity: 'high' | 'medium' | 'low') {
       return chalk.yellow;
     case 'low':
       return chalk.green;
+    default:
+      return chalk.blue;
   }
 }
 

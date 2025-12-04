@@ -43,6 +43,11 @@ export async function findFiles(
     }
   }
 
+  /**
+   * Walks the directory tree starting from startDir
+   * @param startDir The directory to start walking from
+   * @returns void
+   */
   async function walk(startDir: string): Promise<void> {
     // prevent duplicate subtree walks
     const key = path.resolve(startDir);

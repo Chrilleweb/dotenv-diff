@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { type Filtered } from '../../config/types.js';
 
-export interface CompareStats {
+interface CompareStats {
   envCount: number;
   exampleCount: number;
   sharedCount: number;
