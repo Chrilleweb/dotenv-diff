@@ -12,6 +12,13 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.7] - 2025-12-03
+### Added
+- Added warning for environment variables logged to console in codebase scanner.
+
+### Changed
+- Updated dependencies to latest versions.
+
 ## [2.3.6] - 2025-12-02
 ### Added
 - Added strict mode handling for framework specific warnings.

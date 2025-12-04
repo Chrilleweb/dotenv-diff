@@ -1,6 +1,6 @@
 {
   "name": "dotenv-diff",
-  "version": "2.3.6",
+  "version": "2.3.7",
   "type": "module",
   "description": "Scan your codebase to find environment variables in use.",
   "bin": {

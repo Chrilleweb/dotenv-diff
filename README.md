@@ -110,6 +110,18 @@ Potential real secrets found in .env.example:
 
 This helps you avoid accidentally committing sensitive information through your example files.
 
+## Accidentally logging environment variables to console?
+
+`dotenv-diff` can also detect when environment variables are being logged to the console in your codebase.
+
+For example, if you have code like this:
+
+```js
+console.log(process.env.API_KEY);
+```
+
+This will trigger a warning.
+
 ## ignore specific warnings
 
 You can use the `dotenv-diff-ignore` comment to ignore specific lines from secret detection. For example:
