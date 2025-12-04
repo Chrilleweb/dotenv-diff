@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-export interface StrictModeContext {
+interface StrictModeContext {
   unused: number;
   duplicatesEnv: number;
   duplicatesEx: number;

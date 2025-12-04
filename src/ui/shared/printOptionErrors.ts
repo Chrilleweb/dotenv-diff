@@ -33,6 +33,7 @@ export function printInvalidRegex(pattern: string): never {
 
 /**
  * Prints a warning when both --ci and --yes are provided.
+ * @returns void
  */
 export function printCiYesWarning(): void {
   console.log(

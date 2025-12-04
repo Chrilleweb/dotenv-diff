@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-export interface AutoFixResult {
+interface AutoFixResult {
   removedDuplicates: string[];
   addedEnv: string[];
   addedExample: string[];

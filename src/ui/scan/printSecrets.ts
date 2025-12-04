@@ -23,7 +23,9 @@ function getSeverityIcon(severity: SecretFinding['severity']): string {
  * @param severity - The severity level of the secret finding.
  * @returns The corresponding chalk color function.
  */
-function getSeverityColor(severity: SecretFinding['severity']): (text: string) => string {
+function getSeverityColor(
+  severity: SecretFinding['severity'],
+): (text: string) => string {
   switch (severity) {
     case 'high':
       return chalk.red;
@@ -36,12 +38,19 @@ function getSeverityColor(severity: SecretFinding['severity']): (text: string) =
   }
 }
 
-function getSeverityLabel(severity: 'high' | 'medium' | 'low'): string {
+/** Get the label for the severity level.
+ * @param severity - The severity level of the secret finding.
+ * @returns The corresponding label as a string.
+ */
+function getSeverityLabel(severity: SecretFinding['severity']): string {
   return severity.toUpperCase();
 }
 
 /**
  * Print potential secrets detected in the codebase.
+ * @param secrets - List of secret findings
+ * @param json - Whether to output in JSON format
+ * @returns void
  */
 export function printSecrets(secrets: SecretFinding[], json: boolean): void {
   if (json) return;

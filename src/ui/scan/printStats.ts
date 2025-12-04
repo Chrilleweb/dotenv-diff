@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-export interface ScanStats {
+interface ScanStats {
   filesScanned: number;
   totalUsages: number;
   uniqueVariables: number;
