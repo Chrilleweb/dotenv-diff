@@ -19,6 +19,8 @@ import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
 import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
 import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
 import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
+import { computeHealthScore } from '../core/computeHealthScore.js';
+import { printHealthScore } from '../ui/scan/printHealthScore.js';
 
 /**
  * Outputs the scan results to the console.
@@ -47,6 +49,9 @@ export function outputToConsole(
 
   // Show stats if requested
   printStats(scanResult.stats, isJson, opts.showStats ?? true);
+
+  const score = computeHealthScore(scanResult);
+  printHealthScore(score);
 
   // Show used variables if any found
   if (scanResult.stats.uniqueVariables > 0) {

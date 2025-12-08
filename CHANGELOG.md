@@ -15,6 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ## [2.3.8] - 2025-12-08
 ### Added
 - Added variables not using uppercase letters warning to codebase scanner.
+- Added health score feature to codebase scanner.
 
 ### Changed
 - Removed --no-compare option from CLI and config file.
