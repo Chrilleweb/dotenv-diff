@@ -4,6 +4,7 @@ import type {
   EnvUsage,
   ScanJsonEntry,
 } from '../config/types.js';
+import { computeHealthScore } from './computeHealthScore.js';
 
 /**
  * Creates a JSON output for the scan results.
@@ -32,8 +33,11 @@ export function createJsonOutput(
       })),
   }));
 
+  const healthScore = computeHealthScore(scanResult);
+
   const output: ScanJsonEntry = {
     stats: scanResult.stats,
+    healthScore,
     missing: missingGrouped,
     unused: scanResult.unused,
   };

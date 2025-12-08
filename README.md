@@ -133,6 +133,18 @@ const ignoredEntropy = "AIzaSyA-1234567890abcdefgHIJKLMNOpqrstuv" // dotenv-diff
 
 This will prevent `dotenv-diff` from flagging the line as a potential secret.
 
+## Healthscore 
+
+`dotenv-diff` includes by default a health score feature that provides an overall assessment of your project's environment variable management.
+
+The health score is calculated based on several factors, including:
+- The number of missing environment variables.
+- The presence of potential secrets exposed in your codebase.
+- The use of uppercase naming conventions for environment variable keys.
+- Logged environment variables in the codebase.
+- Unused variables in your `.env` or `.env.example` file.
+- Framework specific warning for SvelteKit or Next.js (depending on detected framework).
+
 ## Show unused variables
 
 As default, `dotenv-diff` will list variables that are defined in `.env` but never used in your codebase.

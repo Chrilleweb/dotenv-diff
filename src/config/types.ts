@@ -182,6 +182,7 @@ export interface ScanJsonEntry {
     uniqueVariables: number;
     duration: number;
   };
+  healthScore: number;
   missing: Array<{
     variable: string;
     usages: Array<{
