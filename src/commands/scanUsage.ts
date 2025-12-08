@@ -13,6 +13,7 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
+import { detectUppercaseKeys } from '../core/detectUppercaseKeys.js';
 
 /**
  * Filters out commented usages from the list.
@@ -125,6 +126,10 @@ export async function scanUsage(
     scanResult.frameworkWarnings = frameworkWarnings;
   }
 
+  if (opts.uppercaseKeys) {
+    scanResult.uppercaseWarnings = detectUppercaseKeys(scanResult.used);
+  }
+
   // Determine which file to compare against
   const compareFile = determineComparisonFile(opts);
   let envVariables: Record<string, string | undefined> = {};
@@ -158,7 +163,9 @@ export async function scanUsage(
       removedDuplicates = result.removedDuplicates;
       fixedKeys = result.addedEnv;
       gitignoreUpdated = result.gitignoreUpdated;
-
+      if (result.uppercaseWarnings) {
+        scanResult.uppercaseWarnings = result.uppercaseWarnings;
+      }
       if (result.exampleFull && result.comparedAgainst === '.env.example') {
         scanResult.exampleWarnings = detectSecretsInExample(result.exampleFull);
       }
@@ -199,7 +206,8 @@ export async function scanUsage(
               (scanResult.secrets?.length ?? 0) > 0)) ||
           (scanResult.exampleWarnings?.length ?? 0) > 0 ||
           (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
-          (scanResult.logged?.length ?? 0) > 0
+          (scanResult.logged?.length ?? 0) > 0 ||
+          (scanResult.uppercaseWarnings?.length ?? 0) > 0
         ),
     };
   }

@@ -192,6 +192,17 @@ dotenv-diff --ignore API_KEY --ignore-regex '^SECRET_'
 
 Ignored keys are removed from all warnings and do not affect the exit code.
 
+## Uppercase environment variable keys
+
+`dotenv-diff` can detect environment variable keys that are not in uppercase format, which is a common convention for environment variables.
+
+If any non-uppercase keys are found, a warning will be displayed showing the suggested uppercase version.
+You can disable this check using the `--no-uppercase-keys` flag (enabled by default):
+
+```bash
+dotenv-diff --no-uppercase-keys
+```
+
 ## Create a sample config file with --init
 
 You can create a sample `dotenv-diff.config.json` file in your current directory using the `--init` flag:

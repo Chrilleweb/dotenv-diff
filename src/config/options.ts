@@ -99,6 +99,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const noCompare = toBool(raw.noCompare);
 
   const ignoreUrls = parseList(raw.ignoreUrls);
+  const uppercaseKeys = raw.uppercaseKeys !== false;
 
   const cwd = process.cwd();
   const envFlag =
@@ -137,5 +138,6 @@ export function normalizeOptions(raw: RawOptions): Options {
     strict,
     ignoreUrls,
     noCompare,
+    uppercaseKeys,
   };
 }

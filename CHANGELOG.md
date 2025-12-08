@@ -12,6 +12,16 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.8] - 2025-12-08
+### Added
+- Added variables not using uppercase letters warning to codebase scanner.
+
+### Changed
+- Removed --no-compare option from CLI and config file.
+
+### Fixed
+- Fixed issue where show-stats and show-unused options were not working as expected in config file.
+
 ## [2.3.7] - 2025-12-03
 ### Added
 - Added warning for environment variables logged to console in codebase scanner.
