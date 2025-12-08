@@ -25,6 +25,7 @@ export interface ProcessComparisonResult {
   addedExample: string[];
   gitignoreUpdated: boolean;
   exampleFull?: Record<string, string> | undefined;
+  uppercaseWarnings?: Array<{ key: string; suggestion: string }>;
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -51,6 +52,7 @@ export function processComparisonFile(
   let addedExample: string[] = [];
   let gitignoreUpdated = false;
   let exampleFull: Record<string, string> | undefined = undefined;
+  let uppercaseWarnings: Array<{ key: string; suggestion: string }> = [];
 
   try {
     // Load .env.example (if exists)
@@ -71,6 +73,15 @@ export function processComparisonFile(
     envVariables = Object.fromEntries(envKeys.map((k) => [k, envFull[k]]));
     scanResult = compareWithEnvFiles(scanResult, envVariables);
     comparedAgainst = compareFile.name;
+
+    // Detect uppercase keys
+    if (opts.uppercaseKeys) {
+      for (const key of envKeys) {
+        if (!/^[A-Z0-9_]+$/.test(key)) {
+          uppercaseWarnings.push({ key, suggestion: key.toUpperCase() });
+        }
+      }
+    }
 
     // Find duplicates
     if (!opts.allowDuplicates) {
@@ -130,6 +141,7 @@ export function processComparisonFile(
       addedExample,
       gitignoreUpdated,
       exampleFull,
+      uppercaseWarnings,
       error: {
         message: errorMessage,
         shouldExit: opts.isCiMode ?? false,
@@ -150,6 +162,7 @@ export function processComparisonFile(
     addedExample,
     gitignoreUpdated,
     exampleFull,
+    uppercaseWarnings,
   };
 }
 

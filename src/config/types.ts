@@ -52,6 +52,7 @@ export type Options = {
   strict: boolean | undefined;
   ignoreUrls?: string[];
   noCompare: boolean;
+  uppercaseKeys: boolean;
 };
 
 /** Type representing the raw options for the comparison
@@ -82,6 +83,7 @@ export type RawOptions = {
   ignoreUrls?: string[];
   noCompare?: boolean;
   init?: boolean;
+  uppercaseKeys?: boolean;
 };
 
 /**
@@ -155,6 +157,7 @@ export interface ScanResult {
   frameworkWarnings?: frameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
   logged: EnvUsage[];
+  uppercaseWarnings?: UppercaseWarning[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */
@@ -169,6 +172,7 @@ export interface ScanUsageOptions extends ScanOptions {
   files?: string[];
   allowDuplicates?: boolean;
   strict?: boolean;
+  uppercaseKeys?: boolean;
 }
 
 export interface ScanJsonEntry {
@@ -233,6 +237,7 @@ export interface ComparisonOptions {
   only?: Category[];
   showStats?: boolean;
   strict?: boolean;
+  uppercaseKeys?: boolean;
 }
 
 export interface FilePair {
@@ -268,3 +273,8 @@ export type Filtered = {
   duplicatesEx: Array<{ key: string; count: number }>;
   gitignoreIssue: { reason: 'no-gitignore' | 'not-ignored' } | null;
 };
+
+export interface UppercaseWarning {
+  key: string;
+  suggestion: string;
+}

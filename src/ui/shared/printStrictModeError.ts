@@ -9,6 +9,7 @@ interface StrictModeContext {
   hasGitignoreIssue: boolean;
   frameworkWarnings: number;
   logged: number;
+  uppercaseWarnings?: number;
 }
 
 /**
@@ -34,6 +35,8 @@ export function printStrictModeError(
   if (ctx.hasGitignoreIssue) warnings.push('.env not ignored by git');
   if (ctx.frameworkWarnings > 0) warnings.push('framework specific warnings');
   if (ctx.logged > 0) warnings.push('console logged environment variables');
+  if (ctx.uppercaseWarnings && ctx.uppercaseWarnings > 0)
+    warnings.push('uppercase environment variable keys');
 
   if (warnings.length === 0) return false;
 

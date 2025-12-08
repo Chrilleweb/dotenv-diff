@@ -42,6 +42,7 @@ async function runScanMode(opts: Options): Promise<void> {
     strict: opts.strict ?? false,
     ignoreUrls: opts.ignoreUrls ?? [],
     noCompare: opts.noCompare ?? false,
+    uppercaseKeys: opts.uppercaseKeys ?? true,
     ...(opts.files ? { files: opts.files } : {}),
   });
 
@@ -196,6 +197,7 @@ function buildCompareOptions(
     ignore: opts.ignore,
     ignoreRegex: opts.ignoreRegex,
     showStats: opts.showStats,
+    uppercaseKeys: opts.uppercaseKeys,
     collect: (e: CompareJsonEntry) => report.push(e),
     ...(opts.only ? { only: opts.only } : {}),
   };
