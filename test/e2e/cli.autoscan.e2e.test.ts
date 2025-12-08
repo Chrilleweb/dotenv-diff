@@ -337,4 +337,54 @@ describe('no-flag autoscan', () => {
     );
     expect(res.stdout).toContain('[high]');
   });
+
+  it('will ingore files with excludeFiles option in config', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(
+      path.join(cwd, 'dotenv-diff.config.json'),
+      JSON.stringify(
+        {
+          excludeFiles: ['src/ignore/**'],
+        },
+        null,
+        2,
+      ),
+    );
+
+    fs.mkdirSync(path.join(cwd, 'src', 'ignore'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'ignore', 'index.ts'),
+      `const secret = "sk_test_4eC39HqLyjWDarjtT1zdp7dc";`,
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase');
+  });
+
+  it('excludes a single file using exclude option', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(
+      path.join(cwd, 'dotenv-diff.config.json'),
+      JSON.stringify(
+        {
+          exclude: ['src/secret.ts'],
+        },
+        null,
+        2,
+      ),
+    );
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'secret.ts'),
+      `const secret = "sk_live_123456789";`,
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase');
+    expect(res.status).toBe(0);
+  });
 });

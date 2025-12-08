@@ -28,8 +28,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build project
+        run: pnpm build
+
       - name: Run tests
         run: pnpm test
 
       - name: Run lint
         run: pnpm lint
+
+      - name: dotenv-diff scan
+        run: npx dotenv-diff
