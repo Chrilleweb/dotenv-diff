@@ -19,6 +19,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 - Removed --no-compare option from CLI and config file.
+- Updated dependencies to latest versions.
 
 ### Fixed
 - Fixed issue where show-stats and show-unused options were not working as expected in config file.
