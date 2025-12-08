@@ -33,3 +33,6 @@ jobs:
 
       - name: Run lint
         run: pnpm lint
+
+      - name: dotenv-diff scan
+        run: pnpm dotenv-diff
