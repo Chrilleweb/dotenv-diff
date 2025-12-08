@@ -24,6 +24,7 @@ export function createProgram() {
       'Automatically fix common issues: remove duplicates, add missing keys',
     )
     .option('--json', 'Output results in JSON format')
+    .option('--color', 'Enable colored output')
     .option('--no-color', 'Disable colored output')
     .option(
       '--only <list>',
@@ -44,16 +45,32 @@ export function createProgram() {
       'Comma-separated file patterns to exclude from scan',
     )
     .option(
+      '--show-unused',
+      'List variables that are defined in .env but not used in code',
+    )
+    .option(
       '--no-show-unused',
       'Do not list variables that are defined in .env but not used in code',
     )
+    .option('--show-stats', 'Show statistics')
     .option('--no-show-stats', 'Do not show statistics')
     .option('--strict', 'Enable fail on warnings')
+    .option(
+      '--secrets',
+      'Enable secret detection during scan (enabled by default)',
+    )
     .option(
       '--no-secrets',
       'Disable secret detection during scan (enabled by default)',
     )
-    .option('--ignore-urls <list>', 'Comma-separated URLs to ignore in secret scan')
-    .option('--no-compare', 'Scan codebase without comparing against any .env files')
+    .option(
+      '--ignore-urls <list>',
+      'Comma-separated URLs to ignore in secret scan',
+    )
+    .option(
+      '--uppercase-keys',
+      'Enable uppercase key validation (enabled by default)',
+    )
+    .option('--no-uppercase-keys', 'Disable uppercase key validation')
     .option('--init', 'Create a sample dotenv-diff.config.json file');
 }

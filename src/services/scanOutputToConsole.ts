@@ -18,6 +18,7 @@ import { printCspWarning } from '../ui/scan/printCspWarning.js';
 import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
 import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
 import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
+import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
 
 /**
  * Outputs the scan results to the console.
@@ -70,6 +71,14 @@ export function outputToConsole(
 
   if (scanResult.frameworkWarnings && scanResult.frameworkWarnings.length > 0) {
     printFrameworkWarnings(scanResult.frameworkWarnings, isJson);
+  }
+
+  if (scanResult.uppercaseWarnings && scanResult.uppercaseWarnings.length > 0) {
+    printUppercaseWarning(
+      scanResult.uppercaseWarnings,
+      comparedAgainst,
+      isJson,
+    );
   }
 
   printExampleWarnings(scanResult.exampleWarnings ?? [], isJson);
@@ -160,6 +169,7 @@ export function outputToConsole(
         hasGitignoreIssue,
         frameworkWarnings: scanResult.frameworkWarnings?.length ?? 0,
         logged: scanResult.logged?.length ?? 0,
+        uppercaseWarnings: scanResult.uppercaseWarnings?.length ?? 0,
       },
       isJson,
     );

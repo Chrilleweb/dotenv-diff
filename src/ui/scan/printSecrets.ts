@@ -1,24 +1,6 @@
 import chalk from 'chalk';
 import { type SecretFinding } from '../../core/secretDetectors.js';
 
-/**
- * Get the icon representing the severity level.
- * @param severity - The severity level of the secret finding.
- * @returns The corresponding icon as a string.
- */
-function getSeverityIcon(severity: SecretFinding['severity']): string {
-  switch (severity) {
-    case 'high':
-      return '🔴';
-    case 'medium':
-      return '🟡';
-    case 'low':
-      return '🟢';
-    default:
-      return '🔵';
-  }
-}
-
 /** Get the color function for the severity level.
  * @param severity - The severity level of the secret finding.
  * @returns The corresponding chalk color function.
@@ -72,15 +54,14 @@ export function printSecrets(secrets: SecretFinding[], json: boolean): void {
   }
 
   for (const [file, findings] of byFile) {
-    console.log(chalk.bold(`  ${file}`));
+    console.log(chalk.bold(`   ${file}`));
     for (const f of findings) {
-      const icon = getSeverityIcon(f.severity);
       const color = getSeverityColor(f.severity);
       const label = getSeverityLabel(f.severity);
 
       console.log(
         color(
-          `   ${icon} ${label}: Line ${f.line} - ${f.message}\n     ${chalk.dim(f.snippet)}`,
+          `    ${label}: Line ${f.line} - ${f.message}\n     ${chalk.dim(f.snippet)}`,
         ),
       );
     }
