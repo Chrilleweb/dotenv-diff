@@ -54,6 +54,7 @@ export type Options = {
   noCompare: boolean;
   uppercaseKeys: boolean;
   expireWarnings: boolean;
+  inconsistentNamingWarnings: boolean;
 };
 
 /** Type representing the raw options for the comparison
@@ -86,6 +87,7 @@ export type RawOptions = {
   init?: boolean;
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
+  inconsistentNamingWarnings?: boolean;
 };
 
 /**
@@ -161,6 +163,7 @@ export interface ScanResult {
   logged: EnvUsage[];
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
+  inconsistentNamingWarnings?: InconsistentNamingWarning[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */
@@ -177,6 +180,7 @@ export interface ScanUsageOptions extends ScanOptions {
   strict?: boolean;
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
+  inconsistentNamingWarnings?: boolean;
 }
 
 export interface ScanJsonEntry {
@@ -228,6 +232,15 @@ export interface ScanJsonEntry {
     date: string;
     daysLeft: number;
   }>;
+  uppercaseWarnings?: Array<{
+    key: string;
+    suggestion: string;
+  }>;
+  inconsistentNamingWarnings?: Array<{
+    key1: string;
+    key2: string;
+    suggestion: string;
+  }>;
 }
 
 // Type for grouped usages by variable
@@ -249,6 +262,7 @@ export interface ComparisonOptions {
   strict?: boolean;
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
+  inconsistentNamingWarnings?: boolean;
 }
 
 export interface FilePair {
@@ -294,4 +308,10 @@ export interface ExpireWarning {
   key: string;
   date: string;
   daysLeft: number;
+}
+
+export interface InconsistentNamingWarning {
+  key1: string;
+  key2: string;
+  suggestion: string;
 }

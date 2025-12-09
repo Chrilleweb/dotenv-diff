@@ -101,6 +101,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const ignoreUrls = parseList(raw.ignoreUrls);
   const uppercaseKeys = raw.uppercaseKeys !== false;
   const expireWarnings = raw.expireWarnings !== false;
+  const inconsistentNamingWarnings = raw.inconsistentNamingWarnings !== false;
 
   const cwd = process.cwd();
   const envFlag =
@@ -141,5 +142,6 @@ export function normalizeOptions(raw: RawOptions): Options {
     noCompare,
     uppercaseKeys,
     expireWarnings,
+    inconsistentNamingWarnings,
   };
 }

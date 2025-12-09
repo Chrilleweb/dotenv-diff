@@ -7,6 +7,7 @@ import { applyFixes } from './fixEnv.js';
 import { toUpperSnakeCase } from './helpers/toUpperSnakeCase.js';
 import { resolveFromCwd } from './helpers/resolveFromCwd.js';
 import { detectExpirations } from './detectExpirations.js';
+import { detectInconsistentNaming } from './detectInconsistentNaming.js';
 import type {
   ScanUsageOptions,
   ScanResult,
@@ -29,6 +30,11 @@ export interface ProcessComparisonResult {
   exampleFull?: Record<string, string> | undefined;
   uppercaseWarnings?: Array<{ key: string; suggestion: string }>;
   expireWarnings?: Array<{ key: string; date: string; daysLeft: number }>;
+  inconsistentNamingWarnings?: Array<{
+    key1: string;
+    key2: string;
+    suggestion: string;
+  }>;
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -58,6 +64,11 @@ export function processComparisonFile(
   let uppercaseWarnings: Array<{ key: string; suggestion: string }> = [];
   let expireWarnings: Array<{ key: string; date: string; daysLeft: number }> =
     [];
+  let inconsistentNamingWarnings: Array<{
+    key1: string;
+    key2: string;
+    suggestion: string;
+  }> = [];
 
   try {
     // Load .env.example (if exists)
@@ -98,6 +109,17 @@ export function processComparisonFile(
 
     if (opts.expireWarnings) {
       expireWarnings = detectExpirations(compareFile.path);
+    }
+
+    // Check for inconsistent naming across env + example keys
+    if (opts.inconsistentNamingWarnings) {
+      const envKeysList = Object.keys(envFull);
+      const exampleKeysList = exampleFull ? Object.keys(exampleFull) : [];
+
+      // Combine all keys for naming analysis
+      const allKeys = [...envKeysList, ...exampleKeysList];
+
+      inconsistentNamingWarnings = detectInconsistentNaming(allKeys);
     }
 
     // Apply fixes (both duplicates + missing keys + gitignore)
@@ -152,6 +174,7 @@ export function processComparisonFile(
       exampleFull,
       uppercaseWarnings,
       expireWarnings,
+      inconsistentNamingWarnings,
       error: {
         message: errorMessage,
         shouldExit: opts.isCiMode ?? false,
@@ -174,6 +197,7 @@ export function processComparisonFile(
     exampleFull,
     uppercaseWarnings,
     expireWarnings,
+    inconsistentNamingWarnings,
   };
 }
 

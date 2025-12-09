@@ -164,6 +164,10 @@ export async function scanUsage(
       if (result.expireWarnings) {
         scanResult.expireWarnings = result.expireWarnings;
       }
+      if (result.inconsistentNamingWarnings) {
+        scanResult.inconsistentNamingWarnings =
+          result.inconsistentNamingWarnings;
+      }
       if (result.exampleFull && result.comparedAgainst === '.env.example') {
         scanResult.exampleWarnings = detectSecretsInExample(result.exampleFull);
       }
@@ -206,7 +210,8 @@ export async function scanUsage(
           (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
           (scanResult.logged?.length ?? 0) > 0 ||
           (scanResult.uppercaseWarnings?.length ?? 0) > 0 ||
-          (scanResult.expireWarnings?.length ?? 0) > 0
+          (scanResult.expireWarnings?.length ?? 0) > 0 ||
+          (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0
         ),
     };
   }

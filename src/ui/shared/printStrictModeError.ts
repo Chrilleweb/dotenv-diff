@@ -11,6 +11,7 @@ interface StrictModeContext {
   logged: number;
   uppercaseWarnings?: number;
   expireWarnings?: number;
+  inconsistentNamingWarnings?: number;
 }
 
 /**
@@ -40,6 +41,8 @@ export function printStrictModeError(
     warnings.push('uppercase environment variable keys');
   if (ctx.expireWarnings && ctx.expireWarnings > 0)
     warnings.push('expired environment variables');
+  if (ctx.inconsistentNamingWarnings && ctx.inconsistentNamingWarnings > 0)
+    warnings.push('inconsistent naming patterns');
 
   if (warnings.length === 0) return false;
 

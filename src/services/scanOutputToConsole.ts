@@ -22,6 +22,7 @@ import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
 import { computeHealthScore } from '../core/computeHealthScore.js';
 import { printHealthScore } from '../ui/scan/printHealthScore.js';
 import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
+import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
 
 /**
  * Outputs the scan results to the console.
@@ -83,6 +84,16 @@ export function outputToConsole(
     printUppercaseWarning(
       scanResult.uppercaseWarnings,
       comparedAgainst,
+      isJson,
+    );
+  }
+
+  if (
+    scanResult.inconsistentNamingWarnings &&
+    scanResult.inconsistentNamingWarnings.length > 0
+  ) {
+    printInconsistentNamingWarning(
+      scanResult.inconsistentNamingWarnings,
       isJson,
     );
   }
@@ -180,6 +191,8 @@ export function outputToConsole(
         logged: scanResult.logged?.length ?? 0,
         uppercaseWarnings: scanResult.uppercaseWarnings?.length ?? 0,
         expireWarnings: scanResult.expireWarnings?.length ?? 0,
+        inconsistentNamingWarnings:
+          scanResult.inconsistentNamingWarnings?.length ?? 0,
       },
       isJson,
     );

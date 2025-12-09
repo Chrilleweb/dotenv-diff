@@ -44,6 +44,7 @@ async function runScanMode(opts: Options): Promise<void> {
     noCompare: opts.noCompare ?? false,
     uppercaseKeys: opts.uppercaseKeys ?? true,
     expireWarnings: opts.expireWarnings,
+    inconsistentNamingWarnings: opts.inconsistentNamingWarnings,
     ...(opts.files ? { files: opts.files } : {}),
   });
 
