@@ -13,7 +13,6 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
-import { detectUppercaseKeys } from '../core/detectUppercaseKeys.js';
 
 /**
  * Filters out commented usages from the list.
@@ -124,10 +123,6 @@ export async function scanUsage(
   const frameworkWarnings = frameworkValidator(scanResult.used, opts.cwd);
   if (frameworkWarnings.length > 0) {
     scanResult.frameworkWarnings = frameworkWarnings;
-  }
-
-  if (opts.uppercaseKeys) {
-    scanResult.uppercaseWarnings = detectUppercaseKeys(scanResult.used);
   }
 
   // Determine which file to compare against

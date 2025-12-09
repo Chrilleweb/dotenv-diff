@@ -4,6 +4,7 @@ import { filterIgnoredKeys } from './filterIgnoredKeys.js';
 import { compareWithEnvFiles } from './compareScan.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import { applyFixes } from './fixEnv.js';
+import { toUpperSnakeCase } from './helpers/toUpperSnakeCase.js';
 import { resolveFromCwd } from './helpers/resolveFromCwd.js';
 import type {
   ScanUsageOptions,
@@ -78,7 +79,7 @@ export function processComparisonFile(
     if (opts.uppercaseKeys) {
       for (const key of envKeys) {
         if (!/^[A-Z0-9_]+$/.test(key)) {
-          uppercaseWarnings.push({ key, suggestion: key.toUpperCase() });
+          uppercaseWarnings.push({ key, suggestion: toUpperSnakeCase(key) });
         }
       }
     }
