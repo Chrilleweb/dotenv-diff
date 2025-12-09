@@ -59,6 +59,9 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 - Duration refactored for better code maintainability.
 
+## Changed
+- Removed CSP detection from codebase scanner, as it was causing false positives in some cases for backend frameworks.
+
 ## [2.3.4] - 2025-11-05
 ### Fixed
 - Fixed issue where CSP detection was not working as expected in some file types.

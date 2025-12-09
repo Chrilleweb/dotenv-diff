@@ -14,7 +14,6 @@ import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
-import { printCspWarning } from '../ui/scan/printCspWarning.js';
 import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
 import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
 import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
@@ -122,9 +121,6 @@ export function outputToConsole(
 
   // Console log usage warning
   printConsolelogWarning(scanResult.logged ?? [], isJson);
-
-  // CSP warning
-  printCspWarning(scanResult.hasCsp, isJson);
 
   // Expiration warnings
   printExpireWarnings(scanResult.expireWarnings ?? [], isJson);

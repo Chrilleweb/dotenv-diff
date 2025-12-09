@@ -157,7 +157,6 @@ export interface ScanResult {
     env?: Array<{ key: string; count: number }>;
     example?: Array<{ key: string; count: number }>;
   };
-  hasCsp?: boolean;
   frameworkWarnings?: frameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
   logged: EnvUsage[];
@@ -220,7 +219,6 @@ export interface ScanJsonEntry {
     env?: Array<{ key: string; count: number }>;
     example?: Array<{ key: string; count: number }>;
   };
-  hasCsp?: boolean;
   logged?: Array<{
     variable: string;
     file: string;

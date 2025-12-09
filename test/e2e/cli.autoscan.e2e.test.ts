@@ -246,37 +246,6 @@ describe('no-flag autoscan', () => {
     expect(res.stdout).not.toContain('SECRET_KEY');
   });
 
-  it('warns about missing CSP when scanning codebase', () => {
-    const cwd = tmpDir();
-
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'src', 'index.ts'),
-      `const url = "https://example.com";`,
-    );
-
-    const res = runCli(cwd, []);
-    expect(res.status).toBe(0);
-    expect(res.stdout).toContain('CSP is missing');
-  });
-
-  it('does not warn about CSP when CSP is present in codebase', () => {
-    const cwd = tmpDir();
-
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'src', 'index.ts'),
-      `
-      <head>
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
-      </head>
-    `,
-    );
-
-    const res = runCli(cwd, []);
-    expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('CSP is missing');
-  });
   it('should warn about potential secret foound i .env.example', () => {
     const cwd = tmpDir();
 
