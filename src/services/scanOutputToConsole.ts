@@ -21,6 +21,7 @@ import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
 import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
 import { computeHealthScore } from '../core/computeHealthScore.js';
 import { printHealthScore } from '../ui/scan/printHealthScore.js';
+import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
 
 /**
  * Outputs the scan results to the console.
@@ -114,6 +115,9 @@ export function outputToConsole(
   // CSP warning
   printCspWarning(scanResult.hasCsp, isJson);
 
+  // Expiration warnings
+  printExpireWarnings(scanResult.expireWarnings ?? [], isJson);
+
   // Check for high severity secrets - ALWAYS exit with error
   const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
     (s) => s.severity === 'high',
@@ -175,6 +179,7 @@ export function outputToConsole(
         frameworkWarnings: scanResult.frameworkWarnings?.length ?? 0,
         logged: scanResult.logged?.length ?? 0,
         uppercaseWarnings: scanResult.uppercaseWarnings?.length ?? 0,
+        expireWarnings: scanResult.expireWarnings?.length ?? 0,
       },
       isJson,
     );

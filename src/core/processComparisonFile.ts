@@ -6,6 +6,7 @@ import { findDuplicateKeys } from '../services/duplicates.js';
 import { applyFixes } from './fixEnv.js';
 import { toUpperSnakeCase } from './helpers/toUpperSnakeCase.js';
 import { resolveFromCwd } from './helpers/resolveFromCwd.js';
+import { detectExpirations } from './detectExpirations.js';
 import type {
   ScanUsageOptions,
   ScanResult,
@@ -27,6 +28,7 @@ export interface ProcessComparisonResult {
   gitignoreUpdated: boolean;
   exampleFull?: Record<string, string> | undefined;
   uppercaseWarnings?: Array<{ key: string; suggestion: string }>;
+  expireWarnings?: Array<{ key: string; date: string; daysLeft: number }>;
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -54,6 +56,8 @@ export function processComparisonFile(
   let gitignoreUpdated = false;
   let exampleFull: Record<string, string> | undefined = undefined;
   let uppercaseWarnings: Array<{ key: string; suggestion: string }> = [];
+  let expireWarnings: Array<{ key: string; date: string; daysLeft: number }> =
+    [];
 
   try {
     // Load .env.example (if exists)
@@ -90,6 +94,10 @@ export function processComparisonFile(
       dupsEnv = duplicateResults.dupsEnv;
       dupsEx = duplicateResults.dupsEx;
       duplicatesFound = dupsEnv.length > 0 || dupsEx.length > 0;
+    }
+
+    if (opts.expireWarnings) {
+      expireWarnings = detectExpirations(compareFile.path);
     }
 
     // Apply fixes (both duplicates + missing keys + gitignore)
@@ -143,6 +151,7 @@ export function processComparisonFile(
       gitignoreUpdated,
       exampleFull,
       uppercaseWarnings,
+      expireWarnings,
       error: {
         message: errorMessage,
         shouldExit: opts.isCiMode ?? false,
@@ -164,6 +173,7 @@ export function processComparisonFile(
     gitignoreUpdated,
     exampleFull,
     uppercaseWarnings,
+    expireWarnings,
   };
 }
 

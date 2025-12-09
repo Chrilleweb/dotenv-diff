@@ -53,6 +53,7 @@ export type Options = {
   ignoreUrls?: string[];
   noCompare: boolean;
   uppercaseKeys: boolean;
+  expireWarnings: boolean;
 };
 
 /** Type representing the raw options for the comparison
@@ -84,6 +85,7 @@ export type RawOptions = {
   noCompare?: boolean;
   init?: boolean;
   uppercaseKeys?: boolean;
+  expireWarnings?: boolean;
 };
 
 /**
@@ -158,6 +160,7 @@ export interface ScanResult {
   exampleWarnings?: ExampleSecretWarning[];
   logged: EnvUsage[];
   uppercaseWarnings?: UppercaseWarning[];
+  expireWarnings?: ExpireWarning[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */
@@ -173,6 +176,7 @@ export interface ScanUsageOptions extends ScanOptions {
   allowDuplicates?: boolean;
   strict?: boolean;
   uppercaseKeys?: boolean;
+  expireWarnings?: boolean;
 }
 
 export interface ScanJsonEntry {
@@ -219,6 +223,11 @@ export interface ScanJsonEntry {
     line: number;
     context: string;
   }>;
+  expireWarnings?: Array<{
+    key: string;
+    date: string;
+    daysLeft: number;
+  }>;
 }
 
 // Type for grouped usages by variable
@@ -239,6 +248,7 @@ export interface ComparisonOptions {
   showStats?: boolean;
   strict?: boolean;
   uppercaseKeys?: boolean;
+  expireWarnings?: boolean;
 }
 
 export interface FilePair {
@@ -278,4 +288,10 @@ export type Filtered = {
 export interface UppercaseWarning {
   key: string;
   suggestion: string;
+}
+
+export interface ExpireWarning {
+  key: string;
+  date: string;
+  daysLeft: number;
 }

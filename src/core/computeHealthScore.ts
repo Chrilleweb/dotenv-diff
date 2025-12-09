@@ -33,6 +33,9 @@ export function computeHealthScore(scan: ScanResult): number {
   // === 7. Example secrets ===
   score -= (scan.exampleWarnings?.length ?? 0) * 10;
 
+  // === 8. Expiration warnings ===
+  score -= (scan.expireWarnings?.length ?? 0) * 5;
+
   // Never go below 0 or above 100
   return Math.max(0, Math.min(100, score));
 }

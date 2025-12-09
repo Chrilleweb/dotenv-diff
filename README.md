@@ -145,6 +145,18 @@ The health score is calculated based on several factors, including:
 - Unused variables in your `.env` or `.env.example` file.
 - Framework specific warning for SvelteKit or Next.js (depending on detected framework).
 
+## Expiration date warnings
+
+By default, `dotenv-diff` will detect environment variables with expiration dates and warn you if they are expired or about to expire.
+To specify an expiration date for an environment variable, add a comment in the following format on the same line this an example of a .env.example file:
+
+```bash
+# @expire YYYY-MM-DD
+API_TOKEN=
+```
+
+When you run `dotenv-diff`, it will check the expiration dates and display warnings for any variables that are expired or will expire soon.
+
 ## Show unused variables
 
 As default, `dotenv-diff` will list variables that are defined in `.env` but never used in your codebase.

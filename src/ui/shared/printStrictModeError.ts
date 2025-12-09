@@ -10,6 +10,7 @@ interface StrictModeContext {
   frameworkWarnings: number;
   logged: number;
   uppercaseWarnings?: number;
+  expireWarnings?: number;
 }
 
 /**
@@ -37,6 +38,8 @@ export function printStrictModeError(
   if (ctx.logged > 0) warnings.push('console logged environment variables');
   if (ctx.uppercaseWarnings && ctx.uppercaseWarnings > 0)
     warnings.push('uppercase environment variable keys');
+  if (ctx.expireWarnings && ctx.expireWarnings > 0)
+    warnings.push('expired environment variables');
 
   if (warnings.length === 0) return false;
 
