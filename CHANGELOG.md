@@ -12,6 +12,15 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.9] - 2025-12-09
+### Added
+- Added expiration date warnings for environment variables in codebase scanner.
+- Added inconsistent naming warnings for environment variables in codebase scanner.
+
+### Changed
+- Changed health score calculation weights for better accuracy.
+- Removed CSP detection from codebase scanner, as it was causing false positives in some cases for backend frameworks.
+
 ## [2.3.8] - 2025-12-08
 ### Added
 - Added variables not using uppercase letters warning to codebase scanner.

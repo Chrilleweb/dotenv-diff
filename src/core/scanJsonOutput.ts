@@ -51,6 +51,22 @@ export function createJsonOutput(
     }));
   }
 
+  if (scanResult.uppercaseWarnings?.length) {
+    output.uppercaseWarnings = scanResult.uppercaseWarnings.map((w) => ({
+      key: w.key,
+      suggestion: w.suggestion,
+    }));
+  }
+
+  if (scanResult.inconsistentNamingWarnings?.length) {
+    output.inconsistentNamingWarnings =
+      scanResult.inconsistentNamingWarnings.map((w) => ({
+        key1: w.key1,
+        key2: w.key2,
+        suggestion: w.suggestion,
+      }));
+  }
+
   // Add duplicates if found
   if (scanResult.duplicates) {
     output.duplicates = scanResult.duplicates;

@@ -53,6 +53,8 @@ export type Options = {
   ignoreUrls?: string[];
   noCompare: boolean;
   uppercaseKeys: boolean;
+  expireWarnings: boolean;
+  inconsistentNamingWarnings: boolean;
 };
 
 /** Type representing the raw options for the comparison
@@ -84,6 +86,8 @@ export type RawOptions = {
   noCompare?: boolean;
   init?: boolean;
   uppercaseKeys?: boolean;
+  expireWarnings?: boolean;
+  inconsistentNamingWarnings?: boolean;
 };
 
 /**
@@ -153,11 +157,12 @@ export interface ScanResult {
     env?: Array<{ key: string; count: number }>;
     example?: Array<{ key: string; count: number }>;
   };
-  hasCsp?: boolean;
   frameworkWarnings?: frameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
   logged: EnvUsage[];
   uppercaseWarnings?: UppercaseWarning[];
+  expireWarnings?: ExpireWarning[];
+  inconsistentNamingWarnings?: InconsistentNamingWarning[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */
@@ -173,6 +178,8 @@ export interface ScanUsageOptions extends ScanOptions {
   allowDuplicates?: boolean;
   strict?: boolean;
   uppercaseKeys?: boolean;
+  expireWarnings?: boolean;
+  inconsistentNamingWarnings?: boolean;
 }
 
 export interface ScanJsonEntry {
@@ -212,12 +219,25 @@ export interface ScanJsonEntry {
     env?: Array<{ key: string; count: number }>;
     example?: Array<{ key: string; count: number }>;
   };
-  hasCsp?: boolean;
   logged?: Array<{
     variable: string;
     file: string;
     line: number;
     context: string;
+  }>;
+  expireWarnings?: Array<{
+    key: string;
+    date: string;
+    daysLeft: number;
+  }>;
+  uppercaseWarnings?: Array<{
+    key: string;
+    suggestion: string;
+  }>;
+  inconsistentNamingWarnings?: Array<{
+    key1: string;
+    key2: string;
+    suggestion: string;
   }>;
 }
 
@@ -239,6 +259,8 @@ export interface ComparisonOptions {
   showStats?: boolean;
   strict?: boolean;
   uppercaseKeys?: boolean;
+  expireWarnings?: boolean;
+  inconsistentNamingWarnings?: boolean;
 }
 
 export interface FilePair {
@@ -277,5 +299,17 @@ export type Filtered = {
 
 export interface UppercaseWarning {
   key: string;
+  suggestion: string;
+}
+
+export interface ExpireWarning {
+  key: string;
+  date: string;
+  daysLeft: number;
+}
+
+export interface InconsistentNamingWarning {
+  key1: string;
+  key2: string;
   suggestion: string;
 }

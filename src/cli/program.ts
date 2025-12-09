@@ -72,5 +72,18 @@ export function createProgram() {
       'Enable uppercase key validation (enabled by default)',
     )
     .option('--no-uppercase-keys', 'Disable uppercase key validation')
+    .option(
+      '--expire-warnings',
+      'Enable expiration date warnings for environment variables (enabled by default)',
+    )
+    .option('--no-expire-warnings', 'Disable expiration date warnings')
+    .option(
+      '--inconsistent-naming-warnings',
+      'Enable inconsistent naming pattern warnings (enabled by default)',
+    )
+    .option(
+      '--no-inconsistent-naming-warnings',
+      'Disable inconsistent naming pattern warnings',
+    )
     .option('--init', 'Create a sample dotenv-diff.config.json file');
 }

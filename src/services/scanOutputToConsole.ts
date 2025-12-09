@@ -14,13 +14,14 @@ import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
-import { printCspWarning } from '../ui/scan/printCspWarning.js';
 import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
 import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
 import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
 import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
 import { computeHealthScore } from '../core/computeHealthScore.js';
 import { printHealthScore } from '../ui/scan/printHealthScore.js';
+import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
+import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
 
 /**
  * Outputs the scan results to the console.
@@ -86,6 +87,16 @@ export function outputToConsole(
     );
   }
 
+  if (
+    scanResult.inconsistentNamingWarnings &&
+    scanResult.inconsistentNamingWarnings.length > 0
+  ) {
+    printInconsistentNamingWarning(
+      scanResult.inconsistentNamingWarnings,
+      isJson,
+    );
+  }
+
   printExampleWarnings(scanResult.exampleWarnings ?? [], isJson);
 
   // Unused
@@ -111,8 +122,8 @@ export function outputToConsole(
   // Console log usage warning
   printConsolelogWarning(scanResult.logged ?? [], isJson);
 
-  // CSP warning
-  printCspWarning(scanResult.hasCsp, isJson);
+  // Expiration warnings
+  printExpireWarnings(scanResult.expireWarnings ?? [], isJson);
 
   // Check for high severity secrets - ALWAYS exit with error
   const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
@@ -175,6 +186,9 @@ export function outputToConsole(
         frameworkWarnings: scanResult.frameworkWarnings?.length ?? 0,
         logged: scanResult.logged?.length ?? 0,
         uppercaseWarnings: scanResult.uppercaseWarnings?.length ?? 0,
+        expireWarnings: scanResult.expireWarnings?.length ?? 0,
+        inconsistentNamingWarnings:
+          scanResult.inconsistentNamingWarnings?.length ?? 0,
       },
       isJson,
     );
