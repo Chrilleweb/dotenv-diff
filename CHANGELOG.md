@@ -12,6 +12,10 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 -
 
+## [2.3.9] - 2025-12-09
+### Changed
+- Changed health score calculation weights for better accuracy.
+
 ## [2.3.8] - 2025-12-08
 ### Added
 - Added variables not using uppercase letters warning to codebase scanner.
