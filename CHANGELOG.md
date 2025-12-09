@@ -20,6 +20,9 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Changed
 - Changed health score calculation weights for better accuracy.
 
+### Fixed
+- Fixed issue where show-stats and show-unused options were not working as expected in config file.
+
 ## [2.3.8] - 2025-12-08
 ### Added
 - Added variables not using uppercase letters warning to codebase scanner.
@@ -28,9 +31,6 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Changed
 - Removed --no-compare option from CLI and config file.
 - Updated dependencies to latest versions.
-
-### Fixed
-- Fixed issue where show-stats and show-unused options were not working as expected in config file.
 
 ## [2.3.7] - 2025-12-03
 ### Added
