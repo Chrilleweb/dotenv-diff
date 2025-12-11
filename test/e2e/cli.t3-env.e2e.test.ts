@@ -262,5 +262,15 @@ const dbUrl = process.env.DATABASE_UPSURL;`
     
     expect(res.stdout).not.toContain('T3-env validation issues');
   });
+
+  it('will fail on strict mode when t3-env warnings exist', () => {
+    const cwd = tmpDir();
+    makeT3EnvProject(cwd);
+
+    const res = runCli(cwd, ['--scan-usage', '--t3env', '--strict']);
+    console.log(res.stdout);
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain('T3-env validation issues');
+  });
 });
 

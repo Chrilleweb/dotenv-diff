@@ -194,6 +194,7 @@ export function outputToConsole(
         expireWarnings: scanResult.expireWarnings?.length ?? 0,
         inconsistentNamingWarnings:
           scanResult.inconsistentNamingWarnings?.length ?? 0,
+        t3EnvWarnings: scanResult.t3EnvWarnings?.length ?? 0,
       },
       isJson,
     );
