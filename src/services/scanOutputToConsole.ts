@@ -15,6 +15,7 @@ import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
+import { printT3EnvWarnings } from '../ui/scan/printT3EnvWarnings.js';
 import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
 import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
 import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
@@ -77,6 +78,10 @@ export function outputToConsole(
 
   if (scanResult.frameworkWarnings && scanResult.frameworkWarnings.length > 0) {
     printFrameworkWarnings(scanResult.frameworkWarnings, isJson);
+  }
+
+  if (scanResult.t3EnvWarnings && scanResult.t3EnvWarnings.length > 0) {
+    printT3EnvWarnings(scanResult.t3EnvWarnings, isJson);
   }
 
   if (scanResult.uppercaseWarnings && scanResult.uppercaseWarnings.length > 0) {

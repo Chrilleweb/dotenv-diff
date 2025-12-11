@@ -67,6 +67,15 @@ export function createJsonOutput(
       }));
   }
 
+  if (scanResult.t3EnvWarnings?.length) {
+    output.t3EnvWarnings = scanResult.t3EnvWarnings.map((w) => ({
+      variable: w.variable,
+      reason: w.reason,
+      file: w.file,
+      line: w.line,
+    }));
+  }
+
   // Add duplicates if found
   if (scanResult.duplicates) {
     output.duplicates = scanResult.duplicates;

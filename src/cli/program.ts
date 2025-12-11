@@ -85,5 +85,7 @@ export function createProgram() {
       '--no-inconsistent-naming-warnings',
       'Disable inconsistent naming pattern warnings',
     )
+    .option('--t3env', 'Warns about specifik Next.js t3env usage patterns')
+    .option('--no-t3env', 'Disables warnings about Next.js t3env usage patterns')
     .option('--init', 'Create a sample dotenv-diff.config.json file');
 }

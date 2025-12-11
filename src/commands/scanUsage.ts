@@ -3,6 +3,7 @@ import type {
   ScanUsageOptions,
   EnvUsage,
   ScanResult,
+  T3EnvWarning,
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
 import { outputToConsole } from '../services/scanOutputToConsole.js';
@@ -13,6 +14,8 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
+import { detectT3Env } from '../core/detectT3Env.js';
+import { applyT3EnvRules } from '../core/frameworks/t3EnvRules.js';
 
 /**
  * Scans the codebase for environment variable usage and compares it with
@@ -58,6 +61,22 @@ export async function scanUsage(
   const frameworkWarnings = frameworkValidator(scanResult.used, opts.cwd);
   if (frameworkWarnings.length > 0) {
     scanResult.frameworkWarnings = frameworkWarnings;
+  }
+
+  // T3-env validation if t3env option is enabled or auto-detected
+  if (opts.t3env) {
+    const t3Detection = await detectT3Env(opts.cwd);
+    if (t3Detection.detected && t3Detection.schema) {
+      const t3EnvWarnings: T3EnvWarning[] = [];
+      
+      for (const usage of scanResult.used) {
+        applyT3EnvRules(usage, t3EnvWarnings, t3Detection.schema);
+      }
+      
+      if (t3EnvWarnings.length > 0) {
+        scanResult.t3EnvWarnings = t3EnvWarnings;
+      }
+    }
   }
 
   // Determine which file to compare against
@@ -143,6 +162,7 @@ export async function scanUsage(
               (scanResult.secrets?.length ?? 0) > 0)) ||
           (scanResult.exampleWarnings?.length ?? 0) > 0 ||
           (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
+          (scanResult.t3EnvWarnings?.length ?? 0) > 0 ||
           (scanResult.logged?.length ?? 0) > 0 ||
           (scanResult.uppercaseWarnings?.length ?? 0) > 0 ||
           (scanResult.expireWarnings?.length ?? 0) > 0 ||

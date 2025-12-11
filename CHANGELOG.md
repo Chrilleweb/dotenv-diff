@@ -5,6 +5,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ## [Unreleased]
 ### Added
 - More jsDOcs for better code documentation.
+- t3-env integration to validate environment variable usage against T3 stack schema.
 
 ### Changed
 - 

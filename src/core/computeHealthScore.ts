@@ -39,6 +39,9 @@ export function computeHealthScore(scan: ScanResult): number {
   // === 9. Inconsistent naming warnings ===
   score -= (scan.inconsistentNamingWarnings?.length ?? 0) * 3;
 
+  // === 10. T3-env warnings ===
+  score -= (scan.t3EnvWarnings?.length ?? 0) * 5;
+
   // Never go below 0 or above 100
   return Math.max(0, Math.min(100, score));
 }
