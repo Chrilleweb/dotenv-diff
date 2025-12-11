@@ -51,10 +51,10 @@ export type Options = {
   secrets: boolean;
   strict: boolean | undefined;
   ignoreUrls?: string[];
-  noCompare: boolean;
   uppercaseKeys: boolean;
   expireWarnings: boolean;
   inconsistentNamingWarnings: boolean;
+  t3env: boolean;
 };
 
 /** Type representing the raw options for the comparison
@@ -83,11 +83,11 @@ export type RawOptions = {
   secrets?: boolean;
   strict?: boolean;
   ignoreUrls?: string[];
-  noCompare?: boolean;
   init?: boolean;
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+  t3env?: boolean;
 };
 
 /**
@@ -139,7 +139,6 @@ export interface ScanOptions {
   files?: string[];
   secrets?: boolean;
   ignoreUrls?: string[];
-  noCompare?: boolean;
 }
 
 export interface ScanResult {
@@ -163,6 +162,7 @@ export interface ScanResult {
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
+  t3EnvWarnings?: T3EnvWarning[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */
@@ -180,6 +180,7 @@ export interface ScanUsageOptions extends ScanOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+  t3env?: boolean;
 }
 
 export interface ScanJsonEntry {
@@ -238,6 +239,12 @@ export interface ScanJsonEntry {
     key1: string;
     key2: string;
     suggestion: string;
+  }>;
+  t3EnvWarnings?: Array<{
+    variable: string;
+    reason: string;
+    file: string;
+    line: number;
   }>;
 }
 
@@ -312,4 +319,33 @@ export interface InconsistentNamingWarning {
   key1: string;
   key2: string;
   suggestion: string;
+}
+
+/**
+ * Schema structure for t3-env configuration
+ */
+export interface T3EnvSchema {
+  server: string[];
+  client: string[];
+}
+
+/**
+ * Result of t3-env detection
+ */
+export interface T3EnvDetectionResult {
+  detected: boolean;
+  schema?: T3EnvSchema;
+  detectionMethod: 'config' | 'package.json' | null;
+  configPath?: string;
+}
+
+/**
+ * Warning for t3-env validation issues
+ */
+export interface T3EnvWarning {
+  variable: string;
+  reason: string;
+  file: string;
+  line: number;
+  framework: 't3-env';
 }

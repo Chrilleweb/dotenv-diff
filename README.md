@@ -1,6 +1,6 @@
 # dotenv-diff
 
-![Demo](./public/demo.gif)
+![Demo](./public/demo2.png)
 
 Scan your codebase to detect which environment variables are used in your code.
 
@@ -165,6 +165,22 @@ To disable this behavior, use the `--no-inconsistent-naming-warnings` flags resp
 ```bash
 "inconsistentNamingWarnings": false
 ``` 
+
+## t3-env integration
+
+by default `dotenv-diff` will detect if your project uses t3-env and validate environment variable usage against the T3 stack schema.
+
+This will give you warnings like this:
+
+```bashT3-env validation issues:
+   - API_URL (src\index.ts:25) → Variable "API_URL" is not defined in t3-env schema. Add it to either server or client schema.
+```
+
+To disable this behavior, use the `--no-t3env` flag or set it to false in the config file:
+
+```bash
+"t3env": false
+```
 
 ## Show unused variables
 

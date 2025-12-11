@@ -10,7 +10,15 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 - 
 
 ### Fixed
--
+- 
+
+## [2.3.10] - 2025-12-11
+### Added
+- More jsDOcs for better code documentation.
+- t3-env integration to validate environment variable usage against T3 stack schema.
+
+### Fixed
+- Removed unused code for old --no-compare option.
 
 ## [2.3.9] - 2025-12-09
 ### Added

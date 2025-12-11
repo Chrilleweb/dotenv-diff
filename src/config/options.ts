@@ -96,12 +96,11 @@ export function normalizeOptions(raw: RawOptions): Options {
   const excludeFiles = parseList(raw.excludeFiles);
   const files = parseList(raw.files);
 
-  const noCompare = toBool(raw.noCompare);
-
   const ignoreUrls = parseList(raw.ignoreUrls);
   const uppercaseKeys = raw.uppercaseKeys !== false;
   const expireWarnings = raw.expireWarnings !== false;
   const inconsistentNamingWarnings = raw.inconsistentNamingWarnings !== false;
+  const t3env = raw.t3env !== false;
 
   const cwd = process.cwd();
   const envFlag =
@@ -139,9 +138,9 @@ export function normalizeOptions(raw: RawOptions): Options {
     secrets,
     strict,
     ignoreUrls,
-    noCompare,
     uppercaseKeys,
     expireWarnings,
     inconsistentNamingWarnings,
+    t3env,
   };
 }
