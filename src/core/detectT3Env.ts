@@ -8,6 +8,15 @@ import type { T3EnvDetectionResult, T3EnvSchema } from '../config/types.js';
  * @returns Detection result with schema if found
  */
 export async function detectT3Env(cwd: string): Promise<T3EnvDetectionResult> {
+  const hasT3EnvDependency = await checkPackageJson(cwd);
+
+  if (!hasT3EnvDependency) {
+    return {
+      detected: false,
+      detectionMethod: null,
+    };
+  }
+
   // Check common locations for env config files
   const envFilePaths = [
     'src/env.ts',
@@ -43,8 +52,9 @@ export async function detectT3Env(cwd: string): Promise<T3EnvDetectionResult> {
   }
 
   return {
-    detected: false,
-    detectionMethod: null,
+    detected: true,
+    schema: { server: [], client: [] },
+    detectionMethod: 'package.json',
   };
 }
 
@@ -100,4 +110,27 @@ function extractKeysFromSchema(schemaBlock: string): string[] {
   }
 
   return keys;
+}
+
+/**
+ * Checks if t3-env is listed in package.json dependencies
+ */
+async function checkPackageJson(cwd: string): Promise<boolean> {
+  const packageJsonPath = path.join(cwd, 'package.json');
+
+  if (!fs.existsSync(packageJsonPath)) {
+    return false;
+  }
+
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    const allDeps = {
+      ...packageJson.dependencies,
+      ...packageJson.devDependencies,
+    };
+
+    return !!(allDeps['@t3-oss/env-core'] || allDeps['@t3-oss/env-nextjs']);
+  } catch {
+    return false;
+  }
 }

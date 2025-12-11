@@ -335,7 +335,7 @@ export interface T3EnvSchema {
 export interface T3EnvDetectionResult {
   detected: boolean;
   schema?: T3EnvSchema;
-  detectionMethod: 'config' | null;
+  detectionMethod: 'config' | 'package.json' | null;
   configPath?: string;
 }
 

@@ -32,6 +32,18 @@ function tmpDir() {
  */
 function makeT3EnvProject(cwd: string) {
   fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+
+  fs.writeFileSync(
+    path.join(cwd, 'package.json'),
+    JSON.stringify({
+      name: "test-project",
+      version: "1.0.0",
+      dependencies: {
+        "@t3-oss/env-nextjs": "^0.7.0",
+        "zod": "^3.22.0"
+      }
+    }, null, 2)
+  );
   
   fs.writeFileSync(
     path.join(cwd, 'src', 'env.ts'),
@@ -174,6 +186,18 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   it('should work with env.mjs files', () => {
     const cwd = tmpDir();
+
+    fs.writeFileSync(
+    path.join(cwd, 'package.json'),
+    JSON.stringify({
+      name: "test-project",
+      version: "1.0.0",
+      dependencies: {
+        "@t3-oss/env-nextjs": "^0.7.0",
+        "zod": "^3.22.0"
+      }
+    }, null, 2)
+  );
 
     fs.writeFileSync(
       path.join(cwd, 'env.mjs'),
