@@ -68,11 +68,11 @@ export async function scanUsage(
     const t3Detection = await detectT3Env(opts.cwd);
     if (t3Detection.detected && t3Detection.schema) {
       const t3EnvWarnings: T3EnvWarning[] = [];
-      
+
       for (const usage of scanResult.used) {
         applyT3EnvRules(usage, t3EnvWarnings, t3Detection.schema);
       }
-      
+
       if (t3EnvWarnings.length > 0) {
         scanResult.t3EnvWarnings = t3EnvWarnings;
       }
