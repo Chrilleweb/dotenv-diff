@@ -4,13 +4,13 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ## [Unreleased]
 ### Added
-- 
+- More jsDOcs for better code documentation.
 
 ### Changed
 - 
 
 ### Fixed
--
+- Removed unused code for old --no-compare option.
 
 ## [2.3.9] - 2025-12-09
 ### Added

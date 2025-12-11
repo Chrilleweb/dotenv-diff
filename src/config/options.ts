@@ -96,8 +96,6 @@ export function normalizeOptions(raw: RawOptions): Options {
   const excludeFiles = parseList(raw.excludeFiles);
   const files = parseList(raw.files);
 
-  const noCompare = toBool(raw.noCompare);
-
   const ignoreUrls = parseList(raw.ignoreUrls);
   const uppercaseKeys = raw.uppercaseKeys !== false;
   const expireWarnings = raw.expireWarnings !== false;
@@ -139,7 +137,6 @@ export function normalizeOptions(raw: RawOptions): Options {
     secrets,
     strict,
     ignoreUrls,
-    noCompare,
     uppercaseKeys,
     expireWarnings,
     inconsistentNamingWarnings,

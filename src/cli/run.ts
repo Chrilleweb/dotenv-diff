@@ -18,6 +18,36 @@ import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';
 import { loadConfig } from '../config/loadConfig.js';
 
 /**
+ * Run the CLI program
+ * @param program The commander program instance
+ * @returns void
+ */
+export async function run(program: Command): Promise<void> {
+  program.parse(process.argv);
+
+  // Load and normalize options
+  const cliOptions = program.opts();
+
+  // Handle --init flag
+  if (await handleInitFlag(cliOptions)) return;
+
+  // Merge CLI options with config file options
+  const mergedRawOptions = loadConfig(cliOptions);
+
+  // Normalize merged options
+  const opts = normalizeOptions(mergedRawOptions);
+
+  setupGlobalConfig(opts);
+
+  // Route to appropriate command
+  if (opts.compare) {
+    await runCompareMode(opts);
+  } else {
+    await runScanMode(opts);
+  }
+}
+
+/**
  * Run scan-usage mode (default behavior)
  * @param opts - Normalized options
  * @returns void
@@ -41,7 +71,6 @@ async function runScanMode(opts: Options): Promise<void> {
     secrets: opts.secrets,
     strict: opts.strict ?? false,
     ignoreUrls: opts.ignoreUrls ?? [],
-    noCompare: opts.noCompare ?? false,
     uppercaseKeys: opts.uppercaseKeys ?? true,
     expireWarnings: opts.expireWarnings,
     inconsistentNamingWarnings: opts.inconsistentNamingWarnings,
@@ -234,34 +263,4 @@ function outputResults(
     console.log(JSON.stringify(report, null, 2));
   }
   process.exit(exitWithError ? 1 : 0);
-}
-
-/**
- * Run the CLI program
- * @param program The commander program instance
- * @returns void
- */
-export async function run(program: Command): Promise<void> {
-  program.parse(process.argv);
-
-  // Load and normalize options
-  const cliOptions = program.opts();
-
-  // Handle --init flag
-  if (await handleInitFlag(cliOptions)) return;
-
-  // Merge CLI options with config file options
-  const mergedRawOptions = loadConfig(cliOptions);
-
-  // Normalize merged options
-  const opts = normalizeOptions(mergedRawOptions);
-
-  setupGlobalConfig(opts);
-
-  // Route to appropriate command
-  if (opts.compare) {
-    await runCompareMode(opts);
-  } else {
-    await runScanMode(opts);
-  }
 }

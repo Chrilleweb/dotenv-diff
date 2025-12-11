@@ -13,9 +13,6 @@ export function determineComparisonFile(
 ): { path: string; name: string } | undefined {
   // Priority: explicit flags first, then auto-discovery
 
-  if (opts.noCompare) {
-    return undefined;
-  }
   if (opts.examplePath) {
     const p = resolveFromCwd(opts.cwd, opts.examplePath);
     if (fs.existsSync(p)) {

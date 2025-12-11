@@ -15,71 +15,6 @@ import { frameworkValidator } from '../core/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
 
 /**
- * Filters out commented usages from the list.
- * Skipping comments:
- *   // process.env.API_URL
- *   # process.env.API_URL
- *   /* process.env.API_URL
- *   * process.env.API_URL
- *   <!-- process.env.API_URL -->
- * @param usages - List of environment variable usages
- * @returns Filtered list of environment variable usages
- */
-function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
-  let insideHtmlComment = false;
-  let insideIgnoreBlock = false;
-
-  return usages.filter((u) => {
-    if (!u.context) return true;
-    const line = u.context.trim();
-
-    if (line.includes('<!--')) insideHtmlComment = true;
-    if (line.includes('-->')) {
-      insideHtmlComment = false;
-      return false;
-    }
-
-    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*start\s*-->/i.test(line)) {
-      insideIgnoreBlock = true;
-      return false;
-    }
-
-    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*end\s*-->/i.test(line)) {
-      insideIgnoreBlock = false;
-      return false;
-    }
-
-    if (insideIgnoreBlock) return false;
-
-    return (
-      !insideHtmlComment &&
-      !/^\s*(\/\/|#|\/\*|\*|<!--|-->)/.test(line) &&
-      !hasIgnoreComment(line)
-    );
-  });
-}
-
-/**
- * Recalculates statistics for a scan result after filtering usages.
- * @param scanResult The current scan result
- * @returns Updated scanResult with recalculated stats
- */
-function calculateStats(scanResult: ScanResult): ScanResult {
-  const uniqueVariables = new Set(
-    scanResult.used.map((u: EnvUsage) => u.variable),
-  ).size;
-
-  scanResult.stats = {
-    filesScanned: scanResult.stats.filesScanned,
-    totalUsages: scanResult.used.length,
-    uniqueVariables,
-    duration: scanResult.stats.duration,
-  };
-
-  return scanResult;
-}
-
-/**
  * Scans the codebase for environment variable usage and compares it with
  * the selected environment file (.env or .env.example).
  *
@@ -225,4 +160,69 @@ export async function scanUsage(
   });
 
   return { exitWithError: result.exitWithError || duplicatesFound };
+}
+
+/**
+ * Filters out commented usages from the list.
+ * Skipping comments:
+ *   // process.env.API_URL
+ *   # process.env.API_URL
+ *   /* process.env.API_URL
+ *   * process.env.API_URL
+ *   <!-- process.env.API_URL -->
+ * @param usages - List of environment variable usages
+ * @returns Filtered list of environment variable usages
+ */
+function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
+  let insideHtmlComment = false;
+  let insideIgnoreBlock = false;
+
+  return usages.filter((u) => {
+    if (!u.context) return true;
+    const line = u.context.trim();
+
+    if (line.includes('<!--')) insideHtmlComment = true;
+    if (line.includes('-->')) {
+      insideHtmlComment = false;
+      return false;
+    }
+
+    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*start\s*-->/i.test(line)) {
+      insideIgnoreBlock = true;
+      return false;
+    }
+
+    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*end\s*-->/i.test(line)) {
+      insideIgnoreBlock = false;
+      return false;
+    }
+
+    if (insideIgnoreBlock) return false;
+
+    return (
+      !insideHtmlComment &&
+      !/^\s*(\/\/|#|\/\*|\*|<!--|-->)/.test(line) &&
+      !hasIgnoreComment(line)
+    );
+  });
+}
+
+/**
+ * Recalculates statistics for a scan result after filtering usages.
+ * @param scanResult The current scan result
+ * @returns Updated scanResult with recalculated stats
+ */
+function calculateStats(scanResult: ScanResult): ScanResult {
+  const uniqueVariables = new Set(
+    scanResult.used.map((u: EnvUsage) => u.variable),
+  ).size;
+
+  scanResult.stats = {
+    filesScanned: scanResult.stats.filesScanned,
+    totalUsages: scanResult.used.length,
+    uniqueVariables,
+    duration: scanResult.stats.duration,
+  };
+
+  return scanResult;
 }
