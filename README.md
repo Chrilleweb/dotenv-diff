@@ -1,6 +1,6 @@
 # dotenv-diff
 
-![Demo](./public/demo.gif)
+![Demo](./public/demo2.png)
 
 Scan your codebase to detect which environment variables are used in your code.
 
