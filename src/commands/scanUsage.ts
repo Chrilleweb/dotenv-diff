@@ -14,8 +14,8 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
-import { detectT3Env } from '../core/detectT3Env.js';
-import { applyT3EnvRules } from '../core/frameworks/t3EnvRules.js';
+import { detectT3Env } from '../core/t3env/detectT3Env.js';
+import { applyT3EnvRules } from '../core/t3env/t3EnvRules.js';
 
 /**
  * Scans the codebase for environment variable usage and compares it with

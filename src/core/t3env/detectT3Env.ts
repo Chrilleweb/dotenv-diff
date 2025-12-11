@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import type { T3EnvDetectionResult, T3EnvSchema } from '../config/types.js';
+import type { T3EnvDetectionResult, T3EnvSchema } from '../../config/types.js';
 
 /**
  * Detects if a project uses t3-env by looking for env.ts files
