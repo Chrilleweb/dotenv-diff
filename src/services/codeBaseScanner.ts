@@ -34,7 +34,10 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       if (opts.secrets) {
         try {
           const relativePath = path.relative(opts.cwd, filePath);
-          const sec = detectSecretsInSource(relativePath, content, opts);
+          const sec = detectSecretsInSource(relativePath, content, opts).filter(
+            (s) => s.severity !== 'low',
+          );
+
           if (sec.length) allSecrets.push(...sec);
         } catch {
           // Ignore secret detection errors
