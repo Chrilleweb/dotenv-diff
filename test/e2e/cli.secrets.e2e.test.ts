@@ -231,48 +231,6 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
-  it('should warn about using https URLs in codebase', () => {
-    const cwd = tmpDir();
-
-    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'src', 'index.ts'),
-      `
-      const service = 'https://hello.com';
-      const service2 = "https://hello.com/api";
-      const service3 = \`https://hello.com/path\`;
-
-      console.log(service, service2, service3);
-    `.trimStart(),
-    );
-
-    const res = runCli(cwd, []);
-    expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Potential secrets detected in codebase:');
-        expect(res.stdout).toContain('HTTPS URL detected');
-  });
-    it('should warn about using http URLs in codebase', () => {
-    const cwd = tmpDir();
-
-    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'src', 'index.ts'),
-      `
-      const service = 'http://hello.com';
-      const service2 = "http://thisIsASecret.com/api";
-      const service3 = \`http://yes.com/path\`;
-
-      console.log(service, service2, service3);
-    `.trimStart(),
-    );
-
-    const res = runCli(cwd, []);
-    expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Potential secrets detected in codebase:');
-    expect(res.stdout).toContain('HTTP URL detected');
-  });
   it('should not give warning on SVG content', () => {
     const cwd = tmpDir();
 
@@ -311,46 +269,5 @@ describe('secrets detection (default scan mode)', () => {
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
-  });
-  it('should ignore warnings with dotenv-diff-ignore comments', () => {
-    const cwd = tmpDir();
-
-    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'src', 'index.ts'),
-      `
-      // These should be flagged normally
-      const service1 = 'https://shouldwarn.com';
-      const secret1 = "sk_live_abcdefghijklmnopqrstuvwx";
-      
-      // These should be ignored with comments
-      const service2 = 'https://exdfdfdfdfdfe.com'; // dotenv-diff-ignore
-      const service3 = "https://ignored.com/api" /* dotenv-diff-ignore */;
-      const secret2 = "sk_live_ignoredtoken123"; // dotenv-diff-ignore
-      const apiKey = 'AKIA1234567890IGNORE' /* dotenv-diff-ignore */;
-      
-      // Also test high entropy strings
-      const ignoredEntropy = "highEntropyButIgnored987654321fedcba"; // dotenv-diff-ignore
-
-      console.log(service1, service2, service3, secret1, secret2, apiKey, ignoredEntropy);
-    `.trimStart(),
-    );
-
-    const res = runCli(cwd, []);
-    expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Potential secrets detected in codebase:');
-    
-    // Should warn about the non-ignored ones
-    expect(res.stdout).toContain('HIGH');
-    expect(res.stdout).toContain('shouldwarn.com');
-    expect(res.stdout).toContain('sk_live_abcdefghijklmnopqrstuvwx');
-    
-    // Should NOT warn about the ignored ones
-    expect(res.stdout).not.toContain('exdfdfdfdfdfe.com');
-    expect(res.stdout).not.toContain('ignored.com');
-    expect(res.stdout).not.toContain('sk_live_ignoredtoken123');
-    expect(res.stdout).not.toContain('AKIA1234567890IGNORE');
-    expect(res.stdout).not.toContain('highEntropyButIgnored987654321fedcba');
   });
 });

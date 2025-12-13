@@ -12,6 +12,10 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 - 
 
+## [2.3.11] - 2025-12-13
+### Changed
+- Removed low severity secrets from codebase scanner results, because it made too much noise.
+
 ## [2.3.10] - 2025-12-11
 ### Added
 - More jsDocs for better code documentation.
