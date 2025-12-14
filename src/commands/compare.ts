@@ -42,6 +42,13 @@ function createCategoryFilter(
   return (category: Category) => !onlySet || onlySet.has(category);
 }
 
+interface ParsedAndFilteredEnv {
+  current: Record<string, string>;
+  example: Record<string, string>;
+  currentKeys: string[];
+  exampleKeys: string[];
+}
+
 /**
  * Parses and filters the environment and example files.
  * @param envPath The path to the .env file
@@ -53,7 +60,7 @@ function parseAndFilter(
   envPath: string,
   examplePath: string,
   opts: ComparisonOptions,
-) {
+): ParsedAndFilteredEnv {
   const currentFull = parseEnvFile(envPath);
   const exampleFull = parseEnvFile(examplePath);
 
@@ -121,7 +128,7 @@ function findDuplicates(
  */
 export async function compareMany(
   pairs: FilePair[],
-  opts: ComparisonOptions,
+  opts: Readonly<ComparisonOptions>,
 ): Promise<ComparisonResult> {
   let exitWithError = false;
 
