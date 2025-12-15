@@ -10,9 +10,7 @@ import type { Duplicate } from '../config/types.js';
  * @param filePath - Path to the .env file to scan
  * @returns An array of objects representing duplicate keys and their counts.
  */
-export function findDuplicateKeys(
-  filePath: string,
-): Array<Duplicate> {
+export function findDuplicateKeys(filePath: string): Array<Duplicate> {
   if (!fs.existsSync(filePath)) return [];
 
   const raw = fs.readFileSync(filePath, 'utf8');
