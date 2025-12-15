@@ -361,6 +361,6 @@ If you plan a larger change, please open an issue first to discuss scope and app
 
 ## License
 
-MIT
+Licensed under the [MIT](LICENSE) license.
 
 ### Created by [chrilleweb](https://github.com/chrilleweb)
