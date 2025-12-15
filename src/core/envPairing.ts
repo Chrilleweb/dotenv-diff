@@ -1,20 +1,15 @@
 import fs from 'fs';
 import path from 'path';
-import type { Discovery } from './envDiscovery.js';
+import type { Discovery } from '../services/envDiscovery.js';
+import type { FilePair } from '../config/types.js';
 
 /**
  * Pairs each environment file with its corresponding example file.
  * @param d - The discovery object containing environment and example file information.
  * @returns An array of objects containing the environment name, path, and example path.
  */
-export function pairWithExample(
-  d: Discovery,
-): Array<{ envName: string; envPath: string; examplePath: string }> {
-  const pairs: Array<{
-    envName: string;
-    envPath: string;
-    examplePath: string;
-  }> = [];
+export function pairWithExample(d: Discovery): Array<FilePair> {
+  const pairs: Array<FilePair> = [];
   const list = d.envFiles.length > 0 ? d.envFiles : [d.primaryEnv];
 
   for (const envName of list) {

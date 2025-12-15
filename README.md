@@ -7,6 +7,7 @@ Scan your codebase to detect which environment variables are used in your code.
 Optimized for SvelteKit and Next.js. </br>
 Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js, Nuxt, and Vue — or any other setup where you want reliable .env file comparison / scanning.
 
+![CI](https://github.com/chrilleweb/dotenv-diff/actions/workflows/ci.yml/badge.svg)
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 
@@ -347,12 +348,19 @@ This makes it quick to set up environment files without manually copying or rety
 `dotenv-diff` will warn you if your `.env` file is **not** ignored by Git.  
 This helps prevent accidentally committing sensitive environment variables.
 
+## Exit codes
+
+- `0` → No errors (warnings may be present unless `--strict`)
+- `1` → Errors found (or warnings when using `--strict`)
+
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to open an issue or a pull request.
+Issues, feature requests and pull requests are welcome.
+
+If you plan a larger change, please open an issue first to discuss scope and approach.
 
 ## License
 
-MIT
+Licensed under the [MIT](LICENSE) license.
 
 ### Created by [chrilleweb](https://github.com/chrilleweb)

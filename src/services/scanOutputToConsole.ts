@@ -24,6 +24,13 @@ import { printHealthScore } from '../ui/scan/printHealthScore.js';
 import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
 import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
 
+interface FixContext {
+  fixApplied: boolean;
+  removedDuplicates: string[];
+  addedEnv: string[];
+  gitignoreUpdated: boolean;
+}
+
 /**
  * Outputs the scan results to the console.
  * @param scanResult - The result of the scan.
@@ -35,12 +42,7 @@ export function outputToConsole(
   scanResult: ScanResult,
   opts: ScanUsageOptions,
   comparedAgainst: string,
-  fixContext?: {
-    fixApplied: boolean;
-    removedDuplicates: string[];
-    addedEnv: string[];
-    gitignoreUpdated: boolean;
-  },
+  fixContext?: FixContext,
 ): { exitWithError: boolean } {
   let exitWithError = false;
 
