@@ -1,4 +1,5 @@
 import fs from 'fs';
+import type { Duplicate } from '../config/types.js';
 
 /**
  * Scan a .env-like file for duplicate keys.
@@ -11,7 +12,7 @@ import fs from 'fs';
  */
 export function findDuplicateKeys(
   filePath: string,
-): Array<{ key: string; count: number }> {
+): Array<Duplicate> {
   if (!fs.existsSync(filePath)) return [];
 
   const raw = fs.readFileSync(filePath, 'utf8');
@@ -32,7 +33,7 @@ export function findDuplicateKeys(
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
 
-  const duplicates: Array<{ key: string; count: number }> = [];
+  const duplicates: Array<Duplicate> = [];
   for (const [key, count] of counts) {
     if (count > 1) duplicates.push({ key, count });
   }
