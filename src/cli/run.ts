@@ -259,7 +259,7 @@ function outputResults(
   report: CompareJsonEntry[],
   opts: Options,
   exitWithError: boolean,
-): void {
+): never {
   if (opts.json) {
     console.log(JSON.stringify(report, null, 2));
   }
