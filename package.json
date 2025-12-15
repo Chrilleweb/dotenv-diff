@@ -2,7 +2,7 @@
   "name": "dotenv-diff",
   "version": "2.3.11",
   "type": "module",
-  "description": "Scan your codebase to find environment variables in use.",
+  "description": "Detects environment variable issues, usage, and potential security risks.",
   "bin": {
     "dotenv-diff": "dist/bin/dotenv-diff.js"
   },
