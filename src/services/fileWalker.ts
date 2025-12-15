@@ -6,6 +6,12 @@ import {
   DEFAULT_EXCLUDE_PATTERNS,
 } from '../core/patterns.js';
 
+interface FindFilesOptions {
+  include?: string[];
+  exclude?: string[];
+  files?: string[];
+}
+
 /**
  * Recursively finds all files in the given directory matching the include patterns,
  * while excluding files and directories that match the exclude patterns.
@@ -15,7 +21,7 @@ import {
  */
 export async function findFiles(
   rootDir: string,
-  opts: { include: string[]; exclude: string[]; files?: string[] },
+  opts: FindFilesOptions,
 ): Promise<string[]> {
   // If --files provided, keep existing replacement behavior
   if (opts.files && opts.files.length > 0) {
@@ -24,7 +30,7 @@ export async function findFiles(
 
   const defaultPatterns = getDefaultPatterns();
   const rawInclude =
-    opts.include.length > 0
+    opts.include && opts.include.length > 0
       ? [...defaultPatterns, ...opts.include]
       : defaultPatterns;
   const includePatterns = rawInclude.flatMap(expandBraceSets);
@@ -69,7 +75,7 @@ export async function findFiles(
       if (
         shouldExclude(entry.name, relativeToRoot, [
           ...DEFAULT_EXCLUDE_PATTERNS,
-          ...opts.exclude,
+          ...(opts.exclude ?? []),
         ])
       ) {
         continue;
