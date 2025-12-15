@@ -193,7 +193,7 @@ export async function scanUsage(
  * @param usages - List of environment variable usages
  * @returns Filtered list of environment variable usages
  */
-function skipCommentedUsages(usages: EnvUsage[]): EnvUsage[] {
+function skipCommentedUsages(usages: readonly EnvUsage[]): EnvUsage[] {
   let insideHtmlComment = false;
   let insideIgnoreBlock = false;
 
