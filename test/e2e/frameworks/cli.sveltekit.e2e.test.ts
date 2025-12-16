@@ -179,6 +179,31 @@ describe('SvelteKit environment variable usage rules', () => {
     expect(res.stdout).toContain('Private env vars should only be used in server files like +page.server.ts');
   });
 
+  it('does not warn when using $env/static/private in +page.server.ts', () => {
+  const cwd = tmpDir();
+  makeSvelteKitProject(cwd);
+
+  fs.writeFileSync(
+    path.join(cwd, 'src/routes/+page.server.ts'),
+    `import { SECRET_KEY } from '$env/static/private/SECRET_KEY';
+
+     export function load() {
+       return {
+         secret: SECRET_KEY
+       };
+     }`
+  );
+
+  fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=123');
+
+  const res = runCli(cwd, ['--scan-usage']);
+
+  expect(res.status).toBe(0);
+  expect(res.stdout).not.toContain('Private env vars');
+  expect(res.stdout).not.toContain('warning');
+});
+
+
   it('warns when PUBLIC_ variable is used inside private env import', () => {
     const cwd = tmpDir();
     makeSvelteKitProject(cwd);
