@@ -35,16 +35,20 @@ function makeT3EnvProject(cwd: string) {
 
   fs.writeFileSync(
     path.join(cwd, 'package.json'),
-    JSON.stringify({
-      name: "test-project",
-      version: "1.0.0",
-      dependencies: {
-        "@t3-oss/env-nextjs": "^0.7.0",
-        "zod": "^3.22.0"
-      }
-    }, null, 2)
+    JSON.stringify(
+      {
+        name: 'test-project',
+        version: '1.0.0',
+        dependencies: {
+          '@t3-oss/env-nextjs': '^0.7.0',
+          zod: '^3.22.0',
+        },
+      },
+      null,
+      2,
+    ),
   );
-  
+
   fs.writeFileSync(
     path.join(cwd, 'src', 'env.ts'),
     `import { createEnv } from "@t3-oss/env-nextjs";
@@ -67,7 +71,7 @@ export const env = createEnv({
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_SITE_NAME: process.env.NEXT_PUBLIC_SITE_NAME,
   },
-});`
+});`,
   );
 
   fs.writeFileSync(
@@ -76,7 +80,7 @@ export const env = createEnv({
 SECRET_KEY=secret123
 ADMIN_EMAIL=admin@test.com
 NEXT_PUBLIC_API_URL=https://api.test.com
-NEXT_PUBLIC_SITE_NAME=Test Site`
+NEXT_PUBLIC_SITE_NAME=Test Site`,
   );
 }
 
@@ -95,15 +99,17 @@ export function ClientComponent() {
   const dbUrl = process.env.DATABASE_URL;
   
   return <div>Client Component</div>;
-}`
+}`,
     );
 
     const res = runCli(cwd, []);
-    
+
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('T3-env validation issues');
     expect(res.stdout).toContain('DATABASE_URL');
-    expect(res.stdout).toContain('Use t3-env client schema instead of NEXT_PUBLIC_ prefix for type-safe environment variables.');
+    expect(res.stdout).toContain(
+      'Use t3-env client schema instead of NEXT_PUBLIC_ prefix for type-safe environment variables.',
+    );
   });
 
   it('should detect client variable used in server code', () => {
@@ -120,7 +126,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME;
   
   res.json({ success: true });
-}`
+}`,
     );
 
     const res = runCli(cwd, []);
@@ -128,7 +134,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('T3-env validation issues');
     expect(res.stdout).toContain('NEXT_PUBLIC_SITE_NAME');
-    expect(res.stdout).toContain('Use t3-env client schema instead of NEXT_PUBLIC_ prefix for type-safe environment variables.');
+    expect(res.stdout).toContain(
+      'Use t3-env client schema instead of NEXT_PUBLIC_ prefix for type-safe environment variables.',
+    );
   });
 
   it('should detect undefined variables not in schema', () => {
@@ -138,7 +146,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
     fs.writeFileSync(
       path.join(cwd, 'src', 'test.js'),
-      `const unknownVar = process.env.UNDEFINED_VAR;`
+      `const unknownVar = process.env.UNDEFINED_VAR;`,
     );
 
     const res = runCli(cwd, []);
@@ -146,7 +154,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('T3-env validation issues');
     expect(res.stdout).toContain('UNDEFINED_VAR');
-    expect(res.stdout).toContain('Variable "UNDEFINED_VAR" is not defined in t3-env schema. Add it to either server or client schema.');
+    expect(res.stdout).toContain(
+      'Variable "UNDEFINED_VAR" is not defined in t3-env schema. Add it to either server or client schema.',
+    );
   });
 
   it('should warn about NEXT_PUBLIC_ usage in t3-env projects', () => {
@@ -158,15 +168,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       path.join(cwd, 'src', 'lib', 'client.ts'),
       `export const config = {
   apiUrl: process.env.NEXT_PUBLIC_OLD_API_URL,
-};`
+};`,
     );
 
     const res = runCli(cwd, ['--scan-usage', '--t3env']);
-    
+
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('T3-env validation issues');
     expect(res.stdout).toContain('NEXT_PUBLIC_OLD_API_URL');
-    expect(res.stdout).toContain('is not defined in t3-env schema. Add it to either server or client schema.');
+    expect(res.stdout).toContain(
+      'is not defined in t3-env schema. Add it to either server or client schema.',
+    );
   });
 
   it('should not show t3-env warnings when t3env flag is disabled', () => {
@@ -175,11 +187,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     fs.writeFileSync(
       path.join(cwd, 'src', 'test.js'),
-      `const key = process.env.UNDEFINED_VAR;`
+      `const key = process.env.UNDEFINED_VAR;`,
     );
 
     const res = runCli(cwd, ['--scan-usage', '--no-t3env']);
-    
+
     expect(res.stdout).not.toContain('T3-env validation issues');
     expect(res.stdout).not.toContain('not defined in t3-env schema');
   });
@@ -188,16 +200,20 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const cwd = tmpDir();
 
     fs.writeFileSync(
-    path.join(cwd, 'package.json'),
-    JSON.stringify({
-      name: "test-project",
-      version: "1.0.0",
-      dependencies: {
-        "@t3-oss/env-nextjs": "^0.7.0",
-        "zod": "^3.22.0"
-      }
-    }, null, 2)
-  );
+      path.join(cwd, 'package.json'),
+      JSON.stringify(
+        {
+          name: 'test-project',
+          version: '1.0.0',
+          dependencies: {
+            '@t3-oss/env-nextjs': '^0.7.0',
+            zod: '^3.22.0',
+          },
+        },
+        null,
+        2,
+      ),
+    );
 
     fs.writeFileSync(
       path.join(cwd, 'env.mjs'),
@@ -211,14 +227,14 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_APP_URL: z.string(),
   },
-});`
+});`,
     );
 
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
     fs.writeFileSync(
       path.join(cwd, 'src', 'test.js'),
       `// Should warn: server var in client context
-const dbUrl = process.env.DATABASE_UPSURL;`
+const dbUrl = process.env.DATABASE_UPSURL;`,
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'DATABASE_URL=test');
@@ -228,7 +244,9 @@ const dbUrl = process.env.DATABASE_UPSURL;`
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('T3-env validation issues');
     expect(res.stdout).toContain('DATABASE_URL');
-    expect(res.stdout).toContain('Variable "DATABASE_UPSURL" is not defined in t3-env schema. Add it to either server or client schema.');
+    expect(res.stdout).toContain(
+      'Variable "DATABASE_UPSURL" is not defined in t3-env schema. Add it to either server or client schema.',
+    );
   });
 
   it('should handle JSON output format', () => {
@@ -237,7 +255,7 @@ const dbUrl = process.env.DATABASE_UPSURL;`
 
     fs.writeFileSync(
       path.join(cwd, 'test.js'),
-      `const test = process.env.UNDEFINED_VAR;`
+      `const test = process.env.UNDEFINED_VAR;`,
     );
 
     const res = runCli(cwd, ['--json']);
@@ -253,13 +271,13 @@ const dbUrl = process.env.DATABASE_UPSURL;`
     // No env.ts file - should not detect t3-env
     fs.writeFileSync(
       path.join(cwd, 'test.js'),
-      `const test = process.env.ANY_VAR;`
+      `const test = process.env.ANY_VAR;`,
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), '');
 
     const res = runCli(cwd, ['--scan-usage', '--t3env']);
-    
+
     expect(res.stdout).not.toContain('T3-env validation issues');
   });
 
@@ -273,4 +291,3 @@ const dbUrl = process.env.DATABASE_UPSURL;`
     expect(res.stdout).toContain('T3-env validation issues');
   });
 });
-

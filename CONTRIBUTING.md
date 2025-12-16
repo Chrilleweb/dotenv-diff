@@ -15,15 +15,18 @@ Thanks for your interest in contributing to dotenv-diff! Contributions of all ki
 ## Guidelines
 
 **Code Quality**
+
 - Keep changes small and focused
 - Follow the existing code style and project structure
 - Write clear, descriptive commit messages
 
 **Testing & Documentation**
+
 - Add or update tests when introducing new behavior
 - Update the README or documentation when relevant
 
 **Communication**
+
 - For larger changes or new features, open an issue first to discuss
 - Avoid large refactors or breaking changes unless discussed beforehand
 

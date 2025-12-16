@@ -162,10 +162,7 @@ describe('Inconsistent Naming Warnings', () => {
       }`,
     );
 
-    fs.writeFileSync(
-      path.join(cwd, '.env.example'),
-      `API_KEY=\nAPIKEY=\n`,
-    );
+    fs.writeFileSync(path.join(cwd, '.env.example'), `API_KEY=\nAPIKEY=\n`);
 
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
     fs.writeFileSync(
