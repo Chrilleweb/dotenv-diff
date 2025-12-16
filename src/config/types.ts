@@ -149,6 +149,7 @@ export interface ScanResult {
     filesScanned: number;
     totalUsages: number;
     uniqueVariables: number;
+    warnings: number;
     duration: number;
   };
   secrets: SecretFinding[];

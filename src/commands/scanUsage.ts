@@ -237,10 +237,20 @@ function calculateStats(scanResult: ScanResult): ScanResult {
     scanResult.used.map((u: EnvUsage) => u.variable),
   ).size;
 
+const warningsCount =
+    (scanResult.frameworkWarnings?.length ?? 0) +
+    (scanResult.exampleWarnings?.length ?? 0) +
+    (scanResult.t3EnvWarnings?.length ?? 0) +
+    (scanResult.logged?.length ?? 0) +
+    (scanResult.uppercaseWarnings?.length ?? 0) +
+    (scanResult.expireWarnings?.length ?? 0) +
+    (scanResult.inconsistentNamingWarnings?.length ?? 0);
+
   scanResult.stats = {
     filesScanned: scanResult.stats.filesScanned,
     totalUsages: scanResult.used.length,
     uniqueVariables,
+    warnings: warningsCount,
     duration: scanResult.stats.duration,
   };
 

@@ -66,12 +66,14 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     missing: [],
     unused: [],
     secrets: allSecrets,
-    stats: {
-      filesScanned,
-      totalUsages: filteredUsages.length,
-      uniqueVariables: uniqueVariables.length,
-      duration: 0,
-    },
+   stats: {
+  filesScanned: files.length,
+  totalUsages: 0,
+  uniqueVariables: 0,
+  warnings: 0,
+  duration: 0,
+},
+
     duplicates: {
       env: [],
       example: [],
