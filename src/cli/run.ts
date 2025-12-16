@@ -53,7 +53,12 @@ export async function run(program: Command): Promise<void> {
  * @returns void
  */
 async function runScanMode(opts: Options): Promise<void> {
-  const envPath = opts.envFlag || (fs.existsSync('.env') ? '.env' : undefined);
+  const envPath =
+    typeof opts.envFlag === 'string'
+      ? opts.envFlag
+      : fs.existsSync('.env')
+        ? '.env'
+        : undefined;
 
   const { exitWithError } = await scanUsage({
     cwd: opts.cwd,
