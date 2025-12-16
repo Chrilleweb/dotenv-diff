@@ -31,10 +31,10 @@ function makeProject(cwd: string) {
   fs.writeFileSync(
     path.join(cwd, 'package.json'),
     JSON.stringify({
-      name: "test-project",
+      name: 'test-project',
       devDependencies: {
-        "@sveltejs/kit": "1.0.0"
-      }
+        '@sveltejs/kit': '1.0.0',
+      },
     }),
   );
 
@@ -42,7 +42,6 @@ function makeProject(cwd: string) {
 }
 
 describe('Environment variable console.log detection', () => {
-
   it('warns when environment variables are logged using console.log', () => {
     const cwd = tmpDir();
     makeProject(cwd);
@@ -50,7 +49,7 @@ describe('Environment variable console.log detection', () => {
     fs.writeFileSync(
       path.join(cwd, 'src/index.ts'),
       `console.log(process.env.API_URL);
-       const x = 1;`
+       const x = 1;`,
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'API_URL=https://example.com');
@@ -72,13 +71,10 @@ describe('Environment variable console.log detection', () => {
       `
       console.log(process.env.SECRET_KEY);
       console.warn(import.meta.env.VITE_PUBLIC_URL);
-      `
+      `,
     );
 
-    fs.writeFileSync(
-      path.join(cwd, '.env'),
-      'SECRET_KEY=1\nVITE_PUBLIC_URL=2'
-    );
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=1\nVITE_PUBLIC_URL=2');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -94,7 +90,7 @@ describe('Environment variable console.log detection', () => {
 
     fs.writeFileSync(
       path.join(cwd, 'src/no-log.ts'),
-      `const x = process.env.SECRET_KEY;`
+      `const x = process.env.SECRET_KEY;`,
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=1');
@@ -134,7 +130,7 @@ describe('Environment variable console.log detection', () => {
 
     fs.writeFileSync(
       path.join(cwd, 'src/page.ts'),
-      `console.log(process.env.PASSWORD);`
+      `console.log(process.env.PASSWORD);`,
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'PASSWORD=abc');
@@ -153,7 +149,7 @@ describe('Environment variable console.log detection', () => {
     fs.writeFileSync(
       path.join(cwd, 'src/skip-log.ts'),
       `// dotenv-diff-ignore
-       console.log(process.env.SKIPPED_VAR);`
+       console.log(process.env.SKIPPED_VAR);`,
     );
     fs.writeFileSync(path.join(cwd, '.env'), 'SKIPPED_VAR=shouldnotshow');
 

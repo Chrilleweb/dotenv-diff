@@ -29,7 +29,7 @@
     "test:unit": "vitest run test/unit",
     "test:e2e": "vitest run test/e2e",
     "lint": "eslint ./src --ext .ts",
-    "format": "prettier --write \"src/**/*.ts\" \"src/*.ts\"",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yml}\"",
     "start": "node dist/bin/dotenv-diff.js",
     "dotenv-diff": "dotenv-diff",
     "prepublishOnly": "npm run lint && npm test && npm run build"

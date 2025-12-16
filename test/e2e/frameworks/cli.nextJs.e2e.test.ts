@@ -154,73 +154,72 @@ describe('Next.js environment variable usage rules', () => {
 
   // Client file in components/ folder without "use client" → still forbidden
   it('warns in components folder even without "use client"', () => {
-  const cwd = tmpDir();
-  makeNextProject(cwd);
+    const cwd = tmpDir();
+    makeNextProject(cwd);
 
-  fs.writeFileSync(
-    path.join(cwd, 'components/Profile.tsx'),
-    `console.log(process.env.INTERNAL_SECRET);`,
-  );
+    fs.writeFileSync(
+      path.join(cwd, 'components/Profile.tsx'),
+      `console.log(process.env.INTERNAL_SECRET);`,
+    );
 
-  fs.writeFileSync(path.join(cwd, '.env'), `INTERNAL_SECRET=1`);
+    fs.writeFileSync(path.join(cwd, '.env'), `INTERNAL_SECRET=1`);
 
-  const res = runCli(cwd, ['--scan-usage']);
+    const res = runCli(cwd, ['--scan-usage']);
 
-  expect(res.stdout).toContain(
-    'process.env inside client components must use NEXT_PUBLIC_ variables',
-  );
-  expect(res.stdout).toContain('INTERNAL_SECRET');
-});
+    expect(res.stdout).toContain(
+      'process.env inside client components must use NEXT_PUBLIC_ variables',
+    );
+    expect(res.stdout).toContain('INTERNAL_SECRET');
+  });
 
-it('does not treat commented "use client" as client boundary', () => {
-  const cwd = tmpDir();
-  makeNextProject(cwd);
+  it('does not treat commented "use client" as client boundary', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
 
-  fs.writeFileSync(
-    path.join(cwd, 'components/Sidebar.tsx'),
-    `// "use client"
+    fs.writeFileSync(
+      path.join(cwd, 'components/Sidebar.tsx'),
+      `// "use client"
      console.log(process.env.SECRET_TOKEN);`,
-  );
+    );
 
-  fs.writeFileSync(path.join(cwd, '.env'), `SECRET_TOKEN=1`);
+    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_TOKEN=1`);
 
-  const res = runCli(cwd, ['--scan-usage']);
+    const res = runCli(cwd, ['--scan-usage']);
 
-  // Should NOT warn because it's actually server-side
-  expect(res.stdout).not.toContain('Client components can only');
-});
+    // Should NOT warn because it's actually server-side
+    expect(res.stdout).not.toContain('Client components can only');
+  });
 
-it('does NOT warn when NEXT_PUBLIC_ is used correctly in client components', () => {
-  const cwd = tmpDir();
-  makeNextProject(cwd);
+  it('does NOT warn when NEXT_PUBLIC_ is used correctly in client components', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
 
-  fs.writeFileSync(
-    path.join(cwd, 'components/Hero.tsx'),
-    `"use client";
+    fs.writeFileSync(
+      path.join(cwd, 'components/Hero.tsx'),
+      `"use client";
      console.log(process.env.NEXT_PUBLIC_IMAGE_BASE);`,
-  );
+    );
 
-  fs.writeFileSync(path.join(cwd, '.env'), `NEXT_PUBLIC_IMAGE_BASE=1`);
+    fs.writeFileSync(path.join(cwd, '.env'), `NEXT_PUBLIC_IMAGE_BASE=1`);
 
-  const res = runCli(cwd, ['--scan-usage']);
+    const res = runCli(cwd, ['--scan-usage']);
 
-  expect(res.stdout).not.toContain('must use NEXT_PUBLIC_');
-});
+    expect(res.stdout).not.toContain('must use NEXT_PUBLIC_');
+  });
 
-it('does NOT warn for server components using private env', () => {
-  const cwd = tmpDir();
-  makeNextProject(cwd);
-  fs.mkdirSync(path.join(cwd, 'settings'), { recursive: true });
-  fs.writeFileSync(
-    path.join(cwd, 'settings/page.ts'),
-    `console.log(process.env.ADMIN_KEY);`,
-  );
+  it('does NOT warn for server components using private env', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
+    fs.mkdirSync(path.join(cwd, 'settings'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'settings/page.ts'),
+      `console.log(process.env.ADMIN_KEY);`,
+    );
 
-  fs.writeFileSync(path.join(cwd, '.env'), `ADMIN_KEY=abc`);
+    fs.writeFileSync(path.join(cwd, '.env'), `ADMIN_KEY=abc`);
 
-  const res = runCli(cwd, ['--scan-usage']);
+    const res = runCli(cwd, ['--scan-usage']);
 
-  expect(res.stdout).not.toContain('NEXT_PUBLIC_');
-});
-
+    expect(res.stdout).not.toContain('NEXT_PUBLIC_');
+  });
 });
