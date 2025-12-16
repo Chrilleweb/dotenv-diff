@@ -11,7 +11,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 
--
+- Updated dependencies to latest versions.
 
 ### Fixed
 
