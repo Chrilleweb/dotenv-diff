@@ -37,7 +37,6 @@ export function createJsonOutput(
 
   const output: ScanJsonEntry = {
     stats: scanResult.stats,
-    healthScore,
     missing: missingGrouped,
     unused: scanResult.unused,
   };
@@ -97,6 +96,8 @@ export function createJsonOutput(
       context: u.context,
     }));
   }
+
+  output.healthScore = healthScore;
 
   return output;
 }
