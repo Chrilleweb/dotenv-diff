@@ -7,7 +7,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 
--
+- Added warnings count to scan usage stats.
 
 ### Changed
 
