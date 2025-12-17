@@ -190,7 +190,6 @@ export interface ScanJsonEntry {
     uniqueVariables: number;
     duration: number;
   };
-  healthScore: number;
   missing: Array<{
     variable: string;
     usages: Array<{
@@ -246,6 +245,7 @@ export interface ScanJsonEntry {
     file: string;
     line: number;
   }>;
+  healthScore?: number;
 }
 
 // Type for grouped usages by variable
