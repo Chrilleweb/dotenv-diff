@@ -18,11 +18,10 @@ export default [
       ...tseslint.configs.recommended.rules,
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['warn'],
-      'quotes': ['warn', 'single', { avoidEscape: true }],
+      quotes: ['warn', 'single', { avoidEscape: true }],
     },
   },
   {
     ignores: ['dist/**'],
   },
 ];
-

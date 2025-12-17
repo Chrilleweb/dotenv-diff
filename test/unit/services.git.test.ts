@@ -43,7 +43,10 @@ describe('checkGitignore helpers', () => {
     tmpDirs.push(cwd);
 
     // Typical patterns that should be accepted by our candidate set
-    touch(path.join(cwd, '.gitignore'), ['# comment', '.env', '.env.*'].join('\n'));
+    touch(
+      path.join(cwd, '.gitignore'),
+      ['# comment', '.env', '.env.*'].join('\n'),
+    );
 
     expect(isEnvIgnoredByGit({ cwd })).toBe(true);
   });
@@ -153,7 +156,11 @@ describe('warnIfEnvNotIgnored', () => {
     touch(path.join(cwd, '.gitignore'), '.env\n');
 
     const logs: string[] = [];
-    warnIfEnvNotIgnored({ cwd, envFile: '.env.local', log: (m) => logs.push(m) });
+    warnIfEnvNotIgnored({
+      cwd,
+      envFile: '.env.local',
+      log: (m) => logs.push(m),
+    });
 
     expect(logs.length).toBe(1);
     expect(logs[0]).toContain('.env.local');

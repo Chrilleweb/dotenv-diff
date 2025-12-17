@@ -60,12 +60,15 @@ describe('--ignore and --ignore-regex', () => {
 
   it('combines --ignore and --ignore-regex', () => {
     const cwd = tmpDir();
-    fs.writeFileSync(
-      path.join(cwd, '.env'),
-      'API_KEY=1\nSECRET_TOKEN=1\n',
-    );
+    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=1\nSECRET_TOKEN=1\n');
     fs.writeFileSync(path.join(cwd, '.env.example'), '');
-    const res = runCli(cwd, ['--compare', '--ignore', 'API_KEY', '--ignore-regex', '^SECRET_']);
+    const res = runCli(cwd, [
+      '--compare',
+      '--ignore',
+      'API_KEY',
+      '--ignore-regex',
+      '^SECRET_',
+    ]);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('All keys match');
     expect(res.stdout).not.toContain('API_KEY');

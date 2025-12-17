@@ -533,9 +533,7 @@ describe('scan-usage error handling', () => {
 
       const res = runCli(cwd, ['--scan-usage']);
       expect(res.status).toBe(0);
-      expect(res.stdout).toContain(
-        'Scan Statistics:',
-      );
+      expect(res.stdout).toContain('Scan Statistics:');
     });
   });
   describe('with --fix flag', () => {
@@ -578,6 +576,8 @@ describe('scan-usage error handling', () => {
     const res = runCli(cwd, ['--scan-usage']);
     console.log('stdout:', res.stdout);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Tip: Run with `--fix` to ensure .env is added to .gitignore');
+    expect(res.stdout).toContain(
+      'Tip: Run with `--fix` to ensure .env is added to .gitignore',
+    );
   });
 });
