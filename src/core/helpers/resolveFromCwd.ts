@@ -8,3 +8,4 @@ import path from 'path';
  */
 export const resolveFromCwd = (cwd: string, p: string): string =>
   path.isAbsolute(p) ? p : path.resolve(cwd, p);
+
