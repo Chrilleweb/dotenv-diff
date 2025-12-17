@@ -54,9 +54,6 @@ export function outputToConsole(
   // Show stats if requested
   printStats(scanResult.stats, isJson, opts.showStats ?? true);
 
-  const score = computeHealthScore(scanResult);
-  printHealthScore(score);
-
   // Show used variables if any found
   if (scanResult.stats.uniqueVariables > 0) {
     // Show unique variables found
@@ -218,6 +215,10 @@ export function outputToConsole(
       fixContext.gitignoreUpdated,
     );
   }
+
+  // Health score
+  const score = computeHealthScore(scanResult);
+  printHealthScore(score);
 
   // Filtered results for fix tips
   printFixTips(

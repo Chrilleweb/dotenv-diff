@@ -12,6 +12,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Changed
 
 - Updated dependencies to latest versions.
+- Moved `healthScore` further down on the console output for better visibility of issues.
 
 ### Fixed
 
