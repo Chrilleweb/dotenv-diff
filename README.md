@@ -1,6 +1,6 @@
 # dotenv-diff
 
-![Demo](./public/demo3.png)
+![Demo](./public/demo3.gif)
 
 `dotenv-diff` scans your codebase to detect which environment variables are used
 and compares them against your `.env` or `.env.example` files.

@@ -41,7 +41,7 @@ export function printAutoFix(
         ),
       );
     }
-    if (result.addedExample.length) {
+    if (result.addedExample.length && !result.addedEnv.length) {
       console.log(
         chalk.green(
           `  - Synced ${result.addedExample.length} keys to ${exampleName}: ${result.addedExample.join(', ')}`,
