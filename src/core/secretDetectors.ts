@@ -44,6 +44,10 @@ const HARMLESS_URLS = [
   /xmlns=["']http:\/\/www\.w3\.org\/2000\/svg["']/i, // SVG namespace
 ];
 
+// Known harmless attribute keys commonly used in UI / analytics
+const HARMLESS_ATTRIBUTE_KEYS =
+  /\b(trackingId|trackingContext|data-testid|data-test|aria-label)\b/i;
+
 /**
  * Determines the severity of a secret finding.
  * @param kind 'pattern' | 'entropy'
@@ -256,7 +260,10 @@ export function detectSecretsInSource(
 
     // 1) Suspicious key literal assignments
     if (SUSPICIOUS_KEYS.test(line)) {
-      const m = line!.match(/=\s*["'`](.+?)["'`]/);
+      // Ignore known harmless UI / analytics attributes
+      if (HARMLESS_ATTRIBUTE_KEYS.test(line)) continue;
+
+      const m = line.match(/=\s*["'`](.+?)["'`]/);
       if (
         m &&
         m[1] &&
