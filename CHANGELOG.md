@@ -30,6 +30,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 - Removed used variables output from scan usage to reduce noise.
 - Removed header output from scan usage to reduce noise.
 - Shortened config file path in CLI output to show only the filename.
+- Updated README documentation for better clarity.
 
 ### Fixed
 
