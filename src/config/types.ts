@@ -149,6 +149,7 @@ export interface ScanResult {
     filesScanned: number;
     totalUsages: number;
     uniqueVariables: number;
+    warningsCount: number;
     duration: number;
   };
   secrets: SecretFinding[];
@@ -188,6 +189,7 @@ export interface ScanJsonEntry {
     filesScanned: number;
     totalUsages: number;
     uniqueVariables: number;
+    warningsCount: number;
     duration: number;
   };
   missing: Array<{

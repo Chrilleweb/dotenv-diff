@@ -1,13 +1,16 @@
 import chalk from 'chalk';
+import path from 'path';
 
 /**
  * Prints message when dotenv-diff.config.json is successfully loaded.
- * @param path Path to the config file
+ * @param filePath The path to the loaded config file
  * @returns void
  */
-export function printConfigLoaded(path: string): void {
+export function printConfigLoaded(filePath: string): void {
+  const fileName = path.basename(filePath);
+
   console.log();
-  console.log(`${chalk.cyan('🧩 Loaded config:')} ${chalk.dim(path)}`);
+  console.log(`${chalk.cyan('🧩 Loaded config:')} ${chalk.dim(fileName)}`);
 }
 
 /**

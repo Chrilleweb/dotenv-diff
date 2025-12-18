@@ -270,4 +270,32 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
+  it('does not warn on UI tracking attributes containing auth keywords', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'page.svelte'),
+      `
+    <script>
+      const trackingId = "users-reset-password-button";
+      const trackingContext = "users-reset-password-confirmation-modal";
+    </script>
+
+    <button
+      trackingId="users-reset-password-button"
+      trackingContext="users-reset-password-confirmation-modal"
+    >
+      Reset password
+    </button>
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
 });
