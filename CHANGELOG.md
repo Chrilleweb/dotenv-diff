@@ -13,6 +13,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 - Updated dependencies to latest versions.
 - Moved `healthScore` further down on the console output for better visibility of issues.
+- Shortened config file path in CLI output to show only the filename.
 
 ### Fixed
 
