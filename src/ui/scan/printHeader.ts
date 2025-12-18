@@ -6,15 +6,10 @@ import chalk from 'chalk';
  * @returns void
  */
 export function printHeader(comparedAgainst?: string): void {
-  console.log();
-  console.log(
-    chalk.blue('🔍 Scanning codebase for environment variable usage...'),
-  );
   if (comparedAgainst) {
     console.log();
     console.log(
       chalk.magenta(`📋 Comparing codebase usage against: ${comparedAgainst}`),
     );
   }
-  console.log();
 }

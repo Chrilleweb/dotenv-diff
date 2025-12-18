@@ -4,8 +4,6 @@ import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import type { ScanUsageOptions, ScanResult } from '../config/types.js';
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
-import { printUniqueVariables } from '../ui/scan/printUniqueVariables.js';
-import { printVariables } from '../ui/scan/printVariables.js';
 import { printMissing } from '../ui/scan/printMissing.js';
 import { printUnused } from '../ui/scan/printUnused.js';
 import { printDuplicates } from '../ui/shared/printDuplicates.js';
@@ -53,14 +51,6 @@ export function outputToConsole(
 
   // Show stats if requested
   printStats(scanResult.stats, isJson, opts.showStats ?? true);
-
-  // Show used variables if any found
-  if (scanResult.stats.uniqueVariables > 0) {
-    // Show unique variables found
-    printUniqueVariables(scanResult.stats.uniqueVariables);
-    // Print used variables with locations
-    printVariables(scanResult.used, opts.showStats ?? false, isJson);
-  }
 
   // Missing variables (used in code but not in env file)
   if (
