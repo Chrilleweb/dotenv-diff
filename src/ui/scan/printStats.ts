@@ -20,6 +20,7 @@ export function printStats(
   showStats: boolean,
 ): void {
   if (json || !showStats) return;
+  console.log();
   console.log(chalk.magenta('📊 Scan Statistics:'));
   console.log(chalk.magenta.dim(`   Files scanned: ${stats.filesScanned}`));
   console.log(chalk.magenta.dim(`   Total usages found: ${stats.totalUsages}`));

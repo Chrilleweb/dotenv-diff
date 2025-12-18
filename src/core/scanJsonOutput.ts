@@ -86,17 +86,6 @@ export function createJsonOutput(
     output.totalEnvVariables = totalEnvVariables;
   }
 
-  // Optionally include all usages
-  if (opts.showStats) {
-    output.allUsages = scanResult.used.map((u: EnvUsage) => ({
-      variable: u.variable,
-      file: u.file,
-      line: u.line,
-      pattern: u.pattern,
-      context: u.context,
-    }));
-  }
-
   output.healthScore = healthScore;
 
   return output;
