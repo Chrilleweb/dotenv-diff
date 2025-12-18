@@ -7,19 +7,26 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 
-- Added warnings count to scan usage stats.
+- 
 
 ### Changed
 
+- 
+
+### Fixed
+
+-
+
+## [2.3.12] - 2025-12-18
+### Added
+- Added warnings count to scan usage stats.
+
+### Changed
 - Updated dependencies to latest versions.
 - Moved `healthScore` further down on the console output for better visibility of issues.
 - Removed used variables output from scan usage to reduce noise.
 - Removed header output from scan usage to reduce noise.
 - Shortened config file path in CLI output to show only the filename.
-
-### Fixed
-
--
 
 ## [2.3.11] - 2025-12-13
 
