@@ -27,9 +27,7 @@ export function printStats(
   console.log(
     chalk.magenta.dim(`   Unique variables: ${stats.uniqueVariables}`),
   );
-  console.log(
-    chalk.magenta.dim(`   Warnings: ${stats.warningsCount}`),
-  );
+  console.log(chalk.magenta.dim(`   Warnings: ${stats.warningsCount}`));
   console.log(
     chalk.magenta.dim(`   Scan duration: ${stats.duration.toFixed(2)}s`),
   );
