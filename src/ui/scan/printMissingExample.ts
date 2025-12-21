@@ -15,6 +15,7 @@ export function printMissingExample(opts: ScanUsageOptions): boolean {
   const exampleAbs = resolveFromCwd(opts.cwd, opts.examplePath);
   const missing = !fs.existsSync(exampleAbs);
 
+  console.log(''); // Add spacing before message
   if (missing) {
     const msgText = `Missing specified example file: ${opts.examplePath}`;
     if (opts.isCiMode) {

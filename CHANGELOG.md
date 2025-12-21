@@ -11,7 +11,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 
--
+- Added spacing before missing example file message in scan usage output.
 
 ### Fixed
 
