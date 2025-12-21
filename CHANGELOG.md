@@ -12,6 +12,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Changed
 
 - Added spacing before missing example file message in scan usage output.
+- Changed path display for print missing example file message to show only filename instead of full path.
 
 ### Fixed
 
