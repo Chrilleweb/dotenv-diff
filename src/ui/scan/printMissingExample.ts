@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import fs from 'fs';
+import path from 'path';
 import { resolveFromCwd } from '../../core/helpers/resolveFromCwd.js';
 import type { ScanUsageOptions } from '../../config/types.js';
 
@@ -15,15 +16,20 @@ export function printMissingExample(opts: ScanUsageOptions): boolean {
   const exampleAbs = resolveFromCwd(opts.cwd, opts.examplePath);
   const missing = !fs.existsSync(exampleAbs);
 
-  console.log(''); // Add spacing before message
-  if (missing) {
-    const msgText = `Missing specified example file: ${opts.examplePath}`;
-    if (opts.isCiMode) {
-      console.log(chalk.red('❌ ' + msgText));
-      return true;
-    } else if (!opts.json) {
-      console.log(chalk.yellow('⚠️  ' + msgText));
-    }
+  if (!missing) return false;
+
+  const fileName = path.basename(opts.examplePath);
+  const msgText = `Missing example file: ${fileName}`;
+
+  console.log();
+
+  if (opts.isCiMode) {
+    console.log(chalk.red(`❌ ${msgText}`));
+    return true;
+  }
+
+  if (!opts.json) {
+    console.log(chalk.yellow(`⚠️  ${msgText}`));
   }
 
   return false;
