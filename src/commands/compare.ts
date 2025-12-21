@@ -223,6 +223,7 @@ export async function compareMany(
         filtered,
         opts.json ?? false,
         opts.showStats ?? true,
+        opts.checkValues ?? false,
       );
     }
 

@@ -16,7 +16,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
--
+- Fixed compare mode value mismatch count not showing in stats output if --check-values flag isn't used.
 
 ## [2.3.12] - 2025-12-18
 
