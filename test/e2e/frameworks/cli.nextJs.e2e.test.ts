@@ -87,7 +87,7 @@ describe('Next.js environment variable usage rules', () => {
       'process.env inside client components must use NEXT_PUBLIC_ variables',
     );
     expect(res.stdout).not.toContain(
-      "NEXT_PUBLIC_ variables are exposed to the browser",
+      'NEXT_PUBLIC_ variables are exposed to the browser',
     );
   });
 
