@@ -183,6 +183,18 @@ function isProbablyTestPath(p: string): boolean {
   );
 }
 
+/**
+ * Checks if a string is a pure interpolation template.
+ * @param s - The string to check.
+ * @returns True if the string is a pure interpolation template, false otherwise.
+ */
+function isPureInterpolationTemplate(s: string): boolean {
+  // Matches templates like `${a}`, `${a}:${b}`, `${a}|${b}|${c}`
+  // i.e. no meaningful static content
+  const withoutInterpolations = s.replace(/\$\{[^}]+\}/g, '');
+  return /^[\s:|,._-]*$/.test(withoutInterpolations);
+}
+
 // Threshold is the value between 0 and 1 that determines the sensitivity of the detection.
 const DEFAULT_SECRET_THRESHOLD = 0.85 as const;
 
@@ -270,7 +282,8 @@ export function detectSecretsInSource(
         !looksHarmlessLiteral(m[1]) &&
         !looksLikeUrlConstruction(line) &&
         m[1].length >= 12 &&
-        !isEnvAccessor(line)
+        !isEnvAccessor(line) &&
+        !isPureInterpolationTemplate(m[1])
       ) {
         findings.push({
           file,
