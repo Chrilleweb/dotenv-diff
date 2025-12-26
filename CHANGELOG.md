@@ -15,7 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
--
+- Fixed nextjs framework rules bug where multiple warnings could be generated for the same usage.
 
 ## [2.4.0] - 2025-12-26
 

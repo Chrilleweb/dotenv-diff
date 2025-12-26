@@ -21,11 +21,6 @@ export const ENV_PATTERNS = [
     frameworks: ['deno'],
   },
   {
-    name: 'next' as const,
-    regex: /process\.env\.(NEXT_PUBLIC_[A-Z_][A-Z0-9_]*)/g,
-    frameworks: ['next'],
-  },
-  {
     name: 'nuxt' as const,
     regex: /(?:\$config|useRuntimeConfig\(\))\.([A-Z_][A-Z0-9_]*)/g,
     frameworks: ['nuxt'],
