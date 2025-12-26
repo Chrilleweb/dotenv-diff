@@ -150,10 +150,6 @@ console.log(process.env.SECRET_TOKEN);`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    console.log('=== DEBUG OUTPUT ===');
-    console.log(res.stdout);
-    console.log('=== END DEBUG ===');
-
     // Count occurrences of the warning message
     const warningMessage =
       "NEXT_PUBLIC_ variables are exposed to the browser — don't use them in server-only files";
@@ -165,5 +161,41 @@ console.log(process.env.SECRET_TOKEN);`,
     // Verify the variable name appears exactly twice in warnings section
     const varMatches = res.stdout.match(/NEXT_PUBLIC_API_URL/g);
     expect(varMatches?.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('includes framework warnings in JSON output', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
+
+    fs.mkdirSync(path.join(cwd, 'app/api/test'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'app/api/test/route.ts'),
+      `export async function GET() {
+        process.env.NEXT_PUBLIC_API_KEY;
+      }`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), `NEXT_PUBLIC_API_KEY=secret123`);
+
+    const res = runCli(cwd, ['--scan-usage', '--json']);
+
+    console.log(res.stdout);
+    expect(res.status).toBe(0);
+
+    const json = JSON.parse(res.stdout);
+
+    // Verify framework warnings are present
+    expect(json.frameworkWarnings).toBeDefined();
+    expect(json.frameworkWarnings.length).toBeGreaterThan(0);
+
+    // Check the warning content
+    const warning = json.frameworkWarnings[0];
+    expect(warning.variable).toBe('NEXT_PUBLIC_API_KEY');
+    expect(warning.framework).toBe('next');
+    expect(warning.reason).toContain(
+      'NEXT_PUBLIC_ variables are exposed to the browser',
+    );
+    expect(warning.file).toContain('app/api/test/route.ts');
+    expect(warning.line).toBeGreaterThan(0);
   });
 });

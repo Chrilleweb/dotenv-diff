@@ -247,6 +247,19 @@ export interface ScanJsonEntry {
     file: string;
     line: number;
   }>;
+  frameworkWarnings?: Array<{
+    variable: string;
+    reason: string;
+    file: string;
+    line: number;
+    framework: string;
+  }>;
+  exampleWarnings?: Array<{
+    key: string;
+    value: string;
+    reason: string;
+    severity: string;
+  }>;
   healthScore?: number;
 }
 
