@@ -23,7 +23,7 @@ export function printStats(
   console.log();
   console.log(chalk.magenta('📊 Scan Statistics:'));
   console.log(chalk.magenta.dim(`   Files scanned: ${stats.filesScanned}`));
-  console.log(chalk.magenta.dim(`   Total usages found: ${stats.totalUsages}`));
+  console.log(chalk.magenta.dim(`   Total variables: ${stats.totalUsages}`));
   console.log(
     chalk.magenta.dim(`   Unique variables: ${stats.uniqueVariables}`),
   );
