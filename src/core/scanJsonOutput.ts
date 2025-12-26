@@ -75,9 +75,39 @@ export function createJsonOutput(
     }));
   }
 
+  if (scanResult.frameworkWarnings?.length) {
+    output.frameworkWarnings = scanResult.frameworkWarnings.map((w) => ({
+      variable: w.variable,
+      reason: w.reason,
+      file: w.file,
+      line: w.line,
+      framework: w.framework,
+    }));
+  }
+
   // Add duplicates if found
   if (scanResult.duplicates) {
     output.duplicates = scanResult.duplicates;
+  }
+
+  // Add logged variables if any
+  if (scanResult.logged) {
+    output.logged = scanResult.logged.map((l) => ({
+      variable: l.variable,
+      file: l.file,
+      line: l.line,
+      context: l.context,
+    }));
+  }
+
+  // Example warnings
+  if (scanResult.exampleWarnings?.length) {
+    output.exampleWarnings = scanResult.exampleWarnings.map((w) => ({
+      key: w.key,
+      value: w.value,
+      reason: w.reason,
+      severity: w.severity,
+    }));
   }
 
   // Add comparison info if we compared against a file

@@ -159,14 +159,14 @@ export async function scanUsage(
             (scanResult.unused.length > 0 ||
               (scanResult.duplicates?.env?.length ?? 0) > 0 ||
               (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-              (scanResult.secrets?.length ?? 0) > 0)) ||
-          (scanResult.exampleWarnings?.length ?? 0) > 0 ||
-          (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
-          (scanResult.t3EnvWarnings?.length ?? 0) > 0 ||
-          (scanResult.logged?.length ?? 0) > 0 ||
-          (scanResult.uppercaseWarnings?.length ?? 0) > 0 ||
-          (scanResult.expireWarnings?.length ?? 0) > 0 ||
-          (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0
+              (scanResult.secrets?.length ?? 0) > 0 ||
+              (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
+              (scanResult.t3EnvWarnings?.length ?? 0) > 0 ||
+              (scanResult.logged?.length ?? 0) > 0 ||
+              (scanResult.uppercaseWarnings?.length ?? 0) > 0 ||
+              (scanResult.expireWarnings?.length ?? 0) > 0 ||
+              (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0)) ||
+          (scanResult.exampleWarnings?.length ?? 0) > 0
         ),
     };
   }

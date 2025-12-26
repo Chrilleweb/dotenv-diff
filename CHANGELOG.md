@@ -11,7 +11,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 
--
+- Added Example warings to JSON output of scan usage.
 
 ### Fixed
 
