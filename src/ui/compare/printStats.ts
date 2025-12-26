@@ -17,6 +17,7 @@ interface CompareStats {
  * @param filtered The filtered keys.
  * @param json Whether to output in JSON format.
  * @param showStats Whether to show statistics.
+ * @param checkValues Whether value checking is enabled.
  */
 export function printStats(
   envName: string,
@@ -25,6 +26,7 @@ export function printStats(
   filtered: Pick<Filtered, 'missing' | 'extra' | 'empty'>,
   json: boolean,
   showStats: boolean,
+  checkValues: boolean,
 ): void {
   if (json || !showStats) return;
   console.log(chalk.magenta('📊 Compare Statistics:'));
@@ -47,8 +49,10 @@ export function printStats(
     console.log(chalk.magenta.dim(`   Empty values: ${filtered.empty.length}`));
   }
   console.log(chalk.magenta.dim(`   Duplicate keys: ${s.duplicateCount}`));
-  console.log(
-    chalk.magenta.dim(`   Value mismatches: ${s.valueMismatchCount}`),
-  );
+  if (checkValues) {
+    console.log(
+      chalk.magenta.dim(`   Value mismatches: ${s.valueMismatchCount}`),
+    );
+  }
   console.log();
 }

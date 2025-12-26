@@ -12,26 +12,47 @@ export function applyT3EnvRules(
   warnings: T3EnvWarning[],
   schema: T3EnvSchema,
 ): void {
+  // Ignore env definition files
+  if (
+    u.file.endsWith('/env.ts') ||
+    u.file.endsWith('/env.mjs') ||
+    u.file.endsWith('/env.js') ||
+    u.file.endsWith('\\env.ts') ||
+    u.file.endsWith('\\env.mjs') ||
+    u.file.endsWith('\\env.js')
+  ) {
+    return;
+  }
+
+  // Ignore node_modules
+  if (u.file.includes('node_modules')) {
+    return;
+  }
+
   const allServerVars = schema.server;
   const allClientVars = schema.client;
 
-  // Check if variable is used in client code but not defined in client schema
+  // Client context = explicit "use client" directive or import.meta.env
   const isClientContext =
-    u.file.includes('/components/') ||
-    u.file.includes('/pages/') ||
-    u.file.includes('/app/') ||
-    u.file.includes('client') ||
-    u.file.includes('browser') ||
+    u.context.includes('use client') ||
+    u.context.includes('"use client"') ||
+    u.context.includes("'use client'") ||
     u.pattern === 'import.meta.env';
 
-  const isServerContext =
-    u.file.includes('/api/') ||
-    u.file.includes('server') ||
-    u.file.endsWith('.server.ts') ||
-    u.file.endsWith('.server.js') ||
-    u.pattern === 'process.env';
+  // Discourage NEXT_PUBLIC_ usage in t3-env projects
+  if (u.variable.startsWith('NEXT_PUBLIC_')) {
+    warnings.push({
+      variable: u.variable,
+      reason:
+        'Use t3-env client schema instead of NEXT_PUBLIC_ prefix for type-safe environment variables.',
+      file: u.file,
+      line: u.line,
+      framework: 't3-env',
+    });
+    return; // Stop processing after this
+  }
 
-  // Variable used in client context but only defined in server schema
+  // Client using server-only variable (SECURITY ISSUE!)
   if (
     isClientContext &&
     allServerVars.includes(u.variable) &&
@@ -39,26 +60,12 @@ export function applyT3EnvRules(
   ) {
     warnings.push({
       variable: u.variable,
-      reason: `Variable "${u.variable}" is used in client code but only defined in server schema. Add to client schema or move to server-only code.`,
+      reason: `Variable "${u.variable}" is used in client code but only defined in server schema. This will expose secrets! Add to client schema or move to server-only code.`,
       file: u.file,
       line: u.line,
       framework: 't3-env',
     });
-  }
-
-  // Variable used in server context but only defined in client schema
-  if (
-    isServerContext &&
-    allClientVars.includes(u.variable) &&
-    !allServerVars.includes(u.variable)
-  ) {
-    warnings.push({
-      variable: u.variable,
-      reason: `Variable "${u.variable}" is used in server code but only defined in client schema. This may expose client variables on the server.`,
-      file: u.file,
-      line: u.line,
-      framework: 't3-env',
-    });
+    return;
   }
 
   // Variable not defined in any schema
@@ -68,18 +75,7 @@ export function applyT3EnvRules(
   ) {
     warnings.push({
       variable: u.variable,
-      reason: `Variable "${u.variable}" is not defined in t3-env schema. Add it to either server or client schema.`,
-      file: u.file,
-      line: u.line,
-      framework: 't3-env',
-    });
-  }
-
-  // Warn about NEXT_PUBLIC_ variables in t3-env projects
-  if (u.variable.startsWith('NEXT_PUBLIC_')) {
-    warnings.push({
-      variable: u.variable,
-      reason: `Use t3-env client schema instead of NEXT_PUBLIC_ prefix for type-safe environment variables.`,
+      reason: `Variable "${u.variable}" is not defined in t3-env schema. Add it to either server or client schema for type safety.`,
       file: u.file,
       line: u.line,
       framework: 't3-env',
