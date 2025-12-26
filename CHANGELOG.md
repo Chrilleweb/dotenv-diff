@@ -17,6 +17,8 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 
 - Fixed compare mode value mismatch count not showing in stats output if --check-values flag isn't used.
+- Fixed t3-env integration not working as expected in some edge cases.
+- Fixed nextjs framework validator not working as expected in some edge cases.
 
 ## [2.3.12] - 2025-12-18
 
