@@ -7,7 +7,17 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 
--
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
+
+## [2.4.0] - 2025-12-26
 
 ### Changed
 
