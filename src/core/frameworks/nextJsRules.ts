@@ -44,6 +44,7 @@ export function applyNextJsRules(
       line: u.line,
       framework: 'next',
     });
+    return; // Stop processing other rules for this usage
   }
 
   // Client components MUST use NEXT_PUBLIC_ prefix
@@ -60,6 +61,7 @@ export function applyNextJsRules(
       line: u.line,
       framework: 'next',
     });
+    return; // Stop processing other rules for this usage
   }
 
   // Warn about Vite syntax in Next.js
@@ -71,6 +73,7 @@ export function applyNextJsRules(
       line: u.line,
       framework: 'next',
     });
+    return; // Stop processing other rules for this usage
   }
 
   // Warn if NEXT_PUBLIC_ contains sensitive keywords
@@ -90,5 +93,6 @@ export function applyNextJsRules(
       line: u.line,
       framework: 'next',
     });
+    return; // Stop processing other rules for this usage
   }
 }

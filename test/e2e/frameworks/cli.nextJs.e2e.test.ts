@@ -128,4 +128,42 @@ console.log(process.env.SECRET_TOKEN);`,
       'process.env inside client components must use NEXT_PUBLIC_ variables',
     );
   });
+
+  it('does not duplicate warnings when NEXT_PUBLIC_ is used multiple times in server file', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
+
+    fs.mkdirSync(path.join(cwd, 'app/api/users'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'app/api/users/route.ts'),
+      `export async function GET() {
+        const url1 = process.env.NEXT_PUBLIC_API_URL;
+        const url2 = process.env.NEXT_PUBLIC_API_URL;
+        return Response.json({ url1, url2 });
+      }`,
+    );
+
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      `NEXT_PUBLIC_API_URL=https://api.example.com`,
+    );
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    console.log('=== DEBUG OUTPUT ===');
+    console.log(res.stdout);
+    console.log('=== END DEBUG ===');
+
+    // Count occurrences of the warning message
+    const warningMessage =
+      "NEXT_PUBLIC_ variables are exposed to the browser — don't use them in server-only files";
+    const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
+
+    // Should appear exactly 2 times (once per usage), not 4 times (duplicated)
+    expect(matches?.length).toBe(2);
+
+    // Verify the variable name appears exactly twice in warnings section
+    const varMatches = res.stdout.match(/NEXT_PUBLIC_API_URL/g);
+    expect(varMatches?.length).toBeGreaterThanOrEqual(2);
+  });
 });
