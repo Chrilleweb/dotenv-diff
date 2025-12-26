@@ -237,6 +237,33 @@ describe('SvelteKit environment variable usage rules', () => {
     expect(res.stdout).toContain('PUBLIC_TOKEN');
   });
 
+  it('does not duplicate warnings when variable is used multiple times', () => {
+    const cwd = tmpDir();
+    makeSvelteKitProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/routes/+page.ts'),
+      `const url1 = import.meta.env.PUBLIC_URL;
+const url2 = import.meta.env.PUBLIC_URL;
+const url3 = import.meta.env.PUBLIC_URL;`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), `PUBLIC_URL=123`);
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    // Count occurrences of the warning message
+    const warningMessage =
+      'Variables accessed through import.meta.env must start with "VITE_"';
+    const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
+
+    // Should appear exactly 3 times (once per usage), not 6 times (duplicated)
+    expect(matches?.length).toBe(3);
+
+    // Verify total usages found
+    expect(res.stdout).toContain('Total usages found: 3');
+  });
+
   it('Will exit code 1 on strict mode when warnings are present', () => {
     const cwd = tmpDir();
     makeSvelteKitProject(cwd);
