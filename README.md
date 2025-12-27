@@ -178,18 +178,6 @@ Disable via config:
 
 ---
 
-## t3-env Integration
-
-Validates usage against t3-env schemas.
-
-Disable if needed:
-
-```json
-"t3env": false
-```
-
----
-
 ## Show / Hide Output Options
 
 Disable unused variables list:
