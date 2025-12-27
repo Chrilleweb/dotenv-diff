@@ -15,6 +15,12 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
+-
+
+## [2.4.4] - 2025-12-27
+
+### Fixed
+
 - Fixed bug in next js framework rules
 
 ## [2.4.3] - 2025-12-27
