@@ -198,4 +198,97 @@ console.log(process.env.SECRET_TOKEN);`,
     expect(warning.file).toContain('app/api/test/route.ts');
     expect(warning.line).toBeGreaterThan(0);
   });
+  it('warns when non-NEXT_PUBLIC_ variables are used in client components', () => {
+  const cwd = tmpDir();
+  makeNextProject(cwd);
+
+  fs.writeFileSync(
+    path.join(cwd, 'components/ClientTest.tsx'),
+    `"use client";
+
+export default function ClientTest() {
+  return (
+    <div>
+      <p>Database: {process.env.DATABASE_URL}</p>
+      <p>Secret: {process.env.SECRET_KEY}</p>
+    </div>
+  );
+}`,
+  );
+
+  fs.writeFileSync(
+    path.join(cwd, '.env'),
+    `DATABASE_URL=postgresql://localhost:5432/mydb
+SECRET_KEY=my-secret`,
+  );
+
+  const res = runCli(cwd, ['--scan-usage']);
+
+  expect(res.stdout).toContain(
+    'Client components must use NEXT_PUBLIC_ prefix for environment variables to be accessible in the browser',
+  );
+  expect(res.stdout).toContain('DATABASE_URL');
+  expect(res.stdout).toContain('SECRET_KEY');
+});
+
+it('warns for each non-NEXT_PUBLIC_ variable used in client component', () => {
+  const cwd = tmpDir();
+  makeNextProject(cwd);
+
+  fs.writeFileSync(
+    path.join(cwd, 'app/client-page.tsx'),
+    `'use client';
+
+export default function Page() {
+  const db = process.env.DATABASE_URL;
+  const secret = process.env.SECRET_KEY;
+  const api = process.env.API_ENDPOINT;
+  
+  return <div>{db} {secret} {api}</div>;
+}`,
+  );
+
+  fs.writeFileSync(
+    path.join(cwd, '.env'),
+    `DATABASE_URL=db
+SECRET_KEY=secret
+API_ENDPOINT=api`,
+  );
+
+  const res = runCli(cwd, ['--scan-usage']);
+  console.log(res.stdout);
+
+  // Should warn for all three variables
+  expect(res.stdout).toContain('DATABASE_URL');
+  expect(res.stdout).toContain('SECRET_KEY');
+  expect(res.stdout).toContain('API_ENDPOINT');
+  
+  const warningMessage = 'Client components must use NEXT_PUBLIC_ prefix';
+  const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
+  
+  expect(matches?.length).toBe(3);
+});
+
+it('does not warn when server components use non-NEXT_PUBLIC_ variables', () => {
+  const cwd = tmpDir();
+  makeNextProject(cwd);
+
+  // Server component (no "use client")
+  fs.writeFileSync(
+    path.join(cwd, 'app/page.tsx'),
+    `export default async function Page() {
+  const db = process.env.DATABASE_URL;
+  
+  return <div>{db}</div>;
+}`,
+  );
+
+  fs.writeFileSync(path.join(cwd, '.env'), `DATABASE_URL=postgresql://...`);
+
+  const res = runCli(cwd, ['--scan-usage']);
+
+  expect(res.stdout).not.toContain(
+    'Client components must use NEXT_PUBLIC_ prefix',
+  );
+});
 });

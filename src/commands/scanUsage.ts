@@ -52,7 +52,11 @@ export async function scanUsage(
     return { exitWithError: true };
   }
 
-  const frameworkWarnings = frameworkValidator(scanResult.used, opts.cwd);
+  const frameworkWarnings = frameworkValidator(
+    scanResult.used,
+    opts.cwd,
+    scanResult.fileContentMap,
+  );
   if (frameworkWarnings.length > 0) {
     scanResult.frameworkWarnings = frameworkWarnings;
   }

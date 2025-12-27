@@ -161,6 +161,7 @@ export interface ScanResult {
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
+  fileContentMap?: Map<string, string>;
 }
 
 /** Options for scanning the codebase for environment variable usage. */

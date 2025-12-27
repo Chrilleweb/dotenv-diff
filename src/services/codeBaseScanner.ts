@@ -24,6 +24,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const allUsages: EnvUsage[] = [];
   let filesScanned = 0;
   const allSecrets: SecretFinding[] = [];
+  const fileContentMap = new Map<string, string>();
 
   for (const filePath of files) {
     try {
@@ -31,6 +32,10 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
 
       const fileUsages = await scanFile(filePath, content, opts);
       allUsages.push(...fileUsages);
+
+      // Store file content for framework validation
+      const relativePath = path.relative(opts.cwd, filePath);
+      fileContentMap.set(relativePath, content);
       if (opts.secrets) {
         try {
           const relativePath = path.relative(opts.cwd, filePath);
@@ -78,5 +83,6 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       example: [],
     },
     logged: loggedVariables,
+    fileContentMap,
   };
 }
