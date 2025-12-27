@@ -11,6 +11,16 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 
+-
+
+### Fixed
+
+-
+
+## [2.4.1] - 2025-12-26
+
+### Changed
+
 - Added Example warings to JSON output of scan usage.
 - Changed scan statistics name from "Total usages found" to "Total variables".
 
