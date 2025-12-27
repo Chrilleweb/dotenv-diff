@@ -12,14 +12,12 @@ export function applyT3EnvRules(
   warnings: T3EnvWarning[],
   schema: T3EnvSchema,
 ): void {
-  // Ignore env definition files
+  // Ignore env definition files (can be in root or subdirectories)
+  const fileName = u.file.split(/[/\\]/).pop() || '';
   if (
-    u.file.endsWith('/env.ts') ||
-    u.file.endsWith('/env.mjs') ||
-    u.file.endsWith('/env.js') ||
-    u.file.endsWith('\\env.ts') ||
-    u.file.endsWith('\\env.mjs') ||
-    u.file.endsWith('\\env.js')
+    fileName === 'env.ts' ||
+    fileName === 'env.mjs' ||
+    fileName === 'env.js'
   ) {
     return;
   }
