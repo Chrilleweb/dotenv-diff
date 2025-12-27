@@ -5,21 +5,37 @@ import type { frameworkWarning } from '../frameworkValidator.js';
  * Next.js environment variable validation rules
  * @param u - The environment variable usage information
  * @param warnings - The array to push warnings into
+ * @param fileContentMap - Optional map of file paths to their content for detecting client components
  */
 export function applyNextJsRules(
   u: EnvUsage,
   warnings: frameworkWarning[],
+  fileContentMap?: Map<string, string>,
 ): void {
   // Ignore node_modules
   if (u.file.includes('node_modules')) {
     return;
   }
 
-  // Detect client components
-  const isClientComponent =
-    u.context.includes('use client') ||
-    u.context.includes('"use client"') ||
-    u.context.includes("'use client'");
+  // Detect client components by checking the full file content
+  let isClientComponent = false;
+  if (fileContentMap) {
+    const fileContent = fileContentMap.get(u.file);
+    if (fileContent) {
+      // Check first few lines for "use client" directive
+      const firstLines = fileContent.split('\n').slice(0, 10).join('\n');
+      isClientComponent =
+        /['"]use client['"]/.test(firstLines) ||
+        /^use client;?$/m.test(firstLines);
+    }
+  }
+  // Fallback to context-based detection (less reliable)
+  if (!isClientComponent) {
+    isClientComponent =
+      u.context.includes('use client') ||
+      u.context.includes('"use client"') ||
+      u.context.includes("'use client'");
+  }
 
   // Detect server-only files
   const isServerOnlyFile =
@@ -48,11 +64,7 @@ export function applyNextJsRules(
   }
 
   // Client components MUST use NEXT_PUBLIC_ prefix
-  if (
-    isClientComponent &&
-    u.pattern === 'process.env' &&
-    !u.variable.startsWith('NEXT_PUBLIC_')
-  ) {
+  if (isClientComponent && !u.variable.startsWith('NEXT_PUBLIC_')) {
     warnings.push({
       variable: u.variable,
       reason:
