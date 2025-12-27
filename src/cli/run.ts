@@ -79,7 +79,6 @@ async function runScanMode(opts: Options): Promise<void> {
     uppercaseKeys: opts.uppercaseKeys ?? true,
     expireWarnings: opts.expireWarnings,
     inconsistentNamingWarnings: opts.inconsistentNamingWarnings,
-    t3env: opts.t3env,
     ...(opts.files ? { files: opts.files } : {}),
   });
 

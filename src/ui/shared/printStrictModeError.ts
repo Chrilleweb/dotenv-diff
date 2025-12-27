@@ -12,7 +12,6 @@ interface StrictModeContext {
   uppercaseWarnings?: number;
   expireWarnings?: number;
   inconsistentNamingWarnings?: number;
-  t3EnvWarnings?: number;
 }
 
 /**
@@ -44,8 +43,6 @@ export function printStrictModeError(
     warnings.push('expired environment variables');
   if (ctx.inconsistentNamingWarnings && ctx.inconsistentNamingWarnings > 0)
     warnings.push('inconsistent naming patterns');
-  if (ctx.t3EnvWarnings && ctx.t3EnvWarnings > 0)
-    warnings.push('T3 stack environment variable issues');
 
   if (warnings.length === 0) return false;
 

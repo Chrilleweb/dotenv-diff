@@ -17,6 +17,12 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 -
 
+## [2.4.3] - 2025-12-27
+
+### Changed
+
+- Removed T3-env specific warnings and related code from the codebase scanner.
+
 ## [2.4.2] - 2025-12-27
 
 ### Fixed
