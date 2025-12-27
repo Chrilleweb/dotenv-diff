@@ -17,6 +17,13 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 -
 
+## [2.4.2] - 2025-12-27
+
+### Fixed
+
+- Fixed bug where t3-env schema was not loaded correctly in some edge cases.
+- Fixed duplicate t3-env warnings being shown for the same variable.
+
 ## [2.4.1] - 2025-12-26
 
 ### Changed

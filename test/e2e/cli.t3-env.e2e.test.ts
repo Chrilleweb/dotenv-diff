@@ -176,4 +176,91 @@ console.log(var1, var2, var3);`,
     expect(matches?.length).toBe(1);
     expect(res.stdout).toMatch(/Total (usages found|variables): 6/);
   });
+
+  it('shows one warning per variable across multiple files', () => {
+    const cwd = tmpDir();
+    makeT3EnvProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/file1.ts'),
+      `console.log(process.env.UNKNOWN_VAR);`,
+    );
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/file2.ts'),
+      `console.log(process.env.UNKNOWN_VAR);`,
+    );
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/file3.ts'),
+      `console.log(process.env.UNKNOWN_VAR);`,
+    );
+
+    const res = runCli(cwd, ['--scan-usage', '--t3env']);
+
+    // Count occurrences of the specific warning for UNKNOWN_VAR
+    const warningMessage =
+      'Variable "UNKNOWN_VAR" is not defined in t3-env schema';
+    const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
+
+    // Should appear exactly 1 time even though it's in 3 different files
+    expect(matches?.length).toBe(1);
+  });
+
+  it('detects env.ts in root directory', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(
+      path.join(cwd, 'package.json'),
+      JSON.stringify(
+        {
+          name: 'test-project',
+          version: '1.0.0',
+          dependencies: {
+            '@t3-oss/env-nextjs': '^0.7.0',
+            zod: '^3.22.0',
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    // env.ts in ROOT directory (not src/)
+    fs.writeFileSync(
+      path.join(cwd, 'env.ts'),
+      `import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
+
+export const env = createEnv({
+  server: {
+    ROOT_SERVER_VAR: z.string(),
+  },
+  client: {
+    NEXT_PUBLIC_ROOT_CLIENT: z.string(),
+  },
+  runtimeEnv: {
+    ROOT_SERVER_VAR: process.env.ROOT_SERVER_VAR,
+    NEXT_PUBLIC_ROOT_CLIENT: process.env.NEXT_PUBLIC_ROOT_CLIENT,
+  },
+});`,
+    );
+
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      `ROOT_SERVER_VAR=test\nNEXT_PUBLIC_ROOT_CLIENT=test`,
+    );
+
+    fs.writeFileSync(
+      path.join(cwd, 'test.ts'),
+      `console.log(process.env.UNDEFINED_VAR);`,
+    );
+
+    const res = runCli(cwd, ['--scan-usage', '--t3env']);
+
+    // Should detect t3-env and show warning
+    expect(res.stdout).toContain('T3-env validation issues');
+    expect(res.stdout).toContain('UNDEFINED_VAR');
+    expect(res.stdout).toContain('not defined in t3-env schema');
+  });
 });

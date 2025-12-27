@@ -24,16 +24,19 @@ export async function t3EnvValidator(
     applyT3EnvRules(usage, warnings, t3Detection.schema);
   }
 
-  // Deduplicate warnings based on variable + file + reason (not line number)
+  // Deduplicate warnings based on variable + reason only (not file or line)
+  // This ensures one warning per variable across all files
   if (warnings.length === 0) {
     return [];
   }
 
-  const seen = new Set<string>();
-  return warnings.filter((w) => {
-    const key = `${w.variable}|${w.file}|${w.reason}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const seen = new Map<string, T3EnvWarning>();
+  for (const w of warnings) {
+    const key = `${w.variable}|${w.reason}`;
+    if (!seen.has(key)) {
+      seen.set(key, w);
+    }
+  }
+
+  return Array.from(seen.values());
 }
