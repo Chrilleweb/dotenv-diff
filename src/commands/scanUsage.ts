@@ -14,8 +14,7 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
-import { detectT3Env } from '../core/t3env/detectT3Env.js';
-import { applyT3EnvRules } from '../core/t3env/t3EnvRules.js';
+import { t3EnvValidator } from '../core/t3env/t3EnvValidator.js';
 
 /**
  * Scans the codebase for environment variable usage and compares it with
@@ -62,17 +61,9 @@ export async function scanUsage(
 
   // T3-env validation if t3env option is enabled or auto-detected
   if (opts.t3env) {
-    const t3Detection = await detectT3Env(opts.cwd);
-    if (t3Detection.detected && t3Detection.schema) {
-      const t3EnvWarnings: T3EnvWarning[] = [];
-
-      for (const usage of scanResult.used) {
-        applyT3EnvRules(usage, t3EnvWarnings, t3Detection.schema);
-      }
-
-      if (t3EnvWarnings.length > 0) {
-        scanResult.t3EnvWarnings = t3EnvWarnings;
-      }
+    const t3EnvWarnings = await t3EnvValidator(scanResult.used, opts.cwd);
+    if (t3EnvWarnings.length > 0) {
+      scanResult.t3EnvWarnings = t3EnvWarnings;
     }
   }
 

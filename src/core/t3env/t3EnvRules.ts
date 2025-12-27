@@ -32,7 +32,6 @@ export function applyT3EnvRules(
   const allServerVars = schema.server;
   const allClientVars = schema.client;
 
-  // Client context = explicit "use client" directive or import.meta.env
   const isClientContext =
     u.context.includes('use client') ||
     u.context.includes('"use client"') ||
@@ -41,7 +40,7 @@ export function applyT3EnvRules(
 
   // Discourage NEXT_PUBLIC_ usage in t3-env projects
   if (u.variable.startsWith('NEXT_PUBLIC_')) {
-    warnings.push({
+    pushUniqueWarning(warnings, {
       variable: u.variable,
       reason:
         'Use t3-env client schema instead of NEXT_PUBLIC_ prefix for type-safe environment variables.',
@@ -49,18 +48,17 @@ export function applyT3EnvRules(
       line: u.line,
       framework: 't3-env',
     });
-    return; // Stop processing after this
+    return;
   }
 
   // Client using server-only variable (SECURITY ISSUE!)
   if (
     isClientContext &&
-    allServerVars.includes(u.variable) &&
-    !allClientVars.includes(u.variable)
+    (allServerVars.includes(u.variable) || !allClientVars.includes(u.variable))
   ) {
-    warnings.push({
+    pushUniqueWarning(warnings, {
       variable: u.variable,
-      reason: `Variable "${u.variable}" is used in client code but only defined in server schema. This will expose secrets! Add to client schema or move to server-only code.`,
+      reason: `Variable "${u.variable}" is used in client code but is not defined in the client schema. This may expose secrets. Add it to the client schema or move usage to server-only code.`,
       file: u.file,
       line: u.line,
       framework: 't3-env',
@@ -73,12 +71,32 @@ export function applyT3EnvRules(
     !allServerVars.includes(u.variable) &&
     !allClientVars.includes(u.variable)
   ) {
-    warnings.push({
+    pushUniqueWarning(warnings, {
       variable: u.variable,
       reason: `Variable "${u.variable}" is not defined in t3-env schema. Add it to either server or client schema for type safety.`,
       file: u.file,
       line: u.line,
       framework: 't3-env',
     });
+  }
+}
+
+/**
+ * Pushes a warning into the warnings array if it's not already present
+ * @param warnings - The array to push warnings into
+ * @param warning - The warning to push
+ * @returns void
+ */
+function pushUniqueWarning(
+  warnings: T3EnvWarning[],
+  warning: T3EnvWarning,
+): void {
+  const key = `${warning.variable}:${warning.file}:${warning.line}:${warning.reason}`;
+  if (
+    !warnings.some(
+      (w) => `${w.variable}:${w.file}:${w.line}:${w.reason}` === key,
+    )
+  ) {
+    warnings.push(warning);
   }
 }

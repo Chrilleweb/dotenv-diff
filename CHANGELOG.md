@@ -17,6 +17,8 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 
 - Fixed nextjs framework rules bug where multiple warnings could be generated for the same usage.
+- Fixed t3-env framework rules bug where multiple warnings could be generated for the same usage.
+- Fixed false positive secret detection for certain harmless attribute keys in codebase scanner.
 
 ## [2.4.0] - 2025-12-26
 

@@ -152,4 +152,28 @@ describe('t3-env warnings', () => {
     expect(res.stdout).not.toContain('env.ts');
     expect(res.stdout).not.toContain('NEXT_PUBLIC_API_URL (src/env.ts');
   });
+
+  it('does not duplicate warnings when variable is used multiple times', () => {
+    const cwd = tmpDir();
+    makeT3EnvProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/test.ts'),
+      `const var1 = process.env.UNKNOWN_VAR;
+const var2 = process.env.UNKNOWN_VAR;
+const var3 = process.env.UNKNOWN_VAR;
+console.log(var1, var2, var3);`,
+    );
+
+    const res = runCli(cwd, ['--scan-usage', '--t3env']);
+
+    // Count occurrences of the specific warning for UNKNOWN_VAR
+    const warningMessage =
+      'Variable "UNKNOWN_VAR" is not defined in t3-env schema';
+    const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
+
+    // Should appear exactly 1 time, not 3 times (one per usage)
+    expect(matches?.length).toBe(1);
+    expect(res.stdout).toMatch(/Total (usages found|variables): 6/);
+  });
 });
