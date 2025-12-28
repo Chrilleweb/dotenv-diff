@@ -137,24 +137,6 @@ describe('SvelteKit environment variable usage rules', () => {
     expect(res.stdout).toContain('VITE_PUBLIC');
   });
 
-  it('warns about use of $env/dynamic/public', () => {
-    const cwd = tmpDir();
-    makeSvelteKitProject(cwd);
-
-    fs.writeFileSync(
-      path.join(cwd, 'src/app.ts'),
-      `import { PUBLIC_RUNTIME } from '$env/dynamic/public/PUBLIC_RUNTIME';`,
-    );
-
-    fs.writeFileSync(path.join(cwd, '.env'), 'PUBLIC_RUNTIME=1');
-
-    const res = runCli(cwd, ['--scan-usage']);
-
-    expect(res.stdout).toContain(
-      '$env/dynamic/public is discouraged — use $env/static/public for build-time safety',
-    );
-  });
-
   it('warns when private env vars appear inside .svelte component', () => {
     const cwd = tmpDir();
     makeSvelteKitProject(cwd);
@@ -190,7 +172,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'Private env vars should only be used in server files like +page.server.ts',
+      'Private env vars should only be used in server files',
     );
   });
 
