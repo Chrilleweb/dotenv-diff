@@ -35,7 +35,7 @@ export function applySvelteKitRules(
   if (u.pattern === 'process.env' && u.file.endsWith('.svelte')) {
     warnings.push({
       variable: u.variable,
-      reason: `Avoid using process.env inside Svelte files — use $env/static/private or $env/static/public`,
+      reason: `process.env used inside .svelte file`,
       file: u.file,
       line: u.line,
       framework: 'sveltekit',
@@ -67,7 +67,7 @@ export function applySvelteKitRules(
     if (/\+page\.ts$|\+layout\.ts$/.test(u.file)) {
       warnings.push({
         variable: u.variable,
-        reason: `Private env vars should only be used in server files like +page.server.ts`,
+        reason: `Private env vars should only be used in server files`,
         file: u.file,
         line: u.line,
         framework: 'sveltekit',
@@ -96,16 +96,5 @@ export function applySvelteKitRules(
         framework: 'sveltekit',
       });
     }
-  }
-
-  // $env/dynamic/public
-  if (u.pattern === 'sveltekit' && u.context.includes('$env/dynamic/public')) {
-    warnings.push({
-      variable: u.variable,
-      reason: `$env/dynamic/public is discouraged — use $env/static/public for build-time safety`,
-      file: u.file,
-      line: u.line,
-      framework: 'sveltekit',
-    });
   }
 }
