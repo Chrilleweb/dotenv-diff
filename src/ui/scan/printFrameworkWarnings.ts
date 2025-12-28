@@ -24,7 +24,7 @@ export function printFrameworkWarnings(
     return;
   }
 
-  console.log(chalk.yellow(`⚠️  Framework issues: (${FRAMEWORK_LABELS[warnings[0]?.framework ?? 'unknown']}):`));
+  console.log(chalk.yellow(`⚠️  Framework issues (${FRAMEWORK_LABELS[warnings[0]?.framework ?? 'unknown']}):`));
 
   for (const w of warnings) {
     console.log(
