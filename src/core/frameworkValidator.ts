@@ -27,7 +27,7 @@ export function frameworkValidator(
 
   for (const u of usages) {
     if (framework === 'sveltekit') applySvelteKitRules(u, warnings);
-    if (framework === 'next') applyNextJsRules(u, warnings, fileContentMap);
+    if (framework === 'nextjs') applyNextJsRules(u, warnings, fileContentMap);
   }
 
   return warnings;

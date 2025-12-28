@@ -11,7 +11,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 
--
+- Changed UI for framework warnings to include framework name + better formatting.
 
 ### Fixed
 

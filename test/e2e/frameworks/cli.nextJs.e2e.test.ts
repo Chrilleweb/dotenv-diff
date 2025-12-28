@@ -191,7 +191,7 @@ console.log(process.env.SECRET_TOKEN);`,
     // Check the warning content
     const warning = json.frameworkWarnings[0];
     expect(warning.variable).toBe('NEXT_PUBLIC_API_KEY');
-    expect(warning.framework).toBe('next');
+    expect(warning.framework).toBe('nextjs');
     expect(warning.reason).toContain(
       'NEXT_PUBLIC_ variables are exposed to the browser',
     );

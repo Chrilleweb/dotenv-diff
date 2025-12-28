@@ -1,5 +1,12 @@
 import chalk from 'chalk';
 import type { frameworkWarning } from '../../core/frameworkValidator.js';
+import type { Framework } from '../../core/frameworkDetector.js';
+
+const FRAMEWORK_LABELS: Record<Framework, string> = {
+  nextjs: 'Next.js',
+  sveltekit: 'SvelteKit',
+  unknown: 'Unknown Framework',
+};
 
 /**
  * Prints environment variable usage warnings to the console.
@@ -17,7 +24,7 @@ export function printFrameworkWarnings(
     return;
   }
 
-  console.log(chalk.yellow('⚠️  Environment variable usage issues:'));
+  console.log(chalk.yellow(`⚠️  Framework issues: (${FRAMEWORK_LABELS[warnings[0]?.framework ?? 'unknown']}):`));
 
   for (const w of warnings) {
     console.log(
