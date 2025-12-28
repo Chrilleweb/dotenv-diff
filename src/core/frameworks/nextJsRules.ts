@@ -54,11 +54,10 @@ export function applyNextJsRules(
   if (isServerOnlyFile && u.variable.startsWith('NEXT_PUBLIC_')) {
     warnings.push({
       variable: u.variable,
-      reason:
-        "NEXT_PUBLIC_ variables are exposed to the browser — don't use them in server-only files",
+      reason: 'NEXT_PUBLIC_ variable used in server-only file',
       file: u.file,
       line: u.line,
-      framework: 'next',
+      framework: 'nextjs',
     });
     return; // Stop processing other rules for this usage
   }
@@ -67,11 +66,10 @@ export function applyNextJsRules(
   if (isClientComponent && !u.variable.startsWith('NEXT_PUBLIC_')) {
     warnings.push({
       variable: u.variable,
-      reason:
-        'Client components must use NEXT_PUBLIC_ prefix for environment variables to be accessible in the browser',
+      reason: 'Server-only variable accessed from client code',
       file: u.file,
       line: u.line,
-      framework: 'next',
+      framework: 'nextjs',
     });
     return; // Stop processing other rules for this usage
   }
@@ -83,7 +81,7 @@ export function applyNextJsRules(
       reason: 'Next.js uses process.env, not import.meta.env (Vite syntax)',
       file: u.file,
       line: u.line,
-      framework: 'next',
+      framework: 'nextjs',
     });
     return; // Stop processing other rules for this usage
   }
@@ -99,11 +97,10 @@ export function applyNextJsRules(
   ) {
     warnings.push({
       variable: u.variable,
-      reason:
-        'NEXT_PUBLIC_ variables are exposed to the browser. Do not use NEXT_PUBLIC_ prefix for sensitive data',
+      reason: 'Sensitive data marked as public',
       file: u.file,
       line: u.line,
-      framework: 'next',
+      framework: 'nextjs',
     });
     return; // Stop processing other rules for this usage
   }

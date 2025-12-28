@@ -62,7 +62,7 @@ describe('Next.js environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      "NEXT_PUBLIC_ variables are exposed to the browser — don't use them in server-only files",
+      'NEXT_PUBLIC_ variable used in server-only file',
     );
     expect(res.stdout).toContain('NEXT_PUBLIC_URL');
   });
@@ -151,8 +151,7 @@ console.log(process.env.SECRET_TOKEN);`,
     const res = runCli(cwd, ['--scan-usage']);
 
     // Count occurrences of the warning message
-    const warningMessage =
-      "NEXT_PUBLIC_ variables are exposed to the browser — don't use them in server-only files";
+    const warningMessage = 'NEXT_PUBLIC_ variable used in server-only file';
     const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
 
     // Should appear exactly 2 times (once per usage), not 4 times (duplicated)
@@ -191,20 +190,20 @@ console.log(process.env.SECRET_TOKEN);`,
     // Check the warning content
     const warning = json.frameworkWarnings[0];
     expect(warning.variable).toBe('NEXT_PUBLIC_API_KEY');
-    expect(warning.framework).toBe('next');
+    expect(warning.framework).toBe('nextjs');
     expect(warning.reason).toContain(
-      'NEXT_PUBLIC_ variables are exposed to the browser',
+      'NEXT_PUBLIC_ variable used in server-only file',
     );
     expect(warning.file).toContain('app/api/test/route.ts');
     expect(warning.line).toBeGreaterThan(0);
   });
   it('warns when non-NEXT_PUBLIC_ variables are used in client components', () => {
-  const cwd = tmpDir();
-  makeNextProject(cwd);
+    const cwd = tmpDir();
+    makeNextProject(cwd);
 
-  fs.writeFileSync(
-    path.join(cwd, 'components/ClientTest.tsx'),
-    `"use client";
+    fs.writeFileSync(
+      path.join(cwd, 'components/ClientTest.tsx'),
+      `"use client";
 
 export default function ClientTest() {
   return (
@@ -214,30 +213,30 @@ export default function ClientTest() {
     </div>
   );
 }`,
-  );
+    );
 
-  fs.writeFileSync(
-    path.join(cwd, '.env'),
-    `DATABASE_URL=postgresql://localhost:5432/mydb
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      `DATABASE_URL=postgresql://localhost:5432/mydb
 SECRET_KEY=my-secret`,
-  );
+    );
 
-  const res = runCli(cwd, ['--scan-usage']);
+    const res = runCli(cwd, ['--scan-usage']);
 
-  expect(res.stdout).toContain(
-    'Client components must use NEXT_PUBLIC_ prefix for environment variables to be accessible in the browser',
-  );
-  expect(res.stdout).toContain('DATABASE_URL');
-  expect(res.stdout).toContain('SECRET_KEY');
-});
+    expect(res.stdout).toContain(
+      'Server-only variable accessed from client code',
+    );
+    expect(res.stdout).toContain('DATABASE_URL');
+    expect(res.stdout).toContain('SECRET_KEY');
+  });
 
-it('warns for each non-NEXT_PUBLIC_ variable used in client component', () => {
-  const cwd = tmpDir();
-  makeNextProject(cwd);
+  it('warns for each non-NEXT_PUBLIC_ variable used in client component', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
 
-  fs.writeFileSync(
-    path.join(cwd, 'app/client-page.tsx'),
-    `'use client';
+    fs.writeFileSync(
+      path.join(cwd, 'app/client-page.tsx'),
+      `'use client';
 
 export default function Page() {
   const db = process.env.DATABASE_URL;
@@ -246,49 +245,49 @@ export default function Page() {
   
   return <div>{db} {secret} {api}</div>;
 }`,
-  );
+    );
 
-  fs.writeFileSync(
-    path.join(cwd, '.env'),
-    `DATABASE_URL=db
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      `DATABASE_URL=db
 SECRET_KEY=secret
 API_ENDPOINT=api`,
-  );
+    );
 
-  const res = runCli(cwd, ['--scan-usage']);
-  console.log(res.stdout);
+    const res = runCli(cwd, ['--scan-usage']);
+    console.log(res.stdout);
 
-  // Should warn for all three variables
-  expect(res.stdout).toContain('DATABASE_URL');
-  expect(res.stdout).toContain('SECRET_KEY');
-  expect(res.stdout).toContain('API_ENDPOINT');
-  
-  const warningMessage = 'Client components must use NEXT_PUBLIC_ prefix';
-  const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
-  
-  expect(matches?.length).toBe(3);
-});
+    // Should warn for all three variables
+    expect(res.stdout).toContain('DATABASE_URL');
+    expect(res.stdout).toContain('SECRET_KEY');
+    expect(res.stdout).toContain('API_ENDPOINT');
 
-it('does not warn when server components use non-NEXT_PUBLIC_ variables', () => {
-  const cwd = tmpDir();
-  makeNextProject(cwd);
+    const warningMessage = 'Server-only variable accessed from client code';
+    const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
 
-  // Server component (no "use client")
-  fs.writeFileSync(
-    path.join(cwd, 'app/page.tsx'),
-    `export default async function Page() {
+    expect(matches?.length).toBe(3);
+  });
+
+  it('does not warn when server components use non-NEXT_PUBLIC_ variables', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
+
+    // Server component (no "use client")
+    fs.writeFileSync(
+      path.join(cwd, 'app/page.tsx'),
+      `export default async function Page() {
   const db = process.env.DATABASE_URL;
   
   return <div>{db}</div>;
 }`,
-  );
+    );
 
-  fs.writeFileSync(path.join(cwd, '.env'), `DATABASE_URL=postgresql://...`);
+    fs.writeFileSync(path.join(cwd, '.env'), `DATABASE_URL=postgresql://...`);
 
-  const res = runCli(cwd, ['--scan-usage']);
+    const res = runCli(cwd, ['--scan-usage']);
 
-  expect(res.stdout).not.toContain(
-    'Client components must use NEXT_PUBLIC_ prefix',
-  );
-});
+    expect(res.stdout).not.toContain(
+      'Client components must use NEXT_PUBLIC_ prefix',
+    );
+  });
 });

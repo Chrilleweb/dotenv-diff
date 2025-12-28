@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export type Framework = 'sveltekit' | 'next' | 'unknown';
+export type Framework = 'sveltekit' | 'nextjs' | 'unknown';
 
 export interface FrameworkDetection {
   framework: Framework;
@@ -39,7 +39,7 @@ export function detectFramework(cwd: string): FrameworkDetection {
     // Check for Next.js
     if (deps['next']) {
       return {
-        framework: 'next',
+        framework: 'nextjs',
         version: deps['next'],
       };
     }
