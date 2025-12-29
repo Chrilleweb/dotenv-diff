@@ -1,6 +1,6 @@
 {
   "name": "dotenv-diff",
-  "version": "2.4.4",
+  "version": "2.4.5",
   "type": "module",
   "description": "Detects environment variable issues, usage, and potential security risks.",
   "bin": {
