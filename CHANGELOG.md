@@ -11,13 +11,19 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 
-- Changed UI for framework warnings to include framework name + better formatting.
-- Updated nextjs framework rules.
-- Updated sveltekit framework rules.
+-
 
 ### Fixed
 
 -
+
+## [2.4.5] - 2025-12-29
+
+### Changed
+
+- Changed UI for framework warnings to include framework name + better formatting.
+- Updated nextjs framework rules.
+- Updated sveltekit framework rules.
 
 ## [2.4.4] - 2025-12-27
 
