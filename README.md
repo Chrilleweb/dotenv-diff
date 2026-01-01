@@ -2,13 +2,9 @@
 
 ![Demo](./public/demo3.gif)
 
-`dotenv-diff` scans your codebase to detect which environment variables are used
-and compares them against your `.env` or `.env.example` files.
+Scan your entire codebase to detect every environment variable reference. It helps you catch missing, unused, duplicated, and misused variables early, before they cause runtime errors.
 
-It helps you catch missing, unused, or misconfigured environment variables **before deployment**.
-
-Optimized for **SvelteKit** and **Next.js**, but works well with modern
-JavaScript and TypeScript projects such as **Node.js, Nuxt, and Vue**.
+Optimized for SvelteKit and Next.js. Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js, Nuxt, and Vue — or any other setup where you want reliable .env file comparison.
 
 ![CI](https://github.com/chrilleweb/dotenv-diff/actions/workflows/ci.yml/badge.svg)
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
@@ -26,50 +22,6 @@ JavaScript and TypeScript projects such as **Node.js, Nuxt, and Vue**.
 
 ---
 
-## GitHub Actions Example
-
-Run `dotenv-diff` in CI to validate environment variables automatically:
-
-```yaml
-- name: Check environment variables
-  run: dotenv-diff --example .env.example
-```
-
-To compare against a different example file:
-
-```bash
-dotenv-diff --example .env.example.staging
-```
-
-If no `.env.example` file exists, run:
-
-```bash
-dotenv-diff
-```
-
-This scans the codebase but skips comparison.
-
----
-
-## Monorepo (Turborepo) Usage
-
-In monorepos with multiple apps and packages, you can include shared folders:
-
-```json
-{
-  "scripts": {
-    "dotenv-diff": "dotenv-diff --example .env.example --include-files '../../packages/**/*' --ignore VITE_MODE"
-  }
-}
-```
-
-This will:
-- Scan the current app
-- Include shared packages
-- Ignore variables used only in specific environments
-
----
-
 ## Automatic Fixes (`--fix`)
 
 Automatically add missing variables to your `.env` file:
@@ -82,7 +34,7 @@ dotenv-diff --fix
 
 1. Code uses `process.env.NEW_API_KEY`
 2. Run `dotenv-diff --fix`
-3. Tool adds `NEW_API_KEY=` to `.env`
+3. Tool adds `NEW_API_KEY=` to `.env` or `.env.example`
 
 ---
 
@@ -98,60 +50,16 @@ dotenv-diff --strict
 
 ## Framework-Specific Warnings
 
-When using **SvelteKit** or **Next.js**, `dotenv-diff` warns about incorrect usage.
+In SvelteKit and Next.js projects, dotenv-diff detects framework-specific
+environment variable misuses.
 
 Example warning:
 
 ```bash
-Environment variable usage issues:
+Framework issues (Sveltekit):
   - PUBLIC_URL (src/routes/+page.ts:1)
     → Variables accessed through import.meta.env must start with "VITE_"
 ```
-
----
-
-## Detect Secrets in `.env.example`
-
-`dotenv-diff` scans example files for potential secrets:
-
-```bash
-Potential real secrets found in .env.example:
-  - API_KEY = "sk_test_..." → Matches known provider pattern [high]
-```
-
----
-
-## Logging Environment Variables
-
-Detect accidental logging of sensitive values:
-
-```js
-console.log(process.env.API_KEY);
-```
-
-This triggers a warning.
-
----
-
-## Ignore Specific Warnings
-
-Ignore specific lines using comments:
-
-```js
-const secret = "https://example.com"; // dotenv-diff-ignore
-```
-
----
-
-## Health Score
-
-Provides an overall score based on:
-- Missing variables
-- Potential secrets
-- Naming conventions
-- Logged variables
-- Unused variables
-- Framework-specific rules
 
 ---
 
@@ -162,34 +70,6 @@ Add expiration metadata to variables:
 ```bash
 # @expire 2025-12-31
 API_TOKEN=
-```
-
----
-
-## Inconsistent Naming Warnings
-
-Warns about inconsistent keys like `APIKEY` vs `API_KEY`.
-
-Disable via config:
-
-```json
-"inconsistentNamingWarnings": false
-```
-
----
-
-## Show / Hide Output Options
-
-Disable unused variables list:
-
-```bash
-dotenv-diff --no-show-unused
-```
-
-Disable statistics:
-
-```bash
-dotenv-diff --no-show-stats
 ```
 
 ---
@@ -224,11 +104,22 @@ dotenv-diff --compare --env .env.local --example .env.example.local
 
 ---
 
-## Automatically Create Missing Files
+## Monorepo (Turborepo) Usage
 
-```bash
-dotenv-diff --compare --yes
+In monorepos with multiple apps and packages, you can include shared folders:
+
+```json
+{
+  "scripts": {
+    "dotenv-diff": "dotenv-diff --example .env.example --include-files '../../packages/**/*' --ignore VITE_MODE"
+  }
+}
 ```
+
+This will:
+- Scan the current app
+- Include shared packages
+- Ignore variables used only in specific environments
 
 ---
 
@@ -236,6 +127,12 @@ dotenv-diff --compare --yes
 
 - `0` → No errors
 - `1` → Errors found (or warnings in strict mode)
+
+---
+
+## Documentation
+
+Full documentation: https://dotenv-diff-docs.vercel.app
 
 ---
 
