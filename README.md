@@ -22,31 +22,6 @@ Optimized for SvelteKit and Next.js. Also works well in modern JavaScript/TypeSc
 
 ---
 
-## GitHub Actions Example
-
-Run `dotenv-diff` in CI to validate environment variables automatically:
-
-```yaml
-- name: Check environment variables
-  run: dotenv-diff --example .env.example
-```
-
-To compare against a different example file:
-
-```bash
-dotenv-diff --example .env.example.staging
-```
-
-If no `.env.example` file exists, run:
-
-```bash
-dotenv-diff
-```
-
-This scans the codebase but skips comparison.
-
----
-
 ## Monorepo (Turborepo) Usage
 
 In monorepos with multiple apps and packages, you can include shared folders:
