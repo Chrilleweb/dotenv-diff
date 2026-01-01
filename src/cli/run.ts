@@ -17,6 +17,8 @@ import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';
 import { loadConfig } from '../config/loadConfig.js';
 
+const DEFAULT_ENV_FILE = '.env';
+
 /**
  * Run the CLI program
  * @param program The commander program instance
@@ -39,26 +41,21 @@ export async function run(program: Command): Promise<void> {
 
   setupGlobalConfig(opts);
 
-  // Route to appropriate command
-  if (opts.compare) {
-    await runCompareMode(opts);
-  } else {
-    await runScanMode(opts);
-  }
+  // Route to appropriate command and handle exit
+  const exitWithError = opts.compare
+    ? await runCompareMode(opts)
+    : await runScanMode(opts);
+
+  process.exit(exitWithError ? 1 : 0);
 }
 
 /**
  * Run scan-usage mode (default behavior)
  * @param opts - Normalized options
- * @returns void
+ * @returns Whether to exit with an error code
  */
-async function runScanMode(opts: Options): Promise<void> {
-  const envPath =
-    typeof opts.envFlag === 'string'
-      ? opts.envFlag
-      : fs.existsSync('.env')
-        ? '.env'
-        : undefined;
+async function runScanMode(opts: Options): Promise<boolean> {
+  const envPath = resolveEnvPath(opts.envFlag);
 
   const { exitWithError } = await scanUsage({
     cwd: opts.cwd,
@@ -82,42 +79,51 @@ async function runScanMode(opts: Options): Promise<void> {
     ...(opts.files ? { files: opts.files } : {}),
   });
 
-  process.exit(exitWithError ? 1 : 0);
+  return exitWithError;
 }
 
 /**
  * Run compare mode
  * @param opts - Normalized options
- * @returns void
+ * @returns Whether to exit with an error code
  */
-async function runCompareMode(opts: Options): Promise<void> {
+async function runCompareMode(opts: Options): Promise<boolean> {
   // Handle direct file comparison (both --env and --example specified)
   if (opts.envFlag && opts.exampleFlag) {
-    await runDirectFileComparison(opts);
-    return;
+    return await runDirectFileComparison(opts);
   }
 
   // Handle auto-discovery comparison
-  await runAutoDiscoveryComparison(opts);
+  return await runAutoDiscoveryComparison(opts);
 }
 
 /**
  * Compare two specific files directly
  * @param opts - Normalized options
- * @returns void
+ * @returns Whether to exit with an error code
  */
-async function runDirectFileComparison(opts: Options): Promise<void> {
-  const envExists = fs.existsSync(opts.envFlag!);
-  const exExists = fs.existsSync(opts.exampleFlag!);
+async function runDirectFileComparison(opts: Options): Promise<boolean> {
+  // Type guard ensures both flags are defined
+  if (!opts.envFlag || !opts.exampleFlag) {
+    throw new Error(
+      'Both envFlag and exampleFlag must be defined for direct file comparison',
+    );
+  }
+
+  const envExists = fs.existsSync(opts.envFlag);
+  const exExists = fs.existsSync(opts.exampleFlag);
 
   // Handle missing files
   if (!envExists || !exExists) {
-    const shouldExit = await handleMissingFiles(
+    const result = await handleMissingFiles(
       opts,
-      opts.envFlag!,
-      opts.exampleFlag!,
+      opts.envFlag,
+      opts.exampleFlag,
     );
-    if (shouldExit) return;
+    if (result.shouldExit) {
+      outputResults([], opts);
+      return result.exitWithError;
+    }
   }
 
   // Perform comparison
@@ -125,23 +131,24 @@ async function runDirectFileComparison(opts: Options): Promise<void> {
   const { exitWithError } = await compareMany(
     [
       {
-        envName: path.basename(opts.envFlag!),
-        envPath: opts.envFlag!,
-        examplePath: opts.exampleFlag!,
+        envName: path.basename(opts.envFlag),
+        envPath: opts.envFlag,
+        examplePath: opts.exampleFlag,
       },
     ],
     buildCompareOptions(opts, report),
   );
 
-  outputResults(report, opts, exitWithError);
+  outputResults(report, opts);
+  return exitWithError;
 }
 
 /**
  * Compare using auto-discovery
  * @param opts - Normalized options
- * @returns void
+ * @returns Whether to exit with an error code
  */
-async function runAutoDiscoveryComparison(opts: Options): Promise<void> {
+async function runAutoDiscoveryComparison(opts: Options): Promise<boolean> {
   // Discover available env files
   const discovery = discoverEnvFiles({
     cwd: opts.cwd,
@@ -160,8 +167,8 @@ async function runAutoDiscoveryComparison(opts: Options): Promise<void> {
   });
 
   if (initResult.shouldExit) {
-    outputResults([], opts, initResult.exitCode !== 0);
-    return;
+    outputResults([], opts);
+    return initResult.exitCode !== 0;
   }
 
   // Compare all discovered pairs
@@ -172,7 +179,8 @@ async function runAutoDiscoveryComparison(opts: Options): Promise<void> {
     buildCompareOptions(opts, report),
   );
 
-  outputResults(report, opts, exitWithError);
+  outputResults(report, opts);
+  return exitWithError;
 }
 
 /**
@@ -180,20 +188,20 @@ async function runAutoDiscoveryComparison(opts: Options): Promise<void> {
  * @param opts - Normalized options
  * @param envFlag - Path to the .env file
  * @param exampleFlag - Path to the example file
- * @returns Whether the process should exit after handling missing files
+ * @returns Result indicating if process should exit and with what error code
  */
 async function handleMissingFiles(
   opts: Options,
   envFlag: string,
   exampleFlag: string,
-): Promise<boolean> {
+): Promise<{ shouldExit: boolean; exitWithError: boolean }> {
   const envExists = fs.existsSync(envFlag);
   const exExists = fs.existsSync(exampleFlag);
 
   if (opts.isCiMode) {
     // In CI mode, just show errors and exit
     printErrorNotFound(envExists, exExists, envFlag, exampleFlag);
-    process.exit(1);
+    return { shouldExit: true, exitWithError: true };
   } else {
     // Interactive mode - try to prompt for file creation
     const result = await ensureFilesOrPrompt({
@@ -206,12 +214,11 @@ async function handleMissingFiles(
     });
 
     if (result.shouldExit) {
-      outputResults([], opts, result.exitCode !== 0);
-      return true;
+      return { shouldExit: true, exitWithError: result.exitCode !== 0 };
     }
   }
 
-  return false;
+  return { shouldExit: false, exitWithError: false };
 }
 
 /**
@@ -254,18 +261,31 @@ async function handleInitFlag(cliOptions: RawOptions): Promise<boolean> {
 }
 
 /**
- * Output results and exit with appropriate code
+ * Resolve the environment file path based on the flag or default
+ * @param envFlag - Optional environment file path from CLI flag
+ * @returns The resolved env file path or undefined
+ */
+function resolveEnvPath(
+  envFlag: string | boolean | undefined,
+): string | undefined {
+  if (typeof envFlag === 'string') {
+    return envFlag;
+  }
+
+  if (fs.existsSync(DEFAULT_ENV_FILE)) {
+    return DEFAULT_ENV_FILE;
+  }
+
+  return undefined;
+}
+
+/**
+ * Output results to console if in JSON mode
  * @param report - The comparison report entries
  * @param opts - Normalized options
- * @param exitWithError - Whether to exit with an error code
  */
-function outputResults(
-  report: CompareJsonEntry[],
-  opts: Options,
-  exitWithError: boolean,
-): never {
+function outputResults(report: CompareJsonEntry[], opts: Options): void {
   if (opts.json) {
     console.log(JSON.stringify(report, null, 2));
   }
-  process.exit(exitWithError ? 1 : 0);
 }
