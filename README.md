@@ -2,13 +2,9 @@
 
 ![Demo](./public/demo3.gif)
 
-`dotenv-diff` scans your codebase to detect which environment variables are used
-and compares them against your `.env` or `.env.example` files.
+Scan your entire codebase to detect every environment variable reference. It helps you catch missing, unused, duplicated, and misused variables early, before they cause runtime errors.
 
-It helps you catch missing, unused, or misconfigured environment variables **before deployment**.
-
-Optimized for **SvelteKit** and **Next.js**, but works well with modern
-JavaScript and TypeScript projects such as **Node.js, Nuxt, and Vue**.
+Optimized for SvelteKit and Next.js. Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js, Nuxt, and Vue — or any other setup where you want reliable .env file comparison.
 
 ![CI](https://github.com/chrilleweb/dotenv-diff/actions/workflows/ci.yml/badge.svg)
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
