@@ -50,6 +50,8 @@ export function applyFixes(options: ApplyFixesOptions): {
 
   // --- Remove duplicates ---
   if (duplicateKeys.length) {
+    const duplicateSet = new Set(duplicateKeys);
+
     const lines = fs.readFileSync(envPath, 'utf-8').split('\n');
     const seen = new Set<string>();
     const newLines: string[] = [];
@@ -62,7 +64,7 @@ export function applyFixes(options: ApplyFixesOptions): {
       const match = line.match(/^\s*([\w.-]+)\s*=/);
       if (match) {
         const key = match[1] || '';
-        if (duplicateKeys.includes(key)) {
+        if (duplicateSet.has(key)) {
           if (seen.has(key)) continue; // Skip duplicate
           seen.add(key);
         }

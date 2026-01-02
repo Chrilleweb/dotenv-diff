@@ -27,100 +27,6 @@ import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 
 /**
- * Creates a category filter function based on options.
- * fx: onlyFiltering({ only: ['missing', 'extra'] })
- * @param opts Comparison options
- * @returns A function that filters categories
- */
-function createCategoryFilter(
-  opts: ComparisonOptions,
-): (category: Category) => boolean {
-  const onlySet: Set<Category> | undefined = opts.only?.length
-    ? new Set(opts.only)
-    : undefined;
-
-  return (category: Category) => !onlySet || onlySet.has(category);
-}
-
-interface ParsedAndFilteredEnv {
-  current: Record<string, string>;
-  example: Record<string, string>;
-  currentKeys: string[];
-  exampleKeys: string[];
-}
-
-/**
- * Parses and filters the environment and example files.
- * @param envPath The path to the .env file
- * @param examplePath The path to the .env.example file
- * @param opts Comparison options
- * @returns An object containing the parsed and filtered environment variables
- */
-function parseAndFilter(
-  envPath: string,
-  examplePath: string,
-  opts: ComparisonOptions,
-): ParsedAndFilteredEnv {
-  const currentFull = parseEnvFile(envPath);
-  const exampleFull = parseEnvFile(examplePath);
-
-  const currentKeys = filterIgnoredKeys(
-    Object.keys(currentFull),
-    opts.ignore,
-    opts.ignoreRegex,
-  );
-  const exampleKeys = filterIgnoredKeys(
-    Object.keys(exampleFull),
-    opts.ignore,
-    opts.ignoreRegex,
-  );
-
-  return {
-    current: Object.fromEntries(
-      currentKeys.map((k) => [k, currentFull[k] ?? '']),
-    ),
-    example: Object.fromEntries(
-      exampleKeys.map((k) => [k, exampleFull[k] ?? '']),
-    ),
-    currentKeys,
-    exampleKeys,
-  };
-}
-
-/**
- * Finds duplicate keys in the environment and example files.
- * @param envPath The path to the .env file
- * @param examplePath The path to the .env.example file
- * @param opts Comparison options
- * @param run A function that determines if a category should be included
- * @returns An object containing arrays of duplicate keys for both files
- */
-function findDuplicates(
-  envPath: string,
-  examplePath: string,
-  opts: ComparisonOptions,
-  run: (cat: Category) => boolean,
-): DuplicateResult {
-  if (opts.allowDuplicates || !run('duplicate'))
-    return { dupsEnv: [], dupsEx: [] };
-
-  const ignoreSet = new Set(opts.ignore);
-  const regexList = opts.ignoreRegex;
-
-  const filterKey = (key: string) =>
-    !ignoreSet.has(key) && !regexList.some((rx) => rx.test(key));
-
-  const dupsEnv = findDuplicateKeys(envPath).filter(({ key }) =>
-    filterKey(key),
-  );
-  const dupsEx = findDuplicateKeys(examplePath).filter(({ key }) =>
-    filterKey(key),
-  );
-
-  return { dupsEnv, dupsEx } satisfies DuplicateResult;
-}
-
-/**
  * Compares multiple pairs of .env and .env.example files.
  * @param pairs - The pairs of environment files to compare.
  * @param opts - The comparison options.
@@ -294,4 +200,98 @@ export async function compareMany(
   }
 
   return { exitWithError };
+}
+
+/**
+ * Creates a category filter function based on options.
+ * fx: onlyFiltering({ only: ['missing', 'extra'] })
+ * @param opts Comparison options
+ * @returns A function that filters categories
+ */
+function createCategoryFilter(
+  opts: ComparisonOptions,
+): (category: Category) => boolean {
+  const onlySet: Set<Category> | undefined = opts.only?.length
+    ? new Set(opts.only)
+    : undefined;
+
+  return (category: Category) => !onlySet || onlySet.has(category);
+}
+
+interface ParsedAndFilteredEnv {
+  current: Record<string, string>;
+  example: Record<string, string>;
+  currentKeys: string[];
+  exampleKeys: string[];
+}
+
+/**
+ * Parses and filters the environment and example files.
+ * @param envPath The path to the .env file
+ * @param examplePath The path to the .env.example file
+ * @param opts Comparison options
+ * @returns An object containing the parsed and filtered environment variables
+ */
+function parseAndFilter(
+  envPath: string,
+  examplePath: string,
+  opts: ComparisonOptions,
+): ParsedAndFilteredEnv {
+  const currentFull = parseEnvFile(envPath);
+  const exampleFull = parseEnvFile(examplePath);
+
+  const currentKeys = filterIgnoredKeys(
+    Object.keys(currentFull),
+    opts.ignore,
+    opts.ignoreRegex,
+  );
+  const exampleKeys = filterIgnoredKeys(
+    Object.keys(exampleFull),
+    opts.ignore,
+    opts.ignoreRegex,
+  );
+
+  return {
+    current: Object.fromEntries(
+      currentKeys.map((k) => [k, currentFull[k] ?? '']),
+    ),
+    example: Object.fromEntries(
+      exampleKeys.map((k) => [k, exampleFull[k] ?? '']),
+    ),
+    currentKeys,
+    exampleKeys,
+  };
+}
+
+/**
+ * Finds duplicate keys in the environment and example files.
+ * @param envPath The path to the .env file
+ * @param examplePath The path to the .env.example file
+ * @param opts Comparison options
+ * @param run A function that determines if a category should be included
+ * @returns An object containing arrays of duplicate keys for both files
+ */
+function findDuplicates(
+  envPath: string,
+  examplePath: string,
+  opts: ComparisonOptions,
+  run: (cat: Category) => boolean,
+): DuplicateResult {
+  if (opts.allowDuplicates || !run('duplicate'))
+    return { dupsEnv: [], dupsEx: [] };
+
+  const ignoreSet = new Set(opts.ignore);
+  const regexList = opts.ignoreRegex;
+
+  const filterKey = (key: string) =>
+    !ignoreSet.has(key) && !regexList.some((rx) => rx.test(key));
+
+  const dupsEnv = findDuplicateKeys(envPath).filter(({ key }) =>
+    filterKey(key),
+  );
+  const dupsEx = findDuplicateKeys(examplePath).filter(({ key }) =>
+    filterKey(key),
+  );
+
+  return { dupsEnv, dupsEx } satisfies DuplicateResult;
 }

@@ -12,66 +12,26 @@ import {
 } from '../ui/shared/printOptionErrors.js';
 
 /**
- * Parses a comma-separated list of strings into an array of strings.
- * @param val - The input value, which can be a string, an array of strings, or undefined.
- * @returns An array of strings.
- */
-function parseList(val?: string | string[]): string[] {
-  const arr = Array.isArray(val) ? val : val ? [val] : [];
-  return arr
-    .flatMap((s) => String(s).split(','))
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-/**
- * Parses a comma-separated list of strings into an array of strings.
- * @param val - The input value, which can be a string, an array of strings, or undefined.
- * @param flagName - The name of the flag being parsed (for error messages).
- * @returns An array of categories.
- */
-function parseCategories(
-  val?: string | string[],
-  flagName = '--only',
-): Category[] {
-  const raw = parseList(val);
-  const bad = raw.filter((c) => !ALLOWED_CATEGORIES.includes(c as Category));
-  if (bad.length) {
-    printInvalidCategory(flagName, bad, ALLOWED_CATEGORIES);
-  }
-  return raw as Category[];
-}
-
-/**
- * Parses regex patterns safely, exiting on invalid syntax.
- * @param val - The input value, which can be a string, an array of strings, or undefined.
- * @returns An array of RegExp objects.
- */
-function parseRegexList(val?: string | string[]): RegExp[] {
-  const regexList: RegExp[] = [];
-  for (const pattern of parseList(val)) {
-    try {
-      regexList.push(new RegExp(pattern));
-    } catch {
-      printInvalidRegex(pattern);
-    }
-  }
-  return regexList;
-}
-
-/**
- * Converts flag value to boolean.
- * @param value - The input value.
- * @returns The boolean representation.
- */
-function toBool(value: unknown): boolean {
-  return value === true || value === 'true';
-}
-
-/**
- * Normalizes the raw options by providing default values and parsing specific fields.
- * @param raw - The raw options to normalize.
- * @returns The normalized options.
+ * Normalizes and validates raw CLI options into a standardized configuration object.
+ *
+ * Performs the following transformations:
+ *  - Converts string/boolean flags to proper boolean values
+ *  - Applies sensible defaults for optional configuration
+ *  - Parses comma-separated lists (--ignore, --includeFiles, etc.)
+ *  - Validates and filters category selections (--only)
+ *  - Compiles regex patterns with error handling (--ignoreRegex)
+ *  - Resolves file paths relative to current working directory
+ *
+ * @param raw - Raw options object from CLI argument parser
+ * @returns Fully normalized and type-safe options object ready for use
+ *
+ * @example
+ * const options = normalizeOptions({
+ *   ci: 'true',
+ *   ignore: 'TEST_,DEBUG_',
+ *   only: 'unused,duplicates'
+ * });
+ * // Returns: { isCiMode: true, ignore: ['TEST_', 'DEBUG_'], only: ['unused', 'duplicates'], ... }
  */
 export function normalizeOptions(raw: RawOptions): Options {
   const checkValues = toBool(raw.checkValues);
@@ -141,4 +101,61 @@ export function normalizeOptions(raw: RawOptions): Options {
     expireWarnings,
     inconsistentNamingWarnings,
   };
+}
+
+/**
+ * Parses a comma-separated list of strings into an array of strings.
+ * @param val - The input value, which can be a string, an array of strings, or undefined.
+ * @returns An array of strings.
+ */
+function parseList(val?: string | string[]): string[] {
+  const arr = Array.isArray(val) ? val : val ? [val] : [];
+  return arr
+    .flatMap((s) => String(s).split(','))
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Parses a comma-separated list of strings into an array of strings.
+ * @param val - The input value, which can be a string, an array of strings, or undefined.
+ * @param flagName - The name of the flag being parsed (for error messages).
+ * @returns An array of categories.
+ */
+function parseCategories(
+  val?: string | string[],
+  flagName = '--only',
+): Category[] {
+  const raw = parseList(val);
+  const bad = raw.filter((c) => !ALLOWED_CATEGORIES.includes(c as Category));
+  if (bad.length) {
+    printInvalidCategory(flagName, bad, ALLOWED_CATEGORIES);
+  }
+  return raw as Category[];
+}
+
+/**
+ * Parses regex patterns safely, exiting on invalid syntax.
+ * @param val - The input value, which can be a string, an array of strings, or undefined.
+ * @returns An array of RegExp objects.
+ */
+function parseRegexList(val?: string | string[]): RegExp[] {
+  const regexList: RegExp[] = [];
+  for (const pattern of parseList(val)) {
+    try {
+      regexList.push(new RegExp(pattern));
+    } catch {
+      printInvalidRegex(pattern);
+    }
+  }
+  return regexList;
+}
+
+/**
+ * Converts flag value to boolean.
+ * @param value - The input value.
+ * @returns The boolean representation.
+ */
+function toBool(value: unknown): boolean {
+  return value === true || value === 'true';
 }
