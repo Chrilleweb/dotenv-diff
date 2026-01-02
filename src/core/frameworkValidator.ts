@@ -1,14 +1,6 @@
-import type { EnvUsage } from '../config/types.js';
-import { detectFramework, type Framework } from './frameworkDetector.js';
+import { type EnvUsage, type frameworkWarning } from '../config/types.js';
+import { detectFramework } from './frameworkDetector.js';
 import { applySvelteKitRules, applyNextJsRules } from './frameworks/index.js';
-
-export interface frameworkWarning {
-  variable: string;
-  reason: string;
-  file: string;
-  line: number;
-  framework: Framework;
-}
 
 /**
  * Validates environment variable usages against framework-specific rules

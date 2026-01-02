@@ -1,5 +1,4 @@
-import type { EnvUsage } from '../../config/types.js';
-import type { frameworkWarning } from '../frameworkValidator.js';
+import { type EnvUsage, type frameworkWarning } from '../../config/types.js';
 
 /**
  * Applies SvelteKit specific rules to environment variable usage
