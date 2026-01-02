@@ -428,33 +428,31 @@ describe('duplicate detection', () => {
     expect(envContent).toContain('INCLUDED_VAR=');
     expect(envContent).not.toContain('IGNORED_VAR');
   });
+
   it('should exclude file when using --exclude-files', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
     fs.writeFileSync(
-      path.join(cwd, 'index.php'),
+      path.join(cwd, 'index.ts'),
       `
-      <?php
-      $var = getenv('NEW_PHP_VAR');
+      const newVar = process.env.NEW_VAR;
     `,
     );
 
-    // Exclude .php files → NEW_PHP_VAR må ikke blive fundet
-    const res = runCli(cwd, ['--scan-usage', '--exclude-files', '*.php']);
+    // Exclude .ts files → NEW_VAR should not be detected
+    const res = runCli(cwd, ['--scan-usage', '--exclude-files', '*.ts']);
     expect(res.status).toBe(0); // exit clean
-    expect(res.stdout).not.toContain('NEW_PHP_VAR');
+    expect(res.stdout).not.toContain('NEW_VAR');
   });
 
   it('should only scan files provided with --files', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
 
-    // To filer: en php med NEW_PHP_VAR, en js med NEW_JS_VAR
     fs.writeFileSync(
-      path.join(cwd, 'index.php'),
+      path.join(cwd, 'component.js'),
       `
-      <?php
-      $var = getenv('NEW_PHP_VAR');
+      console.log(process.env.NOT_DETECTED_VAR);
     `,
     );
     fs.writeFileSync(
@@ -467,6 +465,6 @@ describe('duplicate detection', () => {
     const res = runCli(cwd, ['--scan-usage', '--files', 'index.js']);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('NEW_JS_VAR');
-    expect(res.stdout).not.toContain('NEW_PHP_VAR');
+    expect(res.stdout).not.toContain('NOT_DETECTED_VAR');
   });
 });
