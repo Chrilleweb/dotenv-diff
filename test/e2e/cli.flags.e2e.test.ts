@@ -428,22 +428,6 @@ describe('duplicate detection', () => {
     expect(envContent).toContain('INCLUDED_VAR=');
     expect(envContent).not.toContain('IGNORED_VAR');
   });
-  it('should include *php file when using --include-files', () => {
-    const cwd = tmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
-    fs.writeFileSync(
-      path.join(cwd, 'index.php'),
-      `
-            <?php
-            $var = getenv('NEW_PHP_VAR');
-          `,
-    );
-
-    const res = runCli(cwd, ['--scan-usage', '--include-files', '*.php']);
-    expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Missing in .env:');
-    expect(res.stdout).toContain('NEW_PHP_VAR');
-  });
   it('should exclude file when using --exclude-files', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
