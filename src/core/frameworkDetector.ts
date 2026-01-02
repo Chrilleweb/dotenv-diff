@@ -1,9 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import { type Framework } from '../config/types.js';
 
-export type Framework = 'sveltekit' | 'nextjs' | 'unknown';
-
-export interface FrameworkDetection {
+interface FrameworkDetection {
   framework: Framework;
   version?: string;
 }

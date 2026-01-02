@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import type { frameworkWarning } from '../../core/frameworkValidator.js';
-import type { Framework } from '../../core/frameworkDetector.js';
+import type { Framework } from '../../config/types.js';
 
 const FRAMEWORK_LABELS: Record<Framework, string> = {
   nextjs: 'Next.js',

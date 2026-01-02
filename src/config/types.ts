@@ -2,6 +2,9 @@ import { type SecretFinding } from '../core/secretDetectors.js';
 import { type frameworkWarning } from '../core/frameworkValidator.js';
 import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
+// Type representing detected framework
+export type Framework = 'sveltekit' | 'nextjs' | 'unknown';
+
 // Type representing a duplicate entry
 export type Duplicate = { key: string; count: number };
 
