@@ -15,7 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
--
+- Modified JSON output for scan usage.
 
 ## [2.4.5] - 2025-12-29
 
