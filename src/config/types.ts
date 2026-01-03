@@ -193,14 +193,14 @@ export interface ScanUsageOptions extends ScanOptions {
 }
 
 export interface ScanJsonEntry {
-  stats: {
+  stats?: {
     filesScanned: number;
     totalUsages: number;
     uniqueVariables: number;
     warningsCount: number;
     duration: number;
   };
-  missing: Array<{
+  missing?: Array<{
     variable: string;
     usages: Array<{
       file: string;
@@ -209,7 +209,7 @@ export interface ScanJsonEntry {
       context: string;
     }>;
   }>;
-  unused: string[];
+  unused?: string[];
   allUsages?: Array<{
     variable: string;
     file: string;

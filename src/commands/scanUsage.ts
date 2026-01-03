@@ -63,7 +63,6 @@ export async function scanUsage(
 
   // Determine which file to compare against
   const compareFile = determineComparisonFile(opts);
-  let envVariables: Record<string, string | undefined> = {};
   let comparedAgainst = '';
   let duplicatesFound = false;
 
@@ -87,7 +86,6 @@ export async function scanUsage(
       if (exit) return { exitWithError: true };
     } else {
       scanResult = result.scanResult;
-      envVariables = result.envVariables;
       comparedAgainst = result.comparedAgainst;
       duplicatesFound = result.duplicatesFound;
       fixApplied = result.fixApplied;
@@ -115,12 +113,7 @@ export async function scanUsage(
 
   // JSON output
   if (opts.json) {
-    const jsonOutput = createJsonOutput(
-      scanResult,
-      opts,
-      comparedAgainst,
-      Object.keys(envVariables).length,
-    );
+    const jsonOutput = createJsonOutput(scanResult, comparedAgainst);
     console.log(JSON.stringify(jsonOutput, null, 2));
 
     // Check for high severity secrets
