@@ -30,7 +30,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     try {
       const content = await fs.readFile(filePath, 'utf-8');
 
-      const fileUsages = await scanFile(filePath, content, opts);
+      const fileUsages = scanFile(filePath, content, opts);
       allUsages.push(...fileUsages);
 
       // Store file content for framework validation
@@ -38,7 +38,6 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       fileContentMap.set(relativePath, content);
       if (opts.secrets) {
         try {
-          const relativePath = path.relative(opts.cwd, filePath);
           const sec = detectSecretsInSource(relativePath, content, opts).filter(
             (s) => s.severity !== 'low',
           );
@@ -48,6 +47,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
           // Ignore secret detection errors
         }
       }
+      // Count successfully scanned files
       filesScanned++;
     } catch {
       // Skip files we can't read (binary, permissions, etc.)
