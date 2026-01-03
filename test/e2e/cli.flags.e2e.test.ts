@@ -337,7 +337,7 @@ describe('duplicate detection', () => {
       expect(res.status).toBe(0);
 
       const output = JSON.parse(res.stdout);
-      expect(output.missing).toHaveLength(0); // Should be empty after fix
+      expect(output.missing).toBeUndefined();
       expect(output.stats).toBeDefined();
     });
   });

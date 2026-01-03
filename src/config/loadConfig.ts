@@ -35,9 +35,13 @@ export function loadConfig(cliOptions: Partial<RawOptions>): RawOptions {
     try {
       const raw = fs.readFileSync(foundPath, 'utf8');
       fileConfig = JSON.parse(raw) satisfies Partial<RawOptions>;
-      printConfigLoaded(foundPath);
+      if (!cliOptions.json) {
+        printConfigLoaded(foundPath);
+      }
     } catch (err) {
-      printConfigLoadError(err);
+      if (!cliOptions.json) {
+        printConfigLoadError(err);
+      }
     }
   }
 

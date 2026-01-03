@@ -1,53 +1,59 @@
-import type {
-  ScanUsageOptions,
-  ScanResult,
-  EnvUsage,
-  ScanJsonEntry,
-} from '../config/types.js';
+import type { ScanResult, EnvUsage, ScanJsonEntry } from '../config/types.js';
 import { computeHealthScore } from './computeHealthScore.js';
 
 /**
  * Creates a JSON output for the scan results.
  * @param scanResult - The result of the scan.
- * @param opts - The scan options.
  * @param comparedAgainst - The file being compared against.
- * @param totalEnvVariables - The total number of environment variables.
  * @returns The JSON output.
  */
 export function createJsonOutput(
   scanResult: ScanResult,
-  opts: ScanUsageOptions,
   comparedAgainst: string,
-  totalEnvVariables: number,
 ): ScanJsonEntry {
-  // Group usages by variable for missing variables
-  const missingGrouped = scanResult.missing.map((variable: string) => ({
-    variable,
-    usages: scanResult.used
-      .filter((u: EnvUsage) => u.variable === variable)
-      .map((u: EnvUsage) => ({
-        file: u.file,
-        line: u.line,
-        pattern: u.pattern,
-        context: u.context,
-      })),
-  }));
+  const output: ScanJsonEntry = {};
 
-  const healthScore = computeHealthScore(scanResult);
+  // Add comparison info if we compared against a file
+  if (comparedAgainst) {
+    output.comparedAgainst = comparedAgainst;
+  }
 
-  const output: ScanJsonEntry = {
-    stats: scanResult.stats,
-    missing: missingGrouped,
-    unused: scanResult.unused,
-  };
+  output.stats = scanResult.stats;
 
   if (scanResult.secrets?.length) {
-    (output as ScanJsonEntry).secrets = scanResult.secrets.map((s) => ({
+    output.secrets = scanResult.secrets.map((s) => ({
       file: s.file,
       line: s.line,
       message: s.message,
       snippet: s.snippet,
     }));
+  }
+
+  if (scanResult.missing?.length) {
+    const missingSet = new Set(scanResult.missing);
+    const usagesByVariable = new Map<string, EnvUsage[]>();
+
+    for (const usage of scanResult.used) {
+      if (missingSet.has(usage.variable)) {
+        const existing = usagesByVariable.get(usage.variable) ?? [];
+        existing.push(usage);
+        usagesByVariable.set(usage.variable, existing);
+      }
+    }
+
+    output.missing = scanResult.missing.map((variable) => ({
+      variable,
+      usages: (usagesByVariable.get(variable) ?? []).map((u) => ({
+        file: u.file,
+        line: u.line,
+        pattern: u.pattern,
+        context: u.context,
+      })),
+    }));
+  }
+
+  if (scanResult.unused?.length) {
+    output.unused = scanResult.unused;
   }
 
   if (scanResult.uppercaseWarnings?.length) {
@@ -76,13 +82,16 @@ export function createJsonOutput(
     }));
   }
 
-  // Add duplicates if found
-  if (scanResult.duplicates) {
+  const hasDuplicates =
+    (scanResult.duplicates.env?.length ?? 0) > 0 ||
+    (scanResult.duplicates.example?.length ?? 0) > 0;
+
+  if (hasDuplicates) {
     output.duplicates = scanResult.duplicates;
   }
 
   // Add logged variables if any
-  if (scanResult.logged) {
+  if (scanResult.logged?.length) {
     output.logged = scanResult.logged.map((l) => ({
       variable: l.variable,
       file: l.file,
@@ -101,12 +110,7 @@ export function createJsonOutput(
     }));
   }
 
-  // Add comparison info if we compared against a file
-  if (comparedAgainst) {
-    output.comparedAgainst = comparedAgainst;
-    output.totalEnvVariables = totalEnvVariables;
-  }
-
+  const healthScore = computeHealthScore(scanResult);
   output.healthScore = healthScore;
 
   return output;
