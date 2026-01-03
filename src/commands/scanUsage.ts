@@ -63,7 +63,6 @@ export async function scanUsage(
 
   // Determine which file to compare against
   const compareFile = determineComparisonFile(opts);
-  let envVariables: Record<string, string | undefined> = {};
   let comparedAgainst = '';
   let duplicatesFound = false;
 
@@ -87,7 +86,6 @@ export async function scanUsage(
       if (exit) return { exitWithError: true };
     } else {
       scanResult = result.scanResult;
-      envVariables = result.envVariables;
       comparedAgainst = result.comparedAgainst;
       duplicatesFound = result.duplicatesFound;
       fixApplied = result.fixApplied;
