@@ -10,17 +10,17 @@ import { hasIgnoreComment } from '../core/secretDetectors.js';
  * @param opts - The scan options.
  * @returns An array of environment variable usages found in the file.
  */
-export async function scanFile(
+export function scanFile(
   filePath: string,
   content: string,
   opts: ScanOptions,
-): Promise<EnvUsage[]> {
+): EnvUsage[] {
   const usages: EnvUsage[] = [];
   const lines = content.split('\n');
   const relativePath = path.relative(opts.cwd, filePath);
 
   for (const pattern of ENV_PATTERNS) {
-    let match;
+    let match: RegExpExecArray | null;
     const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
 
     while ((match = regex.exec(content)) !== null) {
@@ -32,13 +32,16 @@ export async function scanFile(
       const beforeMatch = content.substring(0, matchIndex);
       const lineNumber = beforeMatch.split('\n').length;
       const lastNewlineIndex = beforeMatch.lastIndexOf('\n');
-      const column = matchIndex - lastNewlineIndex;
+      const column =
+        lastNewlineIndex === -1
+          ? matchIndex + 1
+          : matchIndex - lastNewlineIndex;
 
       // Get the context (the actual line)
-      const contextLine = lines[lineNumber - 1]?.trim() || '';
+      const contextLine = lines[lineNumber - 1] ?? '';
 
       // Determine previous line for ignore detection
-      const prevLine = lines[lineNumber - 2]?.trim() || '';
+      const prevLine = lines[lineNumber - 2] ?? '';
 
       const isIgnored =
         hasIgnoreComment(contextLine) || hasIgnoreComment(prevLine);
@@ -47,7 +50,7 @@ export async function scanFile(
       if (isIgnored) continue;
 
       // Check if console.log
-      const isLogged = /console\.(log|error|warn|info|debug)\(/.test(
+      const isLogged = /\bconsole\.(log|error|warn|info|debug)\s*\(/.test(
         contextLine,
       );
 
