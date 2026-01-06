@@ -337,3 +337,18 @@ export interface InconsistentNamingWarning {
   key2: string;
   suggestion: string;
 }
+
+/**
+ * Represents the discovery of environment files in a project.
+ * Contains information about the current working directory, found environment files,
+ * and the primary environment and example files.
+ */
+export interface Discovery {
+  cwd: string;
+  envFiles: string[];
+  primaryEnv: string;
+  primaryExample: string;
+  envFlag: string | null;
+  exampleFlag: string | null;
+  alreadyWarnedMissingEnv: boolean;
+}

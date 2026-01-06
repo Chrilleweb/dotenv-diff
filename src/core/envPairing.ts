@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import type { Discovery } from '../services/envDiscovery.js';
-import type { FilePair } from '../config/types.js';
+import type { FilePair, Discovery } from '../config/types.js';
 
 /**
  * Pairs each environment file with its corresponding example file.

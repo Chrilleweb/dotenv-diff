@@ -1,20 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-
-/**
- * Represents the discovery of environment files in a project.
- * Contains information about the current working directory, found environment files,
- * and the primary environment and example files.
- */
-export interface Discovery {
-  cwd: string;
-  envFiles: string[];
-  primaryEnv: string;
-  primaryExample: string;
-  envFlag: string | null;
-  exampleFlag: string | null;
-  alreadyWarnedMissingEnv: boolean;
-}
+import type { Discovery } from '../config/types.js';
 
 /**
  * Arguments for the discoverEnvFiles function.

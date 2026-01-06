@@ -13,8 +13,8 @@ import type { Duplicate } from '../config/types.js';
 export function findDuplicateKeys(filePath: string): Array<Duplicate> {
   if (!fs.existsSync(filePath)) return [];
 
-  const raw = fs.readFileSync(filePath, 'utf8');
-  const lines = raw.split('\n');
+  const raw = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '');
+  const lines = raw.split(/\r?\n/);
 
   const counts = new Map<string, number>();
 
