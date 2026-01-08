@@ -296,20 +296,6 @@ export interface ComparisonResult {
   exitWithError: boolean;
 }
 
-export type PairContext = {
-  envName: string;
-  envPath: string;
-  exampleName: string;
-  examplePath: string;
-  exists: { env: boolean; example: boolean };
-  currentFull?: Record<string, string>;
-  exampleFull?: Record<string, string>;
-  currentKeys?: string[];
-  exampleKeys?: string[];
-  current?: Record<string, string>;
-  example?: Record<string, string>;
-};
-
 export type Filtered = {
   missing: string[];
   extra?: string[];
