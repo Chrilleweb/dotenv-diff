@@ -71,12 +71,12 @@ async function runScanMode(opts: Options): Promise<boolean> {
     showStats: opts.showStats,
     isCiMode: opts.isCiMode,
     secrets: opts.secrets,
-    strict: opts.strict ?? false,
-    ignoreUrls: opts.ignoreUrls ?? [],
-    uppercaseKeys: opts.uppercaseKeys ?? true,
+    strict: opts.strict,
+    ignoreUrls: opts.ignoreUrls,
+    files: opts.files,
+    uppercaseKeys: opts.uppercaseKeys,
     expireWarnings: opts.expireWarnings,
     inconsistentNamingWarnings: opts.inconsistentNamingWarnings,
-    ...(opts.files ? { files: opts.files } : {}),
   });
 
   return exitWithError;

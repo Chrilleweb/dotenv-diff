@@ -2,6 +2,7 @@ import { scanCodebase } from '../services/codeBaseScanner.js';
 import type {
   ScanUsageOptions,
   EnvUsage,
+  ExitResult,
   ScanResult,
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
@@ -31,9 +32,7 @@ import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
  * @param {ScanUsageOptions} opts - Scan configuration options
  * @returns {Promise<{exitWithError: boolean}>} Whether the caller should exit with a non-zero code.
  */
-export async function scanUsage(
-  opts: ScanUsageOptions,
-): Promise<{ exitWithError: boolean }> {
+export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   // Start timing the scan
   const startTime = performance.now();
 

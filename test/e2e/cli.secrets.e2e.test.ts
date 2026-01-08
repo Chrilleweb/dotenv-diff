@@ -298,4 +298,27 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
+
+  it('Will handle cross-platform / different path styles', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    const filePath = path.join(cwd, 'src', 'crossPlatform.ts');
+    fs.writeFileSync(
+      filePath,
+      `
+      // kendt mønster: GitHub PAT
+      const gh = "ghp_1234567890ABCDEFGHijklmnopqrstuvwxYZ";
+
+      console.log(process.env.DUMMY);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain('Potential secrets detected in codebase:');
+    expect(res.stdout).toContain('HIGH');
+    expect(res.stdout).toContain('src/crossPlatform.ts');
+  });
 });

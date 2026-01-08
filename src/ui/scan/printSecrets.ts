@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { type SecretFinding } from '../../core/secretDetectors.js';
+import { normalizePath } from '../../core/helpers/normalizePath.js';
 
 /** Get the color function for the severity level.
  * @param severity - The severity level of the secret finding.
@@ -54,7 +55,10 @@ export function printSecrets(secrets: SecretFinding[], json: boolean): void {
   }
 
   for (const [file, findings] of byFile) {
-    console.log(chalk.bold(`   ${file}`));
+    const normalizedFile = normalizePath(file);
+
+    console.log(chalk.bold(`   ${normalizedFile}`));
+
     for (const f of findings) {
       const color = getSeverityColor(f.severity);
       const label = getSeverityLabel(f.severity);

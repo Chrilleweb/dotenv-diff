@@ -15,7 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
--
+- Fixed path normalization issue where file paths were not consistently displayed across different operating systems.
 
 ## [2.4.6] - 2026-01-06
 

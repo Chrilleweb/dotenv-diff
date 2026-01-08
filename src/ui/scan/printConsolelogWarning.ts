@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import type { EnvUsage, VariableUsages } from '../../config/types.js';
+import { normalizePath } from '../../core/helpers/normalizePath.js';
 
 /**
  * Print environment variables that were logged using console.log / warn / error.
@@ -30,8 +31,9 @@ export function printConsolelogWarning(
     const maxShow = 3;
 
     usages.slice(0, maxShow).forEach((usage) => {
+      const normalizedFile = normalizePath(usage.file);
       console.log(
-        chalk.yellow.dim(`     Logged at: ${usage.file}:${usage.line}`),
+        chalk.yellow.dim(`     Logged at: ${normalizedFile}:${usage.line}`),
       );
       console.log(chalk.gray(`       ${usage.context.trim()}`));
     });

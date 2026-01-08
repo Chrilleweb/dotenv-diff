@@ -1,5 +1,6 @@
 import type { ScanResult, EnvUsage, ScanJsonEntry } from '../config/types.js';
 import { computeHealthScore } from './computeHealthScore.js';
+import { normalizePath } from './helpers/normalizePath.js';
 
 /**
  * Creates a JSON output for the scan results.
@@ -22,7 +23,7 @@ export function createJsonOutput(
 
   if (scanResult.secrets?.length) {
     output.secrets = scanResult.secrets.map((s) => ({
-      file: s.file,
+      file: normalizePath(s.file),
       line: s.line,
       message: s.message,
       snippet: s.snippet,
@@ -44,7 +45,7 @@ export function createJsonOutput(
     output.missing = scanResult.missing.map((variable) => ({
       variable,
       usages: (usagesByVariable.get(variable) ?? []).map((u) => ({
-        file: u.file,
+        file: normalizePath(u.file),
         line: u.line,
         pattern: u.pattern,
         context: u.context,
@@ -76,7 +77,7 @@ export function createJsonOutput(
     output.frameworkWarnings = scanResult.frameworkWarnings.map((w) => ({
       variable: w.variable,
       reason: w.reason,
-      file: w.file,
+      file: normalizePath(w.file),
       line: w.line,
       framework: w.framework,
     }));
@@ -94,7 +95,7 @@ export function createJsonOutput(
   if (scanResult.logged?.length) {
     output.logged = scanResult.logged.map((l) => ({
       variable: l.variable,
-      file: l.file,
+      file: normalizePath(l.file),
       line: l.line,
       context: l.context,
     }));
