@@ -50,18 +50,18 @@ export type Options = {
   ignore: string[];
   ignoreRegex: RegExp[];
   cwd: string;
-  only?: Category[];
+  only: Category[];
   compare: boolean;
   scanUsage: boolean;
   includeFiles: string[];
   excludeFiles: string[];
   showUnused: boolean;
   showStats: boolean;
-  files?: string[];
-  noColor?: boolean;
+  files: string[];
+  noColor: boolean;
   secrets: boolean;
-  strict: boolean | undefined;
-  ignoreUrls?: string[];
+  strict: boolean;
+  ignoreUrls: string[];
   uppercaseKeys: boolean;
   expireWarnings: boolean;
   inconsistentNamingWarnings: boolean;
@@ -139,17 +139,6 @@ export interface EnvUsage {
   isLogged?: boolean; // Whether this usage is logged to console
 }
 
-export interface ScanOptions {
-  cwd: string;
-  include: string[];
-  exclude: string[];
-  ignore: string[];
-  ignoreRegex: RegExp[];
-  files?: string[];
-  secrets?: boolean;
-  ignoreUrls?: string[];
-}
-
 export interface ScanResult {
   used: EnvUsage[];
   missing: string[];
@@ -175,16 +164,26 @@ export interface ScanResult {
   fileContentMap?: Map<string, string>;
 }
 
+export interface ScanOptions {
+  cwd: string;
+  include: string[];
+  exclude: string[];
+  ignore: string[];
+  ignoreRegex: RegExp[];
+  files?: string[];
+  secrets?: boolean;
+  ignoreUrls?: string[];
+}
+
 /** Options for scanning the codebase for environment variable usage. */
 export interface ScanUsageOptions extends ScanOptions {
   envPath?: string | undefined;
   examplePath?: string | undefined;
   fix?: boolean;
-  json: boolean;
-  showUnused: boolean;
-  showStats: boolean;
+  json?: boolean;
+  showUnused?: boolean;
+  showStats?: boolean;
   isCiMode?: boolean;
-  files?: string[];
   allowDuplicates?: boolean;
   strict?: boolean;
   uppercaseKeys?: boolean;

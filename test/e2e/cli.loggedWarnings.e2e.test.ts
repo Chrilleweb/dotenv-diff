@@ -157,4 +157,25 @@ describe('Environment variable console.log detection', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Environment variables logged to console');
   });
+
+  it('Will handle cross-platform / different path styles', () => {
+    const cwd = tmpDir();
+    makeProject(cwd);
+
+    const filePath = path.join(cwd, 'src', 'crossPlatform.ts');
+    fs.writeFileSync(
+      filePath,
+      `console.log(process.env.CROSS_PLATFORM_VAR);`,
+    );
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      'CROSS_PLATFORM_VAR=shouldshow',
+    );
+
+    const res = runCli(cwd, ['--scan-usage']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('CROSS_PLATFORM_VAR');
+
+    expect(res.stdout).toContain('Logged at: src/crossPlatform.ts:1');
+  });
 });

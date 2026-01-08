@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import type { EnvUsage, VariableUsages } from '../../config/types.js';
+import { normalizePath } from '../../core/helpers/normalizePath.js';
 
 /**
  * Print missing environment variables (used in code but not in env file).
@@ -36,7 +37,9 @@ export function printMissing(
 
     const maxShow = 3;
     usages.slice(0, maxShow).forEach((usage) => {
-      console.log(chalk.red.dim(`     Used in: ${usage.file}:${usage.line}`));
+      const file = normalizePath(usage.file);
+
+      console.log(chalk.red.dim(`     Used in: ${file}:${usage.line}`));
       console.log(chalk.gray(`       ${usage.context.trim()}`));
     });
 
