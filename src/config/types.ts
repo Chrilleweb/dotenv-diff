@@ -170,9 +170,9 @@ export interface ScanOptions {
   exclude: string[];
   ignore: string[];
   ignoreRegex: RegExp[];
-  files?: string[];
-  secrets?: boolean;
-  ignoreUrls?: string[];
+  files: string[];
+  secrets: boolean;
+  ignoreUrls: string[];
 }
 
 /** Options for scanning the codebase for environment variable usage. */
