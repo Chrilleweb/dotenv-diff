@@ -1,4 +1,5 @@
 import { type EnvUsage, type frameworkWarning } from '../../config/types.js';
+import { normalizePath } from './../helpers/normalizePath.js';
 
 /**
  * Next.js environment variable validation rules
@@ -11,8 +12,11 @@ export function applyNextJsRules(
   warnings: frameworkWarning[],
   fileContentMap?: Map<string, string>,
 ): void {
+  // Normalize path separators for cross-platform consistency
+  const normalizedFile = normalizePath(u.file);
+
   // Ignore node_modules
-  if (u.file.includes('node_modules')) {
+  if (normalizedFile.includes('/node_modules/')) {
     return;
   }
 
@@ -38,23 +42,22 @@ export function applyNextJsRules(
 
   // Detect server-only files
   const isServerOnlyFile =
-    u.file.includes('/app/api/') ||
-    u.file.includes('/pages/api/') ||
-    u.file.endsWith('.server.ts') ||
-    u.file.endsWith('.server.tsx') ||
-    u.file.endsWith('.server.js') ||
-    u.file.endsWith('.server.jsx') ||
-    u.file.endsWith('middleware.ts') ||
-    u.file.endsWith('middleware.js') ||
-    u.file.includes('/route.ts') ||
-    u.file.includes('/route.js');
+    normalizedFile.includes('/app/api/') ||
+    normalizedFile.includes('/pages/api/') ||
+    normalizedFile.endsWith('.server.ts') ||
+    normalizedFile.endsWith('.server.tsx') ||
+    normalizedFile.endsWith('.server.js') ||
+    normalizedFile.endsWith('.server.jsx') ||
+    normalizedFile.endsWith('middleware.ts') ||
+    normalizedFile.endsWith('middleware.js') ||
+    /\/route\.(ts|js)$/.test(normalizedFile);
 
   // Server-only files should NOT use NEXT_PUBLIC_ variables
   if (isServerOnlyFile && u.variable.startsWith('NEXT_PUBLIC_')) {
     warnings.push({
       variable: u.variable,
       reason: 'NEXT_PUBLIC_ variable used in server-only file',
-      file: u.file,
+      file: normalizedFile,
       line: u.line,
       framework: 'nextjs',
     });
@@ -66,7 +69,7 @@ export function applyNextJsRules(
     warnings.push({
       variable: u.variable,
       reason: 'Server-only variable accessed from client code',
-      file: u.file,
+      file: normalizedFile,
       line: u.line,
       framework: 'nextjs',
     });
@@ -78,7 +81,7 @@ export function applyNextJsRules(
     warnings.push({
       variable: u.variable,
       reason: 'Next.js uses process.env, not import.meta.env (Vite syntax)',
-      file: u.file,
+      file: normalizedFile,
       line: u.line,
       framework: 'nextjs',
     });
@@ -88,16 +91,12 @@ export function applyNextJsRules(
   // Warn if NEXT_PUBLIC_ contains sensitive keywords
   if (
     u.variable.startsWith('NEXT_PUBLIC_') &&
-    (u.variable.includes('SECRET') ||
-      u.variable.includes('PRIVATE') ||
-      u.variable.includes('KEY') ||
-      u.variable.includes('TOKEN') ||
-      u.variable.includes('PASSWORD'))
+    /SECRET|PRIVATE|KEY|TOKEN|PASSWORD/.test(u.variable)
   ) {
     warnings.push({
       variable: u.variable,
       reason: 'Sensitive data marked as public',
-      file: u.file,
+      file: normalizedFile,
       line: u.line,
       framework: 'nextjs',
     });
