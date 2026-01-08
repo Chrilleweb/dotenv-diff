@@ -292,7 +292,7 @@ export interface FilePair {
   examplePath: string;
 }
 
-export interface ComparisonResult {
+export interface ExitResult {
   exitWithError: boolean;
 }
 

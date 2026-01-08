@@ -10,7 +10,7 @@ import type {
   CompareJsonEntry,
   ComparisonOptions,
   FilePair,
-  ComparisonResult,
+  ExitResult,
   Filtered,
   DuplicateResult,
 } from '../config/types.js';
@@ -35,7 +35,7 @@ import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 export async function compareMany(
   pairs: FilePair[],
   opts: Readonly<ComparisonOptions>,
-): Promise<ComparisonResult> {
+): Promise<ExitResult> {
   let exitWithError = false;
 
   // For --only filtering

@@ -2,6 +2,7 @@ import { scanCodebase } from '../services/codeBaseScanner.js';
 import type {
   ScanUsageOptions,
   EnvUsage,
+  ExitResult,
   ScanResult,
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
@@ -33,7 +34,7 @@ import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
  */
 export async function scanUsage(
   opts: ScanUsageOptions,
-): Promise<{ exitWithError: boolean }> {
+): Promise<ExitResult> {
   // Start timing the scan
   const startTime = performance.now();
 
