@@ -32,9 +32,7 @@ import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
  * @param {ScanUsageOptions} opts - Scan configuration options
  * @returns {Promise<{exitWithError: boolean}>} Whether the caller should exit with a non-zero code.
  */
-export async function scanUsage(
-  opts: ScanUsageOptions,
-): Promise<ExitResult> {
+export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   // Start timing the scan
   const startTime = performance.now();
 

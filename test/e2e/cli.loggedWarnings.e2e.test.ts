@@ -163,14 +163,8 @@ describe('Environment variable console.log detection', () => {
     makeProject(cwd);
 
     const filePath = path.join(cwd, 'src', 'crossPlatform.ts');
-    fs.writeFileSync(
-      filePath,
-      `console.log(process.env.CROSS_PLATFORM_VAR);`,
-    );
-    fs.writeFileSync(
-      path.join(cwd, '.env'),
-      'CROSS_PLATFORM_VAR=shouldshow',
-    );
+    fs.writeFileSync(filePath, `console.log(process.env.CROSS_PLATFORM_VAR);`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'CROSS_PLATFORM_VAR=shouldshow');
 
     const res = runCli(cwd, ['--scan-usage']);
     expect(res.status).toBe(0);
