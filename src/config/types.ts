@@ -5,7 +5,7 @@ import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 export type Framework = 'sveltekit' | 'nextjs' | 'unknown';
 
 // Type representing a framework-specific warning
-export interface frameworkWarning {
+export interface FrameworkWarning {
   variable: string;
   reason: string;
   file: string;
@@ -150,7 +150,7 @@ export interface ScanResult {
     env?: Array<{ key: string; count: number }>;
     example?: Array<{ key: string; count: number }>;
   };
-  frameworkWarnings?: frameworkWarning[];
+  frameworkWarnings?: FrameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
   logged: EnvUsage[];
   uppercaseWarnings?: UppercaseWarning[];

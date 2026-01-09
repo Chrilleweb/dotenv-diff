@@ -1,4 +1,4 @@
-import { type EnvUsage, type frameworkWarning } from '../../config/types.js';
+import { type EnvUsage, type FrameworkWarning } from '../../config/types.js';
 import { normalizePath } from './../helpers/normalizePath.js';
 
 /**
@@ -8,7 +8,7 @@ import { normalizePath } from './../helpers/normalizePath.js';
  */
 export function applySvelteKitRules(
   u: EnvUsage,
-  warnings: frameworkWarning[],
+  warnings: FrameworkWarning[],
 ): void {
   // Normalize path separators for cross-platform consistency
   const normalizedFile = normalizePath(u.file);
