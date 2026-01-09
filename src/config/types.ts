@@ -129,12 +129,7 @@ export interface EnvUsage {
   pattern:
     | 'process.env'
     | 'import.meta.env'
-    | 'sveltekit'
-    | 'angular'
-    | 'deno'
-    | 'next'
-    | 'nuxt'
-    | 'php';
+    | 'sveltekit';
   context: string; // The actual line content
   isLogged?: boolean; // Whether this usage is logged to console
 }
