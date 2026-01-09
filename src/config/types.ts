@@ -7,7 +7,6 @@ export type SupportedFramework = 'sveltekit' | 'nextjs';
 // Result of framework detection (may be unsupported)
 export type DetectedFramework = SupportedFramework | 'unknown';
 
-
 /**
  * Framework-specific warning about environment variable usage
  * From rules defined for each supported framework (SvelteKit, Next.js)
@@ -82,7 +81,7 @@ export interface RawOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
-};
+}
 
 /**
  * Normalized and validated options used internally by the application.
@@ -124,7 +123,7 @@ export interface Options {
   uppercaseKeys: boolean;
   expireWarnings: boolean;
   inconsistentNamingWarnings: boolean;
-};
+}
 
 /**
  * Represents a single usage of an environment variable in the codebase.
@@ -134,10 +133,7 @@ export interface EnvUsage {
   file: string;
   line: number;
   column: number;
-  pattern:
-    | 'process.env'
-    | 'import.meta.env'
-    | 'sveltekit';
+  pattern: 'process.env' | 'import.meta.env' | 'sveltekit';
   context: string; // The actual line content
   isLogged?: boolean; // Whether this usage is logged to console
 }
@@ -294,10 +290,10 @@ export interface UppercaseWarning {
 /**
  * Warning about environment variable keys that have expiration dates.
  * fx:
- * 
+ *
  * # @expire 2025-12-31
  * API_KEY=
- * 
+ *
  * This will generate a warning that API_KEY expires on 2025-12-31.
  */
 export interface ExpireWarning {
