@@ -39,40 +39,18 @@ export const ALLOWED_CATEGORIES = [
 // Type representing a single category for comparison
 export type Category = (typeof ALLOWED_CATEGORIES)[number];
 
-/** Type representing the options for the comparison
- * These are the options that are processed and validated before being used in the comparison.
- */
-export interface Options {
-  checkValues: boolean;
-  isCiMode: boolean;
-  isYesMode: boolean;
-  allowDuplicates: boolean;
-  fix: boolean;
-  json: boolean;
-  envFlag: string | undefined;
-  exampleFlag: string | undefined;
-  ignore: string[];
-  ignoreRegex: RegExp[];
-  cwd: string;
-  only: Category[];
-  compare: boolean;
-  scanUsage: boolean;
-  includeFiles: string[];
-  excludeFiles: string[];
-  showUnused: boolean;
-  showStats: boolean;
-  files: string[];
-  noColor: boolean;
-  secrets: boolean;
-  strict: boolean;
-  ignoreUrls: string[];
-  uppercaseKeys: boolean;
-  expireWarnings: boolean;
-  inconsistentNamingWarnings: boolean;
-};
-
-/** Type representing the raw options for the comparison
- * These are the options that are directly passed to the comparison function without any processing or validation.
+/**
+ * Raw options as received directly from the CLI argument parser.
+ *
+ * These values are intentionally loose and reflect how flags are actually
+ * provided by the user:
+ *  - Values may be missing
+ *  - Lists may be strings or string arrays
+ *  - No defaults are applied
+ *  - No validation or normalization has happened yet
+ *
+ * This type should only be used at the CLI boundary and passed into the
+ * normalization step that produces {@link Options}.
  */
 export interface RawOptions {
   checkValues?: boolean;
@@ -101,6 +79,48 @@ export interface RawOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+};
+
+/**
+ * Normalized and validated options used internally by the application.
+ *
+ * These options represent the final, safe configuration that the rest of the
+ * codebase can rely on. All values are:
+ *  - Fully normalized (no string | string[] unions)
+ *  - Resolved to absolute paths where applicable
+ *  - Filled with defaults for omitted flags
+ *  - Validated and ready for use
+ *
+ * This type should be used everywhere outside of CLI parsing and option
+ * normalization logic.
+ */
+export interface Options {
+  checkValues: boolean;
+  isCiMode: boolean;
+  isYesMode: boolean;
+  allowDuplicates: boolean;
+  fix: boolean;
+  json: boolean;
+  envFlag: string | undefined;
+  exampleFlag: string | undefined;
+  ignore: string[];
+  ignoreRegex: RegExp[];
+  cwd: string;
+  only: Category[];
+  compare: boolean;
+  scanUsage: boolean;
+  includeFiles: string[];
+  excludeFiles: string[];
+  showUnused: boolean;
+  showStats: boolean;
+  files: string[];
+  noColor: boolean;
+  secrets: boolean;
+  strict: boolean;
+  ignoreUrls: string[];
+  uppercaseKeys: boolean;
+  expireWarnings: boolean;
+  inconsistentNamingWarnings: boolean;
 };
 
 /**
