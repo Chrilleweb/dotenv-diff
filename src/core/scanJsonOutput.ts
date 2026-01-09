@@ -1,6 +1,82 @@
-import type { ScanResult, EnvUsage, ScanJsonEntry } from '../config/types.js';
+import type { ScanResult, EnvUsage, Duplicate, SupportedFramework } from '../config/types.js';
 import { computeHealthScore } from './computeHealthScore.js';
 import { normalizePath } from './helpers/normalizePath.js';
+
+/** 
+ * JSON structure for scan results output
+ */
+interface ScanJsonOutput {
+  stats?: {
+    filesScanned: number;
+    totalUsages: number;
+    uniqueVariables: number;
+    warningsCount: number;
+    duration: number;
+  };
+  missing?: Array<{
+    variable: string;
+    usages: Array<{
+      file: string;
+      line: number;
+      pattern: string;
+      context: string;
+    }>;
+  }>;
+  unused?: string[];
+  allUsages?: Array<{
+    variable: string;
+    file: string;
+    line: number;
+    pattern: string;
+    context: string;
+  }>;
+  comparedAgainst?: string;
+  totalEnvVariables?: number;
+  secrets?: Array<{
+    file: string;
+    line: number;
+    message: string;
+    snippet: string;
+  }>;
+  duplicates?: {
+    env?: Duplicate[];
+    example?: Duplicate[];
+  };
+  logged?: Array<{
+    variable: string;
+    file: string;
+    line: number;
+    context: string;
+  }>;
+  expireWarnings?: Array<{
+    key: string;
+    date: string;
+    daysLeft: number;
+  }>;
+  uppercaseWarnings?: Array<{
+    key: string;
+    suggestion: string;
+  }>;
+  inconsistentNamingWarnings?: Array<{
+    key1: string;
+    key2: string;
+    suggestion: string;
+  }>;
+  frameworkWarnings?: Array<{
+    variable: string;
+    reason: string;
+    file: string;
+    line: number;
+    framework: SupportedFramework;
+  }>;
+  exampleWarnings?: Array<{
+    key: string;
+    value: string;
+    reason: string;
+    severity: string;
+  }>;
+  healthScore?: number;
+}
 
 /**
  * Creates a JSON output for the scan results.
@@ -11,8 +87,8 @@ import { normalizePath } from './helpers/normalizePath.js';
 export function createJsonOutput(
   scanResult: ScanResult,
   comparedAgainst: string,
-): ScanJsonEntry {
-  const output: ScanJsonEntry = {};
+): ScanJsonOutput {
+  const output: ScanJsonOutput = {};
 
   // Add comparison info if we compared against a file
   if (comparedAgainst) {
