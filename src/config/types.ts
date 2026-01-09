@@ -252,7 +252,7 @@ export interface ScanJsonEntry {
     reason: string;
     file: string;
     line: number;
-    framework: string;
+    framework: SupportedFramework;
   }>;
   exampleWarnings?: Array<{
     key: string;
