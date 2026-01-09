@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { FilePair, Discovery } from '../config/types.js';
+import { DEFAULT_ENV_FILE, DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 
 /**
  * Pairs each environment file with its corresponding example file.
@@ -17,8 +18,8 @@ export function pairWithExample(d: Discovery): Array<FilePair> {
       if (envAbs === path.resolve(d.cwd, d.primaryExample)) continue;
     }
 
-    const suffix = envName === '.env' ? '' : envName.replace('.env', '');
-    const exampleName = suffix ? `.env.example${suffix}` : d.primaryExample;
+    const suffix = envName === DEFAULT_ENV_FILE ? '' : envName.replace(DEFAULT_ENV_FILE, '');
+    const exampleName = suffix ? `${DEFAULT_EXAMPLE_FILE}${suffix}` : d.primaryExample;
 
     const envPathCurrent = path.resolve(d.cwd, envName);
     const examplePathCurrent =
