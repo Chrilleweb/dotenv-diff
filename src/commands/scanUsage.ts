@@ -30,7 +30,7 @@ import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
  *  - Returns a boolean indicating whether the process should exit with an error
  *
  * @param {ScanUsageOptions} opts - Scan configuration options
- * @returns {Promise<{exitWithError: boolean}>} Whether the caller should exit with a non-zero code.
+ * @returns {Promise<ExitResult>} Whether the caller should exit with a non-zero code.
  */
 export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   // Start timing the scan

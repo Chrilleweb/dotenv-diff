@@ -1,7 +1,11 @@
 import path from 'path';
 import { checkGitignoreStatus } from './git.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
-import type { ScanUsageOptions, ScanResult } from '../config/types.js';
+import type {
+  ScanUsageOptions,
+  ScanResult,
+  ExitResult,
+} from '../config/types.js';
 import { DEFAULT_ENV_FILE } from '../config/constants.js';
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
@@ -41,7 +45,7 @@ export function outputToConsole(
   opts: ScanUsageOptions,
   comparedAgainst: string,
   fixContext?: FixContext,
-): { exitWithError: boolean } {
+): ExitResult {
   let exitWithError = false;
 
   // Determine if output should be in JSON format

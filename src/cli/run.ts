@@ -6,17 +6,25 @@ import { discoverEnvFiles } from '../services/envDiscovery.js';
 import { pairWithExample } from '../core/envPairing.js';
 import { ensureFilesOrPrompt } from '../services/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
-import {
-  type CompareJsonEntry,
-  type ComparisonOptions,
-  type Options,
-  type RawOptions,
+import type {
+  CompareJsonEntry,
+  ComparisonOptions,
+  Options,
+  RawOptions,
+  ExitResult,
 } from '../config/types.js';
 import { scanUsage } from '../commands/scanUsage.js';
 import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';
 import { loadConfig } from '../config/loadConfig.js';
 import { DEFAULT_ENV_FILE } from '../config/constants.js';
+
+/**
+ * handleMissingFiles result
+ */
+interface ExitDecision extends ExitResult {
+  shouldExit: boolean;
+}
 
 /**
  * Run the CLI program
@@ -193,7 +201,7 @@ async function handleMissingFiles(
   opts: Options,
   envFlag: string,
   exampleFlag: string,
-): Promise<{ shouldExit: boolean; exitWithError: boolean }> {
+): Promise<ExitDecision> {
   const envExists = fs.existsSync(envFlag);
   const exExists = fs.existsSync(exampleFlag);
 
