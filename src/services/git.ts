@@ -1,7 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
-import { DEFAULT_ENV_FILE, GITIGNORE_FILE, GIT_DIR } from '../config/constants.js';
+import {
+  DEFAULT_ENV_FILE,
+  GITIGNORE_FILE,
+  GIT_DIR,
+} from '../config/constants.js';
 
 interface GitignoreCheckOptions {
   /** Project root directory (default: process.cwd()) */
@@ -92,7 +96,11 @@ function matchesCandidate(pattern: string, envFile: string): boolean {
  * @returns console.log messages or void
  */
 export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
-  const { cwd = process.cwd(), envFile = DEFAULT_ENV_FILE, log = console.log } = options;
+  const {
+    cwd = process.cwd(),
+    envFile = DEFAULT_ENV_FILE,
+    log = console.log,
+  } = options;
 
   const envPath = path.resolve(cwd, envFile);
   if (!fs.existsSync(envPath)) return; // No .env file → nothing to warn about

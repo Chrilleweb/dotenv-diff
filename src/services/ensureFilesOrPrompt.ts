@@ -44,7 +44,9 @@ export async function ensureFilesOrPrompt(
 
   // Case 1: no .env and no .env.example
   if (!envExists && !exampleExists) {
-    const hasAnyEnv = fs.readdirSync(cwd).some((f) => f.startsWith(DEFAULT_ENV_FILE));
+    const hasAnyEnv = fs
+      .readdirSync(cwd)
+      .some((f) => f.startsWith(DEFAULT_ENV_FILE));
     if (!hasAnyEnv) {
       printPrompt.noEnvFound();
       return { didCreate: false, shouldExit: true, exitCode: 0 };

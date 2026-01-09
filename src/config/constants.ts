@@ -19,6 +19,4 @@ export const DEFAULT_ENV_CANDIDATES = [
 /**
  * Gitignore patterns for env files
  */
-export const DEFAULT_GITIGNORE_ENV_PATTERNS = [
-  DEFAULT_ENV_FILE,
-] as const;
+export const DEFAULT_GITIGNORE_ENV_PATTERNS = [DEFAULT_ENV_FILE] as const;

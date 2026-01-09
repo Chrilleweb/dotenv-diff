@@ -2,6 +2,7 @@ import path from 'path';
 import { checkGitignoreStatus } from './git.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import type { ScanUsageOptions, ScanResult } from '../config/types.js';
+import { DEFAULT_ENV_FILE } from '../config/constants.js';
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
 import { printMissing } from '../ui/scan/printMissing.js';
@@ -151,12 +152,12 @@ export function outputToConsole(
   // Gitignore check
   const gitignoreIssue = checkGitignoreStatus({
     cwd: opts.cwd,
-    envFile: '.env',
+    envFile: DEFAULT_ENV_FILE,
   });
 
   if (gitignoreIssue && !opts.json) {
     printGitignoreWarning({
-      envFile: '.env',
+      envFile: DEFAULT_ENV_FILE,
       reason: gitignoreIssue.reason,
     });
   }
@@ -193,7 +194,7 @@ export function outputToConsole(
         addedEnv: fixContext.addedEnv,
         addedExample: opts.examplePath ? fixContext.addedEnv : [],
       },
-      comparedAgainst || '.env',
+      comparedAgainst || DEFAULT_ENV_FILE,
       opts.examplePath ? path.basename(opts.examplePath) : 'example file',
       isJson,
       fixContext.gitignoreUpdated,
