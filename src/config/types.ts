@@ -1,8 +1,12 @@
 import { type SecretFinding } from '../core/secretDetectors.js';
 import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
-// Type representing detected framework
-export type Framework = 'sveltekit' | 'nextjs' | 'unknown';
+// Supported frameworks
+export type SupportedFramework = 'sveltekit' | 'nextjs';
+
+// Result of framework detection (may be unsupported)
+export type DetectedFramework = SupportedFramework | 'unknown';
+
 
 // Type representing a framework-specific warning
 export interface FrameworkWarning {
@@ -10,7 +14,7 @@ export interface FrameworkWarning {
   reason: string;
   file: string;
   line: number;
-  framework: Framework;
+  framework: SupportedFramework;
 }
 
 // Type representing a duplicate entry

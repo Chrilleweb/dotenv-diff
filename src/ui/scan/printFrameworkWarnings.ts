@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import { type FrameworkWarning, type Framework } from '../../config/types.js';
+import { type FrameworkWarning, type DetectedFramework } from '../../config/types.js';
 
-const FRAMEWORK_LABELS: Record<Framework, string> = {
+const FRAMEWORK_LABELS: Record<DetectedFramework, string> = {
   nextjs: 'Next.js',
   sveltekit: 'SvelteKit',
   unknown: 'Unknown Framework',
