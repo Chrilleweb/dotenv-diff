@@ -21,8 +21,8 @@ interface ProcessComparisonResult {
   envVariables: Record<string, string | undefined>;
   comparedAgainst: string;
   duplicatesFound: boolean;
-  dupsEnv: Array<{ key: string; count: number }>;
-  dupsEx: Array<{ key: string; count: number }>;
+  dupsEnv: Duplicate[];
+  dupsEx: Duplicate[];
   fixApplied: boolean;
   removedDuplicates: string[];
   addedEnv: string[];
@@ -54,8 +54,8 @@ export function processComparisonFile(
   let envVariables: Record<string, string | undefined> = {};
   let comparedAgainst = '';
   let duplicatesFound = false;
-  let dupsEnv: Array<{ key: string; count: number }> = [];
-  let dupsEx: Array<{ key: string; count: number }> = [];
+  let dupsEnv: Duplicate[] = [];
+  let dupsEx: Duplicate[] = [];
   let fixApplied = false;
   let removedDuplicates: string[] = [];
   let addedEnv: string[] = [];
