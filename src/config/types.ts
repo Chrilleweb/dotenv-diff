@@ -38,7 +38,7 @@ export type Category = (typeof ALLOWED_CATEGORIES)[number];
 /** Type representing the options for the comparison
  * These are the options that are processed and validated before being used in the comparison.
  */
-export type Options = {
+export interface Options {
   checkValues: boolean;
   isCiMode: boolean;
   isYesMode: boolean;
@@ -70,7 +70,7 @@ export type Options = {
 /** Type representing the raw options for the comparison
  * These are the options that are directly passed to the comparison function without any processing or validation.
  */
-export type RawOptions = {
+export interface RawOptions {
   checkValues?: boolean;
   ci?: boolean;
   yes?: boolean;
@@ -108,8 +108,8 @@ export type CompareJsonEntry = {
   example: string;
   skipped?: { reason: string };
   duplicates?: {
-    env?: Array<{ key: string; count: number }>;
-    example?: Array<{ key: string; count: number }>;
+    env?: Duplicate[];
+    example?: Duplicate[];
   };
   missing?: string[];
   extra?: string[];
@@ -147,8 +147,8 @@ export interface ScanResult {
   };
   secrets: SecretFinding[];
   duplicates: {
-    env?: Array<{ key: string; count: number }>;
-    example?: Array<{ key: string; count: number }>;
+    env?: Duplicate[];
+    example?: Duplicate[];
   };
   frameworkWarnings?: FrameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
@@ -220,8 +220,8 @@ export interface ScanJsonEntry {
     snippet: string;
   }>;
   duplicates?: {
-    env?: Array<{ key: string; count: number }>;
-    example?: Array<{ key: string; count: number }>;
+    env?: Duplicate[];
+    example?: Duplicate[];
   };
   logged?: Array<{
     variable: string;
@@ -296,8 +296,8 @@ export type Filtered = {
   extra?: string[];
   empty?: string[];
   mismatches?: Array<{ key: string; expected: string; actual: string }>;
-  duplicatesEnv: Array<{ key: string; count: number }>;
-  duplicatesEx: Array<{ key: string; count: number }>;
+  duplicatesEnv: Duplicate[];
+  duplicatesEx: Duplicate[];
   gitignoreIssue: { reason: 'no-gitignore' | 'not-ignored' } | null;
 };
 
