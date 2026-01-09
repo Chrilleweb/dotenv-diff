@@ -260,9 +260,7 @@ export interface ScanJsonEntry {
 }
 
 // Type for grouped usages by variable
-export interface VariableUsages {
-  [variable: string]: EnvUsage[];
-}
+export type VariableUsages = Record<string, EnvUsage[]>;
 
 export interface ComparisonOptions {
   checkValues: boolean;
