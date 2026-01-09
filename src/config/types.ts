@@ -8,7 +8,10 @@ export type SupportedFramework = 'sveltekit' | 'nextjs';
 export type DetectedFramework = SupportedFramework | 'unknown';
 
 
-// Type representing a framework-specific warning
+/**
+ * Framework-specific warning about environment variable usage
+ * From rules defined for each supported framework (SvelteKit, Next.js)
+ */
 export interface FrameworkWarning {
   variable: string;
   reason: string;
@@ -142,6 +145,9 @@ export interface EnvUsage {
 // Type for grouped usages by variable
 export type VariableUsages = Record<string, EnvUsage[]>;
 
+/**
+ * Options for scanning the codebase
+ */
 export interface ScanOptions {
   cwd: string;
   include: string[];
@@ -153,7 +159,10 @@ export interface ScanOptions {
   ignoreUrls: string[];
 }
 
-/** Options for scanning the codebase for environment variable usage. */
+/**
+ * Extends the basic ScanOptions with additional parameters.
+ * All of these options are optional, as they may not be needed for every scan.
+ */
 export interface ScanUsageOptions extends ScanOptions {
   envPath?: string | undefined;
   examplePath?: string | undefined;
@@ -169,6 +178,9 @@ export interface ScanUsageOptions extends ScanOptions {
   inconsistentNamingWarnings?: boolean;
 }
 
+/**
+ * Result of scanning the codebase for environment variable usages.
+ */
 export interface ScanResult {
   used: EnvUsage[];
   missing: string[];
@@ -213,6 +225,9 @@ export type CompareJsonEntry = {
   ok?: boolean;
 };
 
+/**
+ * Options for comparing environment files (--compare flag).
+ */
 export interface ComparisonOptions {
   checkValues: boolean;
   cwd: string;
@@ -230,12 +245,27 @@ export interface ComparisonOptions {
   inconsistentNamingWarnings?: boolean;
 }
 
+/**
+ * Represents a resolved pair of environment files used for comparison.
+ *
+ * A FilePair describes one concrete comparison unit consisting of:
+ *  - an environment file (e.g. `.env`, `.env.production`)
+ *  - the example file it should be compared against
+ */
 export interface FilePair {
+  /** The name of the environment file (e.g. ".env", ".env.production") */
   envName: string;
+
+  /** Absolute path to the environment file */
   envPath: string;
+
+  /** Absolute path to the example file this env file is compared against */
   examplePath: string;
 }
 
+/**
+ * Result of filtering comparison results based on categories
+ */
 export type Filtered = {
   missing: string[];
   extra?: string[];
@@ -246,6 +276,9 @@ export type Filtered = {
   gitignoreIssue: { reason: 'no-gitignore' | 'not-ignored' } | null;
 };
 
+/** 
+ * JSON structure for scan results output
+ */
 export interface ScanJsonEntry {
   stats?: {
     filesScanned: number;
@@ -319,10 +352,16 @@ export interface ScanJsonEntry {
   healthScore?: number;
 }
 
+/**
+ * Result of the exit code determination after scanning or comparing.
+ */
 export interface ExitResult {
   exitWithError: boolean;
 }
 
+/**
+ * Warning about environment variable keys that are not uppercase.
+ */
 export interface UppercaseWarning {
   key: string;
   suggestion: string;

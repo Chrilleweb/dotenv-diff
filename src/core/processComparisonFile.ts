@@ -12,10 +12,11 @@ import type {
   ScanUsageOptions,
   ScanResult,
   DuplicateResult,
+  UppercaseWarning,
   Duplicate,
 } from '../config/types.js';
 
-export interface ProcessComparisonResult {
+interface ProcessComparisonResult {
   scanResult: ScanResult;
   envVariables: Record<string, string | undefined>;
   comparedAgainst: string;
@@ -28,7 +29,7 @@ export interface ProcessComparisonResult {
   addedExample: string[];
   gitignoreUpdated: boolean;
   exampleFull?: Record<string, string> | undefined;
-  uppercaseWarnings?: Array<{ key: string; suggestion: string }>;
+  uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: Array<{ key: string; date: string; daysLeft: number }>;
   inconsistentNamingWarnings?: Array<{
     key1: string;
@@ -61,7 +62,7 @@ export function processComparisonFile(
   let addedExample: string[] = [];
   let gitignoreUpdated = false;
   let exampleFull: Record<string, string> | undefined = undefined;
-  let uppercaseWarnings: Array<{ key: string; suggestion: string }> = [];
+  let uppercaseWarnings: UppercaseWarning[] = [];
   let expireWarnings: Array<{ key: string; date: string; daysLeft: number }> =
     [];
   let inconsistentNamingWarnings: Array<{
