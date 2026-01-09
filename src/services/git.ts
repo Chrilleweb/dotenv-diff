@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
+import { DEFAULT_ENV_FILE, GITIGNORE_FILE, GIT_DIR } from '../config/constants.js';
 
 interface GitignoreCheckOptions {
   /** Project root directory (default: process.cwd()) */
@@ -13,7 +14,7 @@ interface GitignoreCheckOptions {
 
 /** Are we in a git repo? (checks for .git directory in cwd) */
 export function isGitRepo(cwd = process.cwd()): boolean {
-  return fs.existsSync(path.resolve(cwd, '.git'));
+  return fs.existsSync(path.resolve(cwd, GIT_DIR));
 }
 
 /**
@@ -27,8 +28,8 @@ export function isGitRepo(cwd = process.cwd()): boolean {
 export function isEnvIgnoredByGit(
   options: GitignoreCheckOptions = {},
 ): boolean | null {
-  const { cwd = process.cwd(), envFile = '.env' } = options;
-  const gitignorePath = path.resolve(cwd, '.gitignore');
+  const { cwd = process.cwd(), envFile = DEFAULT_ENV_FILE } = options;
+  const gitignorePath = path.resolve(cwd, GITIGNORE_FILE);
   if (!fs.existsSync(gitignorePath)) return null;
 
   const raw = fs.readFileSync(gitignorePath, 'utf8');
@@ -55,7 +56,7 @@ export function isEnvIgnoredByGit(
  * @param envFile - The env file name (default: ".env")
  * @returns A set of candidate patterns
  */
-function getCandidatePatterns(envFile = '.env'): Set<string> {
+function getCandidatePatterns(envFile = DEFAULT_ENV_FILE): Set<string> {
   const base = envFile; // ".env"
   const star = `${base}*`; // ".env*"
   const dotStar = `${base}.*`; // ".env.*"
@@ -91,13 +92,13 @@ function matchesCandidate(pattern: string, envFile: string): boolean {
  * @returns console.log messages or void
  */
 export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
-  const { cwd = process.cwd(), envFile = '.env', log = console.log } = options;
+  const { cwd = process.cwd(), envFile = DEFAULT_ENV_FILE, log = console.log } = options;
 
   const envPath = path.resolve(cwd, envFile);
   if (!fs.existsSync(envPath)) return; // No .env file → nothing to warn about
   if (!isGitRepo(cwd)) return; // Not a git repo → skip
 
-  const gitignorePath = path.resolve(cwd, '.gitignore');
+  const gitignorePath = path.resolve(cwd, GITIGNORE_FILE);
 
   if (!fs.existsSync(gitignorePath)) {
     printGitignoreWarning({
@@ -127,13 +128,13 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
 export function checkGitignoreStatus(options: GitignoreCheckOptions = {}): {
   reason: 'no-gitignore' | 'not-ignored';
 } | null {
-  const { cwd = process.cwd(), envFile = '.env' } = options;
+  const { cwd = process.cwd(), envFile = DEFAULT_ENV_FILE } = options;
 
   const envPath = path.resolve(cwd, envFile);
   if (!fs.existsSync(envPath)) return null;
   if (!isGitRepo(cwd)) return null;
 
-  const gitignorePath = path.resolve(cwd, '.gitignore');
+  const gitignorePath = path.resolve(cwd, GITIGNORE_FILE);
 
   if (!fs.existsSync(gitignorePath)) {
     return { reason: 'no-gitignore' };
@@ -154,7 +155,7 @@ export function checkGitignoreStatus(options: GitignoreCheckOptions = {}): {
 export function findGitRoot(startDir: string): string | null {
   let dir = path.resolve(startDir);
   while (true) {
-    const gitDir = path.join(dir, '.git');
+    const gitDir = path.join(dir, GIT_DIR);
     if (fs.existsSync(gitDir)) return dir;
     const parent = path.dirname(dir);
     if (parent === dir) break; // reached filesystem root

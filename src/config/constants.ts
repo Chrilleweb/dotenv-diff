@@ -3,6 +3,8 @@
  */
 export const DEFAULT_ENV_FILE = '.env';
 export const DEFAULT_EXAMPLE_FILE = '.env.example';
+export const GIT_DIR = '.git';
+export const GITIGNORE_FILE = '.gitignore';
 
 /**
  * Common default candidates for environment files
