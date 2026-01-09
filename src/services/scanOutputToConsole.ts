@@ -99,7 +99,7 @@ export function outputToConsole(
 
   // Duplicates
   printDuplicates(
-    comparedAgainst || '.env',
+    comparedAgainst || DEFAULT_ENV_FILE,
     'example file',
     scanResult.duplicates?.env ?? [],
     scanResult.duplicates?.example ?? [],
