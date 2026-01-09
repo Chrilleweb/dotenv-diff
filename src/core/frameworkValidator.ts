@@ -1,4 +1,4 @@
-import { type EnvUsage, type frameworkWarning } from '../config/types.js';
+import { type EnvUsage, type FrameworkWarning } from '../config/types.js';
 import { detectFramework } from './frameworkDetector.js';
 import { applySvelteKitRules, applyNextJsRules } from './frameworks/index.js';
 
@@ -13,8 +13,8 @@ export function frameworkValidator(
   usages: EnvUsage[],
   cwd: string,
   fileContentMap?: Map<string, string>,
-): frameworkWarning[] {
-  const warnings: frameworkWarning[] = [];
+): FrameworkWarning[] {
+  const warnings: FrameworkWarning[] = [];
   const { framework } = detectFramework(cwd);
 
   for (const u of usages) {

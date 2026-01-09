@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { isEnvIgnoredByGit, isGitRepo, findGitRoot } from '../services/git.js';
+import { DEFAULT_GITIGNORE_ENV_PATTERNS } from '../config/constants.js';
 
 interface ApplyFixesOptions {
   envPath: string;
@@ -150,7 +151,7 @@ function updateGitignoreForEnv(envPath: string): boolean {
     }
 
     // Need to add patterns
-    const patterns = ['.env'];
+    const patterns = DEFAULT_GITIGNORE_ENV_PATTERNS;
 
     if (fs.existsSync(gitignorePath)) {
       const current = fs.readFileSync(gitignorePath, 'utf8');

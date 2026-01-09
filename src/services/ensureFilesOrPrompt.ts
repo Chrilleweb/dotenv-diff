@@ -3,6 +3,7 @@ import path from 'path';
 import { confirmYesNo } from '../ui/prompts.js';
 import { warnIfEnvNotIgnored } from './git.js';
 import { printPrompt } from '../ui/compare/printPrompt.js';
+import { DEFAULT_ENV_FILE } from '../config/constants.js';
 
 interface EnsureFilesResult {
   didCreate: boolean;
@@ -43,7 +44,9 @@ export async function ensureFilesOrPrompt(
 
   // Case 1: no .env and no .env.example
   if (!envExists && !exampleExists) {
-    const hasAnyEnv = fs.readdirSync(cwd).some((f) => f.startsWith('.env'));
+    const hasAnyEnv = fs
+      .readdirSync(cwd)
+      .some((f) => f.startsWith(DEFAULT_ENV_FILE));
     if (!hasAnyEnv) {
       printPrompt.noEnvFound();
       return { didCreate: false, shouldExit: true, exitCode: 0 };
@@ -66,7 +69,7 @@ export async function ensureFilesOrPrompt(
           );
 
     if (!createEnv) {
-      printPrompt.skipCreation('.env');
+      printPrompt.skipCreation(DEFAULT_ENV_FILE);
       return { didCreate: false, shouldExit: true, exitCode: 0 };
     }
 

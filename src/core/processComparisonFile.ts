@@ -12,23 +12,24 @@ import type {
   ScanUsageOptions,
   ScanResult,
   DuplicateResult,
+  UppercaseWarning,
   Duplicate,
 } from '../config/types.js';
 
-export interface ProcessComparisonResult {
+interface ProcessComparisonResult {
   scanResult: ScanResult;
   envVariables: Record<string, string | undefined>;
   comparedAgainst: string;
   duplicatesFound: boolean;
-  dupsEnv: Array<{ key: string; count: number }>;
-  dupsEx: Array<{ key: string; count: number }>;
+  dupsEnv: Duplicate[];
+  dupsEx: Duplicate[];
   fixApplied: boolean;
   removedDuplicates: string[];
   addedEnv: string[];
   addedExample: string[];
   gitignoreUpdated: boolean;
   exampleFull?: Record<string, string> | undefined;
-  uppercaseWarnings?: Array<{ key: string; suggestion: string }>;
+  uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: Array<{ key: string; date: string; daysLeft: number }>;
   inconsistentNamingWarnings?: Array<{
     key1: string;
@@ -53,15 +54,15 @@ export function processComparisonFile(
   let envVariables: Record<string, string | undefined> = {};
   let comparedAgainst = '';
   let duplicatesFound = false;
-  let dupsEnv: Array<{ key: string; count: number }> = [];
-  let dupsEx: Array<{ key: string; count: number }> = [];
+  let dupsEnv: Duplicate[] = [];
+  let dupsEx: Duplicate[] = [];
   let fixApplied = false;
   let removedDuplicates: string[] = [];
   let addedEnv: string[] = [];
   let addedExample: string[] = [];
   let gitignoreUpdated = false;
   let exampleFull: Record<string, string> | undefined = undefined;
-  let uppercaseWarnings: Array<{ key: string; suggestion: string }> = [];
+  let uppercaseWarnings: UppercaseWarning[] = [];
   let expireWarnings: Array<{ key: string; date: string; daysLeft: number }> =
     [];
   let inconsistentNamingWarnings: Array<{

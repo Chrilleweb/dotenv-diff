@@ -2,18 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import { type ScanUsageOptions } from '../config/types.js';
 import { resolveFromCwd } from './helpers/resolveFromCwd.js';
+import { DEFAULT_ENV_CANDIDATES } from '../config/constants.js';
 
 type ComparisonFile = {
   path: string;
   name: string;
 };
-
-const DEFAULT_ENV_FILES = [
-  '.env',
-  '.env.example',
-  '.env.local',
-  '.env.production',
-] as const;
 
 /**
  * Determines which file to use for comparison based on provided options
@@ -40,7 +34,7 @@ export function determineComparisonFile(
   }
 
   // Auto-discovery: look for common env files relative to cwd
-  for (const candidate of DEFAULT_ENV_FILES) {
+  for (const candidate of DEFAULT_ENV_CANDIDATES) {
     const fullPath = path.resolve(opts.cwd, candidate);
     if (fs.existsSync(fullPath)) {
       return { path: fullPath, name: candidate };

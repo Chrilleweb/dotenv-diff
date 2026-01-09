@@ -1,7 +1,10 @@
 import chalk from 'chalk';
-import { type frameworkWarning, type Framework } from '../../config/types.js';
+import {
+  type FrameworkWarning,
+  type DetectedFramework,
+} from '../../config/types.js';
 
-const FRAMEWORK_LABELS: Record<Framework, string> = {
+const FRAMEWORK_LABELS: Record<DetectedFramework, string> = {
   nextjs: 'Next.js',
   sveltekit: 'SvelteKit',
   unknown: 'Unknown Framework',
@@ -13,7 +16,7 @@ const FRAMEWORK_LABELS: Record<Framework, string> = {
  * @param json - Whether to output in JSON format
  */
 export function printFrameworkWarnings(
-  warnings: frameworkWarning[],
+  warnings: FrameworkWarning[],
   json: boolean,
 ): void {
   if (!warnings || warnings.length === 0) return;

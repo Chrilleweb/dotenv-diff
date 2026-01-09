@@ -14,7 +14,6 @@ import type {
   Filtered,
   DuplicateResult,
 } from '../config/types.js';
-import { isAllOk } from '../core/helpers/isAllOk.js';
 import { updateTotals } from '../core/helpers/updateTotals.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
@@ -294,4 +293,22 @@ function findDuplicates(
   );
 
   return { dupsEnv, dupsEx } satisfies DuplicateResult;
+}
+
+/**
+ * Checks if all filtered comparison results are okay (i.e., no issues found).
+ * This is used in compare.ts to determine if the comparison passed all checks.
+ * @param filtered - The filtered comparison results.
+ * @returns True if all checks pass, false otherwise.
+ */
+function isAllOk(filtered: Filtered): boolean {
+  return (
+    filtered.missing.length === 0 &&
+    (filtered.extra?.length ?? 0) === 0 &&
+    (filtered.empty?.length ?? 0) === 0 &&
+    filtered.duplicatesEnv.length === 0 &&
+    filtered.duplicatesEx.length === 0 &&
+    (filtered.mismatches?.length ?? 0) === 0 &&
+    !filtered.gitignoreIssue
+  );
 }

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { Discovery } from '../config/types.js';
+import { DEFAULT_ENV_FILE, DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 
 /**
  * Arguments for the discoverEnvFiles function.
@@ -26,13 +27,22 @@ export function discoverEnvFiles({
   // Find all .env* files in the current directory except .env.example*
   const envFiles = fs
     .readdirSync(cwd)
-    .filter((f) => f.startsWith('.env') && !f.startsWith('.env.example'))
+    .filter(
+      (f) =>
+        f.startsWith(DEFAULT_ENV_FILE) && !f.startsWith(DEFAULT_EXAMPLE_FILE),
+    )
     .sort((a, b) =>
-      a === '.env' ? -1 : b === '.env' ? 1 : a.localeCompare(b),
+      a === DEFAULT_ENV_FILE
+        ? -1
+        : b === DEFAULT_ENV_FILE
+          ? 1
+          : a.localeCompare(b),
     );
 
-  let primaryEnv = envFiles.includes('.env') ? '.env' : envFiles[0] || '.env';
-  let primaryExample = '.env.example';
+  let primaryEnv = envFiles.includes(DEFAULT_ENV_FILE)
+    ? DEFAULT_ENV_FILE
+    : envFiles[0] || DEFAULT_ENV_FILE;
+  let primaryExample = DEFAULT_EXAMPLE_FILE;
   let alreadyWarnedMissingEnv = false;
 
   // --env (without --example): force primaryEnv and try to find a matching example name via suffix
@@ -49,8 +59,12 @@ export function discoverEnvFiles({
 
     // try to find a matching example name based on the suffix
     const suffix =
-      envNameFromFlag === '.env' ? '' : envNameFromFlag.replace('.env', '');
-    const potentialExample = suffix ? `.env.example${suffix}` : '.env.example';
+      envNameFromFlag === DEFAULT_ENV_FILE
+        ? ''
+        : envNameFromFlag.replace(DEFAULT_ENV_FILE, '');
+    const potentialExample = suffix
+      ? `${DEFAULT_EXAMPLE_FILE}${suffix}`
+      : DEFAULT_EXAMPLE_FILE;
     if (fs.existsSync(path.resolve(cwd, potentialExample))) {
       primaryExample = potentialExample;
     }
@@ -61,9 +75,11 @@ export function discoverEnvFiles({
     const exampleNameFromFlag = path.basename(exampleFlag);
     primaryExample = exampleNameFromFlag;
 
-    if (exampleNameFromFlag.startsWith('.env.example')) {
-      const suffix = exampleNameFromFlag.slice('.env.example'.length);
-      const matchedEnv = suffix ? `.env${suffix}` : '.env';
+    if (exampleNameFromFlag.startsWith(DEFAULT_EXAMPLE_FILE)) {
+      const suffix = exampleNameFromFlag.slice(DEFAULT_EXAMPLE_FILE.length);
+      const matchedEnv = suffix
+        ? `${DEFAULT_ENV_FILE}${suffix}`
+        : DEFAULT_ENV_FILE;
 
       if (fs.existsSync(path.resolve(cwd, matchedEnv))) {
         primaryEnv = matchedEnv;

@@ -16,8 +16,7 @@ import { scanUsage } from '../commands/scanUsage.js';
 import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';
 import { loadConfig } from '../config/loadConfig.js';
-
-const DEFAULT_ENV_FILE = '.env';
+import { DEFAULT_ENV_FILE } from '../config/constants.js';
 
 /**
  * Run the CLI program
