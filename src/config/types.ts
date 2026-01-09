@@ -1,3 +1,4 @@
+import { ALLOWED_CATEGORIES } from './constants.js';
 import { type SecretFinding } from '../core/secretDetectors.js';
 import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
@@ -27,16 +28,6 @@ export interface DuplicateResult {
   dupsEnv: Duplicate[];
   dupsEx: Duplicate[];
 }
-
-// Allowed categories for comparison
-export const ALLOWED_CATEGORIES = [
-  'missing',
-  'extra',
-  'empty',
-  'mismatch',
-  'duplicate',
-  'gitignore',
-] as const;
 
 // Type representing a single category for comparison
 export type Category = (typeof ALLOWED_CATEGORIES)[number];
