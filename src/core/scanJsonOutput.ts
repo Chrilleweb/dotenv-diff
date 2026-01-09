@@ -1,8 +1,13 @@
-import type { ScanResult, EnvUsage, Duplicate, SupportedFramework } from '../config/types.js';
+import type {
+  ScanResult,
+  EnvUsage,
+  Duplicate,
+  SupportedFramework,
+} from '../config/types.js';
 import { computeHealthScore } from './computeHealthScore.js';
 import { normalizePath } from './helpers/normalizePath.js';
 
-/** 
+/**
  * JSON structure for scan results output
  */
 interface ScanJsonOutput {
