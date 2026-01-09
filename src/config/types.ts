@@ -124,25 +124,6 @@ export interface Options {
 };
 
 /**
- * Type representing a single entry in the comparison results
- * This entry contains the environment variable and its example value.
- */
-export type CompareJsonEntry = {
-  env: string;
-  example: string;
-  skipped?: { reason: string };
-  duplicates?: {
-    env?: Duplicate[];
-    example?: Duplicate[];
-  };
-  missing?: string[];
-  extra?: string[];
-  empty?: string[];
-  valueMismatches?: Array<{ key: string; expected: string; actual: string }>;
-  ok?: boolean;
-};
-
-/**
  * Represents a single usage of an environment variable in the codebase.
  */
 export interface EnvUsage {
@@ -158,30 +139,8 @@ export interface EnvUsage {
   isLogged?: boolean; // Whether this usage is logged to console
 }
 
-export interface ScanResult {
-  used: EnvUsage[];
-  missing: string[];
-  unused: string[];
-  stats: {
-    filesScanned: number;
-    totalUsages: number;
-    uniqueVariables: number;
-    warningsCount: number;
-    duration: number;
-  };
-  secrets: SecretFinding[];
-  duplicates: {
-    env?: Duplicate[];
-    example?: Duplicate[];
-  };
-  frameworkWarnings?: FrameworkWarning[];
-  exampleWarnings?: ExampleSecretWarning[];
-  logged: EnvUsage[];
-  uppercaseWarnings?: UppercaseWarning[];
-  expireWarnings?: ExpireWarning[];
-  inconsistentNamingWarnings?: InconsistentNamingWarning[];
-  fileContentMap?: Map<string, string>;
-}
+// Type for grouped usages by variable
+export type VariableUsages = Record<string, EnvUsage[]>;
 
 export interface ScanOptions {
   cwd: string;
@@ -209,6 +168,83 @@ export interface ScanUsageOptions extends ScanOptions {
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
 }
+
+export interface ScanResult {
+  used: EnvUsage[];
+  missing: string[];
+  unused: string[];
+  stats: {
+    filesScanned: number;
+    totalUsages: number;
+    uniqueVariables: number;
+    warningsCount: number;
+    duration: number;
+  };
+  secrets: SecretFinding[];
+  duplicates: {
+    env?: Duplicate[];
+    example?: Duplicate[];
+  };
+  frameworkWarnings?: FrameworkWarning[];
+  exampleWarnings?: ExampleSecretWarning[];
+  logged: EnvUsage[];
+  uppercaseWarnings?: UppercaseWarning[];
+  expireWarnings?: ExpireWarning[];
+  inconsistentNamingWarnings?: InconsistentNamingWarning[];
+  fileContentMap?: Map<string, string>;
+}
+
+/**
+ * Type representing a single entry in the comparison results
+ * This entry contains the environment variable and its example value.
+ */
+export type CompareJsonEntry = {
+  env: string;
+  example: string;
+  skipped?: { reason: string };
+  duplicates?: {
+    env?: Duplicate[];
+    example?: Duplicate[];
+  };
+  missing?: string[];
+  extra?: string[];
+  empty?: string[];
+  valueMismatches?: Array<{ key: string; expected: string; actual: string }>;
+  ok?: boolean;
+};
+
+export interface ComparisonOptions {
+  checkValues: boolean;
+  cwd: string;
+  allowDuplicates?: boolean;
+  fix?: boolean;
+  json?: boolean;
+  ignore: string[];
+  ignoreRegex: RegExp[];
+  collect?: (entry: CompareJsonEntry) => void;
+  only?: Category[];
+  showStats?: boolean;
+  strict?: boolean;
+  uppercaseKeys?: boolean;
+  expireWarnings?: boolean;
+  inconsistentNamingWarnings?: boolean;
+}
+
+export interface FilePair {
+  envName: string;
+  envPath: string;
+  examplePath: string;
+}
+
+export type Filtered = {
+  missing: string[];
+  extra?: string[];
+  empty?: string[];
+  mismatches?: Array<{ key: string; expected: string; actual: string }>;
+  duplicatesEnv: Duplicate[];
+  duplicatesEx: Duplicate[];
+  gitignoreIssue: { reason: 'no-gitignore' | 'not-ignored' } | null;
+};
 
 export interface ScanJsonEntry {
   stats?: {
@@ -283,45 +319,9 @@ export interface ScanJsonEntry {
   healthScore?: number;
 }
 
-// Type for grouped usages by variable
-export type VariableUsages = Record<string, EnvUsage[]>;
-
-export interface ComparisonOptions {
-  checkValues: boolean;
-  cwd: string;
-  allowDuplicates?: boolean;
-  fix?: boolean;
-  json?: boolean;
-  ignore: string[];
-  ignoreRegex: RegExp[];
-  collect?: (entry: CompareJsonEntry) => void;
-  only?: Category[];
-  showStats?: boolean;
-  strict?: boolean;
-  uppercaseKeys?: boolean;
-  expireWarnings?: boolean;
-  inconsistentNamingWarnings?: boolean;
-}
-
-export interface FilePair {
-  envName: string;
-  envPath: string;
-  examplePath: string;
-}
-
 export interface ExitResult {
   exitWithError: boolean;
 }
-
-export type Filtered = {
-  missing: string[];
-  extra?: string[];
-  empty?: string[];
-  mismatches?: Array<{ key: string; expected: string; actual: string }>;
-  duplicatesEnv: Duplicate[];
-  duplicatesEx: Duplicate[];
-  gitignoreIssue: { reason: 'no-gitignore' | 'not-ignored' } | null;
-};
 
 export interface UppercaseWarning {
   key: string;
