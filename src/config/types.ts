@@ -367,12 +367,25 @@ export interface UppercaseWarning {
   suggestion: string;
 }
 
+/**
+ * Warning about environment variable keys that have expiration dates.
+ * fx:
+ * 
+ * # @expire 2025-12-31
+ * API_KEY=
+ * 
+ * This will generate a warning that API_KEY expires on 2025-12-31.
+ */
 export interface ExpireWarning {
   key: string;
   date: string;
   daysLeft: number;
 }
 
+/**
+ * Warning about inconsistent naming of environment variable keys.
+ * fx: If you have both SECRET_KEY and SECRETKEY (inconsistent naming)
+ */
 export interface InconsistentNamingWarning {
   key1: string;
   key2: string;
