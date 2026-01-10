@@ -1,10 +1,6 @@
 import path from 'path';
-import {
-  ALLOWED_CATEGORIES,
-  type Category,
-  type Options,
-  type RawOptions,
-} from './types.js';
+import type { Category, Options, RawOptions } from './types.js';
+import { ALLOWED_CATEGORIES } from './constants.js';
 import {
   printInvalidCategory,
   printInvalidRegex,

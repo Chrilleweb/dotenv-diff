@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { type Filtered } from '../../config/types.js';
+import type { Filtered } from '../../config/types.js';
 
 /**
  * Prints tips for fixing issues found during the comparison.

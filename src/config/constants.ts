@@ -25,7 +25,7 @@ export const GITIGNORE_FILE = '.gitignore';
 /**
  * Common environment file variants checked during auto-discovery.
  * Listed in priority order - earlier entries are preferred when multiple exist.
- * 
+ *
  * @remarks
  * - `.env` - Primary environment file (should be git-ignored)
  * - `.env.example` - Template file (should be committed)
@@ -44,3 +44,16 @@ export const DEFAULT_ENV_CANDIDATES = [
  * These files should always be git-ignored to prevent committing secrets.
  */
 export const DEFAULT_GITIGNORE_ENV_PATTERNS = [DEFAULT_ENV_FILE] as const;
+
+/**
+ * Allowed categories for filtering comparison results.
+ * These categories can be used to focus on specific types of differences.
+ */
+export const ALLOWED_CATEGORIES = [
+  'missing',
+  'extra',
+  'empty',
+  'mismatch',
+  'duplicate',
+  'gitignore',
+] as const;

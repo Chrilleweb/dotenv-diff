@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { type SecretFinding } from '../../core/secretDetectors.js';
+import type { SecretFinding } from '../../core/secretDetectors.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
 
 /** Get the color function for the severity level.

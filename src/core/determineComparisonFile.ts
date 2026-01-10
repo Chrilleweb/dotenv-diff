@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { type ScanUsageOptions } from '../config/types.js';
+import type { ScanUsageOptions } from '../config/types.js';
 import { resolveFromCwd } from './helpers/resolveFromCwd.js';
 import { DEFAULT_ENV_CANDIDATES } from '../config/constants.js';
 
