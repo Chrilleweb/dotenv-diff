@@ -2,6 +2,7 @@ import type { ScanResult } from '../config/types.js';
 
 /**
  * Compares the scan result with the environment variables.
+ * This function identifies missing and unused environment variables.
  * @param scanResult - The result of the scan.
  * @param envVariables - The environment variables to compare against.
  * @returns The comparison result.

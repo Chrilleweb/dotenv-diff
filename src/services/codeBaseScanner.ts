@@ -28,40 +28,30 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const fileContentMap = new Map<string, string>();
 
   for (const filePath of files) {
-    try {
-      const content = await fs.readFile(filePath, 'utf-8');
+    const content = await safeReadFile(filePath);
+    if (!content) continue;
 
-      const fileUsages = scanFile(filePath, content, opts);
-      allUsages.push(...fileUsages);
+    // Scan the file for environment variable usages
+    const fileUsages = scanFile(filePath, content, opts);
+    allUsages.push(...fileUsages);
 
-      // Store file content for framework validation
-      const relativePath = path.relative(opts.cwd, filePath);
-      fileContentMap.set(relativePath, content);
-      if (opts.secrets) {
-        try {
-          const sec = detectSecretsInSource(relativePath, content, opts).filter(
-            (s) => s.severity !== 'low',
-          );
+    // Store file content for later use (e.g., framework validation 'use client')
+    const relativePath = path.relative(opts.cwd, filePath);
+    fileContentMap.set(relativePath, content);
 
-          if (sec.length) allSecrets.push(...sec);
-        } catch {
-          // Ignore secret detection errors
-        }
-      }
-      // Count successfully scanned files
-      filesScanned++;
+    // Detect secrets in the file content
+    const secrets = safeDetectSecrets(relativePath, content, opts);
+    if (secrets.length) allSecrets.push(...secrets);
 
-      // Update every 10 files, or always on first and last
-      if (filesScanned === 1 || filesScanned % 10 === 0 || filesScanned === files.length) {
-        printProgress({
-          isJson: opts.json,
-          current: filesScanned,
-          total: files.length,
-        });
-      }
-    } catch {
-      // Skip files we can't read (binary, permissions, etc.)
-      continue;
+    // Count successfully scanned files
+    filesScanned++;
+
+    if (shouldPrintProgress(filesScanned, files.length)) {
+      printProgress({
+        isJson: opts.json,
+        current: filesScanned,
+        total: files.length,
+      });
     }
   }
 
@@ -95,4 +85,49 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     logged: loggedVariables,
     fileContentMap,
   };
+}
+
+/**
+ * Detects secrets in the given file content if secret detection is enabled.
+ * @param relativePath - The relative path of the file being scanned.
+ * @param content - The content of the file.
+ * @param opts - The scan options.
+ * @returns An array of secret findings.
+ */
+function safeDetectSecrets(
+  relativePath: string,
+  content: string,
+  opts: ScanOptions,
+): SecretFinding[] {
+  if (!opts.secrets) return [];
+
+  try {
+    return detectSecretsInSource(relativePath, content, opts).filter(
+      (s) => s.severity !== 'low',
+    );
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Safely reads a file and returns its content or null if reading fails.
+ * @param filePath - The path to the file to read.
+ * @returns The file content as a string, or null if an error occurs.
+ */
+async function safeReadFile(filePath: string): Promise<string | null> {
+  try {
+    return await fs.readFile(filePath, 'utf-8');
+  } catch {
+    return null;
+  }
+}
+
+/** * Determines whether to print progress based on the number of files scanned.
+ * @param scanned - The number of files scanned so far.
+ * @param total - The total number of files to scan.
+ * @returns True if progress should be printed, false otherwise.
+ */
+function shouldPrintProgress(scanned: number, total: number): boolean {
+  return scanned === 1 || scanned % 10 === 0 || scanned === total;
 }
