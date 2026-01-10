@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import {
-  type FrameworkWarning,
-  type DetectedFramework,
+import type {
+  FrameworkWarning,
+  DetectedFramework,
 } from '../../config/types.js';
 
 const FRAMEWORK_LABELS: Record<DetectedFramework, string> = {

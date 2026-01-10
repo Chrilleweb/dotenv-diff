@@ -1,5 +1,4 @@
-import type { CompareJsonEntry } from '../../config/types.js';
-import type { Filtered } from '../../config/types.js';
+import type { CompareJsonEntry, Filtered } from '../../config/types.js';
 
 export interface Totals {
   missing: number;

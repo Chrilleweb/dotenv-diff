@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { type Options } from '../../config/types.js';
+import type { Options } from '../../config/types.js';
 
 /**
  * @param opts - Options containing noColor flag

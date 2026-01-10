@@ -1,4 +1,4 @@
-import { type EnvUsage, type FrameworkWarning } from '../../config/types.js';
+import type { EnvUsage, FrameworkWarning } from '../../config/types.js';
 import { normalizePath } from './../helpers/normalizePath.js';
 
 /**
