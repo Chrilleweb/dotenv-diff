@@ -337,4 +337,42 @@ describe('no-flag autoscan', () => {
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('Used in: src/index.ts:1');
   });
+
+  it('shows progress bar during scanning in non-json mode', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `const apiKey = process.env.API_KEY;`,
+    );
+
+    const res = runCli(cwd, []);
+
+    expect(res.status).toBe(0);
+
+    expect(res.stdout).toContain('🔍');
+    expect(res.stdout).toMatch(/█|░/);
+
+    expect(res.stdout).toContain('Scan Statistics');
+  });
+
+  it('does not render progress bar when --json is enabled', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `const apiKey = process.env.API_KEY;`,
+    );
+
+    const res = runCli(cwd, ['--json']);
+
+    expect(res.status).toBe(0);
+
+    expect(res.stdout).not.toContain('🔍');
+    expect(res.stdout).not.toMatch(/█|░/);
+
+    expect(res.stdout.trim().startsWith('{')).toBe(true);
+  });
 });
