@@ -144,6 +144,7 @@ export interface ScanOptions {
   files: string[];
   secrets: boolean;
   ignoreUrls: string[];
+  json: boolean;
 }
 
 /**
@@ -154,7 +155,6 @@ export interface ScanUsageOptions extends ScanOptions {
   envPath?: string | undefined;
   examplePath?: string | undefined;
   fix?: boolean;
-  json?: boolean;
   showUnused?: boolean;
   showStats?: boolean;
   isCiMode?: boolean;

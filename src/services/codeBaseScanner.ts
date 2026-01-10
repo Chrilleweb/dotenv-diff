@@ -8,6 +8,7 @@ import {
 import { DEFAULT_EXCLUDE_PATTERNS } from '../core/patterns.js';
 import { scanFile } from '../core/scanFile.js';
 import { findFiles } from './fileWalker.js';
+import { printProgress } from '../ui/scan/printProgress.js';
 
 /**
  * Scans the codebase for environment variable usage based on the provided options.
@@ -49,6 +50,15 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       }
       // Count successfully scanned files
       filesScanned++;
+
+      // Update every 10 files, or always on first and last
+      if (filesScanned === 1 || filesScanned % 10 === 0 || filesScanned === files.length) {
+        printProgress({
+          isJson: opts.json,
+          current: filesScanned,
+          total: files.length,
+        });
+      }
     } catch {
       // Skip files we can't read (binary, permissions, etc.)
       continue;
