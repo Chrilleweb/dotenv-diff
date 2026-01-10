@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 
 interface ProgressOptions {
-  isJson?: boolean;
+  isJson: boolean;
   current: number;
   total: number;
   label?: string;
