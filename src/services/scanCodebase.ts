@@ -4,7 +4,7 @@ import type { EnvUsage, ScanOptions, ScanResult } from '../config/types.js';
 import {
   detectSecretsInSource,
   type SecretFinding,
-} from '../core/secretDetectors.js';
+} from '../core/security/secretDetectors.js';
 import { DEFAULT_EXCLUDE_PATTERNS } from '../core/patterns.js';
 import { scanFile } from '../core/scanFile.js';
 import { findFiles } from './fileWalker.js';

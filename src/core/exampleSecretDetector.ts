@@ -1,5 +1,8 @@
-import { PROVIDER_PATTERNS, SUSPICIOUS_KEYS } from './secretDetectors.js';
-import { shannonEntropyNormalized } from './entropy.js';
+import {
+  PROVIDER_PATTERNS,
+  SUSPICIOUS_KEYS,
+} from './security/secretDetectors.js';
+import { shannonEntropyNormalized } from './security/entropy.js';
 
 export interface ExampleSecretWarning {
   key: string;

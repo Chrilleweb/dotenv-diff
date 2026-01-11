@@ -1,7 +1,7 @@
 import path from 'path';
 import type { EnvUsage, ScanOptions } from '../config/types.js';
 import { ENV_PATTERNS } from './patterns.js';
-import { hasIgnoreComment } from '../core/secretDetectors.js';
+import { hasIgnoreComment } from './security/secretDetectors.js';
 
 /**
  * Scans a file for environment variable usage.

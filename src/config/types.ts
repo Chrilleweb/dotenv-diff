@@ -1,5 +1,5 @@
 import { ALLOWED_CATEGORIES } from './constants.js';
-import { type SecretFinding } from '../core/secretDetectors.js';
+import { type SecretFinding } from '../core/security/secretDetectors.js';
 import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
 
 // Supported frameworks
