@@ -7,11 +7,21 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 
-- Added progress bar to codebase scanner.
+-
 
 ### Changed
 
 -
+
+### Fixed
+
+-
+
+## [2.4.7] - 2026-01-11
+
+### Added
+
+- Added progress bar to codebase scanner.
 
 ### Fixed
 
