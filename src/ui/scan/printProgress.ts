@@ -37,7 +37,9 @@ export function printProgress(options: ProgressOptions): void {
   const emptyBar = chalk.dim('░'.repeat(barLength - filledLength));
   const bar = filledBar + emptyBar;
 
-  const percentLabel = chalk.yellow(`${percentage.toString().padStart(3, ' ')}%`);
+  const percentLabel = chalk.yellow(
+    `${percentage.toString().padStart(3, ' ')}%`,
+  );
   const countLabel = chalk.dim(`(${clampedCurrent}/${total} files)`);
 
   process.stdout.write(
