@@ -1,4 +1,4 @@
-import { scanCodebase } from '../services/codeBaseScanner.js';
+import { scanCodebase } from '../services/scanCodebase.js';
 import type {
   ScanUsageOptions,
   EnvUsage,
