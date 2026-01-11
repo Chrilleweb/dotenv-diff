@@ -1,6 +1,6 @@
-import type { EnvUsage, FrameworkWarning } from '../config/types.js';
+import type { EnvUsage, FrameworkWarning } from '../../config/types.js';
 import { detectFramework } from './frameworkDetector.js';
-import { applySvelteKitRules, applyNextJsRules } from './frameworks/index.js';
+import { applySvelteKitRules, applyNextJsRules } from './index.js';
 
 /**
  * Validates environment variable usages against framework-specific rules

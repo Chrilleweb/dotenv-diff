@@ -12,7 +12,7 @@ import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../core/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/secretDetectors.js';
-import { frameworkValidator } from '../core/frameworkValidator.js';
+import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
 
 /**
