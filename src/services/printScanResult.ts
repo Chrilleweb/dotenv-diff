@@ -34,13 +34,13 @@ interface FixContext {
 }
 
 /**
- * Outputs the scan results to the console.
+ * Prints the scan result to the console.
  * @param scanResult - The result of the scan.
  * @param opts - The scan options.
  * @param comparedAgainst - The file being compared against.
  * @returns An object indicating whether to exit with an error.
  */
-export function outputToConsole(
+export function printScanResult(
   scanResult: ScanResult,
   opts: ScanUsageOptions,
   comparedAgainst: string,

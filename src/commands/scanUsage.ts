@@ -6,7 +6,7 @@ import type {
   ScanResult,
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
-import { outputToConsole } from '../services/scanOutputToConsole.js';
+import { printScanResult } from '../services/printScanResult.js';
 import { createJsonOutput } from '../core/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../core/processComparisonFile.js';
@@ -148,7 +148,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   }
 
   // Console output
-  const result = outputToConsole(scanResult, opts, comparedAgainst, {
+  const result = printScanResult(scanResult, opts, comparedAgainst, {
     fixApplied,
     removedDuplicates,
     addedEnv: fixedKeys,
