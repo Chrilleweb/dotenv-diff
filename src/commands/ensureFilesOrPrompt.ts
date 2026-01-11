@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { confirmYesNo } from '../ui/prompts.js';
-import { warnIfEnvNotIgnored } from './git.js';
+import { warnIfEnvNotIgnored } from '../services/git.js';
 import { printPrompt } from '../ui/compare/printPrompt.js';
 import { DEFAULT_ENV_FILE } from '../config/constants.js';
 

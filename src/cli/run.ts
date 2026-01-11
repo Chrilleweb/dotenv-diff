@@ -4,7 +4,7 @@ import path from 'path';
 import { normalizeOptions } from '../config/options.js';
 import { discoverEnvFiles } from '../core/envDiscovery.js';
 import { pairWithExample } from '../core/envPairing.js';
-import { ensureFilesOrPrompt } from '../services/ensureFilesOrPrompt.js';
+import { ensureFilesOrPrompt } from '../commands/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
 import type {
   CompareJsonEntry,
