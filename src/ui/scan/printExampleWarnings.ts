@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { ExampleSecretWarning } from '../../core/exampleSecretDetector';
+import type { ExampleSecretWarning } from '../../core/security/exampleSecretDetector';
 
 /**
  * Prints example file secret warnings to the console.

@@ -1,4 +1,4 @@
-import { scanCodebase } from '../services/codeBaseScanner.js';
+import { scanCodebase } from '../services/scanCodebase.js';
 import type {
   ScanUsageOptions,
   EnvUsage,
@@ -6,14 +6,14 @@ import type {
   ScanResult,
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
-import { outputToConsole } from '../services/scanOutputToConsole.js';
+import { printScanResult } from '../services/printScanResult.js';
 import { createJsonOutput } from '../core/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../core/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
-import { hasIgnoreComment } from '../core/secretDetectors.js';
+import { hasIgnoreComment } from '../core/security/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
-import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
+import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
 
 /**
  * Scans the codebase for environment variable usage and compares it with
@@ -148,7 +148,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   }
 
   // Console output
-  const result = outputToConsole(scanResult, opts, comparedAgainst, {
+  const result = printScanResult(scanResult, opts, comparedAgainst, {
     fixApplied,
     removedDuplicates,
     addedEnv: fixedKeys,

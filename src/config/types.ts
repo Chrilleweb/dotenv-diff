@@ -1,6 +1,6 @@
 import { ALLOWED_CATEGORIES } from './constants.js';
-import { type SecretFinding } from '../core/secretDetectors.js';
-import { type ExampleSecretWarning } from '../core/exampleSecretDetector.js';
+import { type SecretFinding } from '../core/security/secretDetectors.js';
+import { type ExampleSecretWarning } from '../core/security/exampleSecretDetector.js';
 
 // Supported frameworks
 export type SupportedFramework = 'sveltekit' | 'nextjs';
