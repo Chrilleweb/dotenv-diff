@@ -3,7 +3,7 @@ import path from 'path';
 import { parseEnvFile } from '../core/parseEnv.js';
 import { diffEnv } from '../core/diffEnv.js';
 import { checkGitignoreStatus } from '../services/git.js';
-import { findDuplicateKeys } from '../services/duplicates.js';
+import { findDuplicateKeys } from '../core/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type {
   Category,

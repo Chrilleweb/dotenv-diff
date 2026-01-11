@@ -2,7 +2,7 @@ import fs from 'fs';
 import { parseEnvFile } from './parseEnv.js';
 import { filterIgnoredKeys } from './filterIgnoredKeys.js';
 import { compareWithEnvFiles } from './compareScan.js';
-import { findDuplicateKeys } from '../services/duplicates.js';
+import { findDuplicateKeys } from './duplicates.js';
 import { applyFixes } from './fixEnv.js';
 import { toUpperSnakeCase } from './helpers/toUpperSnakeCase.js';
 import { resolveFromCwd } from './helpers/resolveFromCwd.js';
