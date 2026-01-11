@@ -2,7 +2,7 @@ import type { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import { normalizeOptions } from '../config/options.js';
-import { discoverEnvFiles } from '../services/envDiscovery.js';
+import { discoverEnvFiles } from '../core/envDiscovery.js';
 import { pairWithExample } from '../core/envPairing.js';
 import { ensureFilesOrPrompt } from '../services/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
