@@ -13,7 +13,7 @@ import { processComparisonFile } from '../core/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/security/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
-import { detectSecretsInExample } from '../core/exampleSecretDetector.js';
+import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
 
 /**
  * Scans the codebase for environment variable usage and compares it with
