@@ -15,7 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
--
+- Fixed rules for sveltekit framework
 
 ## [2.4.7] - 2026-01-11
 
