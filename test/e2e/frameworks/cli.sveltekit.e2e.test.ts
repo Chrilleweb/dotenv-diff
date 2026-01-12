@@ -303,4 +303,67 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     );
     expect(res.stdout).toContain('API_KEY');
   });
+
+  it('warns when using $env/dynamic/private inside a .svelte component', () => {
+    const cwd = tmpDir();
+    makeSvelteKitProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/routes/+page.svelte'),
+      `<script>
+      import SECRET from '$env/dynamic/private';
+      console.log(SECRET);
+    </script>`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET=123');
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.stdout).toContain(
+      '$env/dynamic/private cannot be used in Svelte components',
+    );
+  });
+
+  it('does warn when using $env/static/private in +page.svelte file', () => {
+    const cwd = tmpDir();
+    makeSvelteKitProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/routes/+page.svelte'),
+      `import SECRET_KEY from '$env/static/private';`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=123');
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.stdout).toContain(
+      'Private env vars cannot be used in Svelte components',
+    );
+  });
+
+  it('does not warn when using $env/dynamic/private in +page.server.ts', () => {
+    const cwd = tmpDir();
+    makeSvelteKitProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/routes/+page.server.ts'),
+      `import SECRET from '$env/dynamic/private';
+
+     export function load() {
+       return {
+         secret: SECRET
+       };
+     }`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET=123');
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Private env vars');
+    expect(res.stdout).not.toContain('warning');
+  });
 });

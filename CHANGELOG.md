@@ -15,7 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
-- Fixed rules for sveltekit framework
+- Fixed rules for sveltekit framework to correctly identify environment variable usage in $env/static/private and $env/dynamic/private imports.
 
 ## [2.4.7] - 2026-01-11
 

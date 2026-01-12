@@ -12,6 +12,18 @@ export const ENV_PATTERNS = [
     name: 'sveltekit' as const,
     regex: /\$env\/(?:static|dynamic)\/(?:private|public)\/([A-Z_][A-Z0-9_]*)/g,
   },
+  {
+    name: 'sveltekit' as const,
+    // matches import { SECRET }  from '$env/dynamic/private';
+    regex:
+      /import\s*\{\s*([A-Z_][A-Z0-9_]*)\s*\}\s*from\s*['"]\$env\/(?:static|dynamic)\/(?:private|public)['"]/g,
+  },
+  {
+    name: 'sveltekit' as const,
+    // matches: import SECRET from '$env/dynamic/private';
+    regex:
+      /import\s+([A-Z_][A-Z0-9_]*)\s+from\s+['"]\$env\/(?:static|dynamic)\/(?:private|public)['"]/g,
+  },
 ];
 
 // Default file extensions to include in scans
