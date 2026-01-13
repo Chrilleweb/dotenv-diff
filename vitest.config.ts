@@ -5,5 +5,9 @@ export default defineConfig({
     exclude: ['dist', 'node_modules'],
     testTimeout: 15000,
     hookTimeout: 50000,
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['text'],
+    },
   },
 });
