@@ -311,8 +311,8 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+page.svelte'),
       `<script>
-      import SECRET from '$env/dynamic/private';
-      console.log(SECRET);
+      import { env } from '$env/dynamic/private';
+      console.log(env.SECRET);
     </script>`,
     );
 
@@ -349,11 +349,11 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+page.server.ts'),
-      `import SECRET from '$env/dynamic/private';
+      `import { env } from '$env/dynamic/private';
 
      export function load() {
        return {
-         secret: SECRET
+         secret: env.SECRET
        };
      }`,
     );
@@ -373,9 +373,9 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/api.ts'),
-      `import SECRET from '$env/dynamic/private';
+      `import { env } from '$env/dynamic/private';
       
-      console.log(SECRET);`,
+      console.log(env.SECRET);`,
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'SECRET=123');
@@ -394,8 +394,8 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+page.svelte'),
       `<script>
-      import { PUBLIC_KEY } from '$env/dynamic/public';
-      console.log(PUBLIC_KEY);
+      import { env } from '$env/dynamic/public';
+      console.log(env.PUBLIC_KEY);
     </script>`,
     );
 
@@ -413,9 +413,9 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/api.ts'),
-      `import { PUBLIC_KEY } from '$env/dynamic/public';
+      `import { env } from '$env/dynamic/public';
       
-      console.log(PUBLIC_KEY);`,
+      console.log(env.PUBLIC_KEY);`,
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'PUBLIC_KEY=123');
@@ -471,9 +471,9 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/hooks.server.ts'),
-      `import SECRET from '$env/dynamic/private';
+      `import { env } from '$env/dynamic/private';
       
-      console.log(SECRET);`,
+      console.log(env.SECRET);`,
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'SECRET=123');
@@ -490,9 +490,9 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/hooks.client.ts'),
-      `import { PUBLIC_KEY } from '$env/dynamic/public';
+      `import { env } from '$env/dynamic/public';
       
-      console.log(PUBLIC_KEY);`,
+      console.log(env.PUBLIC_KEY);`,
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'PUBLIC_KEY=123');

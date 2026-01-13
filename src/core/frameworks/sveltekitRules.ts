@@ -56,8 +56,8 @@ export function applySvelteKitRules(
 
   if (
     u.pattern === 'sveltekit' &&
-    u.context.includes('$env/dynamic/private') &&
-    !isServerFile
+    u.imports?.includes('$env/dynamic/private') &&
+    (isSvelteFile || isClientFile)
   ) {
     warnings.push({
       variable: u.variable,
@@ -70,7 +70,7 @@ export function applySvelteKitRules(
   }
 
   // $env/static/private
-  if (u.pattern === 'sveltekit' && u.context.includes('$env/static/private')) {
+  if (u.pattern === 'sveltekit' && u.imports?.includes('$env/static/private')) {
     if (u.variable.startsWith('VITE_')) {
       warnings.push({
         variable: u.variable,
@@ -108,7 +108,7 @@ export function applySvelteKitRules(
   // $env/static/public
   if (
     u.pattern === 'sveltekit' &&
-    u.context.includes('$env/static/public') &&
+    u.imports?.includes('$env/static/public') &&
     !u.variable.startsWith('PUBLIC_')
   ) {
     warnings.push({
