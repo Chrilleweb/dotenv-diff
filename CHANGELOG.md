@@ -17,6 +17,12 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 -
 
+## [2.4.9] - 2026-01-13
+
+### Fixed
+
+- Fixed sveltekit framework bug where process.env usage in +server.ts files were given a false warning.
+
 ## [2.4.8] - 2026-01-13
 
 ### Added
