@@ -22,10 +22,10 @@ export const ENV_PATTERNS = [
   },
 
   // SvelteKit dynamic env object
-  // env.SECRET
+  // env.SECRET (Only matches .env variables accessed via env.VAR syntax)
   {
     name: 'sveltekit' as const,
-    regex: /(?<!import\.meta\.)\benv\.([A-Z_][A-Z0-9_]*)/g,
+    regex: /(?<![.\w])env\.([A-Z_][A-Z0-9_]*)/g,
   },
 
   // named import from dynamic is invalid in SvelteKit
