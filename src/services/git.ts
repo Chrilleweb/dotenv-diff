@@ -88,12 +88,9 @@ function matchesCandidate(pattern: string, envFile: string): boolean {
   return getCandidatePatterns(envFile).has(pattern);
 }
 
-/**
- * Logs a friendly warning if .env is not ignored by Git.
- * - Does not hard fail: non-blocking DX.
- * - Skips if not in a git repo or if .env does not exist.
- * @param options - Options for the warning behavior.
- * @returns console.log messages or void
+/** Warns the user if the .env file is not properly ignored by git
+ * @param options - Options for the gitignore check.
+ * @returns void
  */
 export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
   const {
@@ -103,27 +100,18 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
   } = options;
 
   const envPath = path.resolve(cwd, envFile);
-  if (!fs.existsSync(envPath)) return; // No .env file → nothing to warn about
-  if (!isGitRepo(cwd)) return; // Not a git repo → skip
+  if (!fs.existsSync(envPath)) return;
+  if (!isGitRepo(cwd)) return;
 
-  const gitignorePath = path.resolve(cwd, GITIGNORE_FILE);
+  const ignored = isEnvIgnoredByGit({ cwd, envFile });
 
-  if (!fs.existsSync(gitignorePath)) {
-    printGitignoreWarning({
-      envFile,
-      reason: 'no-gitignore',
-      log,
-    });
+  if (ignored === null) {
+    printGitignoreWarning({ envFile, reason: 'no-gitignore', log });
     return;
   }
 
-  const ignored = isEnvIgnoredByGit({ cwd, envFile });
-  if (ignored === false || ignored === null) {
-    printGitignoreWarning({
-      envFile,
-      reason: 'not-ignored',
-      log,
-    });
+  if (ignored === false) {
+    printGitignoreWarning({ envFile, reason: 'not-ignored', log });
   }
 }
 
