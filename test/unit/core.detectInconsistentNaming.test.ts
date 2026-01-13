@@ -64,4 +64,38 @@ describe('detectInconsistentNaming', () => {
 
     expect(warnings).toHaveLength(1);
   });
+
+  it('skips undefined keys in the array', () => {
+    const keys = ['API_KEY', undefined, 'APIKEY', undefined] as any[];
+    const warnings = detectInconsistentNaming(keys);
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].key1).toBe('API_KEY');
+    expect(warnings[0].key2).toBe('APIKEY');
+  });
+
+  it('suggests snake_case key when key1 has underscores', () => {
+    const keys = ['API_KEY', 'APIKEY'];
+    const warnings = detectInconsistentNaming(keys);
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].suggestion).toContain('API_KEY');
+  });
+
+  it('suggests snake_case key when key2 has underscores', () => {
+    const keys = ['APIKEY', 'API_KEY'];
+    const warnings = detectInconsistentNaming(keys);
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].suggestion).toContain('API_KEY');
+  });
+
+  it('avoids duplicate warnings when same key appears multiple times', () => {
+    const keys = ['API_KEY', 'APIKEY', 'API_KEY'];
+    const warnings = detectInconsistentNaming(keys);
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].key1).toBe('API_KEY');
+    expect(warnings[0].key2).toBe('APIKEY');
+  });
 });
