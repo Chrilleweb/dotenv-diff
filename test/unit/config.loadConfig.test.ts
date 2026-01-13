@@ -137,7 +137,7 @@ describe('loadConfig', () => {
     process.chdir(oldCwd);
 
     expect(loadedSpy).toHaveBeenCalledOnce();
-    expect(loadedSpy).toHaveBeenCalledWith(configPath);
+    expect(loadedSpy).toHaveBeenCalledWith(fs.realpathSync(configPath));
 
     loadedSpy.mockRestore();
   });
