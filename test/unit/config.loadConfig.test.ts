@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import { loadConfig } from '../../src/config/loadConfig.js';
 import { makeTmpDir } from '../utils/fs-helpers.js';
+import * as printStatus from '../../src/ui/shared/printConfigStatus.js';
 
 let tmpRoot: string;
 
@@ -62,5 +63,107 @@ describe('loadConfig', () => {
     process.chdir(oldCwd);
 
     expect(config).toEqual({});
+  });
+
+  it('prints config load error when config file contains invalid JSON and json flag is not set', () => {
+    const appDir = path.join(tmpRoot, 'apps', 'frontend');
+    fs.mkdirSync(appDir, { recursive: true });
+
+    // Write invalid JSON config
+    fs.writeFileSync(
+      path.join(appDir, 'dotenv-diff.config.json'),
+      '{ invalid json ',
+    );
+
+    const errorSpy = vi
+      .spyOn(printStatus, 'printConfigLoadError')
+      .mockImplementation(() => {});
+
+    const oldCwd = process.cwd();
+    process.chdir(appDir);
+
+    loadConfig({}); // json flag NOT set
+
+    process.chdir(oldCwd);
+
+    expect(errorSpy).toHaveBeenCalledOnce();
+
+    errorSpy.mockRestore();
+  });
+
+  it('does not print config load error when json flag is set and config is invalid', () => {
+    const appDir = path.join(tmpRoot, 'apps', 'frontend');
+    fs.mkdirSync(appDir, { recursive: true });
+
+    // Write invalid JSON config
+    fs.writeFileSync(
+      path.join(appDir, 'dotenv-diff.config.json'),
+      '{ invalid json ',
+    );
+
+    const errorSpy = vi
+      .spyOn(printStatus, 'printConfigLoadError')
+      .mockImplementation(() => {});
+
+    const oldCwd = process.cwd();
+    process.chdir(appDir);
+
+    loadConfig({ json: true });
+
+    process.chdir(oldCwd);
+
+    expect(errorSpy).not.toHaveBeenCalled(); // this should not be called when json flag is set
+
+    errorSpy.mockRestore();
+  });
+
+  it('prints config loaded message when valid config is found and json flag is not set', () => {
+    const appDir = path.join(tmpRoot, 'apps', 'frontend');
+    fs.mkdirSync(appDir, { recursive: true });
+
+    const configPath = path.join(appDir, 'dotenv-diff.config.json');
+
+    fs.writeFileSync(configPath, JSON.stringify({ ignore: ['FOO'] }, null, 2));
+
+    const loadedSpy = vi
+      .spyOn(printStatus, 'printConfigLoaded')
+      .mockImplementation(() => {});
+
+    const oldCwd = process.cwd();
+    process.chdir(appDir);
+
+    loadConfig({}); // json flag NOT set
+
+    process.chdir(oldCwd);
+
+    expect(loadedSpy).toHaveBeenCalledOnce();
+    expect(loadedSpy).toHaveBeenCalledWith(configPath);
+
+    loadedSpy.mockRestore();
+  });
+
+  it('does not print config loaded message when json flag is set', () => {
+    const appDir = path.join(tmpRoot, 'apps', 'frontend');
+    fs.mkdirSync(appDir, { recursive: true });
+
+    fs.writeFileSync(
+      path.join(appDir, 'dotenv-diff.config.json'),
+      JSON.stringify({ ignore: ['FOO'] }, null, 2),
+    );
+
+    const loadedSpy = vi
+      .spyOn(printStatus, 'printConfigLoaded')
+      .mockImplementation(() => {});
+
+    const oldCwd = process.cwd();
+    process.chdir(appDir);
+
+    loadConfig({ json: true });
+
+    process.chdir(oldCwd);
+
+    expect(loadedSpy).not.toHaveBeenCalled();
+
+    loadedSpy.mockRestore();
   });
 });
