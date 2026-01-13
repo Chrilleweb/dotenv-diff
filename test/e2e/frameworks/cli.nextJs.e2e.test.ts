@@ -45,28 +45,6 @@ function makeNextProject(cwd: string) {
 }
 
 describe('Next.js environment variable usage rules', () => {
-  it('warns when NEXT_PUBLIC_ variables are used inside server-only files', () => {
-    const cwd = tmpDir();
-    makeNextProject(cwd);
-
-    fs.mkdirSync(path.join(cwd, 'app/api/test'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'app/api/test/route.server.ts'),
-      `export async function GET() {
-        console.log(process.env.NEXT_PUBLIC_URL);
-      }`,
-    );
-
-    fs.writeFileSync(path.join(cwd, '.env'), `NEXT_PUBLIC_URL=abc`);
-
-    const res = runCli(cwd, ['--scan-usage']);
-
-    expect(res.stdout).toContain(
-      'NEXT_PUBLIC_ variable used in server-only file',
-    );
-    expect(res.stdout).toContain('NEXT_PUBLIC_URL');
-  });
-
   it('does NOT warn when server env vars are used in server-only files', () => {
     const cwd = tmpDir();
     makeNextProject(cwd);
@@ -129,39 +107,6 @@ console.log(process.env.SECRET_TOKEN);`,
     );
   });
 
-  it('does not duplicate warnings when NEXT_PUBLIC_ is used multiple times in server file', () => {
-    const cwd = tmpDir();
-    makeNextProject(cwd);
-
-    fs.mkdirSync(path.join(cwd, 'app/api/users'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'app/api/users/route.ts'),
-      `export async function GET() {
-        const url1 = process.env.NEXT_PUBLIC_API_URL;
-        const url2 = process.env.NEXT_PUBLIC_API_URL;
-        return Response.json({ url1, url2 });
-      }`,
-    );
-
-    fs.writeFileSync(
-      path.join(cwd, '.env'),
-      `NEXT_PUBLIC_API_URL=https://api.example.com`,
-    );
-
-    const res = runCli(cwd, ['--scan-usage']);
-
-    // Count occurrences of the warning message
-    const warningMessage = 'NEXT_PUBLIC_ variable used in server-only file';
-    const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
-
-    // Should appear exactly 2 times (once per usage), not 4 times (duplicated)
-    expect(matches?.length).toBe(2);
-
-    // Verify the variable name appears exactly twice in warnings section
-    const varMatches = res.stdout.match(/NEXT_PUBLIC_API_URL/g);
-    expect(varMatches?.length).toBeGreaterThanOrEqual(2);
-  });
-
   it('includes framework warnings in JSON output', () => {
     const cwd = tmpDir();
     makeNextProject(cwd);
@@ -191,12 +136,11 @@ console.log(process.env.SECRET_TOKEN);`,
     const warning = json.frameworkWarnings[0];
     expect(warning.variable).toBe('NEXT_PUBLIC_API_KEY');
     expect(warning.framework).toBe('nextjs');
-    expect(warning.reason).toContain(
-      'NEXT_PUBLIC_ variable used in server-only file',
-    );
+    expect(warning.reason).toContain('Sensitive data marked as public');
     expect(warning.file).toContain('app/api/test/route.ts');
     expect(warning.line).toBeGreaterThan(0);
   });
+
   it('warns when non-NEXT_PUBLIC_ variables are used in client components', () => {
     const cwd = tmpDir();
     makeNextProject(cwd);
@@ -288,6 +232,68 @@ API_ENDPOINT=api`,
 
     expect(res.stdout).not.toContain(
       'Client components must use NEXT_PUBLIC_ prefix',
+    );
+  });
+
+  it('treats Pages Router components as client components', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
+
+    fs.mkdirSync(path.join(cwd, 'pages'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'pages/index.tsx'),
+      `export default function Page() {
+      return <div>{process.env.DATABASE_URL}</div>;
+    }`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), `DATABASE_URL=db`);
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.stdout).toContain(
+      'Server-only variable accessed from client code',
+    );
+  });
+
+  it('does not warn in pages/api routes', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
+
+    fs.mkdirSync(path.join(cwd, 'pages/api'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'pages/api/test.ts'),
+      `export default function handler() {
+      console.log(process.env.SECRET_KEY);
+    }`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_KEY=ok`);
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.stdout).not.toContain(
+      'Server-only variable accessed from client code',
+    );
+  });
+
+  it('treats middleware.ts as server-only', () => {
+    const cwd = tmpDir();
+    makeNextProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'middleware.ts'),
+      `export function middleware() {
+      return process.env.SECRET_KEY;
+    }`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_KEY=ok`);
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.stdout).not.toContain(
+      'Server-only variable accessed from client code',
     );
   });
 });

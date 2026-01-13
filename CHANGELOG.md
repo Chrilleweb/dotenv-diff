@@ -18,6 +18,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 - Fixed rules for sveltekit framework to correctly identify environment variable usage in $env/static/private and $env/dynamic/private imports.
 - Fixed secret detection to ignore environment variable usage in HTML tag content.
 - Fixed duplicate warnings on nextjs framework rules and logged env vars in console warnings.
+- Fixed nextjs framework rules to follow the documentation more closely.
 
 ## [2.4.7] - 2026-01-11
 

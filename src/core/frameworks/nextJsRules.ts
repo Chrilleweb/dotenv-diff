@@ -32,37 +32,12 @@ export function applyNextJsRules(
         /^use client;?$/m.test(firstLines);
     }
   }
-  // Fallback to context-based detection (less reliable)
-  if (!isClientComponent) {
-    isClientComponent =
-      u.context.includes('use client') ||
-      u.context.includes('"use client"') ||
-      u.context.includes("'use client'");
-  }
+  // Pages Router: all non-API files are client components
+  const isPagesRouterClientFile =
+    /(^|\/)pages\//.test(normalizedFile) &&
+    !/(^|\/)pages\/api\//.test(normalizedFile);
 
-  // Detect server-only files
-  const isServerOnlyFile =
-    normalizedFile.includes('/app/api/') ||
-    normalizedFile.includes('/pages/api/') ||
-    normalizedFile.endsWith('.server.ts') ||
-    normalizedFile.endsWith('.server.tsx') ||
-    normalizedFile.endsWith('.server.js') ||
-    normalizedFile.endsWith('.server.jsx') ||
-    normalizedFile.endsWith('middleware.ts') ||
-    normalizedFile.endsWith('middleware.js') ||
-    /\/route\.(ts|js)$/.test(normalizedFile);
-
-  // Server-only files should NOT use NEXT_PUBLIC_ variables
-  if (isServerOnlyFile && u.variable.startsWith('NEXT_PUBLIC_')) {
-    warnings.push({
-      variable: u.variable,
-      reason: 'NEXT_PUBLIC_ variable used in server-only file',
-      file: normalizedFile,
-      line: u.line,
-      framework: 'nextjs',
-    });
-    return; // Stop processing other rules for this usage
-  }
+  isClientComponent ||= isPagesRouterClientFile;
 
   // Client components MUST use NEXT_PUBLIC_ prefix
   if (isClientComponent && !u.variable.startsWith('NEXT_PUBLIC_')) {
