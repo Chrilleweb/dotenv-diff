@@ -18,7 +18,18 @@ export function applySvelteKitRules(
     return;
   }
 
-  const isServerFile = /\/server\.(ts|js)$/.test(normalizedFile);
+  const isServerFile =
+    /\/server\.(ts|js)$/.test(normalizedFile) ||
+    normalizedFile.includes('/hooks.server.');
+
+  const isClientFile =
+  !normalizedFile.includes('.server.') &&
+  (
+    normalizedFile.includes('/hooks.client.') ||
+    normalizedFile.includes('/+page.') ||
+    normalizedFile.includes('/+layout.')
+  );
+
 
   const isSvelteFile = /\.svelte$/.test(normalizedFile);
 
@@ -49,11 +60,11 @@ export function applySvelteKitRules(
   if (
     u.pattern === 'sveltekit' &&
     u.context.includes('$env/dynamic/private') &&
-    /\.svelte$/.test(normalizedFile)
+    !isServerFile
   ) {
     warnings.push({
       variable: u.variable,
-      reason: `$env/dynamic/private cannot be used in Svelte components`,
+      reason: `$env/dynamic/private cannot be used in client files`,
       file: normalizedFile,
       line: u.line,
       framework: 'sveltekit',
@@ -66,7 +77,7 @@ export function applySvelteKitRules(
     if (u.variable.startsWith('VITE_')) {
       warnings.push({
         variable: u.variable,
-        reason: `$env/static/private variables must not start with "VITE_"`,
+        reason: `$env/static/private variables must not start with "PUBLIC_" or "VITE_"`,
         file: normalizedFile,
         line: u.line,
         framework: 'sveltekit',
@@ -74,10 +85,10 @@ export function applySvelteKitRules(
       return;
     }
 
-    if (isSvelteFile) {
+    if (isSvelteFile || isClientFile) {
       warnings.push({
         variable: u.variable,
-        reason: `Private env vars cannot be used in Svelte components`,
+        reason: `Private env vars cannot be used in client-side code`,
         file: normalizedFile,
         line: u.line,
         framework: 'sveltekit',
@@ -89,19 +100,6 @@ export function applySvelteKitRules(
       warnings.push({
         variable: u.variable,
         reason: `$env/static/private variables must not start with "PUBLIC_"`,
-        file: normalizedFile,
-        line: u.line,
-        framework: 'sveltekit',
-      });
-      return;
-    }
-  }
-
-  if (u.pattern === 'sveltekit' && u.context.includes('$env/dynamic/')) {
-    if (!isServerFile) {
-      warnings.push({
-        variable: u.variable,
-        reason: `$env/dynamic/* requires runtime access and should primarily be used in server files`,
         file: normalizedFile,
         line: u.line,
         framework: 'sveltekit',
@@ -123,5 +121,6 @@ export function applySvelteKitRules(
       line: u.line,
       framework: 'sveltekit',
     });
+    return;
   }
 }
