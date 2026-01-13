@@ -209,4 +209,214 @@ B=2
 
     expect(changed).toBe(false);
   });
+
+  describe('ensureGitignore functionality', () => {
+    it('creates .gitignore when in git repo but no .gitignore exists', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
+      fs.mkdirSync(path.join(tmpDir, '.git'));
+
+      const envPath = path.join(tmpDir, '.env');
+      fs.writeFileSync(envPath, 'A=1\n');
+
+      const { changed, result } = applyFixes({
+        envPath,
+        examplePath: path.join(tmpDir, '.env.example'),
+        missingKeys: [],
+        duplicateKeys: [],
+        ensureGitignore: true,
+      });
+
+      expect(changed).toBe(true);
+      expect(result.gitignoreUpdated).toBe(true);
+
+      const gitignorePath = path.join(tmpDir, '.gitignore');
+      expect(fs.existsSync(gitignorePath)).toBe(true);
+
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+      expect(content).toContain('.env');
+
+      // Cleanup
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    it('updates .gitignore when missing patterns', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
+      fs.mkdirSync(path.join(tmpDir, '.git'));
+
+      const envPath = path.join(tmpDir, '.env');
+      fs.writeFileSync(envPath, 'A=1\n');
+
+      const gitignorePath = path.join(tmpDir, '.gitignore');
+      fs.writeFileSync(gitignorePath, 'node_modules/\n');
+
+      const { changed, result } = applyFixes({
+        envPath,
+        examplePath: path.join(tmpDir, '.env.example'),
+        missingKeys: [],
+        duplicateKeys: [],
+        ensureGitignore: true,
+      });
+
+      expect(changed).toBe(true);
+      expect(result.gitignoreUpdated).toBe(true);
+
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+      expect(content).toContain('node_modules/');
+      expect(content).toContain('.env');
+
+      // Cleanup
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    it('does not update .gitignore when .env is already properly ignored', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
+      fs.mkdirSync(path.join(tmpDir, '.git'));
+
+      const envPath = path.join(tmpDir, '.env');
+      fs.writeFileSync(envPath, 'A=1\n');
+
+      const gitignorePath = path.join(tmpDir, '.gitignore');
+      fs.writeFileSync(gitignorePath, '.env\n.env.*\n');
+
+      const { changed, result } = applyFixes({
+        envPath,
+        examplePath: path.join(tmpDir, '.env.example'),
+        missingKeys: [],
+        duplicateKeys: [],
+        ensureGitignore: true,
+      });
+
+      expect(result.gitignoreUpdated).toBe(false);
+
+      // Cleanup
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    it('does not update .gitignore when not in a git repo', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
+
+      const envPath = path.join(tmpDir, '.env');
+      fs.writeFileSync(envPath, 'A=1\n');
+
+      const { result } = applyFixes({
+        envPath,
+        examplePath: path.join(tmpDir, '.env.example'),
+        missingKeys: [],
+        duplicateKeys: [],
+        ensureGitignore: true,
+      });
+
+      expect(result.gitignoreUpdated).toBe(false);
+
+      // Cleanup
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    it('does not update .gitignore when all patterns already exist', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
+      fs.mkdirSync(path.join(tmpDir, '.git'));
+
+      const envPath = path.join(tmpDir, '.env');
+      fs.writeFileSync(envPath, 'A=1\n');
+
+      const gitignorePath = path.join(tmpDir, '.gitignore');
+      // Write all DEFAULT_GITIGNORE_ENV_PATTERNS
+      fs.writeFileSync(gitignorePath, '.env\n.env.*\n.env.local\n');
+
+      const { result } = applyFixes({
+        envPath,
+        examplePath: path.join(tmpDir, '.env.example'),
+        missingKeys: [],
+        duplicateKeys: [],
+        ensureGitignore: true,
+      });
+
+      expect(result.gitignoreUpdated).toBe(false);
+
+      // Cleanup
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    it('returns false when gitignore exists with all patterns but has negation', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
+      fs.mkdirSync(path.join(tmpDir, '.git'));
+
+      const envPath = path.join(tmpDir, '.env');
+      fs.writeFileSync(envPath, 'A=1\n');
+
+      const gitignorePath = path.join(tmpDir, '.gitignore');
+      // All patterns present but with negation that causes isEnvIgnoredByGit to return false
+      fs.writeFileSync(gitignorePath, '!.env\n.env\n.env.*\n.env.local\n');
+
+      const { result } = applyFixes({
+        envPath,
+        examplePath: path.join(tmpDir, '.env.example'),
+        missingKeys: [],
+        duplicateKeys: [],
+        ensureGitignore: true,
+      });
+
+      // Should return false - all patterns exist so no update needed
+      expect(result.gitignoreUpdated).toBe(false);
+
+      // Cleanup
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    it('appends patterns to .gitignore without trailing newline', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
+      fs.mkdirSync(path.join(tmpDir, '.git'));
+
+      const envPath = path.join(tmpDir, '.env');
+      fs.writeFileSync(envPath, 'A=1\n');
+
+      const gitignorePath = path.join(tmpDir, '.gitignore');
+      fs.writeFileSync(gitignorePath, 'node_modules/'); // no trailing newline
+
+      const { result } = applyFixes({
+        envPath,
+        examplePath: path.join(tmpDir, '.env.example'),
+        missingKeys: [],
+        duplicateKeys: [],
+        ensureGitignore: true,
+      });
+
+      expect(result.gitignoreUpdated).toBe(true);
+
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+      expect(content).toContain('node_modules/\n.env');
+
+      // Cleanup
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    it('handles errors gracefully in updateGitignoreForEnv (catch block)', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenv-diff-'));
+      fs.mkdirSync(path.join(tmpDir, '.git'));
+
+      const envPath = path.join(tmpDir, '.env');
+      fs.writeFileSync(envPath, 'A=1\n');
+
+      const gitignorePath = path.join(tmpDir, '.gitignore');
+      fs.writeFileSync(gitignorePath, 'node_modules/\n');
+
+      // Make .gitignore read-only to trigger write error
+      fs.chmodSync(gitignorePath, 0o444);
+
+      const { result } = applyFixes({
+        envPath,
+        examplePath: path.join(tmpDir, '.env.example'),
+        missingKeys: [],
+        duplicateKeys: [],
+        ensureGitignore: true,
+      });
+
+      // Should return false on error (non-blocking)
+      expect(result.gitignoreUpdated).toBe(false);
+
+      // Cleanup - restore permissions first
+      fs.chmodSync(gitignorePath, 0o644);
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+  });
 });
