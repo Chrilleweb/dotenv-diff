@@ -19,8 +19,15 @@ export function applySvelteKitRules(
   }
 
   const isServerFile =
-    /\/server\.(ts|js)$/.test(normalizedFile) ||
-    normalizedFile.includes('/hooks.server.');
+  // SvelteKit route server files
+  normalizedFile.includes('/+server.') ||
+  normalizedFile.includes('.server.') ||
+
+  // hooks.server.ts / handle.server.ts etc.
+  /\/(hooks|handle)\.server\.(ts|js)$/.test(normalizedFile) ||
+
+  // generic server.ts fallback
+  /\/server\.(ts|js)$/.test(normalizedFile);
 
   const isClientFile =
     !normalizedFile.includes('.server.') &&

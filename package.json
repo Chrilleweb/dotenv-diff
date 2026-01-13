@@ -1,6 +1,6 @@
 {
   "name": "dotenv-diff",
-  "version": "2.4.8",
+  "version": "2.4.9",
   "type": "module",
   "description": "Detects environment variable issues, usage, and potential security risks.",
   "bin": {
@@ -70,7 +70,7 @@
     "prompts": "^2.4.2"
   },
   "devDependencies": {
-    "@types/node": "^25.0.7",
+    "@types/node": "^25.0.8",
     "@typescript-eslint/eslint-plugin": "^8.53.0",
     "@typescript-eslint/parser": "^8.53.0",
     "@vitest/coverage-istanbul": "^4.0.17",

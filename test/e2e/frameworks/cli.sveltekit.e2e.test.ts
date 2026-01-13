@@ -521,4 +521,40 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('warning');
   });
+
+  it('Will not warn when proccess.env is used in server file', () => {
+    const cwd = tmpDir();
+    makeSvelteKitProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/+server.ts'),
+      `console.log(process.env.SECRET_KEY);`,
+    );
+    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_KEY=123`);
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain(
+      'process.env should only be used in server files',
+    );
+  });
+
+  it('Will not warn when proccess.env is used in hooks.server.ts', () => {
+    const cwd = tmpDir();
+    makeSvelteKitProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/hooks.server.ts'),
+      `console.log(process.env.SECRET_KEY);`,
+    );
+    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_KEY=123`);
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain(
+      'process.env should only be used in server files',
+    );
+  });
 });
