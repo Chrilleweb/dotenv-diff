@@ -21,7 +21,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 
-- Added duplicate warnnings to decrease health score.
+- Added duplicated warnings to decrease health score.
 
 ### Fixed
 
