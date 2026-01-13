@@ -110,4 +110,103 @@ describe('applyFixes', () => {
       addedExample: [],
     });
   });
+
+  it('adds newline before missing keys when .env has no trailing newline', () => {
+    fs.writeFileSync(envPath, 'A=1'); // no newline
+
+    applyFixes({
+      envPath,
+      examplePath,
+      missingKeys: ['B'],
+      duplicateKeys: [],
+    });
+
+    const finalContent = fs.readFileSync(envPath, 'utf-8');
+    expect(finalContent).toBe('A=1\nB=\n');
+  });
+
+  it('adds missing keys to .env even when examplePath is undefined', () => {
+    fs.writeFileSync(envPath, 'A=1\n');
+
+    const { changed, result } = applyFixes({
+      envPath,
+      examplePath: undefined as unknown as string,
+      missingKeys: ['B'],
+      duplicateKeys: [],
+    });
+
+    const env = fs.readFileSync(envPath, 'utf-8');
+    expect(changed).toBe(true);
+    expect(result.addedEnv).toEqual(['B']);
+    expect(result.addedExample).toEqual([]);
+    expect(env).toContain('B=');
+  });
+
+  it('handles duplicateKeys list even if no duplicates exist in file', () => {
+    fs.writeFileSync(envPath, 'A=1\nB=2\n');
+
+    const { changed, result } = applyFixes({
+      envPath,
+      examplePath,
+      missingKeys: [],
+      duplicateKeys: ['C'], // key not in file
+    });
+
+    const env = fs.readFileSync(envPath, 'utf-8');
+    expect(changed).toBe(true); // still considered a change
+    expect(result.removedDuplicates).toEqual(['C']);
+    expect(env).toBe('A=1\nB=2\n');
+  });
+
+  it('removes multiple duplicate keys while preserving other lines', () => {
+    fs.writeFileSync(
+      envPath,
+      `A=1
+B=1
+A=2
+C=1
+B=2
+`,
+    );
+
+    applyFixes({
+      envPath,
+      examplePath,
+      missingKeys: [],
+      duplicateKeys: ['A', 'B'],
+    });
+
+    const env = fs.readFileSync(envPath, 'utf-8');
+    expect(env).toBe(`A=2\nC=1\nB=2\n`);
+  });
+
+  it('adds missing keys to empty .env.example', () => {
+    fs.writeFileSync(envPath, 'A=1\n');
+    fs.writeFileSync(examplePath, '');
+
+    const { result } = applyFixes({
+      envPath,
+      examplePath,
+      missingKeys: ['B'],
+      duplicateKeys: [],
+    });
+
+    const example = fs.readFileSync(examplePath, 'utf-8');
+
+    expect(result.addedExample).toEqual(['B']);
+    expect(example).toContain('B');
+    expect(example.trim()).toBe('B');
+  });
+
+  it('handles ensureGitignore=true without throwing (best-effort)', () => {
+    const { changed } = applyFixes({
+      envPath,
+      examplePath,
+      missingKeys: [],
+      duplicateKeys: [],
+      ensureGitignore: true,
+    });
+
+    expect(changed).toBe(false);
+  });
 });
