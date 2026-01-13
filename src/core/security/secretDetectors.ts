@@ -48,6 +48,25 @@ const HARMLESS_URLS = [
 const HARMLESS_ATTRIBUTE_KEYS =
   /\b(trackingId|trackingContext|data-testid|data-test|aria-label)\b/i;
 
+// Checks if a line is an HTML text node
+// Checks if a line is an HTML text node or tag
+function isHtmlTextNode(line: string): boolean {
+  const trimmed = line.trim();
+
+  // Empty line
+  if (!trimmed) return false;
+
+  // Starts with <tag> and ends with </tag> with text inside
+  // OR is a self-contained HTML tag (even without closing tag on same line)
+  return (
+    (/^<[^>]+>[^<]*<\/[^>]+>$/.test(trimmed) &&
+      !/=["'`][^"'`]*["'`]/.test(trimmed)) || // complete tag without suspicious assignment
+    /^<[a-z][a-z0-9-]*(?:\s+[a-z-]+(?:=["'][^"']*["'])?)*\s*\/?>$/i.test(
+      trimmed,
+    ) // opening or self-closing tag
+  );
+}
+
 /**
  * Determines the severity of a secret finding.
  * @param kind 'pattern' | 'entropy'
@@ -274,6 +293,10 @@ export function detectSecretsInSource(
     if (SUSPICIOUS_KEYS.test(line)) {
       // Ignore known harmless UI / analytics attributes
       if (HARMLESS_ATTRIBUTE_KEYS.test(line)) continue;
+      // Ignore HTML text nodes
+      if (isHtmlTextNode(line)) continue;
+      // Ignore if inside HTML tag content
+      if (/<[^>]*>.*<\/[^>]*>/.test(line.trim())) continue;
 
       const m = line.match(/=\s*["'`](.+?)["'`]/);
       if (

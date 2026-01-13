@@ -25,8 +25,7 @@ export const ENV_PATTERNS = [
   // env.SECRET
   {
     name: 'sveltekit' as const,
-    regex:
-      /(?<!import\.meta\.)\benv\.([A-Z_][A-Z0-9_]*)/g,
+    regex: /(?<!import\.meta\.)\benv\.([A-Z_][A-Z0-9_]*)/g,
   },
 
   // named import from dynamic is invalid in SvelteKit
@@ -37,7 +36,7 @@ export const ENV_PATTERNS = [
       /import\s*\{\s*([A-Z_][A-Z0-9_]*)\s*\}\s*from\s*['"]\$env\/dynamic\/(?:private|public)['"]/g,
   },
 
-  // ❌ INVALID: default import from any $env module
+  // default import from any $env module is invalid in SvelteKit
   // import SECRET from '$env/...';
   {
     name: 'sveltekit' as const,
@@ -45,7 +44,6 @@ export const ENV_PATTERNS = [
       /import\s+([A-Z_][A-Z0-9_]*)\s+from\s+['"]\$env\/(?:static|dynamic)\/(?:private|public)['"]/g,
   },
 ];
-
 
 // Default file extensions to include in scans
 export const DEFAULT_INCLUDE_EXTENSIONS = [

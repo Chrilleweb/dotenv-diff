@@ -23,13 +23,10 @@ export function applySvelteKitRules(
     normalizedFile.includes('/hooks.server.');
 
   const isClientFile =
-  !normalizedFile.includes('.server.') &&
-  (
-    normalizedFile.includes('/hooks.client.') ||
-    normalizedFile.includes('/+page.') ||
-    normalizedFile.includes('/+layout.')
-  );
-
+    !normalizedFile.includes('.server.') &&
+    (normalizedFile.includes('/hooks.client.') ||
+      normalizedFile.includes('/+page.') ||
+      normalizedFile.includes('/+layout.'));
 
   const isSvelteFile = /\.svelte$/.test(normalizedFile);
 
