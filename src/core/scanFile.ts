@@ -19,6 +19,20 @@ export function scanFile(
   const lines = content.split('\n');
   const relativePath = path.relative(opts.cwd, filePath);
 
+  // Collect all $env imports used in this file
+  const envImports: string[] = [];
+
+  const importRegex =
+    /import\s+(?:\{[^}]*\}|\w+)\s+from\s+['"](\$env\/(?:static|dynamic)\/(?:private|public))['"]/g;
+
+  let importMatch: RegExpExecArray | null;
+
+  while ((importMatch = importRegex.exec(content)) !== null) {
+    if (importMatch[1]) {
+      envImports.push(importMatch[1]);
+    }
+  }
+
   for (const pattern of ENV_PATTERNS) {
     let match: RegExpExecArray | null;
     const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
@@ -60,6 +74,7 @@ export function scanFile(
         line: lineNumber,
         column,
         pattern: pattern.name,
+        imports: envImports,
         context: contextLine,
         isLogged,
       });

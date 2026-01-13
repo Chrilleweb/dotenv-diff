@@ -18,8 +18,7 @@ export function printConsolelogWarning(
 
   console.log(chalk.yellow(`⚠️  Environment variables logged to console:`));
 
-  // Group by variable name
-  const grouped = logged.reduce((acc: VariableUsages, entry: EnvUsage) => {
+  const grouped = logged.reduce((acc: VariableUsages, entry) => {
     if (!acc[entry.variable]) acc[entry.variable] = [];
     acc[entry.variable]!.push(entry);
     return acc;
@@ -28,9 +27,14 @@ export function printConsolelogWarning(
   for (const [variable, usages] of Object.entries(grouped)) {
     console.log(chalk.yellow(`   - ${variable}`));
 
+    // Deduplicate by file + line (unique locations)
+    const uniqueUsages = Array.from(
+      new Map(usages.map((u) => [`${u.file}:${u.line}`, u])).values(),
+    );
+
     const maxShow = 3;
 
-    usages.slice(0, maxShow).forEach((usage) => {
+    uniqueUsages.slice(0, maxShow).forEach((usage) => {
       const normalizedFile = normalizePath(usage.file);
       console.log(
         chalk.yellow.dim(`     Logged at: ${normalizedFile}:${usage.line}`),
@@ -38,9 +42,11 @@ export function printConsolelogWarning(
       console.log(chalk.gray(`       ${usage.context.trim()}`));
     });
 
-    if (usages.length > maxShow) {
+    if (uniqueUsages.length > maxShow) {
       console.log(
-        chalk.gray(`     ... and ${usages.length - maxShow} more locations`),
+        chalk.gray(
+          `     ... and ${uniqueUsages.length - maxShow} more locations`,
+        ),
       );
     }
   }

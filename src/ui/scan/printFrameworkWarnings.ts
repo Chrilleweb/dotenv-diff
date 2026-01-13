@@ -26,13 +26,20 @@ export function printFrameworkWarnings(
     return;
   }
 
+  // Deduplicate warnings by variable + file + line + reason
+  const uniqueWarnings = Array.from(
+    new Map(
+      warnings.map((w) => [`${w.variable}:${w.file}:${w.line}:${w.reason}`, w]),
+    ).values(),
+  );
+
   console.log(
     chalk.yellow(
-      `⚠️  Framework issues (${FRAMEWORK_LABELS[warnings[0]?.framework ?? 'unknown']}):`,
+      `⚠️  Framework issues (${FRAMEWORK_LABELS[uniqueWarnings[0]?.framework ?? 'unknown']}):`,
     ),
   );
 
-  for (const w of warnings) {
+  for (const w of uniqueWarnings) {
     console.log(
       chalk.yellow(`   - ${w.variable} (${w.file}:${w.line}) → ${w.reason}`),
     );

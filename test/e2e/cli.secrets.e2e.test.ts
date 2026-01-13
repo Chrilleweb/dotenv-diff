@@ -321,4 +321,138 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.stdout).toContain('HIGH');
     expect(res.stdout).toContain('src/crossPlatform.ts');
   });
+
+  it('Will not give false positives on HTML text nodes', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+      const htmlContent = \`
+        <div>
+          <p>This is a sample HTML content with no secrets.</p>
+          <h2 class="mb-3 text-xl">6. Private variables must only be used in server files</h2>
+        </div>
+      \`;
+
+      console.log(htmlContent);
+    `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
+
+  it('should respect inline ignore comments', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+    // This should be ignored
+    const secret = "AKIA1234567890ABCDEF"; // dotenv-diff-ignore
+    
+    /* This should also be ignored */
+    const token = "ghp_1234567890ABCDEFGHijklmnopqrstuvwxYZ"; /* dotenv-diff-ignore */
+    
+    // This should NOT be ignored
+    const realSecret = "AKIAXXXXXXXXXXX12345";
+    
+    console.log(process.env.DUMMY);
+  `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain('Potential secrets detected in codebase:');
+    expect(res.stdout).toContain('realSecret');
+    expect(res.stdout).not.toContain('line 3'); // ignored secret
+    expect(res.stdout).not.toContain('line 6'); // ignored token
+  });
+
+  it('should respect ignore block comments', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'config.ts'),
+      `
+    const beforeBlock = "AKIA1234567890BEFORE";
+    
+    <!-- dotenv-diff-ignore-start -->
+    const ignored1 = "AKIA1234567890ABCDEF";
+    const ignored2 = "ghp_1234567890ABCDEFGHijklmnopqrstuvwxYZ";
+    const ignored3 = "sk_live_1234567890abcdefghij";
+    <!-- dotenv-diff-ignore-end -->
+    
+    const afterBlock = "AKIA1234567890AFTER1";
+    
+    console.log(process.env.DUMMY);
+  `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(1);
+    expect(res.stdout).toContain('Potential secrets detected in codebase:');
+    expect(res.stdout).toContain('beforeBlock');
+    expect(res.stdout).toContain('afterBlock');
+    expect(res.stdout).not.toContain('ignored1');
+    expect(res.stdout).not.toContain('ignored2');
+    expect(res.stdout).not.toContain('ignored3');
+  });
+
+  it('should not warn on pure interpolation templates', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'DUMMY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `
+    // These are pure interpolations - should NOT be flagged
+    const token = \`\${apiKey}\`;
+    const authHeader = \`\${tokenType}:\${accessToken}\`;
+    const combined = \`\${part1}|\${part2}|\${part3}\`;
+    const password = \`\${user}_\${pass}\`;
+    
+    console.log(token, authHeader);
+  `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
+
+  it('should not warn on SvelteKit $env accessors', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      'API_KEY=\nPRIVATE_KEY=\nVITE_KEY=\nPUBLIC_URL=\n',
+    );
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', '+page.server.ts'),
+      `
+    import { API_KEY } from '$env/static/private';
+    import { PUBLIC_URL } from '$env/static/public';
+    import { env } from '$env/dynamic/private';
+    
+    // These should NOT be flagged - they're using env accessors
+    const key1 = process.env.API_KEY;
+    const key2 = import.meta.env.VITE_KEY;
+    const key3 = env.PRIVATE_KEY;
+    
+    console.log(API_KEY, PUBLIC_URL, key1, key2, key3);
+  `.trimStart(),
+    );
+
+    const res = runCli(cwd, []);
+    console.log(res.stdout);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
+  });
 });

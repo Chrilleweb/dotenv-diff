@@ -18,6 +18,18 @@ export function applySvelteKitRules(
     return;
   }
 
+  const isServerFile =
+    /\/server\.(ts|js)$/.test(normalizedFile) ||
+    normalizedFile.includes('/hooks.server.');
+
+  const isClientFile =
+    !normalizedFile.includes('.server.') &&
+    (normalizedFile.includes('/hooks.client.') ||
+      normalizedFile.includes('/+page.') ||
+      normalizedFile.includes('/+layout.'));
+
+  const isSvelteFile = /\.svelte$/.test(normalizedFile);
+
   if (u.pattern === 'import.meta.env' && !u.variable.startsWith('VITE_')) {
     warnings.push({
       variable: u.variable,
@@ -29,21 +41,27 @@ export function applySvelteKitRules(
     return; // Stop processing other rules for this usage
   }
 
-  if (u.pattern === 'process.env' && u.variable.startsWith('VITE_')) {
-    warnings.push({
-      variable: u.variable,
-      reason: `process.env cannot access VITE_ (client-side) variables`,
-      file: normalizedFile,
-      line: u.line,
-      framework: 'sveltekit',
-    });
-    return;
+  if (u.pattern === 'process.env') {
+    if (!isServerFile) {
+      warnings.push({
+        variable: u.variable,
+        reason: `process.env should only be used in server files`,
+        file: normalizedFile,
+        line: u.line,
+        framework: 'sveltekit',
+      });
+      return;
+    }
   }
-  // process.env in .svelte files
-  if (u.pattern === 'process.env' && /\.svelte$/.test(normalizedFile)) {
+
+  if (
+    u.pattern === 'sveltekit' &&
+    u.imports?.includes('$env/dynamic/private') &&
+    (isSvelteFile || isClientFile)
+  ) {
     warnings.push({
       variable: u.variable,
-      reason: `process.env used inside .svelte file`,
+      reason: `$env/dynamic/private cannot be used in client files`,
       file: normalizedFile,
       line: u.line,
       framework: 'sveltekit',
@@ -52,11 +70,11 @@ export function applySvelteKitRules(
   }
 
   // $env/static/private
-  if (u.pattern === 'sveltekit' && u.context.includes('$env/static/private')) {
+  if (u.pattern === 'sveltekit' && u.imports?.includes('$env/static/private')) {
     if (u.variable.startsWith('VITE_')) {
       warnings.push({
         variable: u.variable,
-        reason: `$env/static/private variables must not start with "VITE_"`,
+        reason: `$env/static/private variables must not start with "PUBLIC_" or "VITE_"`,
         file: normalizedFile,
         line: u.line,
         framework: 'sveltekit',
@@ -64,21 +82,10 @@ export function applySvelteKitRules(
       return;
     }
 
-    if (/\.svelte$/.test(normalizedFile)) {
+    if (isSvelteFile || isClientFile) {
       warnings.push({
         variable: u.variable,
-        reason: `Private env vars cannot be used in Svelte components`,
-        file: normalizedFile,
-        line: u.line,
-        framework: 'sveltekit',
-      });
-      return;
-    }
-
-    if (/\+(page|layout)\.(ts|js)$/.test(normalizedFile)) {
-      warnings.push({
-        variable: u.variable,
-        reason: `Private env vars should only be used in server files`,
+        reason: `Private env vars cannot be used in client-side code`,
         file: normalizedFile,
         line: u.line,
         framework: 'sveltekit',
@@ -89,7 +96,7 @@ export function applySvelteKitRules(
     if (u.variable.startsWith('PUBLIC_')) {
       warnings.push({
         variable: u.variable,
-        reason: `PUBLIC_ variables may never be used in private imports`,
+        reason: `$env/static/private variables must not start with "PUBLIC_"`,
         file: normalizedFile,
         line: u.line,
         framework: 'sveltekit',
@@ -101,15 +108,16 @@ export function applySvelteKitRules(
   // $env/static/public
   if (
     u.pattern === 'sveltekit' &&
-    u.context.includes('$env/static/public') &&
-    u.variable.startsWith('VITE_')
+    u.imports?.includes('$env/static/public') &&
+    !u.variable.startsWith('PUBLIC_')
   ) {
     warnings.push({
       variable: u.variable,
-      reason: `$env/static/public variables must not start with "VITE_"`,
+      reason: `$env/static/public variables must start with "PUBLIC_"`,
       file: normalizedFile,
       line: u.line,
       framework: 'sveltekit',
     });
+    return;
   }
 }

@@ -58,17 +58,6 @@ function areInconsistentlyNamed(key1: string, key2: string): boolean {
     return true;
   }
 
-  // Check for common patterns like API_KEY vs APIKEY
-  const withoutUnderscores1 = key1.replace(/_/g, '');
-  const withoutUnderscores2 = key2.replace(/_/g, '');
-
-  if (
-    withoutUnderscores1.toLowerCase() === withoutUnderscores2.toLowerCase() &&
-    key1 !== key2
-  ) {
-    return true;
-  }
-
   // Check for partial matches that might indicate inconsistency
   // e.g., DATABASE_URL vs DATABASEURL, JWT_SECRET vs JWTSECRET
   return false;

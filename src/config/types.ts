@@ -125,6 +125,7 @@ export interface EnvUsage {
   line: number;
   column: number;
   pattern: 'process.env' | 'import.meta.env' | 'sveltekit';
+  imports?: string[]; // For sveltekit: list of imported env modules
   context: string; // The actual line content
   isLogged?: boolean; // Whether this usage is logged to console
 }
