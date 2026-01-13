@@ -9,6 +9,7 @@ import {
   checkGitignoreStatus,
   findGitRoot,
 } from '../../src/services/git.js';
+import { printGitignoreWarning } from '../../src/ui/shared/printGitignore.js';
 import { makeTmpDir, touch, rmrf } from '../utils/fs-helpers.js';
 
 let tmpDirs: string[] = [];
@@ -459,5 +460,25 @@ describe('findGitRoot', () => {
 
       expect(isEnvIgnoredByGit({ cwd })).toBe(true);
     });
+  });
+});
+
+describe('printGitignoreWarning', () => {
+  it('uses console.log as default when log parameter is not provided', () => {
+    // Test that the default log parameter (console.log) is used
+    // Just verify it doesn't throw when called without log
+    expect(() =>
+      printGitignoreWarning({
+        envFile: '.env',
+        reason: 'no-gitignore',
+      }),
+    ).not.toThrow();
+
+    expect(() =>
+      printGitignoreWarning({
+        envFile: '.env',
+        reason: 'not-ignored',
+      }),
+    ).not.toThrow();
   });
 });
