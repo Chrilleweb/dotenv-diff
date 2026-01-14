@@ -26,7 +26,6 @@ export function findDuplicateKeys(filePath: string): Array<Duplicate> {
     if (eq <= 0) continue; // no '=' or empty key
 
     const key = trimmed.slice(0, eq).trim();
-    if (!key) continue;
 
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }

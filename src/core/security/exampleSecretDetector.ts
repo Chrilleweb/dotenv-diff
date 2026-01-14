@@ -1,4 +1,4 @@
-import { PROVIDER_PATTERNS, SUSPICIOUS_KEYS } from './secretDetectors.js';
+import { PROVIDER_PATTERNS } from './secretDetectors.js';
 import { shannonEntropyNormalized } from './entropy.js';
 
 export interface ExampleSecretWarning {
@@ -48,19 +48,7 @@ export function detectSecretsInExample(
       }
     }
 
-    // 3 — Check suspicious keywords on values
-    if (SUSPICIOUS_KEYS.test(key)) {
-      if (value.length >= 12) {
-        warnings.push({
-          key,
-          value,
-          reason: 'Suspicious key name combined with a non-placeholder value',
-          severity: 'medium',
-        });
-      }
-    }
-
-    // 4 — Check entropy (high randomness → real secret)
+    // 3 — Check entropy (high randomness → real secret)
     if (value.length >= 24) {
       const entropy = shannonEntropyNormalized(value);
       if (entropy > 0.8) {
