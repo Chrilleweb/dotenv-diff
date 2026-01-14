@@ -2,6 +2,7 @@ import path from 'path';
 import type { EnvUsage, ScanOptions } from '../config/types.js';
 import { ENV_PATTERNS } from './patterns.js';
 import { hasIgnoreComment } from './security/secretDetectors.js';
+import { normalizePath } from './helpers/normalizePath.js';
 
 /**
  * Scans a file for environment variable usage.
@@ -17,7 +18,9 @@ export function scanFile(
 ): EnvUsage[] {
   const usages: EnvUsage[] = [];
   const lines = content.split('\n');
-  const relativePath = path.relative(opts.cwd, filePath);
+
+  // Get relative path from cwd corss-platform compatible
+  const relativePath = normalizePath(path.relative(opts.cwd, filePath));
 
   // Collect all $env imports used in this file
   const envImports: string[] = [];

@@ -9,6 +9,7 @@ import { DEFAULT_EXCLUDE_PATTERNS } from '../core/patterns.js';
 import { scanFile } from '../core/scanFile.js';
 import { findFiles } from './fileWalker.js';
 import { printProgress } from '../ui/scan/printProgress.js';
+import { normalizePath } from '../core/helpers/normalizePath.js';
 
 /**
  * Scans the codebase for environment variable usage based on the provided options.
@@ -36,7 +37,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     allUsages.push(...fileUsages);
 
     // Store file content for later use (e.g., framework validation 'use client')
-    const relativePath = path.relative(opts.cwd, filePath);
+    const relativePath = normalizePath(path.relative(opts.cwd, filePath));
     fileContentMap.set(relativePath, content);
 
     // Detect secrets in the file content
