@@ -10,12 +10,12 @@ describe('shannonEntropyNormalized', () => {
     expect(shannonEntropyNormalized(undefined as unknown as string)).toBe(0);
   });
 
-    it('returns 0 for string with only one unique character', () => {
+  it('returns 0 for string with only one unique character', () => {
     // No randomness at all
     expect(shannonEntropyNormalized('aaaaaaaaaa')).toBe(0);
   });
 
-    it('returns low entropy for uneven character distribution', () => {
+  it('returns low entropy for uneven character distribution', () => {
     // Mostly one character, a little noise
     const value = 'aaaaaaaaab';
     const entropy = shannonEntropyNormalized(value);
@@ -24,7 +24,7 @@ describe('shannonEntropyNormalized', () => {
     expect(entropy).toBeLessThan(0.5);
   });
 
-    it('returns high entropy for evenly distributed characters', () => {
+  it('returns high entropy for evenly distributed characters', () => {
     // Many unique characters, fairly even distribution
     const value =
       'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/';
@@ -34,7 +34,7 @@ describe('shannonEntropyNormalized', () => {
     expect(entropy).toBeLessThanOrEqual(1);
   });
 
-    it('never returns a value greater than 1', () => {
+  it('never returns a value greater than 1', () => {
     // Defensive guard for Math.min(1, ...)
     const value =
       'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/'.repeat(
