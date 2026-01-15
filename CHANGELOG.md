@@ -11,7 +11,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 
--
+- Changed total variables to total variable references in scan statistics output.
 
 ### Fixed
 

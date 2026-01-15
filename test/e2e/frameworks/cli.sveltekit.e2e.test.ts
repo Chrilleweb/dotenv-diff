@@ -243,7 +243,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     expect(matches?.length).toBe(3);
 
     // Verify total usages found
-    expect(res.stdout).toContain('Total variables: 3');
+    expect(res.stdout).toContain('Total variable references: 3');
   });
 
   it('Will exit code 1 on strict mode when warnings are present', () => {
