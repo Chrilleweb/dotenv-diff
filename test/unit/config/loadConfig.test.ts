@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { loadConfig } from '../../src/config/loadConfig.js';
-import { makeTmpDir } from '../utils/fs-helpers.js';
-import * as printStatus from '../../src/ui/shared/printConfigStatus.js';
+import { loadConfig } from '../../../src/config/loadConfig.js';
+import { makeTmpDir } from '../../utils/fs-helpers.js';
+import * as printStatus from '../../../src/ui/shared/printConfigStatus.js';
 
 let tmpRoot: string;
 
