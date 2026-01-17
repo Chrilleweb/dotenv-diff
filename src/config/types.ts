@@ -144,7 +144,7 @@ export interface ScanOptions {
   ignoreRegex: RegExp[];
   files?: string[];
   secrets: boolean;
-  ignoreUrls: string[];
+  ignoreUrls?: string[];
   json: boolean;
 }
 
