@@ -20,7 +20,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const files = await findFiles(opts.cwd, {
     include: opts.include,
     exclude: [...DEFAULT_EXCLUDE_PATTERNS, ...opts.exclude],
-    ...(opts.files ? { files: opts.files } : {}), // Pass files option
+    ...(opts.files && opts.files.length > 0 && { files: opts.files }),
   });
 
   const allUsages: EnvUsage[] = [];
