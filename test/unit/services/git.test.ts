@@ -8,9 +8,9 @@ import {
   warnIfEnvNotIgnored,
   checkGitignoreStatus,
   findGitRoot,
-} from '../../src/services/git.js';
-import { printGitignoreWarning } from '../../src/ui/shared/printGitignore.js';
-import { makeTmpDir, touch, rmrf } from '../utils/fs-helpers.js';
+} from '../../../src/services/git.js';
+import { printGitignoreWarning } from '../../../src/ui/shared/printGitignore.js';
+import { makeTmpDir, touch, rmrf } from '../../utils/fs-helpers.js';
 
 let tmpDirs: string[] = [];
 afterEach(() => {

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { findDuplicateKeys } from '../../src/core/duplicates.js';
+import { findDuplicateKeys } from '../../../src/core/duplicates.js';
 
 describe('findDuplicateKeys', () => {
   let tmpDir: string;

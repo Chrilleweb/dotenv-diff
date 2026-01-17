@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { scanFile } from '../../src/core/scanFile.js';
-import type { ScanOptions } from '../../src/config/types.js';
+import { scanFile } from '../../../src/core/scanFile.js';
+import type { ScanOptions } from '../../../src/config/types.js';
 
 describe('scanFile', () => {
   const baseOpts: ScanOptions = {

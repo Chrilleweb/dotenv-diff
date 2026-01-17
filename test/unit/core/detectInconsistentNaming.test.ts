@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectInconsistentNaming } from '../../src/core/detectInconsistentNaming.js';
+import { detectInconsistentNaming } from '../../../src/core/detectInconsistentNaming.js';
 
 describe('detectInconsistentNaming', () => {
   it('detects multiple inconsistencies', () => {
