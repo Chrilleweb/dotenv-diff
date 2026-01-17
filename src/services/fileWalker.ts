@@ -255,10 +255,6 @@ export function shouldExclude(
       return matchesGlobPattern(relativePath, pattern);
     }
 
-    // Special case for test files
-    if (pattern.includes('.test.') && fileName.includes('.test.')) return true;
-    if (pattern.includes('.spec.') && fileName.includes('.spec.')) return true;
-
     return false;
   });
 }
