@@ -142,7 +142,7 @@ export interface ScanOptions {
   exclude: string[];
   ignore: string[];
   ignoreRegex: RegExp[];
-  files: string[];
+  files?: string[];
   secrets: boolean;
   ignoreUrls: string[];
   json: boolean;
