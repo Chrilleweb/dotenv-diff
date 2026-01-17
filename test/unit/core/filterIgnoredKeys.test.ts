@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { filterIgnoredKeys } from '../../src/core/filterIgnoredKeys.js';
+import { filterIgnoredKeys } from '../../../src/core/filterIgnoredKeys.js';
 
 describe('filterIgnoredKeys', () => {
   it('filters exact and regex matches', () => {

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   printConfigLoaded,
   printConfigLoadError,
-} from '../../src/ui/shared/printConfigStatus.js';
+} from '../../../../src/ui/shared/printConfigStatus.js';
 
 describe('printConfigStatus', () => {
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;

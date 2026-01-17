@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectSecretsInExample } from '../../src/core/security/exampleSecretDetector.js';
+import { detectSecretsInExample } from '../../../../src/core/security/exampleSecretDetector.js';
 
 describe('detectSecretsInExample', () => {
   it('skips empty and placeholder values', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { shannonEntropyNormalized } from '../../src/core/security/entropy.js';
+import { shannonEntropyNormalized } from '../../../../src/core/security/entropy.js';
 
 describe('shannonEntropyNormalized', () => {
   it('returns 0 for empty string', () => {

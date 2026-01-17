@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { applyFixes } from '../../src/core/fixEnv.js';
+import { applyFixes } from '../../../src/core/fixEnv.js';
 
 // helper to create temp files
 function makeTempFile(name: string, content: string): string {

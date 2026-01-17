@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { parseEnvFile } from '../../src/core/parseEnv.js';
+import { parseEnvFile } from '../../../src/core/parseEnv.js';
 
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'env-test-'));

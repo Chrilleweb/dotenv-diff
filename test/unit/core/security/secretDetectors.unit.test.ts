@@ -4,7 +4,7 @@ import {
   hasIgnoreComment,
   SUSPICIOUS_KEYS,
   PROVIDER_PATTERNS,
-} from '../../src/core/security/secretDetectors.js';
+} from '../../../../src/core/security/secretDetectors.js';
 
 describe('secretDetectors', () => {
   describe('hasIgnoreComment', () => {
