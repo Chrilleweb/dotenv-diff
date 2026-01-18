@@ -12,7 +12,7 @@ import type { ExpireWarning } from '../config/types.js';
  * @param filePath - Path to the dotenv file
  * @returns Array of expiration warnings
  */
-export function detectExpirations(filePath: string): ExpireWarning[] {
+export function detectEnvExpirations(filePath: string): ExpireWarning[] {
   const lines = fs.readFileSync(filePath, 'utf8').split('\n');
 
   const warnings: ExpireWarning[] = [];
