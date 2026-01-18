@@ -9,7 +9,7 @@ import { determineComparisonFile } from '../core/determineComparisonFile.js';
 import { printScanResult } from '../services/printScanResult.js';
 import { createJsonOutput } from '../core/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
-import { processComparisonFile } from '../core/processComparisonFile.js';
+import { processComparisonFile } from '../services/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/security/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
