@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { normalizeOptions } from '../config/options.js';
 import { discoverEnvFiles } from '../services/envDiscovery.js';
-import { pairWithExample } from '../core/envPairing.js';
+import { envPairing } from '../services/envPairing.js';
 import { ensureFilesOrPrompt } from '../commands/ensureFilesOrPrompt.js';
 import { compareMany } from '../commands/compare.js';
 import type {
@@ -179,7 +179,7 @@ async function runAutoDiscoveryComparison(opts: Options): Promise<boolean> {
   }
 
   // Compare all discovered pairs
-  const pairs = pairWithExample(discovery);
+  const pairs = envPairing(discovery);
   const report: CompareJsonEntry[] = [];
   const { exitWithError } = await compareMany(
     pairs,

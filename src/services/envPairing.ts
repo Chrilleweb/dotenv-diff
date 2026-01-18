@@ -8,7 +8,7 @@ import { DEFAULT_ENV_FILE, DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
  * @param d - The discovery object containing environment and example file information.
  * @returns An array of objects containing the environment name, path, and example path.
  */
-export function pairWithExample(d: Discovery): Array<FilePair> {
+export function envPairing(d: Discovery): Array<FilePair> {
   const pairs: Array<FilePair> = [];
   const list = d.envFiles.length > 0 ? d.envFiles : [d.primaryEnv];
 
