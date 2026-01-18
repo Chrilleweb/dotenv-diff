@@ -6,7 +6,7 @@ import { findDuplicateKeys } from './duplicates.js';
 import { applyFixes } from './fixEnv.js';
 import { toUpperSnakeCase } from './helpers/toUpperSnakeCase.js';
 import { resolveFromCwd } from './helpers/resolveFromCwd.js';
-import { detectExpirations } from './detectExpirations.js';
+import { detectEnvExpirations } from '../services/detectEnvExpirations.js';
 import { detectInconsistentNaming } from './detectInconsistentNaming.js';
 import type {
   ScanUsageOptions,
@@ -109,7 +109,7 @@ export function processComparisonFile(
     }
 
     if (opts.expireWarnings) {
-      expireWarnings = detectExpirations(compareFile.path);
+      expireWarnings = detectEnvExpirations(compareFile.path);
     }
 
     // Check for inconsistent naming across env + example keys
