@@ -1,10 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { parseEnvFile } from '../core/parseEnv.js';
 import { diffEnv } from '../core/diffEnv.js';
 import { checkGitignoreStatus } from '../services/git.js';
 import { findDuplicateKeys } from '../core/duplicates.js';
-import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type {
   Category,
   ComparisonOptions,
@@ -13,6 +11,7 @@ import type {
   Filtered,
   DuplicateResult,
 } from '../config/types.js';
+import { parseAndFilterEnv } from '../core/parseAndFilterEnv.js';
 import { updateTotals } from '../core/helpers/updateTotals.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
@@ -67,7 +66,7 @@ export async function compareMany(
     printHeader(envName, exampleName, opts.json ?? false);
 
     // Parse and filter env files
-    const { current, example, currentKeys, exampleKeys } = parseAndFilter(
+    const { current, example, currentKeys, exampleKeys } = parseAndFilterEnv(
       envPath,
       examplePath,
       opts,
@@ -233,51 +232,6 @@ function createCategoryFilter(
     : undefined;
 
   return (category: Category) => !onlySet || onlySet.has(category);
-}
-
-interface ParsedAndFilteredEnv {
-  current: Record<string, string>;
-  example: Record<string, string>;
-  currentKeys: string[];
-  exampleKeys: string[];
-}
-
-/**
- * Parses and filters the environment and example files.
- * @param envPath The path to the .env file
- * @param examplePath The path to the .env.example file
- * @param opts Comparison options
- * @returns An object containing the parsed and filtered environment variables
- */
-function parseAndFilter(
-  envPath: string,
-  examplePath: string,
-  opts: ComparisonOptions,
-): ParsedAndFilteredEnv {
-  const currentFull = parseEnvFile(envPath);
-  const exampleFull = parseEnvFile(examplePath);
-
-  const currentKeys = filterIgnoredKeys(
-    Object.keys(currentFull),
-    opts.ignore,
-    opts.ignoreRegex,
-  );
-  const exampleKeys = filterIgnoredKeys(
-    Object.keys(exampleFull),
-    opts.ignore,
-    opts.ignoreRegex,
-  );
-
-  return {
-    current: Object.fromEntries(
-      currentKeys.map((k) => [k, currentFull[k] ?? '']),
-    ),
-    example: Object.fromEntries(
-      exampleKeys.map((k) => [k, exampleFull[k] ?? '']),
-    ),
-    currentKeys,
-    exampleKeys,
-  };
 }
 
 /**
