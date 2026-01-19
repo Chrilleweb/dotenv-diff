@@ -38,6 +38,62 @@ describe('ensureFilesOrPrompt', () => {
     vi.clearAllMocks();
   });
 
+  it('does not call printPrompt.missingEnv before confirmYesNo when .env is missing', async () => {
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
+
+    (confirmYesNo as any).mockResolvedValue(true);
+
+    await ensureFilesOrPrompt({
+      cwd,
+      primaryEnv: '.env',
+      primaryExample: '.env.example',
+      alreadyWarnedMissingEnv: false,
+      isYesMode: false,
+      isCiMode: false,
+    });
+
+    // Verify that missingEnv was NEVER called (message is in prompt instead)
+    expect(printPrompt.missingEnv).not.toHaveBeenCalled();
+  });
+
+  it('does not call printPrompt.missingEnv before confirmYesNo when .env.example is missing', async () => {
+    fs.writeFileSync(path.join(cwd, '.env'), 'FOO=bar');
+
+    (confirmYesNo as any).mockResolvedValue(true);
+
+    await ensureFilesOrPrompt({
+      cwd,
+      primaryEnv: '.env',
+      primaryExample: '.env.example',
+      alreadyWarnedMissingEnv: false,
+      isYesMode: false,
+      isCiMode: false,
+    });
+
+    // Verify that missingEnv was NEVER called (message is in prompt instead)
+    expect(printPrompt.missingEnv).not.toHaveBeenCalled();
+  });
+
+  it('includes Do you want to create message in the confirmYesNo prompt text', async () => {
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
+
+    (confirmYesNo as any).mockResolvedValue(true);
+
+    await ensureFilesOrPrompt({
+      cwd,
+      primaryEnv: '.env',
+      primaryExample: '.env.example',
+      alreadyWarnedMissingEnv: false,
+      isYesMode: false,
+      isCiMode: false,
+    });
+
+    expect(confirmYesNo).toHaveBeenCalledWith(
+      expect.stringContaining('Do you want to create'),
+      expect.any(Object),
+    );
+  });
+
   it('exits when neither .env nor .env.example exists', async () => {
     const result = await ensureFilesOrPrompt({
       cwd,
