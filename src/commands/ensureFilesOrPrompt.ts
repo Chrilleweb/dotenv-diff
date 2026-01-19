@@ -48,6 +48,7 @@ export async function ensureFilesOrPrompt(
 
   // Case 2: missing .env but has .env.example
   if (!envExists && exampleExists) {
+    printPrompt.missingEnv(envPath);
     const createEnv = isYesMode
       ? true
       : isCiMode
@@ -71,6 +72,7 @@ export async function ensureFilesOrPrompt(
 
   // Case 3: has .env but is missing .env.example
   if (envExists && !exampleExists) {
+    printPrompt.missingEnv(examplePath);
     const createExample = isYesMode
       ? true
       : isCiMode
