@@ -7,14 +7,11 @@ import { findDuplicateKeys } from '../core/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type {
   Category,
-  CompareJsonEntry,
   ComparisonOptions,
   FilePair,
   ExitResult,
   Filtered,
   DuplicateResult,
-  Duplicate,
-  SkipReason,
 } from '../config/types.js';
 import { updateTotals } from '../core/helpers/updateTotals.js';
 import { applyFixes } from '../core/fixEnv.js';
@@ -26,7 +23,7 @@ import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printIssues } from '../ui/compare/printIssues.js';
 import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
-import { SKIP_REASONS } from '../config/constants.js';
+import { compareJsonOutput } from '../ui/compare/compareJsonOutput.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -59,32 +56,6 @@ export async function compareMany(
     const skipping = !fs.existsSync(envPath) || !fs.existsSync(examplePath);
 
     printHeader(envName, exampleName, opts.json ?? false, skipping);
-
-    // If skipping, create entry and continue
-    if (skipping) {
-      const envExists = fs.existsSync(envPath);
-      const exampleExists = fs.existsSync(examplePath);
-      
-      let skipReason: SkipReason;
-      if (!envExists && !exampleExists) {
-        skipReason = SKIP_REASONS.BOTH_MISSING;
-      } else if (!envExists) {
-        skipReason = SKIP_REASONS.ENV_MISSING;
-      } else {
-        skipReason = SKIP_REASONS.EXAMPLE_MISSING;
-      }
-      
-      const entry = buildCompareJsonEntry({
-        envName,
-        exampleName,
-        dupsEnv: [],
-        dupsEx: [],
-        gitignoreIssue: null,
-        skipReason,
-      });
-      opts.collect?.(entry);
-      continue;
-    }
 
     // Parse and filter env files
     const { current, example, currentKeys, exampleKeys } = parseAndFilter(
@@ -173,7 +144,7 @@ export async function compareMany(
     };
 
     // Build JSON entry with all the data
-    const entry = buildCompareJsonEntry({
+    const entry = compareJsonOutput({
       envName,
       exampleName,
       dupsEnv,
@@ -332,84 +303,6 @@ function findDuplicates(
   );
 
   return { dupsEnv, dupsEx } satisfies DuplicateResult;
-}
-
-/**
- * Builds a CompareJsonEntry for the given comparison results.
- * @param params - The parameters for building the entry.
- * @returns A CompareJsonEntry object.
- */
-function buildCompareJsonEntry({
-  envName,
-  exampleName,
-  dupsEnv,
-  dupsEx,
-  gitignoreIssue,
-  ok,
-  skipReason,
-  filtered,
-  stats,
-}: {
-  envName: string;
-  exampleName: string;
-  dupsEnv: Duplicate[];
-  dupsEx: Duplicate[];
-  gitignoreIssue: Filtered['gitignoreIssue'];
-  ok?: boolean;
-  skipReason?: SkipReason;
-  filtered?: Filtered;
-  stats?: {
-    envCount: number;
-    exampleCount: number;
-    sharedCount: number;
-  };
-}): CompareJsonEntry {
-  const entry: CompareJsonEntry = {
-    env: envName,
-    example: exampleName,
-  };
-
-  if (skipReason) {
-    entry.skipped = { reason: skipReason };
-    return entry;
-  }
-
-  // Add stats if provided
-  if (stats) {
-    entry.stats = stats;
-  }
-
-  // Add filtered data if provided
-  if (filtered) {
-    if (filtered.missing.length > 0) {
-      entry.missing = filtered.missing;
-    }
-    if (filtered.extra && filtered.extra.length > 0) {
-      entry.extra = filtered.extra;
-    }
-    if (filtered.empty && filtered.empty.length > 0) {
-      entry.empty = filtered.empty;
-    }
-    if (filtered.mismatches && filtered.mismatches.length > 0) {
-      entry.valueMismatches = filtered.mismatches;
-    }
-  }
-
-  if (dupsEnv.length || dupsEx.length) {
-    entry.duplicates = {};
-    if (dupsEnv.length) entry.duplicates.env = dupsEnv;
-    if (dupsEx.length) entry.duplicates.example = dupsEx;
-  }
-
-  if (gitignoreIssue) {
-    entry.gitignoreIssue = gitignoreIssue;
-  }
-
-  if (ok) {
-    entry.ok = ok;
-  }
-
-  return entry;
 }
 
 /**
