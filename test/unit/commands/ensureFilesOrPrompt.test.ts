@@ -38,6 +38,26 @@ describe('ensureFilesOrPrompt', () => {
     vi.clearAllMocks();
   });
 
+  it('includes Do you want to create message in the confirmYesNo prompt text', async () => {
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
+
+    (confirmYesNo as any).mockResolvedValue(true);
+
+    await ensureFilesOrPrompt({
+      cwd,
+      primaryEnv: '.env',
+      primaryExample: '.env.example',
+      alreadyWarnedMissingEnv: false,
+      isYesMode: false,
+      isCiMode: false,
+    });
+
+    expect(confirmYesNo).toHaveBeenCalledWith(
+      expect.stringContaining('Do you want to create'),
+      expect.any(Object),
+    );
+  });
+
   it('exits when neither .env nor .env.example exists', async () => {
     const result = await ensureFilesOrPrompt({
       cwd,

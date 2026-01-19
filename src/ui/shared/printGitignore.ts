@@ -6,7 +6,7 @@ interface GitignoreWarningOptions {
   envFile: string;
   reason: GitignoreIssue;
   log?: (msg: string) => void;
-};
+}
 
 /**
  * Logs a warning about .env not being ignored by Git.
