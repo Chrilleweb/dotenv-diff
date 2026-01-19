@@ -2,9 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { scanJsonOutput } from '../../../../src/ui/scan/scanJsonOutput.js';
 import type { ScanResult } from '../../../../src/config/types.js';
 
-function makeScanResult(
-  partial: Partial<ScanResult> = {},
-): ScanResult {
+function makeScanResult(partial: Partial<ScanResult> = {}): ScanResult {
   return {
     used: [],
     missing: [],
@@ -65,5 +63,4 @@ describe('scanJsonOutput', () => {
 
     expect(result.secrets?.[0].file).toBe('src/file.ts');
   });
-
 });

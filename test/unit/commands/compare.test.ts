@@ -174,9 +174,7 @@ describe('compareMany', () => {
   });
 
   it('compares successfully when files exist and have no issues', async () => {
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     const result = await compareMany(pairs, opts);
@@ -212,9 +210,7 @@ describe('compareMany', () => {
       valueMismatches: [],
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     await compareMany(pairs, opts);
@@ -234,9 +230,7 @@ describe('compareMany', () => {
       valueMismatches: [],
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     await compareMany(pairs, opts);
@@ -257,9 +251,7 @@ describe('compareMany', () => {
       return { KEY1: '', KEY2: '' };
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     await compareMany(pairs, opts);
@@ -283,9 +275,7 @@ describe('compareMany', () => {
       return [];
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     await compareMany(pairs, opts);
@@ -302,9 +292,7 @@ describe('compareMany', () => {
   it('skips duplicates check when allowDuplicates is true', async () => {
     mockFindDuplicateKeys.mockReturnValue([{ key: 'DUP', count: 2 }]);
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ allowDuplicates: true });
 
     await compareMany(pairs, opts);
@@ -323,9 +311,7 @@ describe('compareMany', () => {
       reason: 'not-ignored',
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     await compareMany(pairs, opts);
@@ -345,9 +331,7 @@ describe('compareMany', () => {
       ],
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ checkValues: true });
 
     await compareMany(pairs, opts);
@@ -382,9 +366,7 @@ describe('compareMany', () => {
       },
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ fix: true });
 
     await compareMany(pairs, opts);
@@ -417,9 +399,7 @@ describe('compareMany', () => {
 
     mockFilterIgnoredKeys.mockImplementation((keys) => keys);
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ showStats: true });
 
     await compareMany(pairs, opts);
@@ -446,9 +426,7 @@ describe('compareMany', () => {
       valueMismatches: [],
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ strict: true });
 
     const result = await compareMany(pairs, opts);
@@ -457,9 +435,7 @@ describe('compareMany', () => {
   });
 
   it('returns exitWithError false in strict mode when no issues exist', async () => {
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ strict: true });
 
     const result = await compareMany(pairs, opts);
@@ -474,9 +450,7 @@ describe('compareMany', () => {
       valueMismatches: [],
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ only: ['missing'] });
 
     await compareMany(pairs, opts);
@@ -495,9 +469,7 @@ describe('compareMany', () => {
       reason: 'not-ignored',
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ only: ['missing'] });
 
     await compareMany(pairs, opts);
@@ -511,9 +483,7 @@ describe('compareMany', () => {
       collected.push(entry);
     };
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ collect });
 
     await compareMany(pairs, opts);
@@ -555,9 +525,7 @@ describe('compareMany', () => {
   it('returns exitWithError true when updateTotals indicates error', async () => {
     mockUpdateTotals.mockReturnValue(true);
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     const result = await compareMany(pairs, opts);
@@ -577,9 +545,7 @@ describe('compareMany', () => {
       return keys.filter((k: string) => !ignore.includes(k));
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ ignore: ['IGNORED'] });
 
     await compareMany(pairs, opts);
@@ -598,9 +564,7 @@ describe('compareMany', () => {
       );
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ ignoreRegex: [/^TEST_/] });
 
     await compareMany(pairs, opts);
@@ -619,9 +583,7 @@ describe('compareMany', () => {
       valueMismatches: [],
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     await compareMany(pairs, opts);
@@ -636,9 +598,7 @@ describe('compareMany', () => {
       valueMismatches: [],
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ fix: false });
 
     await compareMany(pairs, opts);
@@ -654,9 +614,7 @@ describe('compareMany', () => {
   });
 
   it('outputs JSON format when json flag is enabled', async () => {
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ json: true });
 
     await compareMany(pairs, opts);
@@ -673,9 +631,7 @@ describe('compareMany', () => {
       return { KEY1: '', KEY2: '', KEY3: '' };
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     await compareMany(pairs, opts);
@@ -696,9 +652,7 @@ describe('compareMany', () => {
       return { KEY1: '', KEY2: '' };
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     await compareMany(pairs, opts);
@@ -717,9 +671,7 @@ describe('compareMany', () => {
   it('handles missing example file gracefully', async () => {
     fs.unlinkSync(examplePath);
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     const result = await compareMany(pairs, opts);
@@ -731,9 +683,7 @@ describe('compareMany', () => {
   it('handles missing env file gracefully', async () => {
     fs.unlinkSync(envPath);
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions();
 
     const result = await compareMany(pairs, opts);
@@ -748,9 +698,7 @@ describe('compareMany', () => {
       { key: 'IGNORED_DUP', count: 2 },
     ]);
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ ignore: ['IGNORED_DUP'] });
 
     await compareMany(pairs, opts);
@@ -774,9 +722,7 @@ describe('compareMany', () => {
       },
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ fix: true });
 
     await compareMany(pairs, opts);
@@ -801,9 +747,7 @@ describe('compareMany', () => {
       reason: 'no-gitignore',
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ checkValues: true, strict: true });
 
     const result = await compareMany(pairs, opts);
@@ -828,9 +772,7 @@ describe('compareMany', () => {
       return { KEY1: '', KEY2: '', KEY4: '' };
     });
 
-    const pairs: FilePair[] = [
-      { envName: '.env', envPath, examplePath },
-    ];
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
     const opts = createOptions({ showStats: true });
 
     await compareMany(pairs, opts);

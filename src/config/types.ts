@@ -197,7 +197,8 @@ export interface ScanResult {
 /**
  * Possible issues detected with .gitignore regarding environment files.
  */
-export type GitignoreIssue = (typeof GITIGNORE_ISSUES)[keyof typeof GITIGNORE_ISSUES];
+export type GitignoreIssue =
+  (typeof GITIGNORE_ISSUES)[keyof typeof GITIGNORE_ISSUES];
 
 /**
  * Type representing a single entry in the comparison results
