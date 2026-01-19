@@ -16,6 +16,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 ### Fixed
 
 - Fixed compare mode json output missing stats
+- Fixed compare mode issue where it would warn about .env.example not being gitignored in edgde cases.
 
 ## [2.4.9] - 2026-01-13
 

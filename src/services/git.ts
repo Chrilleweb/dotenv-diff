@@ -3,6 +3,7 @@ import path from 'path';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import {
   DEFAULT_ENV_FILE,
+  DEFAULT_EXAMPLE_FILE,
   GITIGNORE_FILE,
   GIT_DIR,
 } from '../config/constants.js';
@@ -126,6 +127,9 @@ export function checkGitignoreStatus(options: GitignoreCheckOptions = {}): {
 } | null {
   const { cwd = process.cwd(), envFile = DEFAULT_ENV_FILE } = options;
 
+  // .env.example is not expected to be gitignored
+  if (envFile === DEFAULT_EXAMPLE_FILE) return null;
+  
   const envPath = path.resolve(cwd, envFile);
   if (!fs.existsSync(envPath)) return null;
   if (!isGitRepo(cwd)) return null;

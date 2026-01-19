@@ -24,6 +24,7 @@ import { printIssues } from '../ui/compare/printIssues.js';
 import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import { compareJsonOutput } from '../ui/compare/compareJsonOutput.js';
+import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -53,9 +54,19 @@ export async function compareMany(
   for (const { envName, envPath, examplePath } of pairs) {
     const exampleName = path.basename(examplePath);
 
-    const skipping = !fs.existsSync(envPath) || !fs.existsSync(examplePath);
+    // Check if both files exist
+    if (!fs.existsSync(envPath) && !fs.existsSync(examplePath)) {
+      printErrorNotFound(
+        fs.existsSync(envPath),
+        fs.existsSync(examplePath),
+        opts.cwd,
+        opts.cwd,
+      );
+      exitWithError = true;
+      continue;
+    }
 
-    printHeader(envName, exampleName, opts.json ?? false, skipping);
+    printHeader(envName, exampleName, opts.json ?? false);
 
     // Parse and filter env files
     const { current, example, currentKeys, exampleKeys } = parseAndFilter(
@@ -138,9 +149,8 @@ export async function compareMany(
     const stats = {
       envCount: currentKeys.length,
       exampleCount: exampleKeys.length,
-      sharedCount: new Set(
-        currentKeys.filter((k) => exampleKeys.includes(k)),
-      ).size,
+      sharedCount: new Set(currentKeys.filter((k) => exampleKeys.includes(k)))
+        .size,
     };
 
     // Build JSON entry with all the data

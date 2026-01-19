@@ -12,13 +12,9 @@ export function printHeader(
   envName: string,
   exampleName: string,
   json: boolean,
-  skipping: boolean,
 ): void {
   if (json) return;
   console.log();
   console.log(chalk.blue(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
-  if (skipping) {
-    console.log(chalk.yellow('⚠️  Skipping: missing matching example file.'));
-  }
   console.log();
 }
