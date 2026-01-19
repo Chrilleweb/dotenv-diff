@@ -1,4 +1,4 @@
-import { ALLOWED_CATEGORIES } from './constants.js';
+import { ALLOWED_CATEGORIES, SKIP_REASONS } from './constants.js';
 import { type SecretFinding } from '../core/security/secretDetectors.js';
 import { type ExampleSecretWarning } from '../core/security/exampleSecretDetector.js';
 
@@ -195,13 +195,25 @@ export interface ScanResult {
 }
 
 /**
+ * Type representing reasons for skipping a file pair during comparison.
+ */
+export type SkipReason = typeof SKIP_REASONS[keyof typeof SKIP_REASONS];
+
+/**
  * Type representing a single entry in the comparison results
  * This entry contains the environment variable and its example value.
  */
 export type CompareJsonEntry = {
   env: string;
   example: string;
-  skipped?: { reason: string };
+  stats?: {
+     envCount: number;
+     exampleCount: number;
+     sharedCount: number;
+   };
+  skipped?: { 
+     reason: SkipReason;
+   };
   duplicates?: {
     env?: Duplicate[];
     example?: Duplicate[];
@@ -209,6 +221,7 @@ export type CompareJsonEntry = {
   missing?: string[];
   extra?: string[];
   empty?: string[];
+  gitignoreIssue?: { reason: 'no-gitignore' | 'not-ignored' };
   valueMismatches?: Array<{ key: string; expected: string; actual: string }>;
   ok?: boolean;
 };

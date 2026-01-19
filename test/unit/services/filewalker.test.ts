@@ -375,25 +375,20 @@ describe('fileWalker', () => {
     it('excludes files matching exclude patterns', async () => {
       const srcDir = path.join(tmpDir, 'src');
       const testDir = path.join(tmpDir, 'test');
+
       fs.mkdirSync(srcDir);
       fs.mkdirSync(testDir);
-      fs.writeFileSync(path.join(srcDir, 'app.js'), '');
-      fs.writeFileSync(path.join(testDir, 'app.test.js'), '');
+
+      const srcFile = path.join(srcDir, 'app.js');
+      const testFile = path.join(testDir, 'app.test.js');
+
+      fs.writeFileSync(srcFile, '');
+      fs.writeFileSync(testFile, '');
 
       const result = await findFiles(tmpDir, { exclude: ['test'] });
 
-      expect(
-        result.some(
-          (f) => f.includes('src/app.js') || f.endsWith('src/app.js'),
-        ),
-      ).toBe(true);
-      expect(
-        result.some(
-          (f) =>
-            f.includes('test/app.test.js') ||
-            f.includes('test' + path.sep + 'app.test.js'),
-        ),
-      ).toBe(false);
+      expect(result).toContain(srcFile);
+      expect(result).not.toContain(testFile);
     });
 
     it('handles directory read errors gracefully', async () => {
@@ -448,17 +443,22 @@ describe('fileWalker', () => {
     });
 
     it('skips directories excluded by default patterns', async () => {
-      const nodeModules = path.join(tmpDir, 'node_modules');
+      const nodeModulesDir = path.join(tmpDir, 'node_modules');
       const srcDir = path.join(tmpDir, 'src');
-      fs.mkdirSync(nodeModules);
+
+      fs.mkdirSync(nodeModulesDir);
       fs.mkdirSync(srcDir);
-      fs.writeFileSync(path.join(nodeModules, 'lib.js'), '');
-      fs.writeFileSync(path.join(srcDir, 'app.js'), '');
+
+      const nodeModulesFile = path.join(nodeModulesDir, 'lib.js');
+      const srcFile = path.join(srcDir, 'app.js');
+
+      fs.writeFileSync(nodeModulesFile, '');
+      fs.writeFileSync(srcFile, '');
 
       const result = await findFiles(tmpDir, {});
 
-      expect(result.some((f) => f.includes('node_modules'))).toBe(false);
-      expect(result.some((f) => f.includes('src/app.js'))).toBe(true);
+      expect(result).not.toContain(nodeModulesFile);
+      expect(result).toContain(srcFile);
     });
   });
 });

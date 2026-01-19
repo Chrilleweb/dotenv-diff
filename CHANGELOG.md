@@ -15,7 +15,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
--
+- Fixed compare mode json output missing stats
 
 ## [2.4.9] - 2026-01-13
 

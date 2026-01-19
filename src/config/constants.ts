@@ -57,3 +57,12 @@ export const ALLOWED_CATEGORIES = [
   'duplicate',
   'gitignore',
 ] as const;
+
+/**
+ * Reasons for skipping a file pair during comparison in compareMany().
+ */
+export const SKIP_REASONS = {
+  ENV_MISSING: 'env-missing',
+  EXAMPLE_MISSING: 'example-missing',
+  BOTH_MISSING: 'both-missing',
+} as const;
