@@ -33,7 +33,7 @@ describe('non-interactive flags', () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
     const res = runCli(cwd, ['--compare', '--ci']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Do you want to create');
+    expect(res.stdout).toContain('Skipping .env creation.');
     expect(fs.existsSync(path.join(cwd, '.env'))).toBe(false);
   });
 
@@ -53,7 +53,7 @@ describe('non-interactive flags', () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
     const res = runCli(cwd, ['--compare', '--ci']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Do you want to create');
+    expect(res.stdout).toContain('Skipping .env.example creation.');
     expect(fs.existsSync(path.join(cwd, '.env.example'))).toBe(false);
   });
 
