@@ -11,9 +11,9 @@ import {
   shouldInclude,
   shouldExclude,
   matchesGlobPattern,
-} from '../../../src/services/fileWalker.js';
+} from '../../../src/services/filewalker.js';
 
-describe('fileWalker', () => {
+describe('filewalker', () => {
   let tmpDir: string;
 
   beforeEach(() => {

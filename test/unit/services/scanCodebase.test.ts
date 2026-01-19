@@ -23,7 +23,7 @@ vi.mock('../../../src/ui/scan/printProgress.js', () => ({
   printProgress: vi.fn(),
 }));
 
-import { findFiles } from '../../../src/services/fileWalker.js';
+import { findFiles } from '../../../src/services/filewalker.js';
 import { scanFile } from '../../../src/core/scanFile.js';
 import { detectSecretsInSource } from '../../../src/core/security/secretDetectors.js';
 import { printProgress } from '../../../src/ui/scan/printProgress.js';
