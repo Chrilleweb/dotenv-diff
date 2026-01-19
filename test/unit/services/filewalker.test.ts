@@ -11,7 +11,7 @@ import {
   shouldInclude,
   shouldExclude,
   matchesGlobPattern,
-} from '../../../src/services/filewalker.js';
+} from '../../../src/services/fileWalker.js';
 
 describe('filewalker', () => {
   let tmpDir: string;
