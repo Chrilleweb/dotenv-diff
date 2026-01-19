@@ -59,7 +59,7 @@ export async function compareMany(
     const exampleExists = fs.existsSync(examplePath);
 
     if (!envExists || !exampleExists) {
-      printErrorNotFound(envExists, exampleExists, opts.cwd, opts.cwd);
+      printErrorNotFound(envExists, exampleExists, envPath, examplePath);
       exitWithError = true;
       continue;
     }
