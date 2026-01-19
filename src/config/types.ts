@@ -1,4 +1,4 @@
-import { ALLOWED_CATEGORIES } from './constants.js';
+import { ALLOWED_CATEGORIES, GITIGNORE_ISSUES } from './constants.js';
 import { type SecretFinding } from '../core/security/secretDetectors.js';
 import { type ExampleSecretWarning } from '../core/security/exampleSecretDetector.js';
 
@@ -197,7 +197,7 @@ export interface ScanResult {
 /**
  * Possible issues detected with .gitignore regarding environment files.
  */
-export type GitignoreIssue  = 'no-gitignore' | 'not-ignored';
+export type GitignoreIssue = (typeof GITIGNORE_ISSUES)[keyof typeof GITIGNORE_ISSUES];
 
 /**
  * Type representing a single entry in the comparison results
@@ -207,10 +207,10 @@ export type CompareJsonEntry = {
   env: string;
   example: string;
   stats?: {
-     envCount: number;
-     exampleCount: number;
-     sharedCount: number;
-   };
+    envCount: number;
+    exampleCount: number;
+    sharedCount: number;
+  };
   duplicates?: {
     env?: Duplicate[];
     example?: Duplicate[];
@@ -218,7 +218,7 @@ export type CompareJsonEntry = {
   missing?: string[];
   extra?: string[];
   empty?: string[];
-  gitignoreIssue?: { reason: GitignoreIssue  };
+  gitignoreIssue?: { reason: GitignoreIssue };
   valueMismatches?: Array<{ key: string; expected: string; actual: string }>;
   ok?: boolean;
 };
@@ -271,7 +271,7 @@ export type Filtered = {
   mismatches?: Array<{ key: string; expected: string; actual: string }>;
   duplicatesEnv: Duplicate[];
   duplicatesEx: Duplicate[];
-  gitignoreIssue: { reason: 'no-gitignore' | 'not-ignored' } | null;
+  gitignoreIssue: { reason: GitignoreIssue } | null;
 };
 
 /**

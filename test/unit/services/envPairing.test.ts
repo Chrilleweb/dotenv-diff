@@ -64,9 +64,7 @@ describe('pairWithExample', () => {
 
     const result = envPairing(d);
 
-    expect(result[0].examplePath).toBe(
-      path.resolve(cwd, '.env.example'),
-    );
+    expect(result[0].examplePath).toBe(path.resolve(cwd, '.env.example'));
   });
 
   it('uses explicit example flag when provided without env flag', () => {
@@ -85,9 +83,7 @@ describe('pairWithExample', () => {
 
     const result = envPairing(d);
 
-    expect(result[0].examplePath).toBe(
-      path.resolve(cwd, 'custom.example'),
-    );
+    expect(result[0].examplePath).toBe(path.resolve(cwd, 'custom.example'));
   });
 
   it('skips pairing when env and example resolve to the same file', () => {

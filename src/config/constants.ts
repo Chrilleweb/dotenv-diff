@@ -23,6 +23,14 @@ export const GIT_DIR = '.git';
 export const GITIGNORE_FILE = '.gitignore';
 
 /**
+ * Constant of possible issues detected with .gitignore regarding environment files.
+ */
+export const GITIGNORE_ISSUES = {
+  NO_GITIGNORE: 'no-gitignore',
+  NOT_IGNORED: 'not-ignored',
+} as const;
+
+/**
  * Common environment file variants checked during auto-discovery.
  * Listed in priority order - earlier entries are preferred when multiple exist.
  *

@@ -28,7 +28,9 @@ export function printErrorNotFound(
   }
   if (!envExists || !exExists) {
     console.error(
-      chalk.red('Please ensure both files exist before running the comparison.'),
+      chalk.red(
+        'Please ensure both files exist before running the comparison.',
+      ),
     );
   }
 }

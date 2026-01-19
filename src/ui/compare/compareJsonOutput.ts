@@ -2,9 +2,8 @@ import type {
   CompareJsonEntry,
   Duplicate,
   Filtered,
-  GitignoreIssue ,
+  GitignoreIssue,
 } from '../../config/types.js';
-
 
 /**
  * Builds a CompareJsonEntry for the given comparison results.
@@ -25,7 +24,7 @@ export function compareJsonOutput({
   exampleName: string;
   dupsEnv: Duplicate[];
   dupsEx: Duplicate[];
-  gitignoreIssue: { reason: GitignoreIssue  } | null;
+  gitignoreIssue: { reason: GitignoreIssue } | null;
   ok?: boolean;
   filtered?: Filtered;
   stats?: {
