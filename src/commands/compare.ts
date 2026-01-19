@@ -54,14 +54,12 @@ export async function compareMany(
   for (const { envName, envPath, examplePath } of pairs) {
     const exampleName = path.basename(examplePath);
 
-    // Check if both files exist
-    if (!fs.existsSync(envPath) && !fs.existsSync(examplePath)) {
-      printErrorNotFound(
-        fs.existsSync(envPath),
-        fs.existsSync(examplePath),
-        opts.cwd,
-        opts.cwd,
-      );
+    // Check if files exist
+    const envExists = fs.existsSync(envPath);
+    const exampleExists = fs.existsSync(examplePath);
+
+    if (!envExists || !exampleExists) {
+      printErrorNotFound(envExists, exampleExists, opts.cwd, opts.cwd);
       exitWithError = true;
       continue;
     }
