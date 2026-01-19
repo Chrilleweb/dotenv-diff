@@ -3,9 +3,9 @@ import type {
   EnvUsage,
   Duplicate,
   SupportedFramework,
-} from '../config/types.js';
-import { computeHealthScore } from './computeHealthScore.js';
-import { normalizePath } from './helpers/normalizePath.js';
+} from '../../config/types.js';
+import { computeHealthScore } from '../../core/computeHealthScore.js';
+import { normalizePath } from '../../core/helpers/normalizePath.js';
 
 /**
  * JSON structure for scan results output
@@ -89,7 +89,7 @@ interface ScanJsonOutput {
  * @param comparedAgainst - The file being compared against.
  * @returns The JSON output.
  */
-export function createJsonOutput(
+export function scanJsonOutput(
   scanResult: ScanResult,
   comparedAgainst: string,
 ): ScanJsonOutput {

@@ -7,7 +7,7 @@ import type {
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/determineComparisonFile.js';
 import { printScanResult } from '../services/printScanResult.js';
-import { createJsonOutput } from '../core/scanJsonOutput.js';
+import { scanJsonOutput } from '../ui/scan/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../services/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
@@ -112,7 +112,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
 
   // JSON output
   if (opts.json) {
-    const jsonOutput = createJsonOutput(scanResult, comparedAgainst);
+    const jsonOutput = scanJsonOutput(scanResult, comparedAgainst);
     console.log(JSON.stringify(jsonOutput, null, 2));
 
     // Check for high severity secrets
