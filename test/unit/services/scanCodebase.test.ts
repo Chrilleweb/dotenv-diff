@@ -107,48 +107,103 @@ describe('scanCodebase', () => {
   });
 
   describe('file reading', () => {
-    it('skips files that cannot be read', async () => {
-      const testFile = path.join(tmpDir, 'unreadable.js');
-      fsSync.writeFileSync(testFile, 'content');
-      fsSync.chmodSync(testFile, 0o000); // Make file unreadable
+    it.skipIf(process.platform === 'win32')(
+      'skips files that cannot be read',
+      async () => {
+        const testFile = path.join(tmpDir, 'unreadable.js');
+        fsSync.writeFileSync(testFile, 'content');
+        fsSync.chmodSync(testFile, 0o000); // Make file unreadable
 
-      vi.mocked(findFiles).mockResolvedValue([testFile]);
+        vi.mocked(findFiles).mockResolvedValue([testFile]);
 
-      const result = await scanCodebase(defaultOpts);
+        const result = await scanCodebase(defaultOpts);
 
-      expect(result.stats.filesScanned).toBe(0);
+        expect(result.stats.filesScanned).toBe(0);
 
-      // Restore permissions for cleanup
-      fsSync.chmodSync(testFile, 0o644);
-    });
+        // Restore permissions for cleanup
+        fsSync.chmodSync(testFile, 0o644);
+      },
+    );
 
-    it('continues scanning after encountering unreadable file', async () => {
-      const unreadableFile = path.join(tmpDir, 'unreadable.js');
-      const readableFile = path.join(tmpDir, 'readable.js');
+    it.skipIf(process.platform === 'win32')(
+      'continues scanning after encountering unreadable file',
+      async () => {
+        const unreadableFile = path.join(tmpDir, 'unreadable.js');
+        const readableFile = path.join(tmpDir, 'readable.js');
 
-      fsSync.writeFileSync(unreadableFile, 'content');
-      fsSync.writeFileSync(readableFile, 'const x = process.env.KEY;');
-      fsSync.chmodSync(unreadableFile, 0o000);
+        fsSync.writeFileSync(unreadableFile, 'content');
+        fsSync.writeFileSync(readableFile, 'const x = process.env.KEY;');
+        fsSync.chmodSync(unreadableFile, 0o000);
 
-      vi.mocked(findFiles).mockResolvedValue([unreadableFile, readableFile]);
-      vi.mocked(scanFile).mockReturnValue([
-        {
-          variable: 'KEY',
-          file: readableFile,
-          line: 1,
-          column: 10,
-          pattern: 'process.env',
-          context: 'const x = process.env.KEY;',
-        },
-      ]);
+        vi.mocked(findFiles).mockResolvedValue([unreadableFile, readableFile]);
+        vi.mocked(scanFile).mockReturnValue([
+          {
+            variable: 'KEY',
+            file: readableFile,
+            line: 1,
+            column: 10,
+            pattern: 'process.env',
+            context: 'const x = process.env.KEY;',
+          },
+        ]);
 
-      const result = await scanCodebase(defaultOpts);
+        const result = await scanCodebase(defaultOpts);
 
-      expect(result.stats.filesScanned).toBe(1);
-      expect(result.used).toHaveLength(1);
+        expect(result.stats.filesScanned).toBe(1);
+        expect(result.used).toHaveLength(1);
 
-      fsSync.chmodSync(unreadableFile, 0o644);
-    });
+        fsSync.chmodSync(unreadableFile, 0o644);
+      },
+    );
+
+    it.runIf(process.platform === 'win32')(
+      'skips files that cannot be read (Windows)',
+      async () => {
+        // On Windows, we test file read errors by providing a non-existent file path
+        const nonExistentFile = path.join(
+          tmpDir,
+          'non-existent-dir',
+          'file.js',
+        );
+
+        vi.mocked(findFiles).mockResolvedValue([nonExistentFile]);
+
+        const result = await scanCodebase(defaultOpts);
+
+        expect(result.stats.filesScanned).toBe(0);
+      },
+    );
+
+    it.runIf(process.platform === 'win32')(
+      'continues scanning after encountering unreadable file (Windows)',
+      async () => {
+        const nonExistentFile = path.join(
+          tmpDir,
+          'non-existent-dir',
+          'file.js',
+        );
+        const readableFile = path.join(tmpDir, 'readable.js');
+
+        fsSync.writeFileSync(readableFile, 'const x = process.env.KEY;');
+
+        vi.mocked(findFiles).mockResolvedValue([nonExistentFile, readableFile]);
+        vi.mocked(scanFile).mockReturnValue([
+          {
+            variable: 'KEY',
+            file: readableFile,
+            line: 1,
+            column: 10,
+            pattern: 'process.env',
+            context: 'const x = process.env.KEY;',
+          },
+        ]);
+
+        const result = await scanCodebase(defaultOpts);
+
+        expect(result.stats.filesScanned).toBe(1);
+        expect(result.used).toHaveLength(1);
+      },
+    );
   });
 
   describe('ignored variables', () => {

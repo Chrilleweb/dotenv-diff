@@ -85,4 +85,27 @@ describe('added .env to gitignore with --compare and --fix', () => {
     expect(res.stdout).toContain('Auto-fix applied:');
     expect(res.stdout).toContain('Added .env to .gitignore');
   });
+
+  it('Will print json output including gitignoreIssue', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, '.git'));
+    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=test\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'API_KEY=test\n');
+
+    fs.writeFileSync(path.join(cwd, '.gitignore'), 'node_modules\n');
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `const apiKey = process.env.API_KEY;`.trimStart(),
+    );
+
+    const res = runCli(cwd, ['--compare', '--json']);
+
+    expect(res.status).toBe(0);
+    const json = JSON.parse(res.stdout);
+    expect(json[0].gitignoreIssue).toBeDefined();
+    expect(json[0].gitignoreIssue?.reason).toBe('not-ignored');
+  });
 });

@@ -3,9 +3,12 @@ import path from 'path';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import {
   DEFAULT_ENV_FILE,
+  DEFAULT_EXAMPLE_FILE,
   GITIGNORE_FILE,
   GIT_DIR,
+  GITIGNORE_ISSUES,
 } from '../config/constants.js';
+import type { GitignoreIssue } from '../config/types.js';
 
 interface GitignoreCheckOptions {
   /** Project root directory (default: process.cwd()) */
@@ -106,12 +109,20 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
   const ignored = isEnvIgnoredByGit({ cwd, envFile });
 
   if (ignored === null) {
-    printGitignoreWarning({ envFile, reason: 'no-gitignore', log });
+    printGitignoreWarning({
+      envFile,
+      reason: GITIGNORE_ISSUES.NO_GITIGNORE,
+      log,
+    });
     return;
   }
 
   if (ignored === false) {
-    printGitignoreWarning({ envFile, reason: 'not-ignored', log });
+    printGitignoreWarning({
+      envFile,
+      reason: GITIGNORE_ISSUES.NOT_IGNORED,
+      log,
+    });
   }
 }
 
@@ -122,9 +133,12 @@ export function warnIfEnvNotIgnored(options: GitignoreCheckOptions = {}): void {
  * @returns Null if no issue, otherwise the reason for the issue.
  */
 export function checkGitignoreStatus(options: GitignoreCheckOptions = {}): {
-  reason: 'no-gitignore' | 'not-ignored';
+  reason: GitignoreIssue;
 } | null {
   const { cwd = process.cwd(), envFile = DEFAULT_ENV_FILE } = options;
+
+  // .env.example is not expected to be gitignored
+  if (envFile === DEFAULT_EXAMPLE_FILE) return null;
 
   const envPath = path.resolve(cwd, envFile);
   if (!fs.existsSync(envPath)) return null;
@@ -133,12 +147,12 @@ export function checkGitignoreStatus(options: GitignoreCheckOptions = {}): {
   const gitignorePath = path.resolve(cwd, GITIGNORE_FILE);
 
   if (!fs.existsSync(gitignorePath)) {
-    return { reason: 'no-gitignore' };
+    return { reason: GITIGNORE_ISSUES.NO_GITIGNORE };
   }
 
   const ignored = isEnvIgnoredByGit({ cwd, envFile });
   if (ignored === false || ignored === null) {
-    return { reason: 'not-ignored' };
+    return { reason: GITIGNORE_ISSUES.NOT_IGNORED };
   }
 
   return null;

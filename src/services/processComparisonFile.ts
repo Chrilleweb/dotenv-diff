@@ -1,13 +1,13 @@
 import fs from 'fs';
-import { parseEnvFile } from './parseEnv.js';
-import { filterIgnoredKeys } from './filterIgnoredKeys.js';
-import { compareWithEnvFiles } from './compareScan.js';
-import { findDuplicateKeys } from './duplicates.js';
-import { applyFixes } from './fixEnv.js';
-import { toUpperSnakeCase } from './helpers/toUpperSnakeCase.js';
-import { resolveFromCwd } from './helpers/resolveFromCwd.js';
-import { detectEnvExpirations } from '../services/detectEnvExpirations.js';
-import { detectInconsistentNaming } from './detectInconsistentNaming.js';
+import { parseEnvFile } from '../core/parseEnv.js';
+import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
+import { compareWithEnvFiles } from '../core/compareScan.js';
+import { findDuplicateKeys } from '../core/duplicates.js';
+import { applyFixes } from '../core/fixEnv.js';
+import { toUpperSnakeCase } from '../core/helpers/toUpperSnakeCase.js';
+import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
+import { detectEnvExpirations } from './detectEnvExpirations.js';
+import { detectInconsistentNaming } from '../core/detectInconsistentNaming.js';
 import type {
   ScanUsageOptions,
   ScanResult,

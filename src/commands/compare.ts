@@ -7,7 +7,6 @@ import { findDuplicateKeys } from '../core/duplicates.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import type {
   Category,
-  CompareJsonEntry,
   ComparisonOptions,
   FilePair,
   ExitResult,
@@ -24,6 +23,8 @@ import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printIssues } from '../ui/compare/printIssues.js';
 import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
+import { compareJsonOutput } from '../ui/compare/compareJsonOutput.js';
+import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -52,18 +53,18 @@ export async function compareMany(
 
   for (const { envName, envPath, examplePath } of pairs) {
     const exampleName = path.basename(examplePath);
-    const entry: CompareJsonEntry = { env: envName, example: exampleName };
 
-    const skipping = !fs.existsSync(envPath) || !fs.existsSync(examplePath);
+    // Check if files exist
+    const envExists = fs.existsSync(envPath);
+    const exampleExists = fs.existsSync(examplePath);
 
-    printHeader(envName, exampleName, opts.json ?? false, skipping);
-
-    if (skipping) {
+    if (!envExists || !exampleExists) {
+      printErrorNotFound(envExists, exampleExists, opts.cwd, opts.cwd);
       exitWithError = true;
-      entry.skipped = { reason: 'missing file' };
-      opts.collect?.(entry);
       continue;
     }
+
+    printHeader(envName, exampleName, opts.json ?? false);
 
     // Parse and filter env files
     const { current, example, currentKeys, exampleKeys } = parseAndFilter(
@@ -136,14 +137,31 @@ export async function compareMany(
     const allOk = isAllOk(filtered);
 
     if (allOk) {
-      entry.ok = true;
       printSuccess(opts.json ?? false, 'compare');
-      opts.collect?.(entry);
-      continue;
     }
 
     // Print duplicates
     printDuplicates(envName, exampleName, dupsEnv, dupsEx, opts.json ?? false);
+
+    // Calculate stats for JSON entry
+    const stats = {
+      envCount: currentKeys.length,
+      exampleCount: exampleKeys.length,
+      sharedCount: new Set(currentKeys.filter((k) => exampleKeys.includes(k)))
+        .size,
+    };
+
+    // Build JSON entry with all the data
+    const entry = compareJsonOutput({
+      envName,
+      exampleName,
+      dupsEnv,
+      dupsEx,
+      gitignoreIssue,
+      ok: allOk,
+      filtered,
+      stats,
+    });
 
     // Track errors and update totals
     const shouldExit = updateTotals(filtered, totals, entry);

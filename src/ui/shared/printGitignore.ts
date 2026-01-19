@@ -1,8 +1,10 @@
 import chalk from 'chalk';
+import type { GitignoreIssue } from '../../config/types.js';
+import { GITIGNORE_ISSUES } from '../../config/constants.js';
 
-type GitignoreWarningOptions = {
+interface GitignoreWarningOptions {
   envFile: string;
-  reason: 'no-gitignore' | 'not-ignored';
+  reason: GitignoreIssue;
   log?: (msg: string) => void;
 };
 
@@ -14,7 +16,7 @@ type GitignoreWarningOptions = {
 export function printGitignoreWarning(options: GitignoreWarningOptions): void {
   const { envFile, reason, log = console.log } = options;
 
-  if (reason === 'no-gitignore') {
+  if (reason === GITIGNORE_ISSUES.NO_GITIGNORE) {
     log(
       chalk.yellow(
         `⚠️  No .gitignore found – your ${envFile} may be committed.\n` +
