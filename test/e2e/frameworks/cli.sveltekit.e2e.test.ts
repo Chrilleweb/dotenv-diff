@@ -99,25 +99,6 @@ describe('SvelteKit environment variable usage rules', () => {
     expect(res.stdout).toContain('VITE_SECRET');
   });
 
-  it('warns when using $env/static/private with a VITE_ prefixed variable', () => {
-    const cwd = tmpDir();
-    makeSvelteKitProject(cwd);
-
-    fs.writeFileSync(
-      path.join(cwd, 'src/app.ts'),
-      `import { VITE_KEY } from '$env/static/private';`,
-    );
-
-    fs.writeFileSync(path.join(cwd, '.env'), 'VITE_KEY=123');
-
-    const res = runCli(cwd, ['--scan-usage']);
-
-    expect(res.stdout).toContain(
-      '$env/static/private variables must not start with "PUBLIC_" or "VITE_"',
-    );
-    expect(res.stdout).toContain('VITE_KEY');
-  });
-
   it('warns when using $env/static/public with a VITE_ prefixed variable', () => {
     const cwd = tmpDir();
     makeSvelteKitProject(cwd);
@@ -341,7 +322,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '"PUBLIC_" variables cannot be accessed through $env/dynamic/private',
+      '$env/dynamic/private variables must not start with "PUBLIC_"',
     );
     expect(res.stdout).toContain('PUBLIC_KEY');
   });

@@ -84,7 +84,7 @@ export function applySvelteKitRules(
   ) {
     warnings.push({
       variable: u.variable,
-      reason: `"PUBLIC_" variables cannot be accessed through $env/dynamic/private`,
+      reason: `$env/dynamic/private variables must not start with "PUBLIC_"`,
       file: normalizedFile,
       line: u.line,
       framework: 'sveltekit',
@@ -110,10 +110,10 @@ export function applySvelteKitRules(
 
   // $env/static/private
   if (u.pattern === 'sveltekit' && u.imports?.includes('$env/static/private')) {
-    if (u.variable.startsWith('VITE_') || u.variable.startsWith('PUBLIC_')) {
+    if (u.variable.startsWith('PUBLIC_')) {
       warnings.push({
         variable: u.variable,
-        reason: `$env/static/private variables must not start with "PUBLIC_" or "VITE_"`,
+        reason: `$env/static/private variables must not start with "PUBLIC_"`,
         file: normalizedFile,
         line: u.line,
         framework: 'sveltekit',
