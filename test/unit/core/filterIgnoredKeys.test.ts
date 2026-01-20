@@ -23,4 +23,27 @@ describe('filterIgnoredKeys', () => {
     const res = filterIgnoredKeys(keys, [], []);
     expect(res).toEqual(keys);
   });
+
+  it('always filters out DEFAULT_EXCLUDE_KEYS', () => {
+    const keys = [
+      'API_KEY',
+      'NODE_ENV',
+      'MODE',
+      'BASE_URL',
+      'PROD',
+      'DEV',
+      'SSR',
+      'DB_URL',
+    ];
+    const res = filterIgnoredKeys(keys, [], []);
+    expect(res).toEqual(['API_KEY', 'DB_URL']);
+  });
+
+  it('filters combination of ignore list, regex, and DEFAULT_EXCLUDE_KEYS', () => {
+    const keys = ['API_KEY', 'NODE_ENV', 'SECRET_TOKEN', 'MODE', 'DEBUG'];
+    const ignore = ['DEBUG'];
+    const regex = [/^SECRET_/];
+    const res = filterIgnoredKeys(keys, ignore, regex);
+    expect(res).toEqual(['API_KEY']);
+  });
 });

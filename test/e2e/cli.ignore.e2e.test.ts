@@ -83,4 +83,23 @@ describe('--ignore and --ignore-regex', () => {
     expect(res.status).toBe(1);
     expect(res.stderr).toContain('invalid --ignore-regex pattern');
   });
+
+  it('automatically ignores DEFAULT_EXCLUDE_KEYS (NODE_ENV, MODE, etc.)', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      'API_KEY=1\nNODE_ENV=production\nMODE=test\nBASE_URL=/\nPROD=true\nDEV=false\nSSR=true\n',
+    );
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'API_KEY=\n');
+    const res = runCli(cwd, ['--compare']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('All keys match');
+    // DEFAULT_EXCLUDE_KEYS should not be reported as extra
+    expect(res.stdout).not.toContain('NODE_ENV');
+    expect(res.stdout).not.toContain('MODE');
+    expect(res.stdout).not.toContain('BASE_URL');
+    expect(res.stdout).not.toContain('PROD');
+    expect(res.stdout).not.toContain('DEV');
+    expect(res.stdout).not.toContain('SSR');
+  });
 });

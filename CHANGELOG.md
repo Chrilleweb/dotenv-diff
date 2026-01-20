@@ -7,7 +7,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 
--
+- Added default excluded keys to filterIgnoredKeys (e.g. NODE_ENV, PORT, etc).
 
 ### Changed
 
