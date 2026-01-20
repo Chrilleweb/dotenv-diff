@@ -23,6 +23,10 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 - SvelteKit framework rule (PUBLIC_ env vars cant be accessed through $env/dynamic/private).
 
+### Fixed
+
+- Fixed sveltekit framework rules
+
 ## [2.4.10] - 2026-01-19
 
 ### Changed
