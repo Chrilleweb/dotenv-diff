@@ -325,6 +325,27 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     );
   });
 
+  it('Will warn when variable starts with PUBLIC_ inside $env/dynamic/private import', () => {
+    const cwd = tmpDir();
+    makeSvelteKitProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/routes/api.ts'),
+      `import { env } from '$env/dynamic/private';
+      
+      console.log(env.PUBLIC_KEY);`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'PUBLIC_KEY=123');
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.stdout).toContain(
+      '"PUBLIC_" variables cannot be accessed through $env/dynamic/private',
+    );
+    expect(res.stdout).toContain('PUBLIC_KEY');
+  });
+
   it('does warn when using $env/static/private in +page.svelte file', () => {
     const cwd = tmpDir();
     makeSvelteKitProject(cwd);

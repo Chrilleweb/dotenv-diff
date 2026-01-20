@@ -7,7 +7,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 
--
+- SvelteKit framework rule (PUBLIC_ env vars cant be accessed through $env/dynamic/private).
 
 ### Changed
 
