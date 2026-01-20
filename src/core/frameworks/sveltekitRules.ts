@@ -74,6 +74,21 @@ export function applySvelteKitRules(
     return;
   }
 
+  if (
+    u.pattern === 'sveltekit' &&
+    u.imports?.includes('$env/dynamic/private') &&
+    u.variable.startsWith('PUBLIC_')
+  ) {
+    warnings.push({
+      variable: u.variable,
+      reason: `"PUBLIC_" variables cannot be accessed through $env/dynamic/private`,
+      file: normalizedFile,
+      line: u.line,
+      framework: 'sveltekit',
+    });
+    return;
+  }
+
   // $env/static/private
   if (u.pattern === 'sveltekit' && u.imports?.includes('$env/static/private')) {
     if (u.variable.startsWith('VITE_')) {
