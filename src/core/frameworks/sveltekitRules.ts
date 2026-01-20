@@ -35,6 +35,7 @@ export function applySvelteKitRules(
 
   const isSvelteFile = /\.svelte$/.test(normalizedFile);
 
+  // import.meta.env
   if (u.pattern === 'import.meta.env' && !u.variable.startsWith('VITE_')) {
     warnings.push({
       variable: u.variable,
@@ -46,6 +47,7 @@ export function applySvelteKitRules(
     return; // Stop processing other rules for this usage
   }
 
+  // process.env
   if (u.pattern === 'process.env') {
     if (!isServerFile) {
       warnings.push({
@@ -59,6 +61,7 @@ export function applySvelteKitRules(
     }
   }
 
+  // $env/dynamic/private
   if (
     u.pattern === 'sveltekit' &&
     u.imports?.includes('$env/dynamic/private') &&
@@ -66,7 +69,7 @@ export function applySvelteKitRules(
   ) {
     warnings.push({
       variable: u.variable,
-      reason: `$env/dynamic/private cannot be used in client files`,
+      reason: `$env/dynamic/private cannot be used in client-side code`,
       file: normalizedFile,
       line: u.line,
       framework: 'sveltekit',
@@ -89,9 +92,25 @@ export function applySvelteKitRules(
     return;
   }
 
+  //$env/dynamic/public
+  if (
+    u.pattern === 'sveltekit' &&
+    u.imports?.includes('$env/dynamic/public') &&
+    !u.variable.startsWith('PUBLIC_')
+  ) {
+    warnings.push({
+      variable: u.variable,
+      reason: `$env/dynamic/public variables must start with "PUBLIC_"`,
+      file: normalizedFile,
+      line: u.line,
+      framework: 'sveltekit',
+    });
+    return;
+  }
+
   // $env/static/private
   if (u.pattern === 'sveltekit' && u.imports?.includes('$env/static/private')) {
-    if (u.variable.startsWith('VITE_')) {
+    if (u.variable.startsWith('VITE_') || u.variable.startsWith('PUBLIC_')) {
       warnings.push({
         variable: u.variable,
         reason: `$env/static/private variables must not start with "PUBLIC_" or "VITE_"`,
@@ -105,18 +124,7 @@ export function applySvelteKitRules(
     if (isSvelteFile || isClientFile) {
       warnings.push({
         variable: u.variable,
-        reason: `Private env vars cannot be used in client-side code`,
-        file: normalizedFile,
-        line: u.line,
-        framework: 'sveltekit',
-      });
-      return;
-    }
-
-    if (u.variable.startsWith('PUBLIC_')) {
-      warnings.push({
-        variable: u.variable,
-        reason: `$env/static/private variables must not start with "PUBLIC_"`,
+        reason: `$env/static/private variables cannot be used in client-side code`,
         file: normalizedFile,
         line: u.line,
         framework: 'sveltekit',

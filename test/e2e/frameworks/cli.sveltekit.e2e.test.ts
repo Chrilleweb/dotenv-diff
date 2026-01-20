@@ -153,7 +153,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'Private env vars cannot be used in client-side code',
+      '$env/static/private variables cannot be used in client-side code',
     );
     expect(res.stdout).toContain('SECRET_KEY');
   });
@@ -172,7 +172,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'Private env vars cannot be used in client-side code',
+      '$env/static/private variables cannot be used in client-side code',
     );
   });
 
@@ -196,7 +196,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Private env vars');
+    expect(res.stdout).not.toContain('$env/static/private variables cannot be used in client-side code');
     expect(res.stdout).not.toContain('warning');
   });
 
@@ -321,7 +321,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '$env/dynamic/private cannot be used in client files',
+      '$env/dynamic/private cannot be used in client-side code',
     );
   });
 
@@ -360,7 +360,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'Private env vars cannot be used in client-side code',
+      '$env/static/private variables cannot be used in client-side code',
     );
   });
 
@@ -384,7 +384,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Private env vars');
+    expect(res.stdout).not.toContain('$env/static/private variables cannot be used in client-side code');
     expect(res.stdout).not.toContain('warning');
   });
 
@@ -404,7 +404,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Private env vars');
+    expect(res.stdout).not.toContain('$env/static/private variables cannot be used in client-side code');
     expect(res.stdout).not.toContain('warning');
   });
 
@@ -445,6 +445,27 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('warning');
+  });
+
+  it('$env/dynamic/public variables must start with "PUBLIC_"', () => {
+    const cwd = tmpDir();
+    makeSvelteKitProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/routes/api.ts'),
+      `import { env } from '$env/dynamic/public';
+      
+      console.log(env.SECRET_KEY);`,
+    );
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=123');
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.stdout).toContain(
+      '$env/dynamic/public variables must start with "PUBLIC_"',
+    );
+    expect(res.stdout).toContain('SECRET_KEY');
   });
 
   it('allows $env/static/public in client files', () => {
