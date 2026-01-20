@@ -7,7 +7,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 
-- SvelteKit framework rule (PUBLIC_ env vars cant be accessed through $env/dynamic/private).
+-
 
 ### Changed
 
@@ -17,7 +17,17 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 -
 
-# [2.4.10] - 2026-01-19
+## [2.4.11] - 2026-01-20
+
+### Added
+
+- SvelteKit framework rule (PUBLIC_ env vars cant be accessed through $env/dynamic/private).
+
+### Fixed
+
+- Fixed sveltekit framework rules - $env imports were not being detected correctly in some edge cases.
+
+## [2.4.10] - 2026-01-19
 
 ### Changed
 
