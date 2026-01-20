@@ -25,7 +25,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
-- Fixed sveltekit framework rules
+- Fixed sveltekit framework rules - $env imports were not being detected correctly in some edge cases.
 
 ## [2.4.10] - 2026-01-19
 
