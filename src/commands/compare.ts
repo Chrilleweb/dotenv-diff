@@ -75,6 +75,7 @@ export async function compareMany(
     // Run checks
     const diff = diffEnv(current, example, opts.checkValues);
 
+    // Find empty keys in current env
     const emptyKeys = Object.entries(current)
       .filter(([, v]) => (v ?? '').trim() === '')
       .map(([k]) => k);
@@ -82,6 +83,7 @@ export async function compareMany(
     // Find duplicates
     const { dupsEnv, dupsEx } = findDuplicates(envPath, examplePath, opts, run);
 
+    // Check gitignore status
     const gitignoreIssue = run('gitignore')
       ? checkGitignoreStatus({ cwd: opts.cwd, envFile: envName })
       : null;

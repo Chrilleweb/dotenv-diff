@@ -5,12 +5,18 @@ import { warnIfEnvNotIgnored } from '../services/git.js';
 import { printPrompt } from '../ui/compare/printPrompt.js';
 import { DEFAULT_ENV_FILE } from '../config/constants.js';
 
+/**
+ * Result of ensureFilesOrPrompt function
+ */
 interface EnsureFilesResult {
   didCreate: boolean;
   shouldExit: boolean;
   exitCode: number;
 }
 
+/**
+ * Arguments for ensureFilesOrPrompt function
+ */
 interface EnsureFilesArgs {
   cwd: string;
   primaryEnv: string;
