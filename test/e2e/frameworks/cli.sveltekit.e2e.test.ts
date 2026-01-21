@@ -580,4 +580,29 @@ const url3 = import.meta.env.PUBLIC_URL;`,
       'process.env should only be used in server files',
     );
   });
+
+  it('Will warn for sensitive variables used in client code', () => {
+    const cwd = tmpDir();
+    makeSvelteKitProject(cwd);
+
+    fs.writeFileSync(
+      path.join(cwd, 'src/routes/+page.ts'),
+      `console.log(import.meta.env.VITE_SECRET_PASSWORD);
+      console.log(import.meta.env.PUBLIC_API_KEY);`,
+    );
+
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      `VITE_SECRET_PASSWORD=supersecret
+      PUBLIC_API_KEY=publickey`,
+    );
+
+    const res = runCli(cwd, ['--scan-usage']);
+
+    expect(res.stdout).toContain(
+      'Potential sensitive environment variable exposed to the browser',
+    );
+    expect(res.stdout).toContain('VITE_SECRET_PASSWORD');
+    expect(res.stdout).toContain('PUBLIC_API_KEY');
+  });
 });
