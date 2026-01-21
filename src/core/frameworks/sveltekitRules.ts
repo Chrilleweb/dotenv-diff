@@ -148,4 +148,19 @@ export function applySvelteKitRules(
     });
     return;
   }
+
+  // Warn if PUBLIC_ or VITE_ contains sensitive keywords
+    if (
+    (u.variable.startsWith('PUBLIC_') || u.variable.startsWith('VITE_')) &&
+    /SECRET|PRIVATE|PASSWORD/.test(u.variable)
+  ) {
+    warnings.push({
+      variable: u.variable,
+      reason: 'Potential sensitive environment variable exposed to the browser',
+      file: normalizedFile,
+      line: u.line,
+      framework: 'sveltekit',
+    });
+    return; // Stop processing other rules for this usage
+  }
 }

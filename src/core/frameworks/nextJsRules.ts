@@ -66,11 +66,11 @@ export function applyNextJsRules(
   // Warn if NEXT_PUBLIC_ contains sensitive keywords
   if (
     u.variable.startsWith('NEXT_PUBLIC_') &&
-    /SECRET|PRIVATE|KEY|TOKEN|PASSWORD/.test(u.variable)
+    /SECRET|PRIVATE|PASSWORD/.test(u.variable)
   ) {
     warnings.push({
       variable: u.variable,
-      reason: 'Sensitive data marked as public',
+      reason: 'Potential sensitive environment variable exposed to the browser',
       file: normalizedFile,
       line: u.line,
       framework: 'nextjs',

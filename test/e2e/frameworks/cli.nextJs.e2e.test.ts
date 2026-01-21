@@ -115,12 +115,11 @@ console.log(process.env.SECRET_TOKEN);`,
     fs.writeFileSync(
       path.join(cwd, 'app/api/test/route.ts'),
       `export async function GET() {
-        process.env.NEXT_PUBLIC_API_KEY;
+        process.env.NEXT_PUBLIC_SECRET_PASSWORD;
       }`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `NEXT_PUBLIC_API_KEY=secret123`);
-
+    fs.writeFileSync(path.join(cwd, '.env'), `NEXT_PUBLIC_SECRET_PASSWORD=secret123`);
     const res = runCli(cwd, ['--scan-usage', '--json']);
 
     console.log(res.stdout);
@@ -134,9 +133,9 @@ console.log(process.env.SECRET_TOKEN);`,
 
     // Check the warning content
     const warning = json.frameworkWarnings[0];
-    expect(warning.variable).toBe('NEXT_PUBLIC_API_KEY');
+    expect(warning.variable).toBe('NEXT_PUBLIC_SECRET_PASSWORD');
     expect(warning.framework).toBe('nextjs');
-    expect(warning.reason).toContain('Sensitive data marked as public');
+    expect(warning.reason).toContain('Potential sensitive environment variable exposed to the browser');
     expect(warning.file).toContain('app/api/test/route.ts');
     expect(warning.line).toBeGreaterThan(0);
   });

@@ -7,7 +7,8 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Added
 
-- Added default excluded keys to filterIgnoredKeys (e.g. NODE_ENV, PORT, etc).
+- Added default excluded keys to filterIgnoredKeys (e.g. NODE_ENV, VITE_MODE, etc).
+- Added Warn if PUBLIC_ or VITE_ contains sensitive keywords in sveltekit framework rules.
 
 ### Changed
 
