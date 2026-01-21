@@ -1,4 +1,7 @@
-// Framework-specific patterns for finding environment variable usage
+/**
+ * Framework-specific regex patterns for detecting environment variable usage
+ * across different runtimes and frameworks.
+ */
 export const ENV_PATTERNS = [
   // process.env.X
   {

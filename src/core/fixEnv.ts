@@ -3,6 +3,9 @@ import path from 'path';
 import { isEnvIgnoredByGit, isGitRepo, findGitRoot } from '../services/git.js';
 import { DEFAULT_GITIGNORE_ENV_PATTERNS } from '../config/constants.js';
 
+/**
+ * Options for applying fixes to environment files
+ */
 interface ApplyFixesOptions {
   envPath: string;
   examplePath: string;
@@ -11,6 +14,9 @@ interface ApplyFixesOptions {
   ensureGitignore?: boolean;
 }
 
+/**
+ * Result of applying fixes to environment files
+ */
 interface FixResult {
   removedDuplicates: string[];
   addedEnv: string[];

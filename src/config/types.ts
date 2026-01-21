@@ -2,10 +2,14 @@ import { ALLOWED_CATEGORIES, GITIGNORE_ISSUES } from './constants.js';
 import { type SecretFinding } from '../core/security/secretDetectors.js';
 import { type ExampleSecretWarning } from '../core/security/exampleSecretDetector.js';
 
-// Supported frameworks
+/**
+ * Supported frameworks
+ */
 export type SupportedFramework = 'sveltekit' | 'nextjs';
 
-// Result of framework detection (may be unsupported)
+/**
+ * Result of framework detection (may be unsupported)
+ */
 export type DetectedFramework = SupportedFramework | 'unknown';
 
 /**
@@ -20,16 +24,22 @@ export interface FrameworkWarning {
   framework: SupportedFramework;
 }
 
-// Type representing a duplicate entry
+/**
+ * Type representing a duplicate entry
+ */
 export type Duplicate = { key: string; count: number };
 
-// Type representing the result of duplicate detection
+/**
+ * Type representing the result of duplicate detection
+ */
 export interface DuplicateResult {
   dupsEnv: Duplicate[];
   dupsEx: Duplicate[];
 }
 
-// Type representing a single category for comparison
+/**
+ * Type representing a single category for comparison
+ */
 export type Category = (typeof ALLOWED_CATEGORIES)[number];
 
 /**
@@ -130,7 +140,9 @@ export interface EnvUsage {
   isLogged?: boolean; // Whether this usage is logged to console
 }
 
-// Type for grouped usages by variable
+/**
+ * Type for grouped usages by variable
+ */
 export type VariableUsages = Record<string, EnvUsage[]>;
 
 /**

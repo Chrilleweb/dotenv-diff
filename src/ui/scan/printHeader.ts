@@ -9,7 +9,7 @@ export function printHeader(comparedAgainst?: string): void {
   if (comparedAgainst) {
     console.log();
     console.log(
-      chalk.magenta(`📋 Comparing codebase usage against: ${comparedAgainst}`),
+      chalk.magenta(`📋 Scanning environment variable usage against: ${comparedAgainst}`),
     );
   }
 }
