@@ -1,9 +1,20 @@
+/**
+ * Result of comparing two .env files.
+ */
 export type DiffResult = {
+  /** Keys present in the example file but missing from the current file */
   missing: string[];
+
+  /** Keys present in the current file but not defined in the example file */
   extra: string[];
+
+  /** Keys that exist in both files but have mismatched values */
   valueMismatches: {
+    /** The environment variable key */
     key: string;
+    /** Expected value from the example file */
     expected: string;
+    /** Actual value from the current file */
     actual: string;
   }[];
 };
