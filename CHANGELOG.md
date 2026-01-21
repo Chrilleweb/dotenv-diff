@@ -12,7 +12,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Changed
 
--
+- Changed text to 'Scanning environment variable usage against:' in scan usage header.
 
 ### Fixed
 
