@@ -2,7 +2,9 @@ import { shannonEntropyNormalized } from './entropy.js';
 
 export type SecretSeverity = 'high' | 'medium' | 'low';
 
-// Represents a secret finding in the source code.
+/**
+ * Represents a secret finding in the source code.
+ */
 export type SecretFinding = {
   file: string;
   line: number;
@@ -31,8 +33,10 @@ export const PROVIDER_PATTERNS: RegExp[] = [
   /\bAC[0-9a-fA-F]{32}\b/, // Twilio Account SID
 ];
 
+// Regex for detecting long literals
 const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
 
+// Regex for detecting HTTPS URLs
 const HTTPS_PATTERN = /["'`](https?:\/\/(?!localhost)[^"'`]*)["'`]/g;
 
 // List of harmless URL patterns to ignore
