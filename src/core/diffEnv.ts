@@ -52,8 +52,8 @@ export function diffEnv(
       })
       .map((key) => ({
         key,
-        expected: example[key] ?? '',
-        actual: current[key] ?? '',
+        expected: example[key]!,
+        actual: current[key]!,
       }));
   }
 
