@@ -389,6 +389,47 @@ describe('compareMany', () => {
     );
   });
 
+  it('applies fixes with duplicate keys when duplicates exist', async () => {
+    mockDiffEnv.mockReturnValue({
+      missing: [],
+      extra: [],
+      valueMismatches: [],
+    });
+
+    mockFindDuplicateKeys.mockImplementation((filePath: string) => {
+      if (filePath === envPath) {
+        return [
+          { key: 'DUPLICATE_KEY', count: 2 },
+          { key: 'ANOTHER_DUP', count: 3 },
+        ];
+      }
+      return [];
+    });
+
+    mockApplyFixes.mockReturnValue({
+      changed: true,
+      result: {
+        removedDuplicates: ['DUPLICATE_KEY', 'ANOTHER_DUP'],
+        addedEnv: [],
+        gitignoreUpdated: false,
+        addedExample: [],
+      },
+    });
+
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+    const opts = createOptions({ fix: true });
+
+    await compareMany(pairs, opts);
+
+    expect(mockApplyFixes).toHaveBeenCalledWith({
+      envPath,
+      examplePath,
+      missingKeys: [],
+      duplicateKeys: ['DUPLICATE_KEY', 'ANOTHER_DUP'],
+      ensureGitignore: false,
+    });
+  });
+
   it('shows stats when showStats is enabled', async () => {
     mockParseEnvFile.mockImplementation((filePath: string) => {
       if (filePath === envPath) {
@@ -411,6 +452,35 @@ describe('compareMany', () => {
         envCount: 3,
         exampleCount: 2,
         sharedCount: 2,
+      }),
+      expect.any(Object),
+      false,
+      true,
+      false,
+    );
+  });
+
+  it('calculates duplicateCount correctly in stats (count - 1)', async () => {
+    mockFindDuplicateKeys.mockImplementation((filePath: string) => {
+      if (filePath === envPath) {
+        return [{ key: 'DUP_ENV', count: 3 }]; // contributes 2
+      }
+      if (filePath === examplePath) {
+        return [{ key: 'DUP_EX', count: 2 }]; // contributes 1
+      }
+      return [];
+    });
+
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+    const opts = createOptions({ showStats: true });
+
+    await compareMany(pairs, opts);
+
+    expect(mockPrintStats).toHaveBeenCalledWith(
+      '.env',
+      '.env.example',
+      expect.objectContaining({
+        duplicateCount: 3, // (3-1) + (2-1) = 2 + 1
       }),
       expect.any(Object),
       false,
