@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
 import fsSync from 'fs';
@@ -11,7 +10,7 @@ vi.mock('../../../src/services/fileWalker.js', () => ({
   findFiles: vi.fn(),
 }));
 
-vi.mock('../../../src/core/scanFile.js', () => ({
+vi.mock('../../../src/core/scan/scanFile.js', () => ({
   scanFile: vi.fn(),
 }));
 
@@ -24,7 +23,7 @@ vi.mock('../../../src/ui/scan/printProgress.js', () => ({
 }));
 
 import { findFiles } from '../../../src/services/fileWalker.js';
-import { scanFile } from '../../../src/core/scanFile.js';
+import { scanFile } from '../../../src/core/scan/scanFile.js';
 import { detectSecretsInSource } from '../../../src/core/security/secretDetectors.js';
 import { printProgress } from '../../../src/ui/scan/printProgress.js';
 
