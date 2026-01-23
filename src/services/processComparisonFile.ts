@@ -16,6 +16,9 @@ import type {
   Duplicate,
 } from '../config/types.js';
 
+/**
+ * Result of processing comparison file
+ */
 interface ProcessComparisonResult {
   scanResult: ScanResult;
   envVariables: Record<string, string | undefined>;
