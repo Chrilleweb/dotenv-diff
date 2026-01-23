@@ -729,11 +729,13 @@ describe('compareMany', () => {
 
     expect(mockCompareJsonOutput).toHaveBeenCalledWith(
       expect.objectContaining({
-        stats: {
+        stats: expect.objectContaining({
           envCount: 3,
           exampleCount: 2,
           sharedCount: 2,
-        },
+          duplicateCount: 0,
+          valueMismatchCount: 0,
+        }),
       }),
     );
   });

@@ -24,6 +24,7 @@ import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import { compareJsonOutput } from '../ui/compare/compareJsonOutput.js';
 import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
+import { calculateStats } from '../core/compare/calculateStats.js';
 
 /**
  * Compares multiple pairs of .env and .env.example files.
@@ -102,31 +103,19 @@ export async function compareMany(
 
     // Print stats if requested
     if (opts.showStats && !opts.json) {
-      const envCount = currentKeys.length;
-      const exampleCount = exampleKeys.length;
-      const sharedCount = new Set(
-        currentKeys.filter((k) => exampleKeys.includes(k)),
-      ).size;
-
-      const duplicateCount = [...dupsEnv, ...dupsEx].reduce(
-        (acc, { count }) => acc + Math.max(0, count - 1),
-        0,
+      const stats = calculateStats(
+        currentKeys,
+        exampleKeys,
+        dupsEnv,
+        dupsEx,
+        filtered,
+        opts.checkValues,
       );
-
-      const valueMismatchCount = opts.checkValues
-        ? (filtered.mismatches?.length ?? 0)
-        : 0;
 
       printStats(
         envName,
         exampleName,
-        {
-          envCount,
-          exampleCount,
-          sharedCount,
-          duplicateCount,
-          valueMismatchCount,
-        },
+        stats,
         filtered,
         opts.json ?? false,
         opts.showStats ?? true,
@@ -145,12 +134,14 @@ export async function compareMany(
     printDuplicates(envName, exampleName, dupsEnv, dupsEx, opts.json ?? false);
 
     // Calculate stats for JSON entry
-    const stats = {
-      envCount: currentKeys.length,
-      exampleCount: exampleKeys.length,
-      sharedCount: new Set(currentKeys.filter((k) => exampleKeys.includes(k)))
-        .size,
-    };
+    const stats = calculateStats(
+      currentKeys,
+      exampleKeys,
+      dupsEnv,
+      dupsEx,
+      filtered,
+      opts.checkValues,
+    );
 
     // Build JSON entry with all the data
     const entry = compareJsonOutput({
