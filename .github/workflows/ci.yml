@@ -1,4 +1,4 @@
-name: CI
+name: Build, Test and Lint
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-test:
+  build-test-lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,7 +32,7 @@ jobs:
         run: pnpm build
 
       - name: Run tests with coverage
-        run: pnpm test --coverage
+        run: pnpm coverage
 
       - name: Run lint
         run: pnpm lint
