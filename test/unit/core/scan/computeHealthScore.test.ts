@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeHealthScore } from '../../../src/core/scan/computeHealthScore.js';
+import { computeHealthScore } from '../../../../src/core/scan/computeHealthScore.js';
 
 describe('computeHealthScore', () => {
   it('returns 100 for a clean scan', () => {
