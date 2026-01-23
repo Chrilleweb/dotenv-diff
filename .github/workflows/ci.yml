@@ -1,4 +1,4 @@
-name: CI
+name: Build, Test and Lint
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-test:
+  build-test-lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,11 +31,14 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Run tests
-        run: pnpm test
+      - name: Run tests with coverage
+        run: pnpm coverage
 
       - name: Run lint
         run: pnpm lint
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
 
       - name: dotenv-diff scan
         run: npx dotenv-diff
