@@ -11,7 +11,7 @@ import type {
   Filtered,
   DuplicateResult,
 } from '../config/types.js';
-import { parseAndFilterEnv } from '../core/parseAndFilterEnv.js';
+import { parseAndFilterEnv } from '../core/compare/parseAndFilterEnv.js';
 import { updateTotals } from '../core/helpers/updateTotals.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
