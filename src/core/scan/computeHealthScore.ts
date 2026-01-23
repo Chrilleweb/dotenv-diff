@@ -1,4 +1,4 @@
-import type { ScanResult } from '../config/types.js';
+import type { ScanResult } from '../../config/types.js';
 
 /**
  * Computes a health score based on the scan results.

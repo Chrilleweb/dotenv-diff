@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { parseEnvFile } from '../core/parseEnv.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
-import { compareWithEnvFiles } from '../core/compareScan.js';
+import { compareWithEnvFiles } from '../core/scan/compareScan.js';
 import { findDuplicateKeys } from '../core/duplicates.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { toUpperSnakeCase } from '../core/helpers/toUpperSnakeCase.js';

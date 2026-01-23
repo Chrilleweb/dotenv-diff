@@ -1,6 +1,6 @@
-import { parseEnvFile } from './parseEnv.js';
-import { filterIgnoredKeys } from './filterIgnoredKeys.js';
-import type { ComparisonOptions } from '../config/types.js';
+import { parseEnvFile } from '../parseEnv.js';
+import { filterIgnoredKeys } from '../filterIgnoredKeys.js';
+import type { ComparisonOptions } from '../../config/types.js';
 
 /**
  * Result of parsing and filtering environment files

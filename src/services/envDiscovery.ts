@@ -86,7 +86,14 @@ export function discoverEnvFiles({
         envFiles.length = 0;
         envFiles.push(matchedEnv);
       } else {
-        alreadyWarnedMissingEnv = true;
+        // Only set alreadyWarnedMissingEnv if there are NO env files at all
+        // If we have other env files (like .env.local), we should still prompt
+        if (envFiles.length === 0) {
+          alreadyWarnedMissingEnv = true;
+        } else {
+          // Use the first available env file instead
+          primaryEnv = envFiles[0] || DEFAULT_ENV_FILE;
+        }
       }
     } else {
       //  If the example file is not a standard .env.example, we just use it as is

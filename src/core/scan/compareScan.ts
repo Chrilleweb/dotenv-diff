@@ -1,4 +1,4 @@
-import type { ScanResult } from '../config/types.js';
+import type { ScanResult } from '../../config/types.js';
 
 /**
  * Compares the scan result with the environment variables.

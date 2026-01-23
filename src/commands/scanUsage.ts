@@ -5,7 +5,7 @@ import type {
   ExitResult,
   ScanResult,
 } from '../config/types.js';
-import { determineComparisonFile } from '../core/determineComparisonFile.js';
+import { determineComparisonFile } from '../core/scan/determineComparisonFile.js';
 import { printScanResult } from '../services/printScanResult.js';
 import { scanJsonOutput } from '../ui/scan/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';

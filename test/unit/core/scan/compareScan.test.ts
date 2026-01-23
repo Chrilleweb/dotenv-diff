@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { compareWithEnvFiles } from '../../../src/core/compareScan.js';
+import { compareWithEnvFiles } from '../../../../src/core/scan/compareScan.js';
 
 describe('compareWithEnvFiles', () => {
   it('detects missing variables', () => {

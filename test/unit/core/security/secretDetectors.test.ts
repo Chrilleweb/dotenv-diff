@@ -3,6 +3,7 @@ import {
   detectSecretsInSource,
   hasIgnoreComment,
 } from '../../../../src/core/security/secretDetectors.js';
+import { shannonEntropyNormalized } from '../../../../src/core/security/entropy.js';
 
 describe('secretDetectors', () => {
   describe('hasIgnoreComment', () => {
@@ -129,15 +130,22 @@ describe('secretDetectors', () => {
       }
     });
 
-    it('should detect medium-entropy strings (32-47 chars)', () => {
-      const source = 'const key = "aB3dE5fG7hI9jK0lM2nO4pQ6rS8tU1vW";';
-      const findings = detectSecretsInSource('test.ts', source);
+it('should detect medium-entropy strings (32-47 chars)', () => {
+  // High-entropy string using allowed chars: A-Za-z0-9+/_-
+  const literal = "aB3xK9m+QwP2z/LsR8tY-u5nV7cJ4hFgD6eS1iO0p";
+  const source = `const key = "${literal}";`;
+  
+  console.log('Entropy:', shannonEntropyNormalized(literal));
+  console.log('Length:', literal.length);
+  
+  const findings = detectSecretsInSource('test.ts', source);
+  console.log('Findings:', findings);
 
-      const entropyFinding = findings.find((f) => f.kind === 'entropy');
-      if (entropyFinding) {
-        expect(entropyFinding.severity).toBe('medium');
-      }
-    });
+  const entropyFinding = findings.find((f) => f.kind === 'entropy');
+  expect(entropyFinding).toBeDefined();
+  expect(entropyFinding?.severity).toBe('medium');
+  expect(entropyFinding?.message).toContain('found high-entropy string');
+});
 
     it('should skip lines with ignore comment', () => {
       const source = 'const password = "secret123"; // dotenv-diff-ignore';
@@ -263,6 +271,41 @@ const token = "AKIAIOSFODNN7EXAMPLE";
     it('should ignore harmless UI attributes', () => {
       const source =
         '<button data-testid="submit-button" aria-label="Submit">Click me</button>';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(findings).toHaveLength(0);
+    });
+
+    it('should ignore trackingId attributes', () => {
+      const source = 'const config = { trackingId: "UA-12345-67" };';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(findings).toHaveLength(0);
+    });
+
+    it('should ignore trackingContext attributes', () => {
+      const source = 'trackingContext: "some-tracking-data"';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(findings).toHaveLength(0);
+    });
+
+    it('should ignore password field with data-test attribute', () => {
+      const source = '<input type="password" data-test="login-password">';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(findings).toHaveLength(0);
+    });
+
+    it('should ignore lines with HTML tags containing secrets', () => {
+      const source = '<div>secret="MySecretValue123"</div>';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(findings).toHaveLength(0);
+    });
+
+    it('should ignore empty HTML text nodes', () => {
+      const source = '   ';
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(0);

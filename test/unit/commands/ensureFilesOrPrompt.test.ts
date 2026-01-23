@@ -165,6 +165,26 @@ describe('ensureFilesOrPrompt', () => {
     expect(printPrompt.missingEnv).not.toHaveBeenCalled();
   });
 
+  it('does not warn again if alreadyWarnedMissingEnv is true for .env.example', async () => {
+    fs.writeFileSync(path.join(cwd, '.env'), 'FOO=bar');
+
+    const result = await ensureFilesOrPrompt({
+      cwd,
+      primaryEnv: '.env',
+      primaryExample: '.env.example',
+      alreadyWarnedMissingEnv: true,
+      isYesMode: false,
+      isCiMode: false,
+    });
+
+    expect(printPrompt.missingEnv).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      didCreate: false,
+      shouldExit: true,
+      exitCode: 0,
+    });
+  });
+
   it('does not create .env.example in CI mode when missing', async () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=bar');
 

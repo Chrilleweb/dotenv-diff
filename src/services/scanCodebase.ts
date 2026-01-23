@@ -6,7 +6,7 @@ import {
   type SecretFinding,
 } from '../core/security/secretDetectors.js';
 import { DEFAULT_EXCLUDE_PATTERNS } from '../core/patterns.js';
-import { scanFile } from '../core/scanFile.js';
+import { scanFile } from '../core/scan/scanFile.js';
 import { findFiles } from './fileWalker.js';
 import { printProgress } from '../ui/scan/printProgress.js';
 import { normalizePath } from '../core/helpers/normalizePath.js';

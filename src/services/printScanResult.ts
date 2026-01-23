@@ -21,7 +21,7 @@ import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
 import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
 import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
 import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
-import { computeHealthScore } from '../core/computeHealthScore.js';
+import { computeHealthScore } from '../core/scan/computeHealthScore.js';
 import { printHealthScore } from '../ui/scan/printHealthScore.js';
 import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
 import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';

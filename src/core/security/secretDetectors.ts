@@ -2,7 +2,9 @@ import { shannonEntropyNormalized } from './entropy.js';
 
 export type SecretSeverity = 'high' | 'medium' | 'low';
 
-// Represents a secret finding in the source code.
+/**
+ * Represents a secret finding in the source code.
+ */
 export type SecretFinding = {
   file: string;
   line: number;
@@ -31,8 +33,10 @@ export const PROVIDER_PATTERNS: RegExp[] = [
   /\bAC[0-9a-fA-F]{32}\b/, // Twilio Account SID
 ];
 
+// Regex for detecting long literals
 const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
 
+// Regex for detecting HTTPS URLs
 const HTTPS_PATTERN = /["'`](https?:\/\/(?!localhost)[^"'`]*)["'`]/g;
 
 // List of harmless URL patterns to ignore
@@ -48,13 +52,9 @@ const HARMLESS_URLS = [
 const HARMLESS_ATTRIBUTE_KEYS =
   /\b(trackingId|trackingContext|data-testid|data-test|aria-label)\b/i;
 
-// Checks if a line is an HTML text node
 // Checks if a line is an HTML text node or tag
 function isHtmlTextNode(line: string): boolean {
   const trimmed = line.trim();
-
-  // Empty line
-  if (!trimmed) return false;
 
   // Starts with <tag> and ends with </tag> with text inside
   // OR is a self-contained HTML tag (even without closing tag on same line)
@@ -68,48 +68,18 @@ function isHtmlTextNode(line: string): boolean {
 }
 
 /**
- * Determines the severity of a secret finding.
- * @param kind 'pattern' | 'entropy'
- * @param message The message describing the finding
- * @param literalLength The length of the literal string (if applicable)
+ * Determines the severity of an entropy-based secret finding.
+ * Note: This function assumes literalLength >= 32 (filtered before calling).
+ * @param literalLength The length of the literal string
  * @returns The severity level of the secret finding
  */
-function determineSeverity(
-  kind: 'pattern' | 'entropy',
-  message: string,
-  literalLength?: number,
-): SecretSeverity {
-  // HIGH: Known provider key patterns
-  if (message.includes('known provider key pattern')) {
+function determineEntropySeverity(literalLength: number): SecretSeverity {
+  // HIGH: Very high-entropy long strings (48+ chars)
+  if (literalLength >= 48) {
     return 'high';
   }
 
-  // HIGH: Very high-entropy long strings
-  if (kind === 'entropy' && literalLength && literalLength >= 48) {
-    return 'high';
-  }
-
-  // MEDIUM: Password/secret/token patterns
-  if (message.includes('password/secret/token-like')) {
-    return 'medium';
-  }
-
-  // MEDIUM: Medium high-entropy strings
-  if (kind === 'entropy' && literalLength && literalLength >= 32) {
-    return 'medium';
-  }
-
-  // MEDIUM: HTTP URLs
-  if (message.includes('HTTP URL detected')) {
-    return 'medium';
-  }
-
-  // LOW: HTTPS URLs
-  if (message.includes('HTTPS URL detected')) {
-    return 'low';
-  }
-
-  // Default to medium if we can't determine
+  // MEDIUM: Medium high-entropy strings (32-47 chars)
   return 'medium';
 }
 
@@ -273,7 +243,7 @@ export function detectSecretsInSource(
     HTTPS_PATTERN.lastIndex = 0;
     let httpsMatch: RegExpExecArray | null;
     while ((httpsMatch = HTTPS_PATTERN.exec(line))) {
-      const url = httpsMatch[1] || '';
+      const url = httpsMatch[1];
       if (url && !looksHarmlessLiteral(url)) {
         if (ignoreUrlsMatch(url, opts?.ignoreUrls)) continue;
         const protocol = url.startsWith('https') ? 'HTTPS' : 'HTTP';
@@ -337,7 +307,7 @@ export function detectSecretsInSource(
     LONG_LITERAL.lastIndex = 0;
     let lm: RegExpExecArray | null;
     while ((lm = LONG_LITERAL.exec(line))) {
-      const literal = lm[1] || '';
+      const literal = lm[1]!;
       if (looksHarmlessLiteral(literal)) continue;
       if (literal.length < 32) continue;
       const ent = shannonEntropyNormalized(literal);
@@ -349,7 +319,7 @@ export function detectSecretsInSource(
           kind: 'entropy',
           message,
           snippet: line.trim().slice(0, 180),
-          severity: determineSeverity('entropy', message, literal.length),
+          severity: determineEntropySeverity(literal.length),
         });
       }
     }
@@ -361,7 +331,8 @@ export function detectSecretsInSource(
         (other) =>
           other.file === f.file &&
           other.line === f.line &&
-          other.snippet === f.snippet,
+          other.snippet === f.snippet &&
+          other.kind === f.kind,
       ),
   );
 
