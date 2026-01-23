@@ -12,7 +12,7 @@ import type {
   DuplicateResult,
 } from '../config/types.js';
 import { parseAndFilterEnv } from '../core/compare/parseAndFilterEnv.js';
-import { updateTotals } from '../core/helpers/updateTotals.js';
+import { updateTotals } from '../core/compare/updateTotals.js';
 import { applyFixes } from '../core/fixEnv.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printStats } from '../ui/compare/printStats.js';

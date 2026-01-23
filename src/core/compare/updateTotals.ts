@@ -1,5 +1,8 @@
 import type { CompareJsonEntry, Filtered } from '../../config/types.js';
 
+/**
+ * Totals of issues found during comparison --compare operation
+ */
 export interface Totals {
   missing: number;
   extra: number;
