@@ -18,6 +18,21 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 - Fixed `.env.example` creation prompt not appearing for variant `.env` files (e.g. `.env.local`).
 
+## [2.5.0] - 2026-01-24
+
+### Added
+
+- Added default excluded keys to filterIgnoredKeys (e.g. NODE_ENV, VITE_MODE, etc).
+- Added Warn if PUBLIC_ or VITE_ contains sensitive keywords in sveltekit framework rules.
+
+### Changed
+
+- Changed text to 'Scanning environment variable usage against:' in scan usage header.
+
+### Fixed
+
+- Fixed `.env.example` creation prompt not appearing for variant `.env` files (e.g. `.env.local`).
+
 ## [2.4.11] - 2026-01-20
 
 ### Added
