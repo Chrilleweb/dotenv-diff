@@ -4,7 +4,7 @@ import type {
   Duplicate,
   SupportedFramework,
 } from '../../config/types.js';
-import { computeHealthScore } from '../../core/computeHealthScore.js';
+import { computeHealthScore } from '../../core/scan/computeHealthScore.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
 
 /**
