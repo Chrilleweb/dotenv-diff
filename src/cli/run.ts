@@ -112,9 +112,8 @@ async function runCompareMode(opts: Options): Promise<boolean> {
 async function runDirectFileComparison(opts: Options): Promise<boolean> {
   // Type guard ensures both flags are defined
   if (!opts.envFlag || !opts.exampleFlag) {
-    throw new Error(
-      'Both envFlag and exampleFlag must be defined for direct file comparison',
-    );
+    outputResults([], opts);
+    return true; // exitWithError
   }
 
   const envExists = fs.existsSync(opts.envFlag);

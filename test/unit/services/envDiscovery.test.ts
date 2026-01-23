@@ -87,6 +87,22 @@ describe('discoverEnvFiles', () => {
     expect(result.primaryExample).toBe('.env.example.prod');
   });
 
+  it('uses first available env file when --example has no matching env but other env files exist', () => {
+    fs.writeFileSync(path.join(cwd, '.env.local'), '');
+    fs.writeFileSync(path.join(cwd, '.env.example.prod'), '');
+
+    const result = discoverEnvFiles({
+      cwd,
+      envFlag: null,
+      exampleFlag: path.join(cwd, '.env.example.prod'),
+    });
+
+    expect(result.primaryEnv).toBe('.env.local');
+    expect(result.primaryExample).toBe('.env.example.prod');
+    expect(result.alreadyWarnedMissingEnv).toBe(false);
+    expect(result.envFiles).toEqual(['.env.local']);
+  });
+
   it('uses non-standard example file as-is', () => {
     fs.writeFileSync(path.join(cwd, 'custom.example'), '');
 
@@ -147,5 +163,20 @@ describe('discoverEnvFiles', () => {
 
     expect(result.primaryEnv).toBe('.env.missing');
     expect(result.envFiles.includes('.env.missing')).toBe(false);
+  });
+
+  it('handles non-standard example file that does not start with .env.example', () => {
+    fs.writeFileSync(path.join(cwd, '.env'), '');
+    fs.writeFileSync(path.join(cwd, 'my-custom.env'), '');
+
+    const result = discoverEnvFiles({
+      cwd,
+      envFlag: null,
+      exampleFlag: path.join(cwd, 'my-custom.env'),
+    });
+
+    expect(result.primaryExample).toBe('my-custom.env');
+    expect(result.primaryEnv).toBe('.env');
+    expect(result.envFiles).toContain('.env');
   });
 });
