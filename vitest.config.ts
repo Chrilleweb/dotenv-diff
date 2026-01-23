@@ -7,7 +7,8 @@ export default defineConfig({
     hookTimeout: 50000,
     coverage: {
       provider: 'istanbul',
-      reporter: ['text'],
+      reporter: ['text', 'lcov', 'html'],
+      reportsDirectory: './coverage',
     },
   },
 });
