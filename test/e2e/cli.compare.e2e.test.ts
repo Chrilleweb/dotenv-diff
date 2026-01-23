@@ -108,4 +108,19 @@ describe('added .env to gitignore with --compare and --fix', () => {
     expect(json[0].gitignoreIssue).toBeDefined();
     expect(json[0].gitignoreIssue?.reason).toBe('not-ignored');
   });
+
+    it('Will prompt .env.example file not found. and prompt if .env.local exists and .env.example is set to --example', async () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env.local'), 'FOO=bar');
+
+    const res = runCli(cwd, [
+      '--compare',
+      '--example',
+      '.env.example',
+    ]);
+
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('file not found');
+    expect(res.stdout).toContain('Do you want to create a .env.example file from .env.local?');
+  });
 });

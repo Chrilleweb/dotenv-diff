@@ -95,7 +95,7 @@ export async function ensureFilesOrPrompt(
           );
 
     if (!createExample) {
-      printPrompt.skipCreation('.env.example');
+      printPrompt.skipCreation(DEFAULT_ENV_FILE + '.example');
       return { didCreate: false, shouldExit: true, exitCode: 0 };
     }
 

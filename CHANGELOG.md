@@ -16,7 +16,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/) and [Semant
 
 ### Fixed
 
--
+- Fixed `.env.example` creation prompt not appearing for variant `.env` files (e.g. `.env.local`).
 
 ## [2.4.11] - 2026-01-20
 
