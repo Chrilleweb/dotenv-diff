@@ -13,7 +13,7 @@
     "releaseName": "v${version}"
   },
   "npm": {
-    "publish": true,
+    "publish": false,
     "skipChecks": true
   },
   "hooks": {
