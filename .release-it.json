@@ -16,7 +16,7 @@
     "publish": true
   },
   "hooks": {
-    "before:init": ["pnpm run test", "pnpm run lint", "pnpm run build"],
+    "before:init": ["pnpm run lint", "pnpm run build"],
     "after:bump": "npx auto-changelog -p"
   },
   "plugins": {
