@@ -63,6 +63,11 @@ jobs:
 
       - run: pnpm install
 
+      - name: Debug git status
+        run: |
+          echo "Git status:"
+          git status --porcelain
+
       - name: Run release-it
         run: pnpm release -- --ci
         env:
