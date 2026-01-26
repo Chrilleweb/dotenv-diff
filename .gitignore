@@ -1,9 +1,27 @@
+# Dependencies
 /node_modules
 
+# Build output
 /dist
 /dist-test-*
+/lib
+/build
+/out
 
+# TypeScript
+*.tsbuildinfo
+
+# Env files
 .env
 .env.local
 
+# Test & coverage
 coverage/
+.vitest/
+
+# Logs
+npm-debug.log*
+.pnpm-debug.log*
+
+# OS
+.DS_Store
