@@ -68,3 +68,7 @@ jobs:
         run: pnpm release -- --ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Publish to npm
+        run: npm publish --access public
+
