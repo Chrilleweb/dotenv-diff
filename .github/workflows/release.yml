@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # fetch all history for tags
 
       - name: Configure git user
         run: |
