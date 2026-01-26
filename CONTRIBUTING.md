@@ -6,11 +6,61 @@ Thanks for your interest in contributing to dotenv-diff! Contributions of all ki
 
 1. Fork the repository
 2. Clone your fork
-3. Install dependencies: `pnpm install`
-4. Make your changes
-5. Run tests: `pnpm run test`
-6. Commit and push your changes
-7. Open a pull request
+3. Install pnpm: `npm install -g pnpm`
+4. Install dependencies: `pnpm install`
+5. Make your changes
+6. Run tests: `pnpm run test`
+7. Commit and push your changes
+8. Open a pull request
+
+## Commit Message Format
+
+We use [Conventional Commits](https://www.conventionalcommits.org/) for automatic versioning and changelog generation.
+
+**Format:**
+
+```text
+<type>[optional scope]: <description>
+
+[optional body]
+```
+
+**Types:**
+
+- `feat:` - New feature (triggers minor version bump)
+- `fix:` - Bug fix (triggers patch version bump)
+- `perf:` - Performance improvement
+- `revert:` - Revert a previous commit
+- `docs:` - Documentation only
+- `style:` - Code style changes (formatting, missing semi-colons, etc.)
+- `chore:` - Maintenance, tooling, refactors
+- `refactor:` - Code restructuring
+- `test:` - Adding or updating tests
+- `ci:` - CI / workflow changes
+
+**Examples:**
+
+```bash
+feat: add json output support
+fix: handle empty env file
+docs: update README usage section
+chore: refactor parser internals
+```
+
+**Breaking changes** (triggers major version bump):
+
+```bash
+feat!: change CLI output format
+```
+or
+
+```bash
+feat: change CLI output format
+
+BREAKING CHANGE: The CLI output format has changed and is not backward compatible.
+```
+
+This will trigger a major release.
 
 ## Guidelines
 

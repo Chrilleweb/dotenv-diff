@@ -29,6 +29,8 @@
     "coverage": "vitest run --coverage",
     "test:unit": "vitest run test/unit",
     "test:e2e": "vitest run test/e2e",
+    "release": "release-it",
+    "release:dry": "release-it --dry-run",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"**/*.{ts,js,json,md,yml}\"",
     "start": "node dist/bin/dotenv-diff.js",
@@ -70,12 +72,14 @@
     "prompts": "^2.4.2"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.4",
     "@types/node": "^25.0.9",
     "@typescript-eslint/eslint-plugin": "^8.53.1",
     "@typescript-eslint/parser": "^8.53.1",
     "@vitest/coverage-istanbul": "^4.0.17",
     "eslint": "^9.39.2",
     "prettier": "^3.8.0",
+    "release-it": "^19.2.4",
     "typescript": "^5.9.3",
     "vitest": "^4.0.17"
   }
