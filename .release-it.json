@@ -13,7 +13,8 @@
     "releaseName": "v${version}"
   },
   "npm": {
-    "publish": false
+    "publish": true,
+    "skipChecks": true
   },
   "hooks": {
     "before:init": ["pnpm run lint", "pnpm run build"],
