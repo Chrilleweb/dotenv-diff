@@ -3,11 +3,6 @@
   "version": "2.5.0",
   "type": "module",
   "description": "Detects environment variable issues, usage, and potential security risks.",
-  "publishConfig": {
-    "access": "public",
-    "provenance": true,
-    "registry": "https://registry.npmjs.org"
-  },
   "bin": {
     "dotenv-diff": "dist/bin/dotenv-diff.js"
   },
