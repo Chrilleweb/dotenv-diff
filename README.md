@@ -11,10 +11,10 @@ First-class support for SvelteKit and Next.js. Also works well in modern JavaScr
 ---
 
 ### Warnings & errors detection
-![Demo](./public/demo3.gif)
+![Demo](./docs/demo3.gif)
 
 ### Clean / successful scan
-![Successful Scan](./public/successful-scan.png)
+![Successful Scan](./docs/successful-scan.png)
 
 ---
 
