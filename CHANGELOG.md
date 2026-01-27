@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.2...vnull) (2026-01-27)
+
+### Bug Fixes
+
+* changed color of scanning header to cyan ([ed6cad1](https://github.com/Chrilleweb/dotenv-diff/commit/ed6cad1502a8c340ddcbcb45a63c20d1ba9feb26))
+* Expire warning text ui ([90caa27](https://github.com/Chrilleweb/dotenv-diff/commit/90caa27762cb1e1a7a81ec4fa978e26af8e46a5c))
+
+### Documentation
+
+* docs folder instead of public ([f88ad42](https://github.com/Chrilleweb/dotenv-diff/commit/f88ad422a5119cf50b6e27e2ddb7ffd7489e28d4))
+* updated readme gif links ([c45c2df](https://github.com/Chrilleweb/dotenv-diff/commit/c45c2df166139ad2c7a83af3df56032d4f81b310))
+
 ## [](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.1...vnull) (2026-01-26)
 
 ### Bug Fixes
