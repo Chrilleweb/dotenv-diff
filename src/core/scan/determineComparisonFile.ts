@@ -4,6 +4,9 @@ import type { ScanUsageOptions } from '../../config/types.js';
 import { resolveFromCwd } from '../helpers/resolveFromCwd.js';
 import { DEFAULT_ENV_CANDIDATES } from '../../config/constants.js';
 
+/**
+ * Resolved comparison file with absolute path and display name.
+ */
 type ComparisonFile = {
   path: string;
   name: string;
