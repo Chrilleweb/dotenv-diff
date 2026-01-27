@@ -10,7 +10,8 @@
   },
   "github": {
     "release": true,
-    "releaseName": "v${version}"
+    "releaseName": "v${version}",
+    "releaseNotes": "./scripts/generate-release-notes.sh ${version}"
   },
   "npm": {
     "publish": true,
@@ -31,10 +32,10 @@
           { "type": "revert", "section": "Reverts" },
           { "type": "docs", "section": "Documentation" },
           { "type": "style", "section": "Styles", "hidden": true },
-          { "type": "chore", "hidden": true },
-          { "type": "refactor", "hidden": true },
-          { "type": "test", "hidden": true },
-          { "type": "ci", "hidden": true }
+          { "type": "chore", "section": "Miscellaneous", "hidden": true },
+          { "type": "refactor", "section": "Code Refactoring", "hidden": true },
+          { "type": "test", "section": "Tests", "hidden": true },
+          { "type": "ci", "section": "CI/CD", "hidden": true }
         ]
       },
       "infile": "CHANGELOG.md",
