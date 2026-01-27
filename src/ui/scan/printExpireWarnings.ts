@@ -21,15 +21,19 @@ export function printExpireWarnings(
 
   for (const warn of warnings) {
     const severity =
-      warn.daysLeft < 0
-        ? chalk.red(`EXPIRED ${Math.abs(warn.daysLeft)} days ago`)
-        : warn.daysLeft === 0
-          ? chalk.red('EXPIRES TODAY')
-          : warn.daysLeft <= 3
-            ? chalk.red(`expires in ${warn.daysLeft} days`)
-            : warn.daysLeft <= 7
-              ? chalk.yellow(`expires in ${warn.daysLeft} days`)
-              : chalk.green(`expires in ${warn.daysLeft} days`);
+      warn.daysLeft === -1
+        ? chalk.red('EXPIRED YESTERDAY')
+        : warn.daysLeft < 0
+          ? chalk.red(`EXPIRED ${Math.abs(warn.daysLeft)} days ago`)
+          : warn.daysLeft === 0
+            ? chalk.red('EXPIRES TODAY')
+            : warn.daysLeft === 1
+              ? chalk.red('expires tomorrow')
+              : warn.daysLeft <= 3
+                ? chalk.red(`expires in ${warn.daysLeft} days`)
+                : warn.daysLeft <= 7
+                  ? chalk.yellow(`expires in ${warn.daysLeft} days`)
+                  : chalk.green(`expires in ${warn.daysLeft} days`);
 
     const keyLabel = chalk.yellow(`- ${warn.key.padEnd(15)}`);
     console.log(`   ${keyLabel} → ${severity} (${warn.date})`);
