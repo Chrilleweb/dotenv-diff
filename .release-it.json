@@ -18,8 +18,7 @@
     "skipChecks": true
   },
   "hooks": {
-    "before:init": ["pnpm run lint", "pnpm run build"],
-    "after:bump": "npx auto-changelog -p --latest-version ${version}"
+    "before:init": ["pnpm run lint", "pnpm run build"]
   },
   "plugins": {
     "@release-it/conventional-changelog": {
