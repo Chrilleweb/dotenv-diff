@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
 
+## [](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.4...vnull) (2026-01-28)
+
+### Bug Fixes
+
+* Updated UI for missing env variables ([#238](https://github.com/Chrilleweb/dotenv-diff/issues/238)) ([d87eac0](https://github.com/Chrilleweb/dotenv-diff/commit/d87eac002b6b18dc9962c77d1df3d3941ce73587))
+
 ## [v2.5.4](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.3...v2.5.4) (2026-01-28)
 
 ### Bug Fixes
