@@ -10,18 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
 
-## [](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.0...vnull) (2026-01-28)
+## [v2.5.4](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.3...v2.5.4) (2026-01-28)
 
 ### Bug Fixes
 
 * default exclude keys where not ignored in scan mode ([#236](https://github.com/Chrilleweb/dotenv-diff/issues/236)) ([593e69b](https://github.com/Chrilleweb/dotenv-diff/commit/593e69b3a12273c445fa2b365b683cfbe5af283f))
-
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [v2.5.3](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.2...v2.5.3) (2026-01-27)
 
@@ -41,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * scanning color magenta ([b90107b](https://github.com/Chrilleweb/dotenv-diff/commit/b90107b0163de3e0ce5def6f235bc40510be71b7))
 
-#### [v2.5.1](https://github.com/Chrilleweb/dotenv-diff/compare/2.5.0...v2.5.1)
+#### [v2.5.1](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.0...v2.5.1)
 
 > 26 January 2026
 
@@ -64,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ci: release yml [`a1db55f`](https://github.com/Chrilleweb/dotenv-diff/commit/a1db55f7701f3328396359f90154cc3ecab5cb69)
 - chore: release npm outside og release-it [`b685037`](https://github.com/Chrilleweb/dotenv-diff/commit/b685037b8a8f1e5a5fd59d21e7a877d11dc75196)
 
-#### [2.5.0](https://github.com/Chrilleweb/dotenv-diff/compare/v2.4.11...2.5.0)
+#### [v2.5.0](https://github.com/Chrilleweb/dotenv-diff/compare/v2.4.11...v2.5.0)
 
 > 24 January 2026
 
