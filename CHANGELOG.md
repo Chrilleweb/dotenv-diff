@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+- "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
+
+
+## [](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.0...vnull) (2026-01-28)
+
+### Bug Fixes
+
+* default exclude keys where not ignored in scan mode ([#236](https://github.com/Chrilleweb/dotenv-diff/issues/236)) ([593e69b](https://github.com/Chrilleweb/dotenv-diff/commit/593e69b3a12273c445fa2b365b683cfbe5af283f))
+
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [v2.5.3](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.2...v2.5.3) (2026-01-27)
 
 ### Bug Fixes
