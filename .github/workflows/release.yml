@@ -1,7 +1,11 @@
 name: Release
 
 on:
-  push:
+  workflow_run:
+    # Trigger this workflow when the "build, test and lint" workflow completes on the main branch
+    workflows: ["build, test and lint"]
+    types:
+      - completed
     branches:
       - main
 
@@ -10,11 +14,13 @@ permissions:
 
 jobs:
   check:
+    # Only run if the triggering workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       should_release: ${{ steps.check.outputs.should_release }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -37,14 +43,16 @@ jobs:
 
   release:
     needs: check
-    if: needs.check.outputs.should_release == 'true'
+    # Only run release job if a release is needed and prevent releases from forks
+    if: needs.check.outputs.should_release == 'true' && github.repository == 'Chrilleweb/dotenv-diff'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0 # fetch all history for tags
 
@@ -57,7 +65,7 @@ jobs:
         with:
           version: 10
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
