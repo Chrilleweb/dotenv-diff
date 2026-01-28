@@ -3,6 +3,7 @@
  * But may be used in code. 
  */
 export const DEFAULT_EXCLUDE_KEYS = [
+  'PWD',
   'NODE_ENV',
   'VITE_MODE',
   'MODE',

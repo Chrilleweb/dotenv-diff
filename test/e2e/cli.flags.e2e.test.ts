@@ -429,6 +429,30 @@ describe('duplicate detection', () => {
     expect(envContent).not.toContain('IGNORED_VAR');
   });
 
+  it('Will ignore default excluded keys fx: MODE)', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
+    fs.writeFileSync(
+      path.join(cwd, 'app.js'),
+      `
+      const mode = process.env.MODE;
+      const pwd = process.env.PWD;
+      const newVar = process.env.NEW_VAR;
+    `,
+    );
+
+    const res = runCli(cwd, ['--scan-usage', '--fix']);
+    expect(res.status).toBe(0); // exit clean
+    expect(res.stdout).toContain('Auto-fix applied');
+    expect(res.stdout).toContain('Added 1 missing keys to .env');
+    expect(res.stdout).not.toContain('MODE');
+
+    const envContent = fs.readFileSync(path.join(cwd, '.env'), 'utf-8');
+    expect(envContent).toContain('NEW_VAR=');
+    expect(envContent).not.toContain('MODE=');
+    expect(envContent).not.toContain('PWD=');
+  });
+
   it('should exclude file when using --exclude-files', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');
