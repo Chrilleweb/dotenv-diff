@@ -91,7 +91,12 @@ export function processComparisonFile(
       opts.ignoreRegex,
     );
     envVariables = Object.fromEntries(envKeys.map((k) => [k, envFull[k]]));
-    scanResult = compareWithEnvFiles(scanResult, envVariables);
+    scanResult = compareWithEnvFiles(
+      scanResult,
+      envVariables,
+      opts.ignore,
+      opts.ignoreRegex,
+    );
     comparedAgainst = compareFile.name;
 
     // Detect uppercase keys
