@@ -32,21 +32,26 @@ export function printMissing(
     return acc;
   }, {});
 
+  // Group by file first
+  const byFile = new Map<string, Array<{ variable: string; usage: EnvUsage }>>();
+  
   for (const [variable, usages] of Object.entries(grouped)) {
-    console.log(chalk.red(`   - ${variable}`));
-
-    const maxShow = 3;
-    usages.slice(0, maxShow).forEach((usage) => {
+    for (const usage of usages) {
       const file = normalizePath(usage.file);
+      if (!byFile.has(file)) byFile.set(file, []);
+      byFile.get(file)!.push({ variable, usage });
+    }
+  }
 
-      console.log(chalk.red.dim(`     Used in: ${file}:${usage.line}`));
-      console.log(chalk.gray(`       ${usage.context.trim()}`));
-    });
-
-    if (usages.length > maxShow) {
+  // Print grouped by file
+  for (const [file, items] of byFile) {
+    console.log(chalk.bold(`   ${file}`));
+    
+    for (const { variable, usage } of items) {
       console.log(
-        chalk.gray(`     ... and ${usages.length - maxShow} more locations`),
+        chalk.red(`    ${variable}: Line ${usage.line}`),
       );
+      console.log(chalk.red.dim(`    ${usage.context.trim()}`));
     }
   }
   console.log();

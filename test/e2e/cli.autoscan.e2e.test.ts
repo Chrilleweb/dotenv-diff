@@ -335,7 +335,7 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, []);
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Used in: src/index.ts:1');
+    expect(res.stdout).toContain('src/index.ts');
   });
 
   it('shows progress bar during scanning in non-json mode', () => {
