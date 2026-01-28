@@ -65,7 +65,7 @@ export function printSecrets(secrets: SecretFinding[], json: boolean): void {
 
       console.log(
         color(
-          `    ${label}: Line ${f.line} - ${f.message}\n     ${chalk.dim(f.snippet)}`,
+          `    ${label}: Line ${f.line} - ${f.message}\n    ${chalk.dim(f.snippet)}`,
         ),
       );
     }
