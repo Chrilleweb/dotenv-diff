@@ -60,21 +60,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: 'https://registry.npmjs.org'
 
-      - name: Update npm to latest
-        run: npm install -g npm@latest
-
-      - run: pnpm install --frozen-lockfile
+      - run: npm install
 
       - name: Run release-it
-        run: pnpm release -- --ci
+        run: npm run release -- --ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
