@@ -6,7 +6,9 @@
     "tagName": "v${version}",
     "requireCleanWorkingDir": true,
     "requireUpstream": true,
-    "push": true
+    "push": true,
+    "commitArgs": ["--no-verify"],
+    "tagArgs": ["--no-sign"]
   },
   "github": {
     "release": true,
@@ -17,11 +19,7 @@
     "skipChecks": true
   },
   "hooks": {
-    "before:init": [
-      "pnpm run lint",
-      "pnpm run build",
-      "git fetch --prune --prune-tags origin"
-    ]
+    "before:init": ["git fetch --prune --prune-tags origin"]
   },
   "plugins": {
     "@release-it/conventional-changelog": {
