@@ -17,13 +17,15 @@ export function printInconsistentNamingWarning(
 
   console.log(chalk.yellow('⚠️  Inconsistent naming found:'));
 
-  for (const warning of warnings) {
+  for (const { key1, key2, suggestion } of warnings) {
     console.log(
       chalk.yellow(
-        `   You have both ${chalk.cyan(warning.key1)} and ${chalk.cyan(warning.key2)} (inconsistent naming)`,
+        `   - ${chalk.cyan(key1)} ↔ ${chalk.cyan(key2)}`,
       ),
     );
-    console.log(chalk.gray(`   ${warning.suggestion}`));
+    console.log(
+      chalk.gray(`     Suggested canonical name: ${suggestion}`),
+    );
   }
 
   console.log();
