@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
 
+## [](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.5...vnull) (2026-01-29)
+
+### 🐛 Bug Fixes
+
+* inconsistent naming warning ui ([#241](https://github.com/Chrilleweb/dotenv-diff/issues/241)) ([b672b12](https://github.com/Chrilleweb/dotenv-diff/commit/b672b1206a94b375df1db23a8c0ba4acaa675b84))
+
 ## [v2.5.5](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.4...v2.5.5) (2026-01-28)
 
 ### Bug Fixes
