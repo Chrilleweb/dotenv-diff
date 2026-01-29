@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Updated inconsistent name text ([#243](https://github.com/Chrilleweb/dotenv-diff/issues/243)) ([c400aac](https://github.com/Chrilleweb/dotenv-diff/commit/c400aac46b434d7525d9ad75a135d374ab737b13))
 
-## [](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.5...vnull) (2026-01-29)
+## [2.5.6](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.5...v2.5.6) (2026-01-29)
 
 ### 🐛 Bug Fixes
 
