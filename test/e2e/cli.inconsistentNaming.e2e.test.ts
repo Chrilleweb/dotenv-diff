@@ -55,7 +55,7 @@ describe('Inconsistent Naming Warnings', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Inconsistent naming found');
     expect(res.stdout).toContain(
-      'Suggested canonical name: API_KEY',
+      'Suggested name: API_KEY',
     );
   });
 
@@ -78,13 +78,13 @@ describe('Inconsistent Naming Warnings', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Inconsistent naming found');
     expect(res.stdout).toContain(
-      'Suggested canonical name: API_KEY',
+      'Suggested name: API_KEY',
     );
     expect(res.stdout).toContain(
-      'Suggested canonical name: DATABASE_URL',
+      'Suggested name: DATABASE_URL',
     );
     expect(res.stdout).toContain(
-      'Suggested canonical name: JWT_SECRET',
+      'Suggested name: JWT_SECRET',
     );
   });
 
@@ -127,7 +127,7 @@ describe('Inconsistent Naming Warnings', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Inconsistent naming found');
     expect(res.stdout).toContain(
-      'Suggested canonical name: API_KEY',
+      'Suggested name: API_KEY',
     );
   });
 
@@ -147,7 +147,7 @@ describe('Inconsistent Naming Warnings', () => {
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('Inconsistent naming found');
     expect(res.stdout).toContain(
-      'Suggested canonical name: API_KEY',
+      'Suggested name: API_KEY',
     );
     expect(res.stdout).toContain('inconsistent naming patterns');
   });

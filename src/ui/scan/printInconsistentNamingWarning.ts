@@ -24,7 +24,7 @@ export function printInconsistentNamingWarning(
       ),
     );
     console.log(
-      chalk.gray(`     Suggested canonical name: ${suggestion}`),
+      chalk.gray(`     Suggested name: ${suggestion}`),
     );
   }
 
