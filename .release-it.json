@@ -17,23 +17,28 @@
     "skipChecks": true
   },
   "hooks": {
-    "before:init": ["pnpm run lint", "pnpm run build"]
+    "before:init": [
+      "pnpm run lint",
+      "pnpm run build",
+      "git fetch --prune --prune-tags origin"
+    ]
   },
   "plugins": {
     "@release-it/conventional-changelog": {
       "preset": {
         "name": "conventionalcommits",
         "types": [
-          { "type": "feat", "section": "Features" },
-          { "type": "fix", "section": "Bug Fixes" },
-          { "type": "perf", "section": "Performance Improvements" },
-          { "type": "revert", "section": "Reverts" },
-          { "type": "docs", "section": "Documentation" },
-          { "type": "style", "section": "Styles", "hidden": true },
-          { "type": "chore", "section": "Miscellaneous", "hidden": true },
-          { "type": "refactor", "section": "Code Refactoring", "hidden": true },
-          { "type": "test", "section": "Tests", "hidden": true },
-          { "type": "ci", "section": "CI/CD", "hidden": true }
+          { "type": "feat", "section": "✨ Features" },
+          { "type": "fix", "section": "🐛 Bug Fixes" },
+          { "type": "perf", "section": "⚡ Performance" },
+          { "type": "revert", "section": "⏪ Reverts" },
+          { "type": "docs", "section": "📝 Documentation" },
+
+          { "type": "style", "hidden": true },
+          { "type": "chore", "hidden": true },
+          { "type": "refactor", "hidden": true },
+          { "type": "test", "hidden": true },
+          { "type": "ci", "hidden": true }
         ]
       },
       "infile": "CHANGELOG.md",
