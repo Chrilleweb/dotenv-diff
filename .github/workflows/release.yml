@@ -64,12 +64,7 @@ jobs:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Update npm to latest
-        run: npm install -g npm@latest
-
-      - run: pnpm install --frozen-lockfile
-
       - name: Run release-it
-        run: pnpm release -- --ci --dry-run
+        run: npx release-it -- --ci --dry-run
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
