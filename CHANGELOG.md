@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
 
-## [](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.4...vnull) (2026-01-28)
+## [v2.5.5](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.4...v2.5.5) (2026-01-28)
 
 ### Bug Fixes
 

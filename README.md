@@ -54,6 +54,37 @@ dotenv-diff --strict
 
 ---
 
+## Configuration (`--init`)
+
+Generate a default config file:
+
+```bash
+dotenv-diff --init
+```
+
+This creates a dotenv-diff.config.json file:
+
+```json
+{
+  "strict": false,
+  "example": ".env.example",
+  "ignore": ["NODE_ENV", "VITE_MODE"],
+  "ignoreUrls": ["https://example.com"]
+}
+```
+
+**Configuration options:**
+- **`strict`** (boolean): Treat warnings as errors (default: false)
+- **`example`** (string): Path to .env file to compare against (or example path for `--compare`)
+- **`ignore`** (array): Array of environment variable names to ignore
+- **`ignoreUrls`** (array): URL patterns to ignore when scanning files
+
+You can use all CLI flags in the config file.
+
+> **Note:** You can use all CLI flags in the config file and CLI flags always override config file values.
+
+---
+
 ## Framework-Specific Warnings
 
 In SvelteKit and Next.js projects, dotenv-diff detects framework-specific
