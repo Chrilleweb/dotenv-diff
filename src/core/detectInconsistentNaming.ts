@@ -27,8 +27,7 @@ export function detectInconsistentNaming(
 
       if (areInconsistentlyNamed(key1, key2)) {
         // Always suggest the snake_case version (the one with underscores)
-        const snakeCaseKey = key1.includes('_') ? key1 : key2;
-        const suggestion = `Consider using snake_case naming: '${snakeCaseKey}'`;
+        const suggestion = key1.includes('_') ? key1 : key2;
 
         warnings.push({
           key1,
