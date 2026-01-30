@@ -16,4 +16,4 @@
 
 ---
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for more details.
+See [CONTRIBUTING.md](https://github.com/Chrilleweb/dotenv-diff/blob/main/CONTRIBUTING.md)
