@@ -83,6 +83,7 @@ This will trigger a major release.
 ## Pull Requests
 
 - Open your PR against the `main` branch
+- The changes are small, focused, and easy to review
 - Describe what you changed and why
 - Link to related issues if applicable
 
