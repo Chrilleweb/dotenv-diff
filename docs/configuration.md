@@ -75,3 +75,45 @@ Usage in the configuration file:
 ```
 
 In short, `--env` defines the runtime environment file, while `--example` defines the reference file used for comparison.
+
+### `--compare`
+
+Explicitly enables the comparison between the specified `.env` file and the example `.env` file.
+
+Example usage:
+
+```bash
+dotenv-diff --compare
+```
+
+This flag is useful when you want to ensure that your runtime environment file matches the structure of your example file.
+
+Usage in the configuration file:
+
+```json
+{
+  "compare": true
+}
+```
+
+### `--check-values`
+
+Compare not only the keys but also the values of the environment variables between the two files.
+
+This flag can only be used in combination with the `--compare` flag.
+
+Example usage:
+
+```bash
+dotenv-diff --compare --check-values
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "checkValues": true
+}
+```
+
+### `--allow-duplicates`
