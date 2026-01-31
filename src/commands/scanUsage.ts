@@ -14,6 +14,7 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/security/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
+import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 
 /**
  * Scans the codebase for environment variable usage and compares it with
@@ -86,7 +87,9 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
     } else {
       scanResult = result.scanResult;
       comparedAgainst = result.comparedAgainst;
-      duplicatesFound = result.duplicatesFound;
+      if (result.duplicatesFound) {
+        duplicatesFound = result.duplicatesFound;
+      }
       fixApplied = result.fixApplied;
       removedDuplicates = result.removedDuplicates;
       fixedKeys = result.addedEnv;
@@ -101,7 +104,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
         scanResult.inconsistentNamingWarnings =
           result.inconsistentNamingWarnings;
       }
-      if (result.exampleFull && result.comparedAgainst === '.env.example') {
+      if (result.exampleFull && result.comparedAgainst === DEFAULT_EXAMPLE_FILE) {
         scanResult.exampleWarnings = detectSecretsInExample(result.exampleFull);
       }
     }
@@ -128,7 +131,6 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
     return {
       exitWithError:
         scanResult.missing.length > 0 ||
-        duplicatesFound ||
         hasHighSeveritySecrets ||
         hasHighSeverityExampleWarnings ||
         !!(
@@ -155,7 +157,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
     gitignoreUpdated,
   });
 
-  return { exitWithError: result.exitWithError || duplicatesFound };
+  return { exitWithError: result.exitWithError };
 }
 
 /**
