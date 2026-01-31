@@ -17,7 +17,6 @@ describe('updateTotals', () => {
       missing: 0,
       extra: 0,
       empty: 0,
-      mismatch: 0,
       duplicate: 0,
       gitignore: 0,
     };
@@ -72,23 +71,6 @@ describe('updateTotals', () => {
 
     expect(totals.empty).toBe(1);
     expect(entry.empty).toEqual(['EMPTY1']);
-  });
-
-  it('updates value mismatches', () => {
-    const filtered: Filtered = {
-      missing: [],
-      mismatches: [{ key: 'KEY1', expected: 'a', actual: 'b' }],
-      duplicatesEnv: [],
-      duplicatesEx: [],
-      gitignoreIssue: null,
-    };
-
-    updateTotals(filtered, totals, entry);
-
-    expect(totals.mismatch).toBe(1);
-    expect(entry.valueMismatches).toEqual([
-      { key: 'KEY1', expected: 'a', actual: 'b' },
-    ]);
   });
 
   it('updates duplicates from both env and example', () => {
