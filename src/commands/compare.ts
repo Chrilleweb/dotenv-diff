@@ -129,7 +129,14 @@ export async function compareMany(
     }
 
     // Print duplicates
-    printDuplicates(envName, exampleName, dupsEnv, dupsEx, opts.json ?? false);
+    printDuplicates(
+      envName,
+      exampleName,
+      dupsEnv,
+      dupsEx,
+      opts.json ?? false,
+      opts.fix ?? false,
+    );
 
     // Calculate stats for JSON entry
     const stats = calculateStats(
@@ -160,9 +167,9 @@ export async function compareMany(
     }
 
     // Print all issues
-    printIssues(filtered, opts.json ?? false);
+    printIssues(filtered, opts.json ?? false, opts.fix ?? false);
 
-    if (filtered.gitignoreIssue && !opts.json) {
+    if (filtered.gitignoreIssue && !opts.json && !opts.fix) {
       printGitignoreWarning({
         envFile: envName,
         reason: filtered.gitignoreIssue.reason,

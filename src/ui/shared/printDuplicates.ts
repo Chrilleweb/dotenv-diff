@@ -7,6 +7,7 @@ import chalk from 'chalk';
  * @param dEnv Array of duplicate keys in the environment file with their counts.
  * @param dEx Array of duplicate keys in the example file with their counts.
  * @param json Whether to output in JSON format.
+ * @param fix Whether fix mode is enabled (skips printing duplicates as they will be fixed).
  * @returns void
  */
 export function printDuplicates(
@@ -15,9 +16,10 @@ export function printDuplicates(
   dEnv: Array<{ key: string; count: number }>,
   dEx: Array<{ key: string; count: number }>,
   json: boolean,
+  fix = false,
 ): void {
   if (json) return;
-  if (dEnv.length) {
+  if (dEnv.length && !fix) {
     console.log(
       chalk.yellow(`⚠️  Duplicate keys in ${envName} (last occurrence wins):`),
     );

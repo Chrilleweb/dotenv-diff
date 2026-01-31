@@ -220,6 +220,7 @@ describe('compareMany', () => {
         missing: ['KEY3'],
       }),
       false,
+      false,
     );
   });
 
@@ -239,6 +240,7 @@ describe('compareMany', () => {
       expect.objectContaining({
         extra: ['EXTRA_KEY'],
       }),
+      false,
       false,
     );
   });
@@ -260,6 +262,7 @@ describe('compareMany', () => {
       expect.objectContaining({
         empty: ['KEY1'],
       }),
+      false,
       false,
     );
   });
@@ -286,6 +289,7 @@ describe('compareMany', () => {
       [{ key: 'DUP_KEY', count: 2 }],
       [{ key: 'DUP_EX', count: 3 }],
       false,
+      false,
     );
   });
 
@@ -302,6 +306,7 @@ describe('compareMany', () => {
       '.env.example',
       [],
       [],
+      false,
       false,
     );
   });
@@ -345,6 +350,7 @@ describe('compareMany', () => {
       expect.objectContaining({
         mismatches: [{ key: 'KEY1', expected: 'expected', actual: 'actual' }],
       }),
+      false,
       false,
     );
   });
@@ -527,6 +533,7 @@ describe('compareMany', () => {
         extra: [],
       }),
       false,
+      false,
     );
   });
 
@@ -707,6 +714,7 @@ describe('compareMany', () => {
         empty: expect.arrayContaining(['KEY1', 'KEY2']),
       }),
       false,
+      false,
     );
   });
 
@@ -826,6 +834,7 @@ describe('compareMany', () => {
         extra: ['EXTRA1'],
         mismatches: [{ key: 'KEY1', expected: 'exp', actual: 'act' }],
       }),
+      false,
       false,
     );
     expect(mockPrintGitignoreWarning).toHaveBeenCalled();
