@@ -108,6 +108,35 @@ Usage in the configuration file:
 }
 ```
 
+### `--ignore <keys>`
+
+Specify a comma-separated list of keys to ignore during the comparison other than the default ignored keys which is:
+
+- `PWD`
+- `NODE_ENV`
+- `VITE_MODE`
+- `MODE`
+- `BASE_URL`
+- `PROD`
+- `DEV`
+- `SSR`
+
+This is useful when you have certain environment variables that are expected to differ between environments and you want to exclude them from the comparison.
+
+Example usage:
+
+```bash
+dotenv-diff --ignore SECRET_KEY,API_TOKEN
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "ignore": ["SECRET_KEY", "API_TOKEN"]
+}
+```
+
 # Comparison Flags
 
 This is flags related to comparing two `.env` files. 
