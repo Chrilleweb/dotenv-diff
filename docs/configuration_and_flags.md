@@ -96,10 +96,6 @@ This is useful when you have legitimate reasons for duplicate keys in your envir
 
 This flag can also be used together with the `--compare` flag:
 
-```bash
-dotenv-diff --compare --allow-duplicates
-```
-
 Usage in the configuration file:
 
 ```json
@@ -129,11 +125,35 @@ Example usage:
 dotenv-diff --ignore SECRET_KEY,API_TOKEN
 ```
 
+This flag can also be used together with the `--compare` flag:
+
 Usage in the configuration file:
 
 ```json
 {
   "ignore": ["SECRET_KEY", "API_TOKEN"]
+}
+```
+
+### `--ignore-regex <patterns>`
+
+Specify a comma-separated list of regex patterns to ignore keys matching those patterns during the comparison.
+
+This is useful when you have patterns of environment variable names that are expected to differ between environments and you want to exclude them from the comparison.
+
+Example usage:
+
+```bash
+dotenv-diff --ignore-regex SECRET_,API_
+```
+
+This flag can also be used together with the `--compare` flag:
+
+Usage in the configuration file:
+
+```json
+{
+  "ignoreRegex": ["SECRET_", "API_"]
 }
 ```
 
