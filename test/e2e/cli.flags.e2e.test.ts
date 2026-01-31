@@ -254,6 +254,41 @@ describe('duplicate detection', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Duplicate keys in .env');
   });
+
+  it('will detect duplicates in scan mode', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nA=2\nC=3\n');
+        fs.writeFileSync(
+      path.join(cwd, 'app.js'),
+      `
+      const api = process.env.A;
+      const client = process.env.C;
+    `,
+    );
+
+    const res = runCli(cwd, ['--scan-usage']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain(
+      'Duplicate keys in .env (last occurrence wins):',
+    );
+    expect(res.stdout).toContain('- A (2 occurrences)');
+  });
+
+  it('--allow-duplicates works in scan mode', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nA=2\nC=3\n');
+    fs.writeFileSync(
+      path.join(cwd, 'app.js'),
+      `
+      const api = process.env.A;
+      const client = process.env.C;
+    `,
+    );
+
+    const res = runCli(cwd, ['--scan-usage', '--allow-duplicates']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Duplicate keys in .env');
+  });
   describe('--json output', () => {
     it('prints a JSON array with ok=true when files match', () => {
       const cwd = tmpDir();
