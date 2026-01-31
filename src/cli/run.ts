@@ -66,6 +66,7 @@ async function runScanMode(opts: Options): Promise<boolean> {
 
   const { exitWithError } = await scanUsage({
     cwd: opts.cwd,
+    allowDuplicates: opts.allowDuplicates,
     include: opts.includeFiles,
     exclude: opts.excludeFiles,
     ignore: opts.ignore,

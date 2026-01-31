@@ -1,13 +1,7 @@
 name: Release
 
 on:
-  workflow_run:
-    # Trigger this workflow when the "build, test and lint" workflow completes on the main branch
-    workflows: ["build, test and lint"]
-    types:
-      - completed
-    branches:
-      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
