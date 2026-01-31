@@ -3,6 +3,12 @@
 dotenv-diff can be configured using CLI flags or a configuration file.
 CLI flags always take precedence over configuration file values.
 
+- [--init](#configuration-file)
+- [--env](#--env-file)
+- [--example](#--example-file)
+- [--allow-duplicates](#--allow-duplicates)
+- [--compare](#--compare)
+- [--check-values](#--check-values)
 
 ## Configuration file
 
@@ -76,6 +82,37 @@ Usage in the configuration file:
 
 In short, `--env` defines the runtime environment file, while `--example` defines the reference file used for comparison.
 
+### `--allow-duplicates`
+
+Allows duplicate keys are a boolean flag that allows duplicate keys in the `.env` files without throwing a warning (or error in strict mode).
+
+Example usage:
+
+```bash
+dotenv-diff --allow-duplicates
+```
+
+This is useful when you have legitimate reasons for duplicate keys in your environment files.
+
+This flag can also be used together with the `--compare` flag:
+
+```bash
+dotenv-diff --compare --allow-duplicates
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "allowDuplicates": true
+}
+```
+
+# Comparison Flags
+
+This is flags related to comparing two `.env` files. 
+And can only be used in combination with the `--compare` flag.
+
 ### `--compare`
 
 Explicitly enables the comparison between the specified `.env` file and the example `.env` file.
@@ -116,4 +153,29 @@ Usage in the configuration file:
 }
 ```
 
-### `--allow-duplicates`
+### `--only <list>`
+
+Specify a comma-separated list of keys to exclusively check in the comparison.
+
+Example usage:
+
+```bash
+dotenv-diff --compare --only missing,duplicate
+```
+
+This flag can only be used in combination with the `--compare` flag.
+
+`--only` accepts the following values:
+- `missing`: Check for missing keys in the runtime `.env` file compared to the example file.
+- `extra`: Check for extra keys in the runtime `.env` file that are not present in the example file.
+- `empty`: Check for keys that have empty values in the runtime `.env` file.
+- `duplicate`: Check for duplicate keys in either of the `.env` files.
+- `gitignore`: check if the `.env` file is listed in `.gitignore`.
+
+Usage in the configuration file:
+
+```json
+{
+  "only": ["missing", "duplicate"]
+}
+```
