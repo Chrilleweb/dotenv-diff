@@ -182,7 +182,6 @@ export async function compareMany(
     if (opts.fix) {
       const { changed, result } = applyFixes({
         envPath,
-        examplePath,
         missingKeys: filtered.missing,
         duplicateKeys: dupsEnv.map((d) => d.key),
         ensureGitignore: hasGitignoreIssue,

@@ -196,7 +196,6 @@ export function printScanResult(
       {
         removedDuplicates: fixContext.removedDuplicates,
         addedEnv: fixContext.addedEnv,
-        addedExample: opts.examplePath ? fixContext.addedEnv : [],
       },
       comparedAgainst || DEFAULT_ENV_FILE,
       opts.examplePath ? path.basename(opts.examplePath) : 'example file',

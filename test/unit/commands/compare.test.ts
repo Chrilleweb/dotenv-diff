@@ -362,7 +362,6 @@ describe('compareMany', () => {
         removedDuplicates: [],
         addedEnv: ['MISSING_KEY'],
         gitignoreUpdated: false,
-        addedExample: [],
       },
     });
 
@@ -373,7 +372,6 @@ describe('compareMany', () => {
 
     expect(mockApplyFixes).toHaveBeenCalledWith({
       envPath,
-      examplePath,
       missingKeys: ['MISSING_KEY'],
       duplicateKeys: [],
       ensureGitignore: false,
@@ -412,7 +410,6 @@ describe('compareMany', () => {
         removedDuplicates: ['DUPLICATE_KEY', 'ANOTHER_DUP'],
         addedEnv: [],
         gitignoreUpdated: false,
-        addedExample: [],
       },
     });
 
@@ -423,7 +420,6 @@ describe('compareMany', () => {
 
     expect(mockApplyFixes).toHaveBeenCalledWith({
       envPath,
-      examplePath,
       missingKeys: [],
       duplicateKeys: ['DUPLICATE_KEY', 'ANOTHER_DUP'],
       ensureGitignore: false,
@@ -790,7 +786,6 @@ describe('compareMany', () => {
         removedDuplicates: [],
         addedEnv: [],
         gitignoreUpdated: true,
-        addedExample: [],
       },
     });
 

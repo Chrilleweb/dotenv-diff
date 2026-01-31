@@ -35,7 +35,6 @@ describe('applyFixes', () => {
     fs.writeFileSync(envPath, 'A=1\nB=2\nA=3\n');
     const { changed, result } = applyFixes({
       envPath,
-      examplePath,
       missingKeys: [],
       duplicateKeys: ['A'],
     });
@@ -50,7 +49,6 @@ describe('applyFixes', () => {
     fs.writeFileSync(envPath, 'A=1\n');
     const { changed, result } = applyFixes({
       envPath,
-      examplePath,
       missingKeys: ['B', 'C'],
       duplicateKeys: [],
     });
@@ -62,33 +60,15 @@ describe('applyFixes', () => {
     expect(finalContent).toContain('C=');
   });
 
-  it('syncs missing keys to .env.example', () => {
-    fs.writeFileSync(envPath, 'A=1\n');
-    fs.writeFileSync(examplePath, 'A=\n');
-    const { changed, result } = applyFixes({
-      envPath,
-      examplePath,
-      missingKeys: ['B'],
-      duplicateKeys: [],
-    });
-
-    const finalExample = fs.readFileSync(examplePath, 'utf-8');
-    expect(changed).toBe(true);
-    expect(result.addedExample).toEqual(['B']);
-    expect(finalExample).toContain('B');
-  });
-
   it('does not duplicate keys in .env.example if already present', () => {
     fs.writeFileSync(examplePath, 'A=\nB=\n');
     const { changed, result } = applyFixes({
       envPath,
-      examplePath,
       missingKeys: ['B'],
       duplicateKeys: [],
     });
 
     const finalExample = fs.readFileSync(examplePath, 'utf-8');
-    expect(result.addedExample).toEqual([]);
     expect(finalExample.match(/^B=/gm)?.length).toBe(1); // only one B
   });
 
@@ -97,7 +77,6 @@ describe('applyFixes', () => {
     fs.writeFileSync(examplePath, 'A=\n');
     const { changed, result } = applyFixes({
       envPath,
-      examplePath,
       missingKeys: [],
       duplicateKeys: [],
     });
@@ -107,7 +86,6 @@ describe('applyFixes', () => {
       removedDuplicates: [],
       addedEnv: [],
       gitignoreUpdated: false,
-      addedExample: [],
     });
   });
 
@@ -116,7 +94,6 @@ describe('applyFixes', () => {
 
     applyFixes({
       envPath,
-      examplePath,
       missingKeys: ['B'],
       duplicateKeys: [],
     });
@@ -130,7 +107,6 @@ describe('applyFixes', () => {
 
     const { changed, result } = applyFixes({
       envPath,
-      examplePath: undefined as unknown as string,
       missingKeys: ['B'],
       duplicateKeys: [],
     });
@@ -138,7 +114,6 @@ describe('applyFixes', () => {
     const env = fs.readFileSync(envPath, 'utf-8');
     expect(changed).toBe(true);
     expect(result.addedEnv).toEqual(['B']);
-    expect(result.addedExample).toEqual([]);
     expect(env).toContain('B=');
   });
 
@@ -147,7 +122,6 @@ describe('applyFixes', () => {
 
     const { changed, result } = applyFixes({
       envPath,
-      examplePath,
       missingKeys: [],
       duplicateKeys: ['C'], // key not in file
     });
@@ -171,7 +145,6 @@ B=2
 
     applyFixes({
       envPath,
-      examplePath,
       missingKeys: [],
       duplicateKeys: ['A', 'B'],
     });
@@ -180,28 +153,9 @@ B=2
     expect(env).toBe(`A=2\nC=1\nB=2\n`);
   });
 
-  it('adds missing keys to empty .env.example', () => {
-    fs.writeFileSync(envPath, 'A=1\n');
-    fs.writeFileSync(examplePath, '');
-
-    const { result } = applyFixes({
-      envPath,
-      examplePath,
-      missingKeys: ['B'],
-      duplicateKeys: [],
-    });
-
-    const example = fs.readFileSync(examplePath, 'utf-8');
-
-    expect(result.addedExample).toEqual(['B']);
-    expect(example).toContain('B');
-    expect(example.trim()).toBe('B');
-  });
-
   it('handles ensureGitignore=true without throwing (best-effort)', () => {
     const { changed } = applyFixes({
       envPath,
-      examplePath,
       missingKeys: [],
       duplicateKeys: [],
       ensureGitignore: true,
@@ -220,7 +174,6 @@ B=2
 
       const { changed, result } = applyFixes({
         envPath,
-        examplePath: path.join(tmpDir, '.env.example'),
         missingKeys: [],
         duplicateKeys: [],
         ensureGitignore: true,
@@ -251,7 +204,6 @@ B=2
 
       const { changed, result } = applyFixes({
         envPath,
-        examplePath: path.join(tmpDir, '.env.example'),
         missingKeys: [],
         duplicateKeys: [],
         ensureGitignore: true,
@@ -280,7 +232,6 @@ B=2
 
       const { changed, result } = applyFixes({
         envPath,
-        examplePath: path.join(tmpDir, '.env.example'),
         missingKeys: [],
         duplicateKeys: [],
         ensureGitignore: true,
@@ -300,7 +251,6 @@ B=2
 
       const { result } = applyFixes({
         envPath,
-        examplePath: path.join(tmpDir, '.env.example'),
         missingKeys: [],
         duplicateKeys: [],
         ensureGitignore: true,
@@ -325,7 +275,6 @@ B=2
 
       const { result } = applyFixes({
         envPath,
-        examplePath: path.join(tmpDir, '.env.example'),
         missingKeys: [],
         duplicateKeys: [],
         ensureGitignore: true,
@@ -350,7 +299,6 @@ B=2
 
       const { result } = applyFixes({
         envPath,
-        examplePath: path.join(tmpDir, '.env.example'),
         missingKeys: [],
         duplicateKeys: [],
         ensureGitignore: true,
@@ -375,7 +323,6 @@ B=2
 
       const { result } = applyFixes({
         envPath,
-        examplePath: path.join(tmpDir, '.env.example'),
         missingKeys: [],
         duplicateKeys: [],
         ensureGitignore: true,
@@ -405,7 +352,6 @@ B=2
 
       const { result } = applyFixes({
         envPath,
-        examplePath: path.join(tmpDir, '.env.example'),
         missingKeys: [],
         duplicateKeys: [],
         ensureGitignore: true,
