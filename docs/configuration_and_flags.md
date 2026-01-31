@@ -157,6 +157,26 @@ Usage in the configuration file:
 }
 ```
 
+### `--fix`
+
+Automatically fix issues found during the comparison by adding missing keys, remove duplicates and add .env to .gitignore if missing.
+
+Example usage:
+
+```bash
+dotenv-diff --fix
+```
+
+This flag can also be used together with the `--compare` flag:
+
+Usage in the configuration file:
+
+```json
+{
+  "fix": true
+}
+```
+
 # Comparison Flags
 
 This is flags related to comparing two `.env` files. 
