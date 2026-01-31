@@ -7,7 +7,6 @@ export interface Totals {
   missing: number;
   extra: number;
   empty: number;
-  mismatch: number;
   duplicate: number;
   gitignore: number;
 }
@@ -41,11 +40,6 @@ export function updateTotals(
   if (filtered.empty?.length) {
     entry.empty = filtered.empty;
     totals.empty += filtered.empty.length;
-  }
-
-  if (filtered.mismatches?.length) {
-    entry.valueMismatches = filtered.mismatches;
-    totals.mismatch += filtered.mismatches.length;
   }
 
   if (filtered.duplicatesEnv.length || filtered.duplicatesEx.length) {

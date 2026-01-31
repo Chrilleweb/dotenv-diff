@@ -61,7 +61,6 @@ export const ALLOWED_CATEGORIES = [
   'missing',
   'extra',
   'empty',
-  'mismatch',
   'duplicate',
   'gitignore',
 ] as const;

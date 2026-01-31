@@ -123,4 +123,34 @@ describe('added .env to gitignore with --compare and --fix', () => {
     expect(res.stdout).toContain('file not found');
     expect(res.stdout).toContain('Do you want to create a .env.example file from .env.local?');
   });
+
+  describe('Values mismatch checks', () => {
+    it('will report value mismatches when --check-values is set', () => {
+      const cwd = tmpDir();
+      fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=actual_value\n');
+      fs.writeFileSync(
+        path.join(cwd, '.env.example'),
+        'API_KEY=example_value\n',
+      );
+
+      const res = runCli(cwd, ['--compare', '--check-values']);
+      expect(res.status).toBe(0);
+      expect(res.stdout).toContain('Value mismatches');
+      expect(res.stdout).toContain('API_KEY');
+    });
+
+    it('will not report value mismatches when --check-values is not set', () => {
+      const cwd = tmpDir();
+      fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=actual_value\n');
+      fs.writeFileSync(
+        path.join(cwd, '.env.example'),
+        'API_KEY=example_value\n',
+      );
+
+      const res = runCli(cwd, ['--compare']);
+      expect(res.status).toBe(0);
+      expect(res.stdout).not.toContain('Value mismatches');
+      expect(res.stdout).not.toContain('API_KEY');
+    });
+  });
 });

@@ -28,7 +28,7 @@ export function createProgram() {
     .option('--no-color', 'Disable colored output')
     .option(
       '--only <list>',
-      'Comma-separated categories to only run (missing,extra,empty,mismatch,duplicate,gitignore)',
+      'Comma-separated categories to only run (missing,extra,empty,duplicate,gitignore)',
     )
     .option('--scan-usage', 'Scan codebase for environment variable usage')
     .option('--compare', 'Compare .env and .env.example files')

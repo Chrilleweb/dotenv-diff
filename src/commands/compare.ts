@@ -46,7 +46,6 @@ export async function compareMany(
     missing: 0,
     extra: 0,
     empty: 0,
-    mismatch: 0,
     duplicate: 0,
     gitignore: 0,
   };
@@ -94,8 +93,7 @@ export async function compareMany(
       missing: run('missing') ? diff.missing : [],
       extra: run('extra') ? diff.extra : [],
       empty: run('empty') ? emptyKeys : [],
-      mismatches:
-        run('mismatch') && opts.checkValues ? diff.valueMismatches : [],
+      mismatches: opts.checkValues ? diff.valueMismatches : [],
       duplicatesEnv: run('duplicate') ? dupsEnv : [],
       duplicatesEx: run('duplicate') ? dupsEx : [],
       gitignoreIssue,
