@@ -219,8 +219,9 @@ Usage in the configuration file:
 
 ### `--ci`
 
-Run non-interactively and never create or modify files.
-Recommended for CI pipelines.
+Run in CI mode: non-interactive and read-only.
+Prevents all file creation and modification, including prompts for missing files.
+Always exits with an error if issues are found. Recommended for CI/CD pipelines.
 
 Example usage:
 
@@ -236,9 +237,69 @@ Usage in the configuration file:
 }
 ```
 
+### `--files <patterns>`
+
+Specify a comma-separated list of file patterns to scan for environment variable usage.
+This **completely replaces** the default file patterns (use `--include-files` to extend instead).
+Useful when you want full control over which files are scanned.
+
+Example usage:
+
+```bash
+dotenv-diff --files "src/**/*.ts,config/*.js"
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "files": ["src/**/*.ts", "config/*.js"]
+}
+```
+
+### `--include-files <patterns>`
+
+Specify a comma-separated list of file patterns to **add** to the default scan patterns.
+This extends the default patterns rather than replacing them (unlike `--files`).
+Useful when you want to include additional file types while keeping the defaults.
+
+Example usage:
+
+```bash
+dotenv-diff --include-files "*.config.js,scripts/*.sh"
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "includeFiles": ["*.config.js", "scripts/*.sh"]
+}
+```
+
+### `--exclude-files <patterns>`
+
+Specify a comma-separated list of file patterns to exclude from scanning.
+These patterns are added to the default exclude patterns (like `node_modules`, `dist`, etc.).
+Useful when you want to skip specific files or directories that shouldn't be scanned.
+
+Example usage:
+
+```bash
+dotenv-diff --exclude-files "tests/**,*.spec.ts"
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "excludeFiles": ["tests/**", "*.spec.ts"]
+}
+```
+
 # Comparison Flags
 
-This is flags related to comparing two `.env` files. 
+This is flags related to comparing two `.env` files.
 And can only be used in combination with the `--compare` flag.
 
 ### `--compare`
@@ -294,6 +355,7 @@ dotenv-diff --compare --only missing,duplicate
 This flag can only be used in combination with the `--compare` flag.
 
 `--only` accepts the following values:
+
 - `missing`: Check for missing keys in the runtime `.env` file compared to the example file.
 - `extra`: Check for extra keys in the runtime `.env` file that are not present in the example file.
 - `empty`: Check for keys that have empty values in the runtime `.env` file.
@@ -310,11 +372,9 @@ Usage in the configuration file:
 
 ### `-y, --yes`
 
-Run non-interactively and automatically accept prompts.
-
-Again, this flag is mainly used together with the `--compare` flag.
-
-Because in default mode, there is nothing to confirm or modify.
+Run non-interactively and automatically accept all prompts with "yes".
+Useful for automation when you want to auto-create missing files or apply fixes without manual confirmation.
+Cannot be combined with `--ci` (use one or the other).
 
 Example usage:
 
