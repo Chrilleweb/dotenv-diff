@@ -177,6 +177,26 @@ Usage in the configuration file:
 }
 ```
 
+### `--json`
+
+Outputs the results in JSON format.
+
+Example usage:
+
+```bash
+dotenv-diff --json
+```
+
+This flag can also be used together with the `--compare` flag:
+
+Usage in the configuration file:
+
+```json
+{
+  "json": true
+}
+```
+
 # Comparison Flags
 
 This is flags related to comparing two `.env` files. 
