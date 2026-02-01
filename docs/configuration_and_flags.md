@@ -84,7 +84,7 @@ In short, `--env` defines the runtime environment file, while `--example` define
 
 ### `--allow-duplicates`
 
-Allows duplicate keys are a boolean flag that allows duplicate keys in the `.env` files without throwing a warning (or error in strict mode).
+Allows duplicate keys in `.env` files without throwing a warning (or error in strict mode).
 
 Example usage:
 
@@ -197,6 +197,24 @@ Usage in the configuration file:
 }
 ```
 
+### `--color`
+
+Enables colored output in the terminal (enabled by default).
+
+Example usage:
+
+```bash
+dotenv-diff --color
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "color": true
+}
+```
+
 ### `--no-color`
 
 Disables colored output in the terminal.
@@ -206,8 +224,6 @@ Example usage:
 ```bash
 dotenv-diff --no-color
 ```
-
-This flag can also be used together with the `--compare` flag:
 
 Usage in the configuration file:
 
@@ -530,12 +546,9 @@ Usage in the configuration file:
 }
 ```
 
-### --inconsistent-naming-warnings
+### `--inconsistent-naming-warnings`
 
-**Type:** Boolean  
-**Default:** Enabled
-
-Detects inconsistent naming patterns in environment variable keys. This helps identify keys that are semantically the same but use different formatting styles (e.g., `API_KEY` vs `APIKEY`, `DATABASE_URL` vs `DATABASEURL`). The tool compares keys and warns when they match after removing underscores, suggesting the snake_case version as the standard.
+Detects inconsistent naming patterns in environment variable keys (enabled by default). This helps identify keys that are semantically the same but use different formatting styles (e.g., `API_KEY` vs `APIKEY`, `DATABASE_URL` vs `DATABASEURL`). The tool compares keys and warns when they match after removing underscores, suggesting the snake_case version as the standard.
 
 Use this to maintain consistent naming conventions across your environment variables and avoid confusion.
 
@@ -545,7 +558,7 @@ Usage in the CLI:
 dotenv-diff --inconsistent-naming-warnings
 ```
 
-### --no-inconsistent-naming-warnings
+### `--no-inconsistent-naming-warnings`
 
 Disable inconsistent naming pattern warnings.
 
@@ -646,4 +659,12 @@ Example usage:
 
 ```bash
 dotenv-diff --compare --fix --yes
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "yes": true
+}
 ```
