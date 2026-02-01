@@ -197,6 +197,45 @@ Usage in the configuration file:
 }
 ```
 
+### `--no-color`
+
+Disables colored output in the terminal.
+
+Example usage:
+
+```bash
+dotenv-diff --no-color
+```
+
+This flag can also be used together with the `--compare` flag:
+
+Usage in the configuration file:
+
+```json
+{
+  "noColor": true
+}
+```
+
+### `--ci`
+
+Run non-interactively and never create or modify files.
+Recommended for CI pipelines.
+
+Example usage:
+
+```bash
+dotenv-diff --compare --ci
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "ci": true
+}
+```
+
 # Comparison Flags
 
 This is flags related to comparing two `.env` files. 
@@ -267,4 +306,18 @@ Usage in the configuration file:
 {
   "only": ["missing", "duplicate"]
 }
+```
+
+### `-y, --yes`
+
+Run non-interactively and automatically accept prompts.
+
+Again, this flag is mainly used together with the `--compare` flag.
+
+Because in default mode, there is nothing to confirm or modify.
+
+Example usage:
+
+```bash
+dotenv-diff --compare --fix --yes
 ```
