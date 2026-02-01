@@ -3,12 +3,54 @@
 dotenv-diff can be configured using CLI flags or a configuration file.
 CLI flags always take precedence over configuration file values.
 
+## Table of Contents
+
+### General Flags
+
 - [--init](#configuration-file)
 - [--env](#--env-file)
 - [--example](#--example-file)
 - [--allow-duplicates](#--allow-duplicates)
+- [--ignore](#--ignore-keys)
+- [--ignore-regex](#--ignore-regex-patterns)
+- [--fix](#--fix)
+- [--json](#--json)
+- [--color](#--color)
+- [--no-color](#--no-color)
+- [--ci](#--ci)
+- [--yes](#-y---yes)
+
+### File Scanning Flags
+
+- [--files](#--files-patterns)
+- [--include-files](#--include-files-patterns)
+- [--exclude-files](#--exclude-files-patterns)
+
+### Display Options
+
+- [--show-unused](#--show-unused)
+- [--no-show-unused](#--no-show-unused)
+- [--show-stats](#--show-stats)
+- [--no-show-stats](#--no-show-stats)
+
+### Validation Flags
+
+- [--strict](#--strict)
+- [--secrets](#--secrets)
+- [--no-secrets](#--no-secrets)
+- [--ignore-urls](#--ignore-urls-list)
+- [--uppercase-keys](#--uppercase-keys)
+- [--no-uppercase-keys](#--no-uppercase-keys)
+- [--expire-warnings](#--expire-warnings)
+- [--no-expire-warnings](#--no-expire-warnings)
+- [--inconsistent-naming-warnings](#--inconsistent-naming-warnings)
+- [--no-inconsistent-naming-warnings](#--no-inconsistent-naming-warnings)
+
+### Comparison Flags
+
 - [--compare](#--compare)
 - [--check-values](#--check-values)
+- [--only](#--only-list)
 
 ## Configuration file
 
@@ -22,7 +64,7 @@ This creates a `dotenv-diff.config.json` file in the project root with an exampl
 
 > **Note:** You can use all CLI flags in the config file
 
-## CLI flags
+## General Flags
 
 ### `--env <file>`
 
@@ -253,6 +295,8 @@ Usage in the configuration file:
 }
 ```
 
+## File Scanning Flags
+
 ### `--files <patterns>`
 
 Specify a comma-separated list of file patterns to scan for environment variable usage.
@@ -312,6 +356,8 @@ Usage in the configuration file:
   "excludeFiles": ["tests/**", "*.spec.ts"]
 }
 ```
+
+## Display Options
 
 ### `--show-unused`
 
@@ -388,6 +434,8 @@ Usage in the configuration file:
   "showStats": false
 }
 ```
+
+## Validation Flags
 
 ### `--strict`
 
