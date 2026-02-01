@@ -5,11 +5,16 @@ import type { Filtered } from '../../config/types.js';
  * Prints the issues found during the comparison.
  * @param filtered The filtered comparison results.
  * @param json Whether to output in JSON format.
+ * @param fix Whether fix mode is enabled (skips printing missing keys as they will be fixed).
  * @returns void
  */
-export function printIssues(filtered: Filtered, json: boolean): void {
+export function printIssues(
+  filtered: Filtered,
+  json: boolean,
+  fix = false,
+): void {
   if (json) return;
-  if (filtered.missing.length) {
+  if (filtered.missing.length && !fix) {
     const header = chalk.red('❌ Missing keys:');
     console.log(header);
     filtered.missing.forEach((key) => console.log(chalk.red(`  - ${key}`)));

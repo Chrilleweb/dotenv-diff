@@ -220,6 +220,7 @@ describe('compareMany', () => {
         missing: ['KEY3'],
       }),
       false,
+      false,
     );
   });
 
@@ -239,6 +240,7 @@ describe('compareMany', () => {
       expect.objectContaining({
         extra: ['EXTRA_KEY'],
       }),
+      false,
       false,
     );
   });
@@ -260,6 +262,7 @@ describe('compareMany', () => {
       expect.objectContaining({
         empty: ['KEY1'],
       }),
+      false,
       false,
     );
   });
@@ -286,6 +289,7 @@ describe('compareMany', () => {
       [{ key: 'DUP_KEY', count: 2 }],
       [{ key: 'DUP_EX', count: 3 }],
       false,
+      false,
     );
   });
 
@@ -302,6 +306,7 @@ describe('compareMany', () => {
       '.env.example',
       [],
       [],
+      false,
       false,
     );
   });
@@ -346,6 +351,7 @@ describe('compareMany', () => {
         mismatches: [{ key: 'KEY1', expected: 'expected', actual: 'actual' }],
       }),
       false,
+      false,
     );
   });
 
@@ -362,7 +368,6 @@ describe('compareMany', () => {
         removedDuplicates: [],
         addedEnv: ['MISSING_KEY'],
         gitignoreUpdated: false,
-        addedExample: [],
       },
     });
 
@@ -373,7 +378,6 @@ describe('compareMany', () => {
 
     expect(mockApplyFixes).toHaveBeenCalledWith({
       envPath,
-      examplePath,
       missingKeys: ['MISSING_KEY'],
       duplicateKeys: [],
       ensureGitignore: false,
@@ -412,7 +416,6 @@ describe('compareMany', () => {
         removedDuplicates: ['DUPLICATE_KEY', 'ANOTHER_DUP'],
         addedEnv: [],
         gitignoreUpdated: false,
-        addedExample: [],
       },
     });
 
@@ -423,7 +426,6 @@ describe('compareMany', () => {
 
     expect(mockApplyFixes).toHaveBeenCalledWith({
       envPath,
-      examplePath,
       missingKeys: [],
       duplicateKeys: ['DUPLICATE_KEY', 'ANOTHER_DUP'],
       ensureGitignore: false,
@@ -530,6 +532,7 @@ describe('compareMany', () => {
         missing: ['MISSING'],
         extra: [],
       }),
+      false,
       false,
     );
   });
@@ -711,6 +714,7 @@ describe('compareMany', () => {
         empty: expect.arrayContaining(['KEY1', 'KEY2']),
       }),
       false,
+      false,
     );
   });
 
@@ -790,7 +794,6 @@ describe('compareMany', () => {
         removedDuplicates: [],
         addedEnv: [],
         gitignoreUpdated: true,
-        addedExample: [],
       },
     });
 
@@ -831,6 +834,7 @@ describe('compareMany', () => {
         extra: ['EXTRA1'],
         mismatches: [{ key: 'KEY1', expected: 'exp', actual: 'act' }],
       }),
+      false,
       false,
     );
     expect(mockPrintGitignoreWarning).toHaveBeenCalled();

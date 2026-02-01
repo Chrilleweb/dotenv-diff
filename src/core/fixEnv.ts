@@ -8,7 +8,6 @@ import { DEFAULT_GITIGNORE_ENV_PATTERNS } from '../config/constants.js';
  */
 interface ApplyFixesOptions {
   envPath: string;
-  examplePath: string;
   missingKeys: string[];
   duplicateKeys: string[];
   ensureGitignore?: boolean;
@@ -20,17 +19,15 @@ interface ApplyFixesOptions {
 interface FixResult {
   removedDuplicates: string[];
   addedEnv: string[];
-  addedExample: string[];
   gitignoreUpdated: boolean;
 }
 
 /**
- * Applies fixes to the .env and .env.example files based on the detected issues.
+ * Applies fixes to the .env file based on the detected issues.
  *
  * This function will:
  * - Remove duplicate keys from .env (keeping the last occurrence)
- * - Add missing keys to .env with empty values
- * - Add missing keys to .env.example (if not already present)
+ * - Add missing keys to .env file (with empty values)
  * - Ensure .env is ignored in .gitignore (if in a git repo and ensureGitignore is true)
  *
  * @param options - Fix options including file paths and keys to fix
@@ -42,7 +39,6 @@ export function applyFixes(options: ApplyFixesOptions): {
 } {
   const {
     envPath,
-    examplePath,
     missingKeys = [],
     duplicateKeys = [],
     ensureGitignore = false,
@@ -51,7 +47,6 @@ export function applyFixes(options: ApplyFixesOptions): {
   const result: FixResult = {
     removedDuplicates: [],
     addedEnv: [],
-    addedExample: [],
     gitignoreUpdated: false,
   };
 
@@ -94,29 +89,6 @@ export function applyFixes(options: ApplyFixesOptions): {
     fs.writeFileSync(envPath, newContent);
     result.addedEnv = missingKeys;
   }
-
-  // --- Add missing keys to .env.example ---
-  if (examplePath && missingKeys.length) {
-    const exContent = fs.readFileSync(examplePath, 'utf-8');
-    const existingExKeys = new Set(
-      exContent
-        .split('\n')
-        .map((l) => l.trim().split('=')[0])
-        .filter(Boolean),
-    );
-    const newExampleKeys = missingKeys.filter((k) => !existingExKeys.has(k));
-
-    if (newExampleKeys.length) {
-      const newExContent =
-        exContent +
-        (exContent.endsWith('\n') ? '' : '\n') +
-        newExampleKeys.join('\n') +
-        '\n';
-      fs.writeFileSync(examplePath, newExContent);
-      result.addedExample = newExampleKeys;
-    }
-  }
-
   // --- Ensure .env is ignored in .gitignore ---
   if (ensureGitignore) {
     result.gitignoreUpdated = updateGitignoreForEnv(envPath);
@@ -125,7 +97,6 @@ export function applyFixes(options: ApplyFixesOptions): {
   const changed =
     result.removedDuplicates.length > 0 ||
     result.addedEnv.length > 0 ||
-    result.addedExample.length > 0 ||
     result.gitignoreUpdated;
 
   return { changed, result };

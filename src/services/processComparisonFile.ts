@@ -29,7 +29,6 @@ interface ProcessComparisonResult {
   fixApplied: boolean;
   removedDuplicates: string[];
   addedEnv: string[];
-  addedExample: string[];
   gitignoreUpdated: boolean;
   exampleFull?: Record<string, string> | undefined;
   uppercaseWarnings?: UppercaseWarning[];
@@ -62,7 +61,6 @@ export function processComparisonFile(
   let fixApplied = false;
   let removedDuplicates: string[] = [];
   let addedEnv: string[] = [];
-  let addedExample: string[] = [];
   let gitignoreUpdated = false;
   let exampleFull: Record<string, string> | undefined = undefined;
   let uppercaseWarnings: UppercaseWarning[] = [];
@@ -138,9 +136,6 @@ export function processComparisonFile(
     ) {
       const { changed, result } = applyFixes({
         envPath: compareFile.path,
-        examplePath: opts.examplePath
-          ? resolveFromCwd(opts.cwd, opts.examplePath)
-          : '',
         missingKeys: scanResult.missing,
         duplicateKeys: dupsEnv.map((d) => d.key),
         ensureGitignore: true,
@@ -150,7 +145,6 @@ export function processComparisonFile(
         fixApplied = true;
         removedDuplicates = result.removedDuplicates;
         addedEnv = result.addedEnv;
-        addedExample = result.addedExample;
         gitignoreUpdated = result.gitignoreUpdated;
 
         scanResult.missing = [];
@@ -178,7 +172,6 @@ export function processComparisonFile(
       fixApplied,
       removedDuplicates,
       addedEnv,
-      addedExample,
       gitignoreUpdated,
       exampleFull,
       uppercaseWarnings,
@@ -201,7 +194,6 @@ export function processComparisonFile(
     fixApplied,
     removedDuplicates,
     addedEnv,
-    addedExample,
     gitignoreUpdated,
     exampleFull,
     uppercaseWarnings,
