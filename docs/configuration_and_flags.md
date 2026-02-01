@@ -297,6 +297,272 @@ Usage in the configuration file:
 }
 ```
 
+### `--show-unused`
+
+List variables that are defined in `.env` but not used in the codebase (enabled by default).
+Helps identify environment variables that may be outdated or unnecessary.
+
+Example usage:
+
+```bash
+dotenv-diff --show-unused
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "showUnused": true
+}
+```
+
+### `--no-show-unused`
+
+Do not list variables that are defined in `.env` but not used in code.
+Use this flag to hide the unused variables section from the output.
+
+Example usage:
+
+```bash
+dotenv-diff --no-show-unused
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "showUnused": false
+}
+```
+
+### `--show-stats`
+
+Display statistics about the scan or comparison results (enabled by default).
+Shows metrics like files scanned, total usages, unique variables, and warnings count.
+
+Example usage:
+
+```bash
+dotenv-diff --show-stats
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "showStats": true
+}
+```
+
+### `--no-show-stats`
+
+Do not display statistics in the output.
+Use this flag to hide the statistics section for a cleaner output.
+
+Example usage:
+
+```bash
+dotenv-diff --no-show-stats
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "showStats": false
+}
+```
+
+### `--strict`
+
+Enable strict mode: treat all warnings as errors and exit with error code 1.
+In strict mode, issues like unused variables, duplicates, secrets, and framework warnings will cause the process to fail.
+Useful for enforcing strict environment variable hygiene in CI/CD pipelines.
+
+Example usage:
+
+```bash
+dotenv-diff --strict
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "strict": true
+}
+```
+
+### `--secrets`
+
+Enable secret detection during codebase scan (enabled by default).
+Scans your code for hardcoded secrets like API keys, tokens, passwords, and other sensitive values.
+Detects high and medium severity secrets that may pose security risks.
+
+Example usage:
+
+```bash
+dotenv-diff --secrets
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "secrets": true
+}
+```
+
+### `--no-secrets`
+
+Disable secret detection during scan.
+Use this flag to skip the secret scanning phase and improve scan performance.
+
+Example usage:
+
+```bash
+dotenv-diff --no-secrets
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "secrets": false
+}
+```
+
+### `--ignore-urls <list>`
+
+Specify a comma-separated list of URLs to ignore during secret detection.
+Useful for whitelisting known safe URLs that might otherwise be flagged as potential secrets.
+Uses case-insensitive substring matching.
+
+Example usage:
+
+```bash
+dotenv-diff --ignore-urls https://safesecret
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "ignoreUrls": ["https://example.com", "localhost"]
+}
+```
+
+### `--uppercase-keys`
+
+Enable validation that environment variable keys follow UPPER*SNAKE_CASE naming convention (enabled by default).
+Warns about keys that don't match the pattern `[A-Z0-9*]+` and suggests properly formatted alternatives.
+Helps maintain consistent naming conventions across your environment files.
+
+Example usage:
+
+```bash
+dotenv-diff --uppercase-keys
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "uppercaseKeys": true
+}
+```
+
+### `--no-uppercase-keys`
+
+Disable uppercase key validation.
+Use this flag if your project uses different naming conventions for environment variables.
+
+Example usage:
+
+```bash
+dotenv-diff --no-uppercase-keys
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "uppercaseKeys": false
+}
+```
+
+### `--expire-warnings`
+
+Enable detection of expiration dates for environment variables (enabled by default).
+Detects `@expire` or `# @expire YYYY-MM-DD` comments in `.env` files and warns when variables are approaching or past their expiration date.
+Useful for managing temporary API keys, tokens, or time-sensitive credentials.
+
+Example usage:
+
+```bash
+dotenv-diff --expire-warnings
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "expireWarnings": true
+}
+```
+
+### `--no-expire-warnings`
+
+Disable expiration date warnings.
+Use this flag to skip checking for `@expire` annotations in environment files.
+
+Example usage:
+
+```bash
+dotenv-diff --no-expire-warnings
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "expireWarnings": false
+}
+```
+
+### --inconsistent-naming-warnings
+
+**Type:** Boolean  
+**Default:** Enabled
+
+Detects inconsistent naming patterns in environment variable keys. This helps identify keys that are semantically the same but use different formatting styles (e.g., `API_KEY` vs `APIKEY`, `DATABASE_URL` vs `DATABASEURL`). The tool compares keys and warns when they match after removing underscores, suggesting the snake_case version as the standard.
+
+Use this to maintain consistent naming conventions across your environment variables and avoid confusion.
+
+Usage in the CLI:
+
+```bash
+dotenv-diff --inconsistent-naming-warnings
+```
+
+### --no-inconsistent-naming-warnings
+
+Disable inconsistent naming pattern warnings.
+
+Usage in the CLI:
+
+```bash
+dotenv-diff --no-inconsistent-naming-warnings
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "inconsistentNamingWarnings": false
+}
+```
+
 # Comparison Flags
 
 This is flags related to comparing two `.env` files.
