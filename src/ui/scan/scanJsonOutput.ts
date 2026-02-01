@@ -134,8 +134,14 @@ export function scanJsonOutput(
     }));
   }
 
-  if (scanResult.unused?.length) {
-    output.unused = scanResult.unused;
+  if (scanResult.frameworkWarnings?.length) {
+    output.frameworkWarnings = scanResult.frameworkWarnings.map((w) => ({
+      variable: w.variable,
+      reason: w.reason,
+      file: normalizePath(w.file),
+      line: w.line,
+      framework: w.framework,
+    }));
   }
 
   if (scanResult.uppercaseWarnings?.length) {
@@ -154,14 +160,8 @@ export function scanJsonOutput(
       }));
   }
 
-  if (scanResult.frameworkWarnings?.length) {
-    output.frameworkWarnings = scanResult.frameworkWarnings.map((w) => ({
-      variable: w.variable,
-      reason: w.reason,
-      file: normalizePath(w.file),
-      line: w.line,
-      framework: w.framework,
-    }));
+  if (scanResult.unused?.length) {
+    output.unused = scanResult.unused;
   }
 
   const hasDuplicates =
