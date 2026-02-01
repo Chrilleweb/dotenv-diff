@@ -56,15 +56,5 @@ export function printMissing(
   }
   console.log();
 
-  if (isCiMode) {
-    console.log(
-      chalk.red(`💥 Found ${missing.length} missing environment variable(s).`),
-    );
-    console.log(
-      chalk.red(`   Add these variables to ${fileType} to fix this error.`),
-    );
-    console.log();
-  }
-
   return true;
 }
