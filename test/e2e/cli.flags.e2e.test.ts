@@ -258,7 +258,7 @@ describe('duplicate detection', () => {
   it('will detect duplicates in scan mode', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\nA=2\nC=3\n');
-        fs.writeFileSync(
+    fs.writeFileSync(
       path.join(cwd, 'app.js'),
       `
       const api = process.env.A;
@@ -376,6 +376,40 @@ describe('duplicate detection', () => {
       expect(output.stats).toBeDefined();
     });
   });
+
+  it('when adding missing keys, remove duplicates and add .env til gitignore dont print issues', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      'EXISTING=value\nEXISTING=value2\n',
+    );
+    fs.writeFileSync(
+      path.join(cwd, 'app.js'),
+      `
+            const newVar = process.env.NEW_VAR;
+          `,
+    );
+
+    const res = runCli(cwd, ['--scan-usage', '--fix']);
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Auto-fix applied');
+    expect(res.stdout).toContain('Added 1 missing keys to .env');
+    expect(res.stdout).toContain('Removed 1 duplicate keys from .env');
+  });
+
+  it('when adding missing keys, remove duplicates and add .env til gitignore dont print issues in --compare', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      'EXISTING=value\nEXISTING=value2\n',
+    );
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'EXISTING=\nNEW_KEY=\n');
+    const res = runCli(cwd, ['--compare', '--fix']);
+    expect(res.stdout).toContain('Auto-fix applied');
+    expect(res.stdout).toContain('Added 1 missing keys to .env');
+    expect(res.stdout).toContain('Removed 1 duplicate keys from .env');
+  });
+
   it('does not duplicate keys in .env.example when they already exist', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING=value\n');

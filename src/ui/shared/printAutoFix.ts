@@ -3,7 +3,6 @@ import chalk from 'chalk';
 interface AutoFixResult {
   removedDuplicates: string[];
   addedEnv: string[];
-  addedExample: string[];
 }
 
 /**
@@ -38,13 +37,6 @@ export function printAutoFix(
       console.log(
         chalk.green(
           `  - Added ${result.addedEnv.length} missing keys to ${envName}: ${result.addedEnv.join(', ')}`,
-        ),
-      );
-    }
-    if (result.addedExample.length && !result.addedEnv.length) {
-      console.log(
-        chalk.green(
-          `  - Synced ${result.addedExample.length} keys to ${exampleName}: ${result.addedExample.join(', ')}`,
         ),
       );
     }
