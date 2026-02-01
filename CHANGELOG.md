@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
 
+## [2.5.8](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.7...v2.5.8) (2026-02-01)
+
+### 🐛 Bug Fixes
+
+* Fixed --allow-duplicates flag in default ([#249](https://github.com/Chrilleweb/dotenv-diff/issues/249)) ([3cccc35](https://github.com/Chrilleweb/dotenv-diff/commit/3cccc3523cb6c54ea48f3a22a895b887dea58098))
+* Fixed bug in --fix for compare mode ([#251](https://github.com/Chrilleweb/dotenv-diff/issues/251)) ([a26d6b5](https://github.com/Chrilleweb/dotenv-diff/commit/a26d6b51f440cede84381c0ea065bc2106979189))
+* removed mismatch from only flag ([#250](https://github.com/Chrilleweb/dotenv-diff/issues/250)) ([a4ee8c2](https://github.com/Chrilleweb/dotenv-diff/commit/a4ee8c27ca62c380f9bee7e0444c2c9488a6b7c9))
+
+### 📝 Documentation
+
+* **contribution:** updated PR guidelines ([#248](https://github.com/Chrilleweb/dotenv-diff/issues/248)) ([f3a8209](https://github.com/Chrilleweb/dotenv-diff/commit/f3a8209f22a810b34240250976f18e0c428669e1))
+
 ## [2.5.7](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.6...v2.5.7) (2026-01-29)
 
 ### 🐛 Bug Fixes
