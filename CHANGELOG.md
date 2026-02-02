@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
+## [2.5.9](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.8...v2.5.9) (2026-02-02)
+
+### 🐛 Bug Fixes
+
+* removed ci warning on missing - duplicate ([#254](https://github.com/Chrilleweb/dotenv-diff/issues/254)) ([b9e70f0](https://github.com/Chrilleweb/dotenv-diff/commit/b9e70f03eeaa764176ae67d4b2b16e6b58cd5c9c))
+* **scan:** json output order ([#255](https://github.com/Chrilleweb/dotenv-diff/issues/255)) ([db3fd14](https://github.com/Chrilleweb/dotenv-diff/commit/db3fd1469603e33347bb91da83dded90bb0fefb4))
+
+### 📝 Documentation
+
+* Config and flags  ([#256](https://github.com/Chrilleweb/dotenv-diff/issues/256)) ([996e636](https://github.com/Chrilleweb/dotenv-diff/commit/996e6366bea9a0392d029d1f29835c5779ac2556))
 
 ## [2.5.8](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.7...v2.5.8) (2026-02-01)
 
