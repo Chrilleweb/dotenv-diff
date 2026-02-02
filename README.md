@@ -11,10 +11,10 @@ First-class support for SvelteKit and Next.js. Also works well in modern JavaScr
 ---
 
 ### Warnings & errors detection
-![Demo](./docs/assets//demo3.gif)
+![Demo](./docs/assets/demo1.gif)
 
 ### Clean / successful scan
-![Successful Scan](./docs/assets//successful-scan.png)
+![Successful Scan](./docs/assets/success1.png)
 
 ---
 
@@ -28,62 +28,23 @@ First-class support for SvelteKit and Next.js. Also works well in modern JavaScr
 
 ---
 
-## Automatic Fixes (`--fix`)
-
-Automatically add missing variables to your `.env` file:
-
-```bash
-dotenv-diff --fix
-```
-
-### Example
-
-1. Code uses `process.env.NEW_API_KEY`
-2. Run `dotenv-diff --fix`
-3. Tool adds `NEW_API_KEY=` to `.env` or `.env.example`
-
----
-
-## Strict Mode
-
-Treat warnings as errors (useful for CI):
-
-```bash
-dotenv-diff --strict
-```
-
----
-
 ## Configuration (`--init`)
 
-Generate a default config file:
+Generate a default configuration file:
 
 ```bash
 dotenv-diff --init
 ```
 
-This creates a dotenv-diff.config.json file:
-
-```json
-{
-  "strict": false,
-  "example": ".env.example",
-  "ignore": ["NODE_ENV", "VITE_MODE"],
-  "ignoreUrls": ["https://example.com"]
-}
-```
-
-**Configuration options:**
-- **`strict`** (boolean): Treat warnings as errors (default: false)
-- **`example`** (string): Path to .env file to compare against (or example path for `--compare`)
-- **`ignore`** (array): Array of environment variable names to ignore
-- **`ignoreUrls`** (array): URL patterns to ignore when scanning files
-
-You can use all CLI flags in the config file.
-
-> **Note:** You can use all CLI flags in the config file and CLI flags always override config file values.
+→ See [Configuration Documentation](https://dotenv-diff-docs.vercel.app/configuration) for more details.
 
 ---
+
+## Git hooks and CI/CD Integration
+
+Easily integrate dotenv-diff into your Git hooks or CI/CD pipelines to enforce environment variable consistency.
+
+→ See [Git Hooks Documentation](https://dotenv-diff-docs.vercel.app/hooks-ci) for more details.
 
 ## Framework-Specific Warnings
 
@@ -98,46 +59,32 @@ Framework issues (Sveltekit):
     → Variables accessed through import.meta.env must start with "VITE_"
 ```
 
+→ See [Framework Documentation](https://dotenv-diff-docs.vercel.app/sveltekit) for more details.
+
+## Ignore Comments 
+
+You can ignore specific environment variable warnings by adding comments in your code. For example:
+
+```javascript
+const apiKey = process.env.API_KEY; // dotenv-diff-ignore
+```
+
+This is helpful when you know a specific warning is safe in your source code.
+
+→ See [Ignore Comments Documentation](https://dotenv-diff-docs.vercel.app/ignore-comments) for more details.
+
 ---
 
 ## Expiration Warnings
 
-Add expiration metadata to variables:
+Add expiration metadata to your environment variables to get warnings when they are about to expire. For example, in your `.env` file:
 
 ```bash
 # @expire 2025-12-31
 API_TOKEN=
 ```
 
----
-
-## File Scanning Options
-
-Include or exclude files:
-
-```bash
-dotenv-diff --include-files '**/*.js,**/*.ts' --exclude-files '**/*.spec.ts'
-```
-
-Override defaults:
-
-```bash
-dotenv-diff --files '**/*.js'
-```
-
----
-
-## Compare Environment Files
-
-```bash
-dotenv-diff --compare
-```
-
-Compare specific files:
-
-```bash
-dotenv-diff --compare --env .env.local --example .env.example.local
-```
+→ See [Expiration Documentation](https://dotenv-diff-docs.vercel.app/expire-warnings) for more details.
 
 ---
 
@@ -152,6 +99,8 @@ In monorepos with multiple apps and packages, you can include shared folders:
   }
 }
 ```
+
+→ See [Monorepo Documentation](https://dotenv-diff-docs.vercel.app/monorepo) for more details.
 
 This will:
 - Scan the current app
@@ -176,7 +125,7 @@ Full documentation: https://dotenv-diff-docs.vercel.app
 ## 🤝 Contributing
 
 Issues and pull requests are welcome.  
-For large changes, please open an issue first.
+→ See [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ---
 
