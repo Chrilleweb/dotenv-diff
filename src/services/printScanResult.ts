@@ -26,10 +26,17 @@ import { printHealthScore } from '../ui/scan/printHealthScore.js';
 import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
 import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
 
+/**
+ * Context for auto-fix operations
+ */
 interface FixContext {
+  /** Whether any fixes were applied */
   fixApplied: boolean;
+  /** List of removed duplicate keys */
   removedDuplicates: string[];
+  /** List of added environment variables */
   addedEnv: string[];
+  /** Whether the .gitignore file was updated */
   gitignoreUpdated: boolean;
 }
 

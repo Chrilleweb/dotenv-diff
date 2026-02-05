@@ -10,6 +10,9 @@ import {
 } from '../config/constants.js';
 import type { GitignoreIssue } from '../config/types.js';
 
+/** 
+ * Options for checking gitignore status
+ */
 interface GitignoreCheckOptions {
   /** Project root directory (default: process.cwd()) */
   cwd?: string;

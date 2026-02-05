@@ -6,9 +6,15 @@ import {
   DEFAULT_EXCLUDE_PATTERNS,
 } from '../core/patterns.js';
 
+/**
+ * Options for finding files
+ */
 interface FindFilesOptions {
+  /** Include patterns for files to find */
   include?: string[];
+  /** Exclude patterns for files to skip */
   exclude?: string[];
+  /** Specific files to include (overrides include/exclude) */
   files?: string[];
 }
 
