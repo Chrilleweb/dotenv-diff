@@ -295,6 +295,26 @@ Usage in the configuration file:
 }
 ```
 
+### `-y, --yes`
+
+Run non-interactively and automatically accept all prompts with "yes".
+Useful for automation when you want to auto-create missing files or apply fixes without manual confirmation.
+Cannot be combined with `--ci` (use one or the other).
+
+Example usage:
+
+```bash
+dotenv-diff --compare --fix --yes
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "yes": true
+}
+```
+
 ## File Scanning Flags
 
 ### `--files <patterns>`
@@ -600,17 +620,25 @@ Detects inconsistent naming patterns in environment variable keys (enabled by de
 
 Use this to maintain consistent naming conventions across your environment variables and avoid confusion.
 
-Usage in the CLI:
+Example usage:
 
 ```bash
 dotenv-diff --inconsistent-naming-warnings
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "inconsistentNamingWarnings": true
+}
 ```
 
 ### `--no-inconsistent-naming-warnings`
 
 Disable inconsistent naming pattern warnings.
 
-Usage in the CLI:
+Example usage:
 
 ```bash
 dotenv-diff --no-inconsistent-naming-warnings
@@ -694,25 +722,5 @@ Usage in the configuration file:
 ```json
 {
   "only": ["missing", "duplicate"]
-}
-```
-
-### `-y, --yes`
-
-Run non-interactively and automatically accept all prompts with "yes".
-Useful for automation when you want to auto-create missing files or apply fixes without manual confirmation.
-Cannot be combined with `--ci` (use one or the other).
-
-Example usage:
-
-```bash
-dotenv-diff --compare --fix --yes
-```
-
-Usage in the configuration file:
-
-```json
-{
-  "yes": true
 }
 ```
