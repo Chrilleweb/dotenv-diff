@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
+## [2.6.0](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.9...v2.6.0) (2026-02-06)
+
+### ✨ Features
+
+* prompt if no env file is found ([#262](https://github.com/Chrilleweb/dotenv-diff/issues/262)) ([c14adf4](https://github.com/Chrilleweb/dotenv-diff/commit/c14adf4206fc045833d985f1d599b5ac92a2a399))
+
+### 🐛 Bug Fixes
+
+* Added more space after prompt ([#263](https://github.com/Chrilleweb/dotenv-diff/issues/263)) ([c5e5770](https://github.com/Chrilleweb/dotenv-diff/commit/c5e57700dabb25ef43635c7a53b7d903244fadc0))
+
+### 📝 Documentation
+
+* moved -y flag up ([#261](https://github.com/Chrilleweb/dotenv-diff/issues/261)) ([08d0530](https://github.com/Chrilleweb/dotenv-diff/commit/08d0530a5c4f5aa183540b4b4afd647894f019ca))
+
 ## [2.5.9](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.8...v2.5.9) (2026-02-02)
 
 ### 🐛 Bug Fixes
