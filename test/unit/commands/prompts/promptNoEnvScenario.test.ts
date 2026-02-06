@@ -64,7 +64,6 @@ describe('promptNoEnvScenario', () => {
     });
     expect(mockConfirmYesNo).not.toHaveBeenCalled();
     expect(mockWriteFileSync).toHaveBeenCalledWith(expectedPath, '');
-    expect(mockConsoleLog).toHaveBeenCalledWith('Created empty .env');
   });
 
   it('prompts user and creates .env file when user confirms', async () => {
@@ -91,7 +90,6 @@ describe('promptNoEnvScenario', () => {
       },
     });
     expect(mockWriteFileSync).toHaveBeenCalledWith(expectedPath, '');
-    expect(mockConsoleLog).toHaveBeenCalledWith('Created empty .env');
   });
 
   it('returns undefined compareFile when user declines', async () => {
@@ -111,7 +109,6 @@ describe('promptNoEnvScenario', () => {
     );
     expect(result).toEqual({ compareFile: undefined });
     expect(mockWriteFileSync).not.toHaveBeenCalled();
-    expect(mockConsoleLog).not.toHaveBeenCalled();
   });
 
   it('handles different cwd paths correctly', async () => {

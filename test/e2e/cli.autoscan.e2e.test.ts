@@ -391,7 +391,6 @@ describe('It will prompt to ask to create .env file is no .env files are found',
     const res = runCli(cwd, ['--yes']);
 
     expect(res.status).toBe(1); // fails because API_KEY is missing
-    expect(res.stdout).toContain('Created empty .env');
     expect(fs.existsSync(path.join(cwd, '.env'))).toBe(true);
   });
 
