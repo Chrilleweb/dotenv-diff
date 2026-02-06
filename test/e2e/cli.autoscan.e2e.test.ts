@@ -342,6 +342,7 @@ describe('no-flag autoscan', () => {
     const cwd = tmpDir();
 
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=12345\n');
     fs.writeFileSync(
       path.join(cwd, 'src', 'index.ts'),
       `const apiKey = process.env.API_KEY;`,
@@ -374,5 +375,95 @@ describe('no-flag autoscan', () => {
     expect(res.stdout).not.toMatch(/█|░/);
 
     expect(res.stdout.trim().startsWith('{')).toBe(true);
+  });
+});
+
+describe('It will prompt to ask to create .env file is no .env files are found', () => {
+  it('should create .env file automatically with --yes flag when none found', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `const apiKey = process.env.API_KEY;`,
+    );
+
+    const res = runCli(cwd, ['--yes']);
+
+    expect(res.status).toBe(1); // fails because API_KEY is missing
+    expect(fs.existsSync(path.join(cwd, '.env'))).toBe(true);
+  });
+
+  it('should not prompt in CI mode when no .env file found', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `const apiKey = process.env.API_KEY;`,
+    );
+
+    const res = runCli(cwd, ['--ci']);
+
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Do you want to create a .env?');
+    expect(res.stdout).not.toContain('Created empty .env');
+    expect(fs.existsSync(path.join(cwd, '.env'))).toBe(false);
+  });
+
+  it('should not create .env if already exists', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.env'), 'EXISTING_KEY=value\n');
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `const apiKey = process.env.API_KEY;`,
+    );
+
+    const res = runCli(cwd, ['--yes']);
+
+    expect(res.status).toBe(1);
+    expect(res.stdout).not.toContain('Created empty .env');
+    const envContent = fs.readFileSync(path.join(cwd, '.env'), 'utf-8');
+    expect(envContent).toBe('EXISTING_KEY=value\n');
+  });
+
+  it('should not create a new .env file when --yes and --json flags are used together', () => {
+    const cwd = tmpDir();
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      `const apiKey = process.env.API_KEY;`,
+    );
+
+    const res = runCli(cwd, ['--yes', '--json']);
+
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Created empty .env');
+    expect(fs.existsSync(path.join(cwd, '.env'))).toBe(false);
+    
+    // Should still output JSON
+    const lines = res.stdout.split('\n');
+    const jsonLine = lines.find(line => line.trim().startsWith('{'));
+    expect(jsonLine).toBeDefined();
+  });
+
+  it('should create .env in correct working directory', () => {
+    const cwd = tmpDir();
+    const subdir = path.join(cwd, 'subfolder');
+
+    fs.mkdirSync(path.join(subdir, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(subdir, 'src', 'index.ts'),
+      `const apiKey = process.env.API_KEY;`,
+    );
+
+    const res = runCli(subdir, ['--yes']);
+
+    expect(res.status).toBe(1); // fails because API_KEY is missing
+    expect(fs.existsSync(path.join(subdir, '.env'))).toBe(true);
+    expect(fs.existsSync(path.join(cwd, '.env'))).toBe(false);
   });
 });

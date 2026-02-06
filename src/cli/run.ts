@@ -4,7 +4,7 @@ import path from 'path';
 import { normalizeOptions } from '../config/options.js';
 import { discoverEnvFiles } from '../services/envDiscovery.js';
 import { envPairing } from '../services/envPairing.js';
-import { ensureFilesOrPrompt } from '../commands/ensureFilesOrPrompt.js';
+import { promptEnsureFiles } from '../commands/prompts/promptEnsureFiles.js';
 import { compareMany } from '../commands/compare.js';
 import type {
   CompareJsonEntry,
@@ -78,6 +78,7 @@ async function runScanMode(opts: Options): Promise<boolean> {
     showUnused: opts.showUnused,
     showStats: opts.showStats,
     isCiMode: opts.isCiMode,
+    isYesMode: opts.isYesMode,
     secrets: opts.secrets,
     strict: opts.strict,
     ignoreUrls: opts.ignoreUrls,
@@ -164,7 +165,7 @@ async function runAutoDiscoveryComparison(opts: Options): Promise<boolean> {
   });
 
   // Ensure required files exist or prompt to create them
-  const initResult = await ensureFilesOrPrompt({
+  const initResult = await promptEnsureFiles({
     cwd: discovery.cwd,
     primaryEnv: discovery.primaryEnv,
     primaryExample: discovery.primaryExample,
@@ -211,7 +212,7 @@ async function handleMissingFiles(
     return { shouldExit: true, exitWithError: true };
   } else {
     // Interactive mode - try to prompt for file creation
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd: opts.cwd,
       primaryEnv: envFlag,
       primaryExample: exampleFlag,
