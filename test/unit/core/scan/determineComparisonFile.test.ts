@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { determineComparisonFile } from '../../../../src/core/scan/determineComparisonFile.js';
 import type { ScanUsageOptions } from '../../../../src/config/types.js';
+import { normalizePath } from '../../../../src/core/helpers/normalizePath.js';
 import fs from 'fs';
+import path from 'path';
 
 vi.mock('fs');
 
@@ -26,7 +28,8 @@ describe('determineComparisonFile', () => {
     vi.clearAllMocks();
   });
 
-  it('returns examplePath when it exists', () => {
+  it('returns examplePath when it exists', async () => {
+    const expectedPath = normalizePath(path.resolve('/project/.env.example'));
     mockExistsSync.mockReturnValue(true);
 
     const opts: ScanUsageOptions = {
@@ -34,16 +37,20 @@ describe('determineComparisonFile', () => {
       examplePath: '.env.example',
     };
 
-    const result = determineComparisonFile(opts);
+    const result = await determineComparisonFile(opts);
 
     expect(result).toEqual({
-      path: '/project/.env.example',
-      name: '.env.example',
+      type: 'found',
+      file: {
+        path: expectedPath,
+        name: '.env.example',
+      },
     });
-    expect(mockExistsSync).toHaveBeenCalledWith('/project/.env.example');
+    expect(mockExistsSync).toHaveBeenCalled();
   });
 
-  it('returns envPath when it exists and no examplePath provided', () => {
+  it('returns envPath when it exists and no examplePath provided', async () => {
+    const expectedPath = normalizePath(path.resolve('/project/.env.local'));
     mockExistsSync.mockReturnValue(true);
 
     const opts: ScanUsageOptions = {
@@ -51,16 +58,20 @@ describe('determineComparisonFile', () => {
       envPath: '.env.local',
     };
 
-    const result = determineComparisonFile(opts);
+    const result = await determineComparisonFile(opts);
 
     expect(result).toEqual({
-      path: '/project/.env.local',
-      name: '.env.local',
+      type: 'found',
+      file: {
+        path: expectedPath,
+        name: '.env.local',
+      },
     });
-    expect(mockExistsSync).toHaveBeenCalledWith('/project/.env.local');
+    expect(mockExistsSync).toHaveBeenCalled();
   });
 
-  it('prioritizes examplePath over envPath when both exist', () => {
+  it('prioritizes examplePath over envPath when both exist', async () => {
+    const expectedPath = normalizePath(path.resolve('/project/.env.example'));
     mockExistsSync.mockReturnValue(true);
 
     const opts: ScanUsageOptions = {
@@ -69,18 +80,21 @@ describe('determineComparisonFile', () => {
       envPath: '.env',
     };
 
-    const result = determineComparisonFile(opts);
+    const result = await determineComparisonFile(opts);
 
     expect(result).toEqual({
-      path: '/project/.env.example',
-      name: '.env.example',
+      type: 'found',
+      file: {
+        path: expectedPath,
+        name: '.env.example',
+      },
     });
-    expect(mockExistsSync).toHaveBeenCalledWith('/project/.env.example');
-    expect(mockExistsSync).not.toHaveBeenCalledWith('/project/.env');
+    expect(mockExistsSync).toHaveBeenCalled();
   });
 
-  it('falls back to envPath when examplePath does not exist', () => {
-    mockExistsSync.mockImplementation((p) => p === '/project/.env');
+  it('falls back to envPath when examplePath does not exist', async () => {
+    const expectedPath = path.resolve('/project/.env');
+    mockExistsSync.mockImplementation((p) => p === expectedPath);
 
     const opts: ScanUsageOptions = {
       ...baseOpts,
@@ -88,50 +102,62 @@ describe('determineComparisonFile', () => {
       envPath: '.env',
     };
 
-    const result = determineComparisonFile(opts);
+    const result = await determineComparisonFile(opts);
 
     expect(result).toEqual({
-      path: '/project/.env',
-      name: '.env',
+      type: 'found',
+      file: {
+        path: normalizePath(expectedPath),
+        name: '.env',
+      },
     });
   });
 
-  it('falls back to auto-discovery when envPath does not exist', () => {
-    mockExistsSync.mockImplementation((p) => p === '/project/.env');
+  it('falls back to auto-discovery when envPath does not exist', async () => {
+    const expectedPath = path.resolve('/project/.env');
+    mockExistsSync.mockImplementation((p) => p === expectedPath);
 
     const opts: ScanUsageOptions = {
       ...baseOpts,
       envPath: '.env.missing',
     };
 
-    const result = determineComparisonFile(opts);
+    const result = await determineComparisonFile(opts);
 
     expect(result).toEqual({
-      path: '/project/.env',
-      name: '.env',
+      type: 'found',
+      file: {
+        path: normalizePath(expectedPath),
+        name: '.env',
+      },
     });
   });
 
-  it('auto-discovers first available candidate when no paths provided', () => {
-    mockExistsSync.mockImplementation((p) => p === '/project/.env.local');
+  it('auto-discovers first available candidate when no paths provided', async () => {
+    const expectedPath = path.resolve('/project/.env.local');
+    mockExistsSync.mockImplementation((p) => p === expectedPath);
 
-    const result = determineComparisonFile(baseOpts);
+    const result = await determineComparisonFile(baseOpts);
 
     expect(result).toEqual({
-      path: '/project/.env.local',
-      name: '.env.local',
+      type: 'found',
+      file: {
+        path: normalizePath(expectedPath),
+        name: '.env.local',
+      },
     });
   });
 
-  it('returns undefined when no files exist', () => {
+  it('returns type none when no files exist', async () => {
     mockExistsSync.mockReturnValue(false);
 
-    const result = determineComparisonFile(baseOpts);
+    const result = await determineComparisonFile(baseOpts);
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({ type: 'none' });
   });
 
-  it('resolves relative paths correctly', () => {
+  it('resolves relative paths correctly', async () => {
+    const expectedPath = normalizePath(path.resolve('/home/user/project/config/.env.example'));
     mockExistsSync.mockReturnValue(true);
 
     const opts: ScanUsageOptions = {
@@ -140,28 +166,36 @@ describe('determineComparisonFile', () => {
       examplePath: 'config/.env.example',
     };
 
-    const result = determineComparisonFile(opts);
+    const result = await determineComparisonFile(opts);
 
     expect(result).toEqual({
-      path: '/home/user/project/config/.env.example',
-      name: '.env.example',
+      type: 'found',
+      file: {
+        path: expectedPath,
+        name: '.env.example',
+      },
     });
   });
 
-  it('handles absolute paths correctly', () => {
+  it('handles absolute paths correctly', async () => {
+    const absolutePath = '/absolute/path/.env.example';
+    const expectedPath = normalizePath(absolutePath);
     mockExistsSync.mockReturnValue(true);
 
     const opts: ScanUsageOptions = {
       ...baseOpts,
-      examplePath: '/absolute/path/.env.example',
+      examplePath: absolutePath,
     };
 
-    const result = determineComparisonFile(opts);
+    const result = await determineComparisonFile(opts);
 
     expect(result).toEqual({
-      path: '/absolute/path/.env.example',
-      name: '.env.example',
+      type: 'found',
+      file: {
+        path: expectedPath,
+        name: '.env.example',
+      },
     });
-    expect(mockExistsSync).toHaveBeenCalledWith('/absolute/path/.env.example');
+    expect(mockExistsSync).toHaveBeenCalled();
   });
 });

@@ -171,6 +171,7 @@ export interface ScanUsageOptions extends ScanOptions {
   showUnused?: boolean;
   showStats?: boolean;
   isCiMode?: boolean;
+  isYesMode?: boolean;
   allowDuplicates?: boolean;
   strict?: boolean;
   uppercaseKeys?: boolean;
@@ -341,3 +342,11 @@ export interface Discovery {
   exampleFlag: string | null;
   alreadyWarnedMissingEnv: boolean;
 }
+
+/**
+ * Resolved comparison file with absolute path and display name.
+ */
+export interface ComparisonFile {
+  path: string;
+  name: string;
+};

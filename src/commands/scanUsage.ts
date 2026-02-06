@@ -4,6 +4,7 @@ import type {
   EnvUsage,
   ExitResult,
   ScanResult,
+  ComparisonFile,
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/scan/determineComparisonFile.js';
 import { printScanResult } from '../services/printScanResult.js';
@@ -15,6 +16,7 @@ import { hasIgnoreComment } from '../core/security/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
 import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
+import { promptNoEnvScenario } from './prompts/promptNoEnvScenario.js';
 
 /**
  * Scans the codebase for environment variable usage and compares it with
@@ -62,7 +64,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   }
 
   // Determine which file to compare against
-  const compareFile = determineComparisonFile(opts);
+  const comparisonResolution = await determineComparisonFile(opts);
   let comparedAgainst = '';
   let duplicatesFound = false;
 
@@ -71,6 +73,20 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   let fixedKeys: string[] = [];
   let removedDuplicates: string[] = [];
   let gitignoreUpdated = false;
+
+  // Handle no env file found scenario
+  let compareFile: ComparisonFile | undefined;
+
+  if (comparisonResolution.type === 'found') {
+    compareFile = comparisonResolution.file;
+  } else if (
+    comparisonResolution.type === 'none' &&
+    !opts.isCiMode &&
+    !opts.json
+  ) {
+    const promptResult = await promptNoEnvScenario(opts);
+    compareFile = promptResult.compareFile;
+  }
 
   // If comparing against a file, process it
   // fx: if the scan is comparing against .env.example, it will check for missing keys there
@@ -104,7 +120,10 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
         scanResult.inconsistentNamingWarnings =
           result.inconsistentNamingWarnings;
       }
-      if (result.exampleFull && result.comparedAgainst === DEFAULT_EXAMPLE_FILE) {
+      if (
+        result.exampleFull &&
+        result.comparedAgainst === DEFAULT_EXAMPLE_FILE
+      ) {
         scanResult.exampleWarnings = detectSecretsInExample(result.exampleFull);
       }
     }

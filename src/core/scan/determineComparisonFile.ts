@@ -1,38 +1,44 @@
 import fs from 'fs';
 import path from 'path';
-import type { ScanUsageOptions } from '../../config/types.js';
+import type { ScanUsageOptions, ComparisonFile } from '../../config/types.js';
 import { resolveFromCwd } from '../helpers/resolveFromCwd.js';
 import { DEFAULT_ENV_CANDIDATES } from '../../config/constants.js';
+import { normalizePath } from '../helpers/normalizePath.js';
 
 /**
- * Resolved comparison file with absolute path and display name.
+ * Result of determining the comparison file, either found with details or none
  */
-type ComparisonFile = {
-  path: string;
-  name: string;
-};
+type ComparisonResolution =
+  | { type: 'found'; file: ComparisonFile }
+  | { type: 'none' };
 
 /**
  * Determines which file to use for comparison based on provided options
  * @param {ScanUsageOptions} opts - Scan configuration options
  * @returns Comparison file info with absolute path and basename, or undefined if not found
  */
-export function determineComparisonFile(
+export async function determineComparisonFile(
   opts: ScanUsageOptions,
-): ComparisonFile | undefined {
+): Promise<ComparisonResolution> {
   // Priority: explicit flags first, then auto-discovery
 
   if (opts.examplePath) {
     const p = resolveFromCwd(opts.cwd, opts.examplePath);
     if (fs.existsSync(p)) {
-      return { path: p, name: path.basename(opts.examplePath) };
+      return {
+        type: 'found',
+        file: { path: normalizePath(p), name: path.basename(opts.examplePath) },
+      };
     }
   }
 
   if (opts.envPath) {
     const p = resolveFromCwd(opts.cwd, opts.envPath);
     if (fs.existsSync(p)) {
-      return { path: p, name: path.basename(opts.envPath) };
+      return {
+        type: 'found',
+        file: { path: normalizePath(p), name: path.basename(opts.envPath) },
+      };
     }
   }
 
@@ -40,9 +46,12 @@ export function determineComparisonFile(
   for (const candidate of DEFAULT_ENV_CANDIDATES) {
     const fullPath = path.resolve(opts.cwd, candidate);
     if (fs.existsSync(fullPath)) {
-      return { path: fullPath, name: candidate };
+      return {
+        type: 'found',
+        file: { path: normalizePath(fullPath), name: candidate },
+      };
     }
   }
 
-  return undefined;
+  return { type: 'none' };
 }

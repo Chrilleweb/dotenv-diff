@@ -78,6 +78,7 @@ async function runScanMode(opts: Options): Promise<boolean> {
     showUnused: opts.showUnused,
     showStats: opts.showStats,
     isCiMode: opts.isCiMode,
+    isYesMode: opts.isYesMode,
     secrets: opts.secrets,
     strict: opts.strict,
     ignoreUrls: opts.ignoreUrls,
