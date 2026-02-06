@@ -66,7 +66,6 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   // Determine which file to compare against
   const comparisonResolution = await determineComparisonFile(opts);
   let comparedAgainst = '';
-  let duplicatesFound = false;
 
   // Store fix information for consolidated display
   let fixApplied = false;
@@ -103,9 +102,6 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
     } else {
       scanResult = result.scanResult;
       comparedAgainst = result.comparedAgainst;
-      if (result.duplicatesFound) {
-        duplicatesFound = result.duplicatesFound;
-      }
       fixApplied = result.fixApplied;
       removedDuplicates = result.removedDuplicates;
       fixedKeys = result.addedEnv;
