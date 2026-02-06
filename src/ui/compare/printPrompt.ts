@@ -6,6 +6,7 @@ import path from 'path';
  */
 export const printPrompt = {
   noEnvFound() {
+    console.log();
     console.log(
       chalk.yellow(
         '⚠️  No .env* or .env.example file found. Skipping comparison.',
@@ -19,10 +20,12 @@ export const printPrompt = {
   },
 
   skipCreation(fileType: string) {
+    console.log();
     console.log(chalk.gray(`🚫 Skipping ${fileType} creation.`));
   },
 
   envCreated(envPath: string, examplePath: string) {
+    console.log();
     console.log(
       chalk.green(
         `✅ ${path.basename(envPath)} file created successfully from ${path.basename(examplePath)}.`,
@@ -31,6 +34,7 @@ export const printPrompt = {
   },
 
   exampleCreated(examplePath: string, envPath: string) {
+    console.log();
     console.log(
       chalk.green(
         `✅ ${path.basename(examplePath)} file created successfully from ${path.basename(envPath)}.`,
