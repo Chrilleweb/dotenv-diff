@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { confirmYesNo } from '../ui/prompts.js';
-import { warnIfEnvNotIgnored } from '../services/git.js';
-import { printPrompt } from '../ui/compare/printPrompt.js';
-import { DEFAULT_ENV_FILE } from '../config/constants.js';
+import { confirmYesNo } from '../../ui/prompts.js';
+import { warnIfEnvNotIgnored } from '../../services/git.js';
+import { printPrompt } from '../../ui/compare/printPrompt.js';
+import { DEFAULT_ENV_FILE } from '../../config/constants.js';
 
 /**
  * Result of ensureFilesOrPrompt function
@@ -31,7 +31,7 @@ interface EnsureFilesArgs {
  * @param args - The arguments for the function.
  * @returns An object indicating whether a file was created or if the process should exit.
  */
-export async function ensureFilesOrPrompt(
+export async function promptEnsureFiles(
   args: EnsureFilesArgs,
 ): Promise<EnsureFilesResult> {
   const { cwd, primaryEnv, primaryExample, isYesMode, isCiMode } = args;

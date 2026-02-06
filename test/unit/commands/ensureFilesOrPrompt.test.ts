@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { ensureFilesOrPrompt } from '../../../src/commands/ensureFilesOrPrompt.js';
+import { promptEnsureFiles } from '../../../src/commands/prompts/promptEnsureFiles.js';
 
 // ---- mocks ----
 vi.mock('../../../src/ui/prompts.js', () => ({
@@ -26,7 +26,7 @@ vi.mock('../../../src/services/git.js', () => ({
 import { confirmYesNo } from '../../../src/ui/prompts.js';
 import { printPrompt } from '../../../src/ui/compare/printPrompt.js';
 
-describe('ensureFilesOrPrompt', () => {
+describe('promptEnsureFiles', () => {
   let cwd: string;
 
   beforeEach(() => {
@@ -43,7 +43,7 @@ describe('ensureFilesOrPrompt', () => {
 
     (confirmYesNo as any).mockResolvedValue(true);
 
-    await ensureFilesOrPrompt({
+    await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -59,7 +59,7 @@ describe('ensureFilesOrPrompt', () => {
   });
 
   it('exits when neither .env nor .env.example exists', async () => {
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -80,7 +80,7 @@ describe('ensureFilesOrPrompt', () => {
 
     (confirmYesNo as any).mockResolvedValue(false);
 
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -96,7 +96,7 @@ describe('ensureFilesOrPrompt', () => {
   it('does not exit when another .env* file exists', async () => {
     fs.writeFileSync(path.join(cwd, '.env.local'), 'FOO=bar');
 
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -113,7 +113,7 @@ describe('ensureFilesOrPrompt', () => {
 
     (confirmYesNo as any).mockResolvedValue(false);
 
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -133,7 +133,7 @@ describe('ensureFilesOrPrompt', () => {
   it('does not create .env in CI mode when missing', async () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
 
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -153,7 +153,7 @@ describe('ensureFilesOrPrompt', () => {
   it('does not warn again if alreadyWarnedMissingEnv is true', async () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
 
-    await ensureFilesOrPrompt({
+    await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -168,7 +168,7 @@ describe('ensureFilesOrPrompt', () => {
   it('does not warn again if alreadyWarnedMissingEnv is true for .env.example', async () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=bar');
 
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -188,7 +188,7 @@ describe('ensureFilesOrPrompt', () => {
   it('does not create .env.example in CI mode when missing', async () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=bar');
 
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -208,7 +208,7 @@ describe('ensureFilesOrPrompt', () => {
   it('creates .env from .env.example when --yes is set', async () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
 
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
@@ -234,7 +234,7 @@ BAZ=123
 `,
     );
 
-    const result = await ensureFilesOrPrompt({
+    const result = await promptEnsureFiles({
       cwd,
       primaryEnv: '.env',
       primaryExample: '.env.example',
