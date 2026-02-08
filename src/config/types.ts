@@ -1,6 +1,5 @@
 import { ALLOWED_CATEGORIES, GITIGNORE_ISSUES } from './constants.js';
 import { type SecretFinding } from '../core/security/secretDetectors.js';
-import { type ExampleSecretWarning } from '../core/security/exampleSecretDetector.js';
 
 /**
  * Supported frameworks
@@ -144,6 +143,16 @@ export interface EnvUsage {
  * Type for grouped usages by variable
  */
 export type VariableUsages = Record<string, EnvUsage[]>;
+
+/**
+ * Warning about secrets found in example files
+ */
+export interface ExampleSecretWarning {
+  key: string;
+  value: string;
+  reason: string;
+  severity: 'high' | 'medium' | 'low';
+}
 
 /**
  * Options for scanning the codebase
@@ -349,4 +358,4 @@ export interface Discovery {
 export interface ComparisonFile {
   path: string;
   name: string;
-};
+}
