@@ -15,15 +15,14 @@ interface AutoFixResult {
  * @param changed - Whether any changes were made.
  * @param result - The result of the auto-fix operation.
  * @param envName - The name of the environment file.
- * @param exampleName - The name of the example file.
  * @param json - Whether to output in JSON format.
+ * @param gitignoreUpdated - Whether the .gitignore file was updated to ignore the environment file.
  * @returns void
  */
 export function printAutoFix(
   changed: boolean,
   result: AutoFixResult,
   envName: string,
-  exampleName: string,
   json: boolean,
   gitignoreUpdated: boolean,
 ): void {
