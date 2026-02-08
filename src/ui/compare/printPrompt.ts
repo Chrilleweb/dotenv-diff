@@ -2,7 +2,17 @@ import chalk from 'chalk';
 import path from 'path';
 
 /**
- * Prompt messages for user interactions.
+ * User interface messages for environment file operations.
+ *
+ * @description Provides formatted console output for various environment file
+ * comparison and creation scenarios. All methods output styled messages using
+ * chalk for enhanced readability.
+ *
+ * @property {Function} noEnvFound - Displays warning when no environment files are detected
+ * @property {Function} missingEnv - Displays warning for a specific missing environment file
+ * @property {Function} skipCreation - Notifies user that file creation was skipped
+ * @property {Function} envCreated - Confirms successful creation of .env file from example
+ * @property {Function} exampleCreated - Confirms successful creation of .env.example file from .env
  */
 export const printPrompt = {
   noEnvFound() {

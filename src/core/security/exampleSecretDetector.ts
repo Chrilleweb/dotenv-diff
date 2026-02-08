@@ -1,12 +1,6 @@
 import { PROVIDER_PATTERNS } from './secretDetectors.js';
 import { shannonEntropyNormalized } from './entropy.js';
-
-export interface ExampleSecretWarning {
-  key: string;
-  value: string;
-  reason: string;
-  severity: 'high' | 'medium' | 'low';
-}
+import type { ExampleSecretWarning } from '../../config/types.js';
 
 /**
  * Detects potential secrets in a .env.example file.

@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { ExampleSecretWarning } from '../../core/security/exampleSecretDetector';
+import type { ExampleSecretWarning } from '../../config/types.js';
 
 /**
  * Prints example file secret warnings to the console.

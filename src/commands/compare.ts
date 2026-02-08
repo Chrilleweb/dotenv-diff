@@ -198,7 +198,6 @@ export async function compareMany(
         changed,
         result,
         envName,
-        exampleName,
         opts.json ?? false,
         hasGitignoreIssue,
       );

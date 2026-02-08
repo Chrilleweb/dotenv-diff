@@ -387,7 +387,6 @@ describe('compareMany', () => {
       true,
       expect.any(Object),
       '.env',
-      '.env.example',
       false,
       false,
     );
