@@ -7,9 +7,13 @@ import { DEFAULT_GITIGNORE_ENV_PATTERNS } from '../config/constants.js';
  * Options for applying fixes to environment files
  */
 interface ApplyFixesOptions {
+  /** Path to the .env file to fix */
   envPath: string;
+  /** List of missing keys to add to the .env file */
   missingKeys: string[];
+  /** List of duplicate keys to remove from the .env file (keep last occurrence) */
   duplicateKeys: string[];
+  /** Whether to ensure .env is ignored in .gitignore (if in a git repo) */
   ensureGitignore?: boolean;
 }
 
@@ -17,8 +21,11 @@ interface ApplyFixesOptions {
  * Result of applying fixes to environment files
  */
 interface FixResult {
+  /** List of removed duplicate keys */
   removedDuplicates: string[];
+  /** List of added environment variables */
   addedEnv: string[];
+  /** Whether the .gitignore file was updated */
   gitignoreUpdated: boolean;
 }
 
