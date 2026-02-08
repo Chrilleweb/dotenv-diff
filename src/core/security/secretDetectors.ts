@@ -1,5 +1,8 @@
 import { shannonEntropyNormalized } from './entropy.js';
 
+/**
+ * Severity levels for detected secrets
+ */
 export type SecretSeverity = 'high' | 'medium' | 'low';
 
 /**
