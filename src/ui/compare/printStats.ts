@@ -1,11 +1,19 @@
 import chalk from 'chalk';
 import type { Filtered } from '../../config/types.js';
 
+/**
+ * Interface representing the comparison statistics between two environment files
+ */
 interface CompareStats {
+  /** Total number of keys in the environment file */
   envCount: number;
+  /** Total number of keys in the example file */
   exampleCount: number;
+  /** Number of keys that are shared between the environment and example files */
   sharedCount: number;
+  /** Number of duplicate keys found in either file */
   duplicateCount: number; // sum of (count - 1)
+  /** Number of keys that have mismatched values between the two files (if value checking is enabled) */
   valueMismatchCount: number;
 }
 
