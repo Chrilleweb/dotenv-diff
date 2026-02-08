@@ -1,7 +1,12 @@
 import chalk from 'chalk';
 
+/**
+ * Result of the auto-fix operation to be printed to the user.
+ */
 interface AutoFixResult {
+  /** List of duplicate keys removed from the environment file */
   removedDuplicates: string[];
+  /** List of missing keys added to the environment file */
   addedEnv: string[];
 }
 

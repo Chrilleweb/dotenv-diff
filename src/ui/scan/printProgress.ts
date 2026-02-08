@@ -1,12 +1,20 @@
 import chalk from 'chalk';
 
+/**
+ * Options for printing progress in the console.
+ */
 interface ProgressOptions {
+  /** Whether to output in JSON format (if true, progress will not be printed) */
   isJson: boolean;
+  /** The current progress count (e.g., number of files scanned) */
   current: number;
+  /** The total count for completion (e.g., total number of files to scan) */
   total: number;
+  /** Optional label to display alongside the progress bar (default: 'Scanning') */
   label?: string;
 }
 
+/** Internal flag to track if the progress bar has been rendered at least once */
 let hasRendered = false;
 
 /**

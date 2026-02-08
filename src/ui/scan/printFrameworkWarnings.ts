@@ -4,6 +4,9 @@ import type {
   DetectedFramework,
 } from '../../config/types.js';
 
+/**
+ * Labels for detected frameworks to display in warnings
+ */
 const FRAMEWORK_LABELS: Record<DetectedFramework, string> = {
   nextjs: 'Next.js',
   sveltekit: 'SvelteKit',
