@@ -14,6 +14,9 @@ import type {
   DuplicateResult,
   UppercaseWarning,
   Duplicate,
+  ComparisonFile,
+  ExpireWarning,
+  InconsistentNamingWarning,
 } from '../config/types.js';
 
 /**
@@ -32,12 +35,8 @@ interface ProcessComparisonResult {
   gitignoreUpdated: boolean;
   exampleFull?: Record<string, string> | undefined;
   uppercaseWarnings?: UppercaseWarning[];
-  expireWarnings?: Array<{ key: string; date: string; daysLeft: number }>;
-  inconsistentNamingWarnings?: Array<{
-    key1: string;
-    key2: string;
-    suggestion: string;
-  }>;
+  expireWarnings?: ExpireWarning[];
+  inconsistentNamingWarnings?: InconsistentNamingWarning[];
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -50,7 +49,7 @@ interface ProcessComparisonResult {
  */
 export function processComparisonFile(
   scanResult: ScanResult,
-  compareFile: { path: string; name: string },
+  compareFile: ComparisonFile,
   opts: ScanUsageOptions,
 ): ProcessComparisonResult {
   let envVariables: Record<string, string | undefined> = {};
@@ -64,13 +63,8 @@ export function processComparisonFile(
   let gitignoreUpdated = false;
   let exampleFull: Record<string, string> | undefined = undefined;
   let uppercaseWarnings: UppercaseWarning[] = [];
-  let expireWarnings: Array<{ key: string; date: string; daysLeft: number }> =
-    [];
-  let inconsistentNamingWarnings: Array<{
-    key1: string;
-    key2: string;
-    suggestion: string;
-  }> = [];
+  let expireWarnings: ExpireWarning[] = [];
+  let inconsistentNamingWarnings: InconsistentNamingWarning[] = [];
 
   try {
     // Load .env.example (if exists)
@@ -130,10 +124,7 @@ export function processComparisonFile(
     }
 
     // Apply fixes (both duplicates + missing keys + gitignore)
-    if (
-      opts.fix &&
-      (duplicatesFound || scanResult.missing.length > 0 || true)
-    ) {
+    if (opts.fix) {
       const { changed, result } = applyFixes({
         envPath: compareFile.path,
         missingKeys: scanResult.missing,
@@ -142,11 +133,13 @@ export function processComparisonFile(
       });
 
       if (changed) {
+        // Update state based on what was actually fixed
         fixApplied = true;
         removedDuplicates = result.removedDuplicates;
         addedEnv = result.addedEnv;
         gitignoreUpdated = result.gitignoreUpdated;
 
+        // clear the issues that were fixed
         scanResult.missing = [];
         dupsEnv = [];
         dupsEx = [];
@@ -209,7 +202,7 @@ export function processComparisonFile(
  * @returns Object containing duplicate keys in env and example files
  */
 function checkDuplicates(
-  compareFile: { path: string; name: string },
+  compareFile: ComparisonFile,
   opts: ScanUsageOptions,
 ): DuplicateResult {
   const isIgnored = (key: string) =>

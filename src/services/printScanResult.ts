@@ -1,4 +1,3 @@
-import path from 'path';
 import { checkGitignoreStatus } from './git.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import type {

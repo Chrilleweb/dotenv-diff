@@ -67,12 +67,11 @@ export function applyFixes(options: ApplyFixesOptions): {
 
     // Process from bottom to top, keeping last occurrence
     for (let i = lines.length - 1; i >= 0; i--) {
-      const line = lines[i];
-      if (line === undefined) continue;
+      const line = lines[i]!;
 
       const match = line.match(/^\s*([\w.-]+)\s*=/);
       if (match) {
-        const key = match[1] || '';
+        const key = match[1]!;
         if (duplicateSet.has(key)) {
           if (seen.has(key)) continue; // Skip duplicate
           seen.add(key);

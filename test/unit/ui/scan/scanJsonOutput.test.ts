@@ -274,6 +274,37 @@ describe('scanJsonOutput', () => {
     });
   });
 
+  it('includes expire warnings', () => {
+    const scanResult = makeScanResult({
+      expireWarnings: [
+        {
+          key: 'API_TOKEN',
+          date: '2026-12-31',
+          daysLeft: 321,
+        },
+        {
+          key: 'LICENSE_KEY',
+          date: '2026-06-30',
+          daysLeft: 137,
+        },
+      ],
+    });
+
+    const result = scanJsonOutput(scanResult, '');
+
+    expect(result.expireWarnings).toHaveLength(2);
+    expect(result.expireWarnings?.[0]).toEqual({
+      key: 'API_TOKEN',
+      date: '2026-12-31',
+      daysLeft: 321,
+    });
+    expect(result.expireWarnings?.[1]).toEqual({
+      key: 'LICENSE_KEY',
+      date: '2026-06-30',
+      daysLeft: 137,
+    });
+  });
+
   it('includes healthScore', () => {
     const scanResult = makeScanResult();
 

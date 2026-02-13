@@ -41,10 +41,10 @@ export function parseAndFilterEnv(
 
   return {
     current: Object.fromEntries(
-      currentKeys.map((k) => [k, currentFull[k] ?? '']),
+      currentKeys.map((k) => [k, currentFull[k]!]),
     ),
     example: Object.fromEntries(
-      exampleKeys.map((k) => [k, exampleFull[k] ?? '']),
+      exampleKeys.map((k) => [k, exampleFull[k]!]),
     ),
     currentKeys,
     exampleKeys,
