@@ -14,7 +14,8 @@ import type {
   DuplicateResult,
   UppercaseWarning,
   Duplicate,
-  ComparisonFile
+  ComparisonFile,
+  ExpireWarning
 } from '../config/types.js';
 
 /**
@@ -33,7 +34,7 @@ interface ProcessComparisonResult {
   gitignoreUpdated: boolean;
   exampleFull?: Record<string, string> | undefined;
   uppercaseWarnings?: UppercaseWarning[];
-  expireWarnings?: Array<{ key: string; date: string; daysLeft: number }>;
+  expireWarnings?: ExpireWarning[];
   inconsistentNamingWarnings?: Array<{
     key1: string;
     key2: string;
@@ -65,8 +66,7 @@ export function processComparisonFile(
   let gitignoreUpdated = false;
   let exampleFull: Record<string, string> | undefined = undefined;
   let uppercaseWarnings: UppercaseWarning[] = [];
-  let expireWarnings: Array<{ key: string; date: string; daysLeft: number }> =
-    [];
+  let expireWarnings: ExpireWarning[] = [];
   let inconsistentNamingWarnings: Array<{
     key1: string;
     key2: string;
