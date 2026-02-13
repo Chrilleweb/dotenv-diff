@@ -2,14 +2,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { promptEnsureFiles } from '../../../src/commands/prompts/promptEnsureFiles.js';
+import { promptEnsureFiles } from '../../../../src/commands/prompts/promptEnsureFiles.js';
 
 // ---- mocks ----
-vi.mock('../../../src/ui/prompts.js', () => ({
+vi.mock('../../../../src/ui/prompts.js', () => ({
   confirmYesNo: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/compare/printPrompt.js', () => ({
+vi.mock('../../../../src/ui/compare/printPrompt.js', () => ({
   printPrompt: {
     noEnvFound: vi.fn(),
     missingEnv: vi.fn(),
@@ -19,12 +19,12 @@ vi.mock('../../../src/ui/compare/printPrompt.js', () => ({
   },
 }));
 
-vi.mock('../../../src/services/git.js', () => ({
+vi.mock('../../../../src/services/git.js', () => ({
   warnIfEnvNotIgnored: vi.fn(),
 }));
 
-import { confirmYesNo } from '../../../src/ui/prompts.js';
-import { printPrompt } from '../../../src/ui/compare/printPrompt.js';
+import { confirmYesNo } from '../../../../src/ui/prompts.js';
+import { printPrompt } from '../../../../src/ui/compare/printPrompt.js';
 
 describe('promptEnsureFiles', () => {
   let cwd: string;
@@ -91,6 +91,31 @@ describe('promptEnsureFiles', () => {
 
     expect(fs.existsSync(path.join(cwd, '.env'))).toBe(false);
     expect(result.shouldExit).toBe(true);
+  });
+
+  it('creates .env when user confirms via interactive prompt', async () => {
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
+
+    (confirmYesNo as any).mockResolvedValue(true);
+
+    const result = await promptEnsureFiles({
+      cwd,
+      primaryEnv: '.env',
+      primaryExample: '.env.example',
+      alreadyWarnedMissingEnv: false,
+      isYesMode: false,
+      isCiMode: false,
+    });
+
+    const envPath = path.join(cwd, '.env');
+
+    expect(fs.existsSync(envPath)).toBe(true);
+    expect(fs.readFileSync(envPath, 'utf-8')).toBe('FOO=bar');
+    expect(result).toEqual({
+      didCreate: true,
+      shouldExit: false,
+      exitCode: 0,
+    });
   });
 
   it('does not exit when another .env* file exists', async () => {
