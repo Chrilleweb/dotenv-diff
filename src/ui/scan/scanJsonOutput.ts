@@ -3,6 +3,7 @@ import type {
   EnvUsage,
   Duplicate,
   SupportedFramework,
+  ExpireWarning
 } from '../../config/types.js';
 import { computeHealthScore } from '../../core/scan/computeHealthScore.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
@@ -53,11 +54,7 @@ interface ScanJsonOutput {
     line: number;
     context: string;
   }>;
-  expireWarnings?: Array<{
-    key: string;
-    date: string;
-    daysLeft: number;
-  }>;
+  expireWarnings?: ExpireWarning[];
   uppercaseWarnings?: Array<{
     key: string;
     suggestion: string;
@@ -189,6 +186,15 @@ export function scanJsonOutput(
       value: w.value,
       reason: w.reason,
       severity: w.severity,
+    }));
+  }
+
+  // Expire warnings
+  if (scanResult.expireWarnings?.length) {
+    output.expireWarnings = scanResult.expireWarnings.map((w) => ({
+      key: w.key,
+      date: w.date,
+      daysLeft: w.daysLeft,
     }));
   }
 
