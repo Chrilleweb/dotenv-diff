@@ -2,6 +2,6 @@
  * @param file - The file path to normalize.
  * @returns The normalized file path.
  */
-export function normalizePath(file: string) {
+export function normalizePath(file: string): string {
   return file.replace(/\\/g, '/');
 }

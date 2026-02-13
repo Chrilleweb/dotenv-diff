@@ -2,8 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import type { DetectedFramework } from '../../config/types.js';
 
+/**
+ * Framework detection interface 
+ */
 interface FrameworkDetection {
+  /** The detected framework name */
   framework: DetectedFramework;
+  /** The detected framework version (if applicable) */
   version?: string;
 }
 
