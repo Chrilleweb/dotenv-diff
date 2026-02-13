@@ -15,7 +15,8 @@ import type {
   UppercaseWarning,
   Duplicate,
   ComparisonFile,
-  ExpireWarning
+  ExpireWarning,
+  InconsistentNamingWarning
 } from '../config/types.js';
 
 /**
@@ -35,11 +36,7 @@ interface ProcessComparisonResult {
   exampleFull?: Record<string, string> | undefined;
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
-  inconsistentNamingWarnings?: Array<{
-    key1: string;
-    key2: string;
-    suggestion: string;
-  }>;
+  inconsistentNamingWarnings?: InconsistentNamingWarning[];
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -67,11 +64,7 @@ export function processComparisonFile(
   let exampleFull: Record<string, string> | undefined = undefined;
   let uppercaseWarnings: UppercaseWarning[] = [];
   let expireWarnings: ExpireWarning[] = [];
-  let inconsistentNamingWarnings: Array<{
-    key1: string;
-    key2: string;
-    suggestion: string;
-  }> = [];
+  let inconsistentNamingWarnings: InconsistentNamingWarning[] = [];
 
   try {
     // Load .env.example (if exists)
