@@ -2,8 +2,11 @@ import type {
   ScanResult,
   EnvUsage,
   Duplicate,
-  SupportedFramework,
-  ExpireWarning
+  ExpireWarning,
+  InconsistentNamingWarning,
+  UppercaseWarning,
+  FrameworkWarning,
+  ExampleSecretWarning,
 } from '../../config/types.js';
 import { computeHealthScore } from '../../core/scan/computeHealthScore.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
@@ -55,28 +58,10 @@ interface ScanJsonOutput {
     context: string;
   }>;
   expireWarnings?: ExpireWarning[];
-  uppercaseWarnings?: Array<{
-    key: string;
-    suggestion: string;
-  }>;
-  inconsistentNamingWarnings?: Array<{
-    key1: string;
-    key2: string;
-    suggestion: string;
-  }>;
-  frameworkWarnings?: Array<{
-    variable: string;
-    reason: string;
-    file: string;
-    line: number;
-    framework: SupportedFramework;
-  }>;
-  exampleWarnings?: Array<{
-    key: string;
-    value: string;
-    reason: string;
-    severity: string;
-  }>;
+  uppercaseWarnings?: UppercaseWarning[];
+  inconsistentNamingWarnings?: InconsistentNamingWarning[];
+  frameworkWarnings?: FrameworkWarning[];
+  exampleWarnings?: ExampleSecretWarning[];
   healthScore?: number;
 }
 
