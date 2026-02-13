@@ -14,6 +14,7 @@ import type {
   DuplicateResult,
   UppercaseWarning,
   Duplicate,
+  ComparisonFile
 } from '../config/types.js';
 
 /**
@@ -50,7 +51,7 @@ interface ProcessComparisonResult {
  */
 export function processComparisonFile(
   scanResult: ScanResult,
-  compareFile: { path: string; name: string },
+  compareFile: ComparisonFile,
   opts: ScanUsageOptions,
 ): ProcessComparisonResult {
   let envVariables: Record<string, string | undefined> = {};
@@ -209,7 +210,7 @@ export function processComparisonFile(
  * @returns Object containing duplicate keys in env and example files
  */
 function checkDuplicates(
-  compareFile: { path: string; name: string },
+  compareFile: ComparisonFile,
   opts: ScanUsageOptions,
 ): DuplicateResult {
   const isIgnored = (key: string) =>
