@@ -16,7 +16,7 @@ import type {
   Duplicate,
   ComparisonFile,
   ExpireWarning,
-  InconsistentNamingWarning
+  InconsistentNamingWarning,
 } from '../config/types.js';
 
 /**
@@ -124,10 +124,7 @@ export function processComparisonFile(
     }
 
     // Apply fixes (both duplicates + missing keys + gitignore)
-    if (
-      opts.fix &&
-      (duplicatesFound || scanResult.missing.length > 0 || true)
-    ) {
+    if (opts.fix) {
       const { changed, result } = applyFixes({
         envPath: compareFile.path,
         missingKeys: scanResult.missing,
@@ -136,11 +133,13 @@ export function processComparisonFile(
       });
 
       if (changed) {
+        // Update state based on what was actually fixed
         fixApplied = true;
         removedDuplicates = result.removedDuplicates;
         addedEnv = result.addedEnv;
         gitignoreUpdated = result.gitignoreUpdated;
 
+        // clear the issues that were fixed
         scanResult.missing = [];
         dupsEnv = [];
         dupsEx = [];
