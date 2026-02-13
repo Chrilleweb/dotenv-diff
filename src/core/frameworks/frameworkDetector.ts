@@ -3,12 +3,12 @@ import path from 'path';
 import type { DetectedFramework } from '../../config/types.js';
 
 /**
- * Framework detection interface 
+ * Interface representing the detected framework and its version (if applicable)
  */
 interface FrameworkDetection {
-  /** The detected framework name */
+  /** The detected framework (e.g., 'sveltekit', 'nextjs', or 'unknown') */
   framework: DetectedFramework;
-  /** The detected framework version (if applicable) */
+  /** The version of the detected framework (if available) */
   version?: string;
 }
 

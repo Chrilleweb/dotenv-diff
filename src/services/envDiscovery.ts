@@ -7,8 +7,11 @@ import { DEFAULT_ENV_FILE, DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
  * Arguments for the discoverEnvFiles function.
  */
 interface DiscoverEnvFilesArgs {
+  /** The current working directory to search for environment files */
   cwd: string;
+  /** The value of the --env flag if provided, otherwise null */
   envFlag: string | null;
+  /** The value of the --example flag if provided, otherwise null */
   exampleFlag: string | null;
 }
 

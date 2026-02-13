@@ -1,5 +1,8 @@
 import chalk from 'chalk';
 
+/**
+ * Context for strict mode warnings to be printed to the user.
+ */
 interface StrictModeContext {
   unused: number;
   duplicatesEnv: number;

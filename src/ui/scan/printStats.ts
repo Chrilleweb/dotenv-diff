@@ -1,10 +1,18 @@
 import chalk from 'chalk';
 
+/**
+ * Statistics for codebase scanning
+ */
 interface ScanStats {
+  /** Total number of files scanned during the scan process */
   filesScanned: number;
+  /** Total number of environment variable references found across all scanned files */
   totalUsages: number;
+  /** Total number of unique environment variables referenced across all scanned files */
   uniqueVariables: number;
+  /** Total number of warnings found during the scan process */
   warningsCount: number;
+  /** Total duration of the scan process in seconds */
   duration: number;
 }
 

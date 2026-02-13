@@ -2,9 +2,15 @@ import chalk from 'chalk';
 import type { GitignoreIssue } from '../../config/types.js';
 import { GITIGNORE_ISSUES } from '../../config/constants.js';
 
+/**
+ * Options for printing gitignore warnings to the user.
+ */
 interface GitignoreWarningOptions {
+  /** The name of the environment file */
   envFile: string;
+  /** The reason for the gitignore warning */
   reason: GitignoreIssue;
+  /** Optional custom log function (defaults to console.log) */
   log?: (msg: string) => void;
 }
 

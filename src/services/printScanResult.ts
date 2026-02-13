@@ -205,7 +205,6 @@ export function printScanResult(
         addedEnv: fixContext.addedEnv,
       },
       comparedAgainst || DEFAULT_ENV_FILE,
-      opts.examplePath ? path.basename(opts.examplePath) : 'example file',
       isJson,
       fixContext.gitignoreUpdated,
     );
