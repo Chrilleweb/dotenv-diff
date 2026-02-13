@@ -236,8 +236,8 @@ describe('scanJsonOutput', () => {
         {
           variable: 'SECRET_KEY',
           file: 'src\\logger.ts',
-          column: 0,
           line: 42,
+          column: 0,
           pattern: 'process.env',
           context: 'console.log(process.env.SECRET_KEY)',
         },

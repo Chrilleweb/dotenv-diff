@@ -51,12 +51,7 @@ interface ScanJsonOutput {
     env?: Duplicate[];
     example?: Duplicate[];
   };
-  logged?: Array<{
-    variable: string;
-    file: string;
-    line: number;
-    context: string;
-  }>;
+  logged?: EnvUsage[];
   expireWarnings?: ExpireWarning[];
   uppercaseWarnings?: UppercaseWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
@@ -160,6 +155,8 @@ export function scanJsonOutput(
       variable: l.variable,
       file: normalizePath(l.file),
       line: l.line,
+      column: l.column,
+      pattern: l.pattern,
       context: l.context,
     }));
   }
