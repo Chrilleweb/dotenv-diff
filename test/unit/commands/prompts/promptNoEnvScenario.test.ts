@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 vi.mock('fs');
+vi.mock('../../../../src/commands/prompts/prompts.js');
 vi.mock('../../../../src/ui/prompts.js');
 
 describe('promptNoEnvScenario', () => {
