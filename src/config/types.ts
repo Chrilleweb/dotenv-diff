@@ -155,6 +155,22 @@ export interface ExampleSecretWarning {
 }
 
 /**
+ * Statistics for codebase scanning
+ */
+export interface ScanStats {
+  /** Total number of files scanned during the scan process */
+  filesScanned: number;
+  /** Total number of environment variable references found across all scanned files */
+  totalUsages: number;
+  /** Total number of unique environment variables referenced across all scanned files */
+  uniqueVariables: number;
+  /** Total number of warnings found during the scan process */
+  warningsCount: number;
+  /** Total duration of the scan process in seconds */
+  duration: number;
+}
+
+/**
  * Options for scanning the codebase
  */
 export interface ScanOptions {
@@ -195,13 +211,7 @@ export interface ScanResult {
   used: EnvUsage[];
   missing: string[];
   unused: string[];
-  stats: {
-    filesScanned: number;
-    totalUsages: number;
-    uniqueVariables: number;
-    warningsCount: number;
-    duration: number;
-  };
+  stats: ScanStats;
   secrets: SecretFinding[];
   duplicates: {
     env?: Duplicate[];
@@ -264,6 +274,29 @@ export interface ComparisonOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+}
+
+/**
+ * Resolved comparison file with absolute path and display name.
+ */
+export interface ComparisonFile {
+  path: string;
+  name: string;
+}
+
+/**
+ * Represents the discovery of environment files in a project.
+ * Contains information about the current working directory, found environment files,
+ * and the primary environment and example files.
+ */
+export interface Discovery {
+  cwd: string;
+  envFiles: string[];
+  primaryEnv: string;
+  primaryExample: string;
+  envFlag: string | null;
+  exampleFlag: string | null;
+  alreadyWarnedMissingEnv: boolean;
 }
 
 /**
@@ -335,27 +368,4 @@ export interface InconsistentNamingWarning {
   key1: string;
   key2: string;
   suggestion: string;
-}
-
-/**
- * Represents the discovery of environment files in a project.
- * Contains information about the current working directory, found environment files,
- * and the primary environment and example files.
- */
-export interface Discovery {
-  cwd: string;
-  envFiles: string[];
-  primaryEnv: string;
-  primaryExample: string;
-  envFlag: string | null;
-  exampleFlag: string | null;
-  alreadyWarnedMissingEnv: boolean;
-}
-
-/**
- * Resolved comparison file with absolute path and display name.
- */
-export interface ComparisonFile {
-  path: string;
-  name: string;
 }
