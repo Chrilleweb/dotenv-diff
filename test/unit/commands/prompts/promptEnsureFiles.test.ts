@@ -5,7 +5,7 @@ import os from 'os';
 import { promptEnsureFiles } from '../../../../src/commands/prompts/promptEnsureFiles.js';
 
 // ---- mocks ----
-vi.mock('../../../../src/ui/prompts.js', () => ({
+vi.mock('../../../../src/commands/prompts/prompts.js', () => ({
   confirmYesNo: vi.fn(),
 }));
 
@@ -23,7 +23,7 @@ vi.mock('../../../../src/services/git.js', () => ({
   warnIfEnvNotIgnored: vi.fn(),
 }));
 
-import { confirmYesNo } from '../../../../src/ui/prompts.js';
+import { confirmYesNo } from '../../../../src/commands/prompts/prompts.js'
 import { printPrompt } from '../../../../src/ui/compare/printPrompt.js';
 
 describe('promptEnsureFiles', () => {

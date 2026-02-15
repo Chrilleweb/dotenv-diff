@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { promptNoEnvScenario } from '../../../../src/commands/prompts/promptNoEnvScenario.js';
 import type { ScanUsageOptions } from '../../../../src/config/types.js';
-import * as prompts from '../../../../src/ui/prompts.js';
+import * as prompts from '../../../../src/commands/prompts/prompts.js';
 import fs from 'fs';
 import path from 'path';
 
 vi.mock('fs');
+vi.mock('../../../../src/commands/prompts/prompts.js');
 vi.mock('../../../../src/ui/prompts.js');
 
 describe('promptNoEnvScenario', () => {
