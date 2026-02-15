@@ -1,5 +1,6 @@
 import type {
   ScanResult,
+  ScanStats,
   EnvUsage,
   Duplicate,
   ExpireWarning,
@@ -15,13 +16,7 @@ import { normalizePath } from '../../core/helpers/normalizePath.js';
  * JSON structure for scan results output
  */
 interface ScanJsonOutput {
-  stats?: {
-    filesScanned: number;
-    totalUsages: number;
-    uniqueVariables: number;
-    warningsCount: number;
-    duration: number;
-  };
+  stats?: ScanStats;
   missing?: Array<{
     variable: string;
     usages: Array<{
