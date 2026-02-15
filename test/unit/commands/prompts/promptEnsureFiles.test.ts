@@ -5,7 +5,7 @@ import os from 'os';
 import { promptEnsureFiles } from '../../../../src/commands/prompts/promptEnsureFiles.js';
 
 // ---- mocks ----
-vi.mock('../../../../src/ui/prompts.js', () => ({
+vi.mock('../../../../src/commands/prompts/prompts.js', () => ({
   confirmYesNo: vi.fn(),
 }));
 
