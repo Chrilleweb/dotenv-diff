@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { confirmYesNo } from '../../ui/prompts.js';
+import { confirmYesNo } from './prompts.js';
 import { DEFAULT_ENV_FILE } from '../../config/constants.js';
 import type { ScanUsageOptions, ComparisonFile } from '../../config/types.js';
 
