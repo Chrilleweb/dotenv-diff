@@ -17,6 +17,7 @@ import type {
   ComparisonFile,
   ExpireWarning,
   InconsistentNamingWarning,
+  FixContext,
 } from '../config/types.js';
 
 /**
@@ -29,10 +30,7 @@ interface ProcessComparisonResult {
   duplicatesFound: boolean;
   dupsEnv: Duplicate[];
   dupsEx: Duplicate[];
-  fixApplied: boolean;
-  removedDuplicates: string[];
-  addedEnv: string[];
-  gitignoreUpdated: boolean;
+  fix: FixContext;
   exampleFull?: Record<string, string> | undefined;
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
@@ -57,14 +55,17 @@ export function processComparisonFile(
   let duplicatesFound = false;
   let dupsEnv: Duplicate[] = [];
   let dupsEx: Duplicate[] = [];
-  let fixApplied = false;
-  let removedDuplicates: string[] = [];
-  let addedEnv: string[] = [];
-  let gitignoreUpdated = false;
   let exampleFull: Record<string, string> | undefined = undefined;
   let uppercaseWarnings: UppercaseWarning[] = [];
   let expireWarnings: ExpireWarning[] = [];
   let inconsistentNamingWarnings: InconsistentNamingWarning[] = [];
+
+  const fix: FixContext = {
+    fixApplied: false,
+    removedDuplicates: [],
+    addedEnv: [],
+    gitignoreUpdated: false,
+  };
 
   try {
     // Load .env.example (if exists)
@@ -134,10 +135,10 @@ export function processComparisonFile(
 
       if (changed) {
         // Update state based on what was actually fixed
-        fixApplied = true;
-        removedDuplicates = result.removedDuplicates;
-        addedEnv = result.addedEnv;
-        gitignoreUpdated = result.gitignoreUpdated;
+        fix.fixApplied = true;
+        fix.removedDuplicates = result.removedDuplicates;
+        fix.addedEnv = result.addedEnv;
+        fix.gitignoreUpdated = result.gitignoreUpdated;
 
         // clear the issues that were fixed
         scanResult.missing = [];
@@ -148,7 +149,7 @@ export function processComparisonFile(
     }
 
     // Keep duplicates for output if not fixed
-    if (duplicatesFound && (!opts.fix || !fixApplied)) {
+    if (duplicatesFound && (!opts.fix || !fix.fixApplied)) {
       if (!scanResult.duplicates) scanResult.duplicates = {};
       if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
       if (dupsEx.length > 0) scanResult.duplicates.example = dupsEx;
@@ -162,10 +163,7 @@ export function processComparisonFile(
       duplicatesFound,
       dupsEnv,
       dupsEx,
-      fixApplied,
-      removedDuplicates,
-      addedEnv,
-      gitignoreUpdated,
+      fix,
       exampleFull,
       uppercaseWarnings,
       expireWarnings,
@@ -184,10 +182,7 @@ export function processComparisonFile(
     duplicatesFound,
     dupsEnv,
     dupsEx,
-    fixApplied,
-    removedDuplicates,
-    addedEnv,
-    gitignoreUpdated,
+    fix,
     exampleFull,
     uppercaseWarnings,
     expireWarnings,
