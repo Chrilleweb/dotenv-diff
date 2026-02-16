@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { isEnvIgnoredByGit, isGitRepo, findGitRoot } from '../services/git.js';
 import { DEFAULT_GITIGNORE_ENV_PATTERNS } from '../config/constants.js';
+import type { FixResult } from '../config/types.js';
 
 /**
  * Options for applying fixes to environment files
@@ -15,18 +16,6 @@ interface ApplyFixesOptions {
   duplicateKeys: string[];
   /** Whether to ensure .env is ignored in .gitignore (if in a git repo) */
   ensureGitignore?: boolean;
-}
-
-/**
- * Result of applying fixes to environment files
- */
-interface FixResult {
-  /** List of removed duplicate keys */
-  removedDuplicates: string[];
-  /** List of added environment variables */
-  addedEnv: string[];
-  /** Whether the .gitignore file was updated */
-  gitignoreUpdated: boolean;
 }
 
 /**

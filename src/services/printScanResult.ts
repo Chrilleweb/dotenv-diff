@@ -4,6 +4,7 @@ import type {
   ScanUsageOptions,
   ScanResult,
   ExitResult,
+  FixResult,
 } from '../config/types.js';
 import { DEFAULT_ENV_FILE } from '../config/constants.js';
 import { printHeader } from '../ui/scan/printHeader.js';
@@ -26,17 +27,11 @@ import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
 import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
 
 /**
- * Context for auto-fix operations
+ * Context for auto-fix operations, extending FixResult with applied status
  */
-interface FixContext {
+interface FixContext extends FixResult {
   /** Whether any fixes were applied */
   fixApplied: boolean;
-  /** List of removed duplicate keys */
-  removedDuplicates: string[];
-  /** List of added environment variables */
-  addedEnv: string[];
-  /** Whether the .gitignore file was updated */
-  gitignoreUpdated: boolean;
 }
 
 /**

@@ -338,6 +338,18 @@ export interface ExitResult {
 }
 
 /**
+ * Result of applying fixes to environment files.
+ */
+export interface FixResult {
+  /** List of removed duplicate keys */
+  removedDuplicates: string[];
+  /** List of added environment variables */
+  addedEnv: string[];
+  /** Whether the .gitignore file was updated */
+  gitignoreUpdated: boolean;
+}
+
+/**
  * Warning about environment variable keys that are not uppercase.
  */
 export interface UppercaseWarning {
