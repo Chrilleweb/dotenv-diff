@@ -194,7 +194,6 @@ export async function compareMany(
         ensureGitignore: hasGitignoreIssue,
       });
 
-      // Create FixContext with the result + fixApplied status
       const fixContext = {
         ...result,
         fixApplied: changed,
