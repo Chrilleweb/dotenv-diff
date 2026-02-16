@@ -350,6 +350,14 @@ export interface FixResult {
 }
 
 /**
+ * Context for auto-fix operations, extending FixResult with applied status
+ */
+export interface FixContext extends FixResult {
+  /** Whether any fixes were applied */
+  fixApplied: boolean;
+}
+
+/**
  * Warning about environment variable keys that are not uppercase.
  */
 export interface UppercaseWarning {

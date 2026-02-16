@@ -194,13 +194,12 @@ export async function compareMany(
         ensureGitignore: hasGitignoreIssue,
       });
 
-      printAutoFix(
-        changed,
-        result,
-        envName,
-        opts.json ?? false,
-        hasGitignoreIssue,
-      );
+      const fixContext = {
+        ...result,
+        fixApplied: changed,
+      };
+
+      printAutoFix(fixContext, envName, opts.json ?? false);
     }
 
     opts.collect?.(entry);

@@ -102,10 +102,10 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
     } else {
       scanResult = result.scanResult;
       comparedAgainst = result.comparedAgainst;
-      fixApplied = result.fixApplied;
-      removedDuplicates = result.removedDuplicates;
-      fixedKeys = result.addedEnv;
-      gitignoreUpdated = result.gitignoreUpdated;
+      fixApplied = result.fix.fixApplied;
+      removedDuplicates = result.fix.removedDuplicates;
+      fixedKeys = result.fix.addedEnv;
+      gitignoreUpdated = result.fix.gitignoreUpdated;
       if (result.uppercaseWarnings) {
         scanResult.uppercaseWarnings = result.uppercaseWarnings;
       }

@@ -1,34 +1,21 @@
 import chalk from 'chalk';
-
-/**
- * Result of the auto-fix operation to be printed to the user.
- */
-interface AutoFixResult {
-  /** List of duplicate keys removed from the environment file */
-  removedDuplicates: string[];
-  /** List of missing keys added to the environment file */
-  addedEnv: string[];
-}
+import type { FixContext } from '../../config/types.js';
 
 /**
  * Prints the result of the auto-fix operation.
- * @param changed - Whether any changes were made.
  * @param result - The result of the auto-fix operation.
  * @param envName - The name of the environment file.
  * @param json - Whether to output in JSON format.
- * @param gitignoreUpdated - Whether the .gitignore file was updated to ignore the environment file.
  * @returns void
  */
 export function printAutoFix(
-  changed: boolean,
-  result: AutoFixResult,
+  result: FixContext,
   envName: string,
   json: boolean,
-  gitignoreUpdated: boolean,
 ): void {
   if (json) return;
 
-  if (changed) {
+  if (result.fixApplied) {
     console.log(chalk.green('✅ Auto-fix applied:'));
     if (result.removedDuplicates.length) {
       console.log(
@@ -44,7 +31,7 @@ export function printAutoFix(
         ),
       );
     }
-    if (gitignoreUpdated) {
+    if (result.gitignoreUpdated) {
       console.log(chalk.green(`  - Added ${envName} to .gitignore`));
     }
   } else {

@@ -384,10 +384,13 @@ describe('compareMany', () => {
     });
 
     expect(mockPrintAutoFix).toHaveBeenCalledWith(
-      true,
-      expect.any(Object),
+      {
+        fixApplied: true,
+        removedDuplicates: [],
+        addedEnv: ['MISSING_KEY'],
+        gitignoreUpdated: false,
+      },
       '.env',
-      false,
       false,
     );
   });

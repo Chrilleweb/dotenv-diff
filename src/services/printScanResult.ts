@@ -4,7 +4,7 @@ import type {
   ScanUsageOptions,
   ScanResult,
   ExitResult,
-  FixResult,
+  FixContext,
 } from '../config/types.js';
 import { DEFAULT_ENV_FILE } from '../config/constants.js';
 import { printHeader } from '../ui/scan/printHeader.js';
@@ -25,14 +25,6 @@ import { computeHealthScore } from '../core/scan/computeHealthScore.js';
 import { printHealthScore } from '../ui/scan/printHealthScore.js';
 import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
 import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
-
-/**
- * Context for auto-fix operations, extending FixResult with applied status
- */
-interface FixContext extends FixResult {
-  /** Whether any fixes were applied */
-  fixApplied: boolean;
-}
 
 /**
  * Prints the scan result to the console.
@@ -193,14 +185,9 @@ export function printScanResult(
 
   if (opts.fix && fixContext) {
     printAutoFix(
-      fixContext.fixApplied,
-      {
-        removedDuplicates: fixContext.removedDuplicates,
-        addedEnv: fixContext.addedEnv,
-      },
+      fixContext,
       comparedAgainst || DEFAULT_ENV_FILE,
       isJson,
-      fixContext.gitignoreUpdated,
     );
   }
 
