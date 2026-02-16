@@ -185,14 +185,9 @@ export function printScanResult(
 
   if (opts.fix && fixContext) {
     printAutoFix(
-      fixContext.fixApplied,
-      {
-        removedDuplicates: fixContext.removedDuplicates,
-        addedEnv: fixContext.addedEnv,
-      },
+      fixContext,
       comparedAgainst || DEFAULT_ENV_FILE,
       isJson,
-      fixContext.gitignoreUpdated,
     );
   }
 
