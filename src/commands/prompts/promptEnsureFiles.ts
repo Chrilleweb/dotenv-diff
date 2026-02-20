@@ -9,8 +9,11 @@ import { DEFAULT_ENV_FILE } from '../../config/constants.js';
  * Result of ensureFilesOrPrompt function
  */
 interface EnsureFilesResult {
+  /** Indicates if a file was created */
   didCreate: boolean;
+  /** Indicates if the process should exit */
   shouldExit: boolean;
+  /** Exit code to use if the process should exit */
   exitCode: number;
 }
 
@@ -18,11 +21,17 @@ interface EnsureFilesResult {
  * Arguments for ensureFilesOrPrompt function
  */
 interface EnsureFilesArgs {
+  /** Current working directory */
   cwd: string;
+  /** Path to the primary .env file */
   primaryEnv: string;
+  /** Path to the primary .env.example file */
   primaryExample: string;
+  /** Indicates if the user has already been warned about a missing .env file */
   alreadyWarnedMissingEnv: boolean;
+  /** Indicates if the --yes flag is set */
   isYesMode: boolean;
+  /** Indicates if the --ci flag is set */
   isCiMode: boolean;
 }
 /**
