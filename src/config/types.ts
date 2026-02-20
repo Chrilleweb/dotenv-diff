@@ -16,10 +16,15 @@ export type DetectedFramework = SupportedFramework | 'unknown';
  * From rules defined for each supported framework (SvelteKit, Next.js)
  */
 export interface FrameworkWarning {
+  /** The environment variable causing the warning */
   variable: string;
+  /** The reason for the warning */
   reason: string;
+  /** The file where the warning was detected */
   file: string;
+  /** The line number where the warning was detected */
   line: number;
+  /** The framework in which the warning was detected */
   framework: SupportedFramework;
 }
 
@@ -32,7 +37,9 @@ export type Duplicate = { key: string; count: number };
  * Type representing the result of duplicate detection
  */
 export interface DuplicateResult {
+  /** Number of duplicate keys in the .env file */
   dupsEnv: Duplicate[];
+  /** Number of duplicate keys in the .env.example file */
   dupsEx: Duplicate[];
 }
 
@@ -129,14 +136,22 @@ export interface Options {
  * Represents a single usage of an environment variable in the codebase.
  */
 export interface EnvUsage {
+  /** The environment variable being used */
   variable: string;
+  /** The file where the usage was detected */
   file: string;
+  /** The line number where the usage was detected */
   line: number;
+  /** The column number where the usage was detected */
   column: number;
+  /** The pattern used to access the environment variable */
   pattern: 'process.env' | 'import.meta.env' | 'sveltekit';
-  imports?: string[]; // For sveltekit: list of imported env modules
-  context: string; // The actual line content
-  isLogged?: boolean; // Whether this usage is logged to console
+  /** List of imported env modules (for sveltekit) */
+  imports?: string[];
+  /** The actual line content where the usage was detected */
+  context: string;
+  /** Whether this usage is logged to console */
+  isLogged?: boolean;
 }
 
 /**
@@ -148,9 +163,13 @@ export type VariableUsages = Record<string, EnvUsage[]>;
  * Warning about secrets found in example files
  */
 export interface ExampleSecretWarning {
+  /** The environment variable key */
   key: string;
+  /** The environment variable value */
   value: string;
+  /** The reason for the warning */
   reason: string;
+  /** The severity of the warning */
   severity: 'high' | 'medium' | 'low';
 }
 
@@ -280,7 +299,9 @@ export interface ComparisonOptions {
  * Resolved comparison file with absolute path and display name.
  */
 export interface ComparisonFile {
+  /** Absolute path to the comparison file */
   path: string;
+  /** Display name of the comparison file */
   name: string;
 }
 
@@ -309,10 +330,8 @@ export interface Discovery {
 export interface FilePair {
   /** The name of the environment file (e.g. ".env", ".env.production") */
   envName: string;
-
   /** Absolute path to the environment file */
   envPath: string;
-
   /** Absolute path to the example file this env file is compared against */
   examplePath: string;
 }
@@ -334,6 +353,7 @@ export type Filtered = {
  * Result of the exit code determination after scanning or comparing.
  */
 export interface ExitResult {
+  /** Whether the process should exit with an error */
   exitWithError: boolean;
 }
 
@@ -361,7 +381,9 @@ export interface FixContext extends FixResult {
  * Warning about environment variable keys that are not uppercase.
  */
 export interface UppercaseWarning {
+  /** The environment variable key */
   key: string;
+  /** Suggested uppercase version of the key */
   suggestion: string;
 }
 
@@ -375,8 +397,11 @@ export interface UppercaseWarning {
  * This will generate a warning that API_KEY expires on 2025-12-31.
  */
 export interface ExpireWarning {
+  /** The environment variable key */
   key: string;
+  /** The expiration date of the environment variable */
   date: string;
+  /** The number of days left until the environment variable expires */
   daysLeft: number;
 }
 
@@ -385,7 +410,10 @@ export interface ExpireWarning {
  * fx: If you have both SECRET_KEY and SECRETKEY (inconsistent naming)
  */
 export interface InconsistentNamingWarning {
+  /** The first environment variable key */
   key1: string;
+  /** The second environment variable key */
   key2: string;
+  /** Suggested consistent naming for the keys */
   suggestion: string;
 }

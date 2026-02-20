@@ -23,6 +23,7 @@ import { DEFAULT_ENV_FILE } from '../config/constants.js';
  * handleMissingFiles result
  */
 interface ExitDecision extends ExitResult {
+  /** Indicates if the process should exit */
   shouldExit: boolean;
 }
 

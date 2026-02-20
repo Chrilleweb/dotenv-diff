@@ -6,9 +6,13 @@ import type { ComparisonOptions } from '../../config/types.js';
  * Result of parsing and filtering environment files
  */
 interface ParsedAndFilteredEnv {
+  /** Parsed and filtered current environment variables */
   current: Record<string, string>;
+  /** Parsed and filtered example environment variables */
   example: Record<string, string>;
+  /** Keys of the parsed and filtered current environment variables */
   currentKeys: string[];
+  /** Keys of the parsed and filtered example environment variables */
   exampleKeys: string[];
 }
 

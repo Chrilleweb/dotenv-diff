@@ -4,10 +4,15 @@ import type { CompareJsonEntry, Filtered } from '../../config/types.js';
  * Totals of issues found during comparison --compare operation
  */
 export interface Totals {
+  /** Number of missing keys */
   missing: number;
+  /** Number of extra keys */
   extra: number;
+  /** Number of empty keys */
   empty: number;
+  /** Number of duplicate keys */
   duplicate: number;
+  /** Number of gitignore issues */
   gitignore: number;
 }
 
