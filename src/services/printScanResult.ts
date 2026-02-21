@@ -91,7 +91,9 @@ export function printScanResult(
     printSecrets(scanResult.secrets);
   }
   // Console log usage warning
-  printConsolelogWarning(scanResult.logged ?? [], isJson);
+  if (scanResult.logged) {
+    printConsolelogWarning(scanResult.logged);
+  }
 
   // Expiration warnings
   printExpireWarnings(scanResult.expireWarnings ?? [], isJson);
