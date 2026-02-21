@@ -55,7 +55,7 @@ export function printScanResult(
   }
 
   if (scanResult.frameworkWarnings && scanResult.frameworkWarnings.length > 0) {
-    printFrameworkWarnings(scanResult.frameworkWarnings, isJson);
+    printFrameworkWarnings(scanResult.frameworkWarnings);
   }
 
   if (scanResult.uppercaseWarnings && scanResult.uppercaseWarnings.length > 0) {
