@@ -47,7 +47,9 @@ export function printScanResult(
   printHeader(comparedAgainst);
 
   // Show stats if requested
-  printStats(scanResult.stats, opts.showStats ?? true);
+  if (opts.showStats ?? true) {
+    printStats(scanResult.stats, true);
+  }
 
   // Missing variables (used in code but not in env file)
   if (printMissing(scanResult.missing, scanResult.used, comparedAgainst)) {
@@ -71,12 +73,9 @@ export function printScanResult(
   }
 
   // Unused
-  printUnused(
-    scanResult.unused,
-    comparedAgainst,
-    opts.showUnused ?? false,
-    isJson,
-  );
+  if (opts.showUnused ?? true) {
+    printUnused(scanResult.unused, comparedAgainst);
+  }
 
   // Duplicates
   printDuplicates(
