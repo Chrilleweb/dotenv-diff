@@ -62,7 +62,6 @@ export function printScanResult(
     printUppercaseWarning(
       scanResult.uppercaseWarnings,
       comparedAgainst,
-      isJson,
     );
   }
 

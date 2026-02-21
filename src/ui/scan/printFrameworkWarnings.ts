@@ -16,7 +16,6 @@ const FRAMEWORK_LABELS: Record<DetectedFramework, string> = {
 /**
  * Prints environment variable usage warnings to the console.
  * @param warnings - List of environment variable warnings
- * @param json - Whether to output in JSON format
  */
 export function printFrameworkWarnings(warnings: FrameworkWarning[]): void {
   if (!warnings || warnings.length === 0) return;
