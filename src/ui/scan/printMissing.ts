@@ -8,18 +8,13 @@ import { normalizePath } from '../../core/helpers/normalizePath.js';
  * @param missing - List of missing variables
  * @param used - All usages found in the codebase
  * @param comparedAgainst - Name of the env file or example file
- * @param isCiMode - Whether we are in CI mode (extra error message)
- * @param json - Whether to output in JSON format
  * @returns true if any missing variables were printed
  */
 export function printMissing(
   missing: string[],
   used: EnvUsage[],
   comparedAgainst: string,
-  isCiMode: boolean,
-  json: boolean,
 ): boolean {
-  if (json) return false;
   if (missing.length === 0) return false;
 
   const fileType = comparedAgainst || 'environment file';
@@ -33,8 +28,11 @@ export function printMissing(
   }, {});
 
   // Group by file first
-  const byFile = new Map<string, Array<{ variable: string; usage: EnvUsage }>>();
-  
+  const byFile = new Map<
+    string,
+    Array<{ variable: string; usage: EnvUsage }>
+  >();
+
   for (const [variable, usages] of Object.entries(grouped)) {
     for (const usage of usages) {
       const file = normalizePath(usage.file);
@@ -46,11 +44,9 @@ export function printMissing(
   // Print grouped by file
   for (const [file, items] of byFile) {
     console.log(chalk.bold(`   ${file}`));
-    
+
     for (const { variable, usage } of items) {
-      console.log(
-        chalk.red(`    ${variable}: Line ${usage.line}`),
-      );
+      console.log(chalk.red(`    ${variable}: Line ${usage.line}`));
       console.log(chalk.red.dim(`    ${usage.context.trim()}`));
     }
   }

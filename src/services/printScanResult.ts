@@ -50,15 +50,7 @@ export function printScanResult(
   printStats(scanResult.stats, opts.showStats ?? true);
 
   // Missing variables (used in code but not in env file)
-  if (
-    printMissing(
-      scanResult.missing,
-      scanResult.used,
-      comparedAgainst,
-      opts.isCiMode ?? false,
-      isJson,
-    )
-  ) {
+  if (printMissing(scanResult.missing, scanResult.used, comparedAgainst)) {
     exitWithError = true;
   }
 
@@ -184,11 +176,7 @@ export function printScanResult(
   }
 
   if (opts.fix && fixContext) {
-    printAutoFix(
-      fixContext,
-      comparedAgainst || DEFAULT_ENV_FILE,
-      isJson,
-    );
+    printAutoFix(fixContext, comparedAgainst || DEFAULT_ENV_FILE, isJson);
   }
 
   // Health score
