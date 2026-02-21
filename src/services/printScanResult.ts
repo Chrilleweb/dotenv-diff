@@ -87,8 +87,9 @@ export function printScanResult(
   );
 
   // Print potential secrets found
-  printSecrets(scanResult.secrets ?? [], isJson);
-
+  if (opts.secrets) {
+    printSecrets(scanResult.secrets);
+  }
   // Console log usage warning
   printConsolelogWarning(scanResult.logged ?? [], isJson);
 
