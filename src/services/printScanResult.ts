@@ -54,25 +54,16 @@ export function printScanResult(
     exitWithError = true;
   }
 
-  if (scanResult.frameworkWarnings && scanResult.frameworkWarnings.length > 0) {
+  if (scanResult.frameworkWarnings) {
     printFrameworkWarnings(scanResult.frameworkWarnings);
   }
 
-  if (scanResult.uppercaseWarnings && scanResult.uppercaseWarnings.length > 0) {
-    printUppercaseWarning(
-      scanResult.uppercaseWarnings,
-      comparedAgainst,
-    );
+  if (scanResult.uppercaseWarnings) {
+    printUppercaseWarning(scanResult.uppercaseWarnings, comparedAgainst);
   }
 
-  if (
-    scanResult.inconsistentNamingWarnings &&
-    scanResult.inconsistentNamingWarnings.length > 0
-  ) {
-    printInconsistentNamingWarning(
-      scanResult.inconsistentNamingWarnings,
-      isJson,
-    );
+  if (scanResult.inconsistentNamingWarnings) {
+    printInconsistentNamingWarning(scanResult.inconsistentNamingWarnings);
   }
 
   printExampleWarnings(scanResult.exampleWarnings ?? [], isJson);
