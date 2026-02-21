@@ -9,10 +9,9 @@ import type { ScanStats } from '../../config/types.js';
  */
 export function printStats(
   stats: ScanStats,
-  json: boolean,
   showStats: boolean,
 ): void {
-  if (json || !showStats) return;
+  if (!showStats) return;
   console.log();
   console.log(chalk.magenta('📊 Scan Statistics:'));
   console.log(chalk.magenta.dim(`   Files scanned: ${stats.filesScanned}`));

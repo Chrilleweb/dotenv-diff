@@ -6,14 +6,9 @@ import { normalizePath } from '../../core/helpers/normalizePath.js';
  * Print environment variables that were logged using console.log / warn / error.
  *
  * @param logged - List of EnvUsage entries where isLogged=true
- * @param json - Whether JSON output is enabled
  * @returns true if anything was printed
  */
-export function printConsolelogWarning(
-  logged: EnvUsage[],
-  json: boolean,
-): boolean {
-  if (json) return false;
+export function printConsolelogWarning(logged: EnvUsage[]): boolean {
   if (!logged || logged.length === 0) return false;
 
   console.log(chalk.yellow(`⚠️  Environment variables logged to console:`));

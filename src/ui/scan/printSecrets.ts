@@ -32,11 +32,9 @@ function getSeverityLabel(severity: SecretFinding['severity']): string {
 /**
  * Print potential secrets detected in the codebase.
  * @param secrets - List of secret findings
- * @param json - Whether to output in JSON format
  * @returns void
  */
-export function printSecrets(secrets: SecretFinding[], json: boolean): void {
-  if (json) return;
+export function printSecrets(secrets: SecretFinding[]): void {
   if (!secrets || secrets.length === 0) return;
 
   // Sort by severity (high -> medium -> low)
