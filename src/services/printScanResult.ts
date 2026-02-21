@@ -47,7 +47,7 @@ export function printScanResult(
   printHeader(comparedAgainst);
 
   // Show stats if requested
-  printStats(scanResult.stats, isJson, opts.showStats ?? true);
+  printStats(scanResult.stats, opts.showStats ?? true);
 
   // Missing variables (used in code but not in env file)
   if (
