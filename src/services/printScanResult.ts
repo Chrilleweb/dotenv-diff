@@ -66,7 +66,9 @@ export function printScanResult(
     printInconsistentNamingWarning(scanResult.inconsistentNamingWarnings);
   }
 
-  printExampleWarnings(scanResult.exampleWarnings ?? [], isJson);
+  if (scanResult.exampleWarnings) {
+    printExampleWarnings(scanResult.exampleWarnings);
+  }
 
   // Unused
   printUnused(
