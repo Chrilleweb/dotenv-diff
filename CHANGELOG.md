@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
+## [2.6.2](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.1...v2.6.2) (2026-02-24)
+
+### 🐛 Bug Fixes
+
+* emoji health score ([#275](https://github.com/Chrilleweb/dotenv-diff/issues/275)) ([b7d8499](https://github.com/Chrilleweb/dotenv-diff/commit/b7d84997286e44a249461554b6deb55e90d10c8c))
+* updated dependencies ([#278](https://github.com/Chrilleweb/dotenv-diff/issues/278)) ([f172462](https://github.com/Chrilleweb/dotenv-diff/commit/f17246285556769996273e090649bf44c838920f))
+
+### 📝 Documentation
+
+* interface docs ([#276](https://github.com/Chrilleweb/dotenv-diff/issues/276)) ([c6789e7](https://github.com/Chrilleweb/dotenv-diff/commit/c6789e75dfe3eae1801cbce52cc6425555a79ab1))
+* updated docs ([#279](https://github.com/Chrilleweb/dotenv-diff/issues/279)) ([a2bfeea](https://github.com/Chrilleweb/dotenv-diff/commit/a2bfeea14dec18dc927e902bf2f6e4c9b86c729a))
+
 ## [2.6.1](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.0...v2.6.1) (2026-02-13)
 
 ### 🐛 Bug Fixes
