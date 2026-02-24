@@ -118,7 +118,7 @@ This will:
 
 ## Documentation
 
-→ See [dotenv-diif Documentation](./docs/index.md) for full documentation
+→ See [dotenv-diff Documentation](./docs/index.md) for full documentation
 
 ---
 
