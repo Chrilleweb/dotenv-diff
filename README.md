@@ -118,7 +118,7 @@ This will:
 
 ## Documentation
 
-Full documentation: https://dotenv-diff-docs.vercel.app
+→ See [dotenv-diif Documentation](./docs/index.md) for full documentation
 
 ---
 
