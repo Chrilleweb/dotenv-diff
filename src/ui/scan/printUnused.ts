@@ -6,15 +6,8 @@ import chalk from 'chalk';
  * @param unused - Array of unused variable names
  * @param comparedAgainst - File name (.env eller andet)
  * @param showUnused - Whether unused should be shown at all
- * @param json - Whether to output in JSON format
  */
-export function printUnused(
-  unused: string[],
-  comparedAgainst: string,
-  showUnused: boolean,
-  json: boolean,
-): void {
-  if (json || !showUnused) return;
+export function printUnused(unused: string[], comparedAgainst: string): void {
   if (unused.length === 0) return;
 
   const fileType = comparedAgainst || 'environment file';

@@ -6,14 +6,12 @@ import type { UppercaseWarning } from '../../config/types.js';
  *
  * @param warnings - List of non-uppercase env keys
  * @param comparedAgainst - The .env file name being checked
- * @param json - Whether JSON output is enabled
  */
 export function printUppercaseWarning(
   warnings: UppercaseWarning[],
   comparedAgainst: string,
-  json: boolean,
 ): void {
-  if (json || warnings.length === 0) return;
+  if (warnings.length === 0) return;
 
   console.log(
     chalk.yellow(

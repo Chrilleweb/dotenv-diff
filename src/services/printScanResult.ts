@@ -47,52 +47,35 @@ export function printScanResult(
   printHeader(comparedAgainst);
 
   // Show stats if requested
-  printStats(scanResult.stats, isJson, opts.showStats ?? true);
+  if (opts.showStats ?? true) {
+    printStats(scanResult.stats, true);
+  }
 
   // Missing variables (used in code but not in env file)
-  if (
-    printMissing(
-      scanResult.missing,
-      scanResult.used,
-      comparedAgainst,
-      opts.isCiMode ?? false,
-      isJson,
-    )
-  ) {
+  if (printMissing(scanResult.missing, scanResult.used, comparedAgainst)) {
     exitWithError = true;
   }
 
-  if (scanResult.frameworkWarnings && scanResult.frameworkWarnings.length > 0) {
-    printFrameworkWarnings(scanResult.frameworkWarnings, isJson);
+  if (scanResult.frameworkWarnings) {
+    printFrameworkWarnings(scanResult.frameworkWarnings);
   }
 
-  if (scanResult.uppercaseWarnings && scanResult.uppercaseWarnings.length > 0) {
-    printUppercaseWarning(
-      scanResult.uppercaseWarnings,
-      comparedAgainst,
-      isJson,
-    );
+  if (scanResult.uppercaseWarnings) {
+    printUppercaseWarning(scanResult.uppercaseWarnings, comparedAgainst);
   }
 
-  if (
-    scanResult.inconsistentNamingWarnings &&
-    scanResult.inconsistentNamingWarnings.length > 0
-  ) {
-    printInconsistentNamingWarning(
-      scanResult.inconsistentNamingWarnings,
-      isJson,
-    );
+  if (scanResult.inconsistentNamingWarnings) {
+    printInconsistentNamingWarning(scanResult.inconsistentNamingWarnings);
   }
 
-  printExampleWarnings(scanResult.exampleWarnings ?? [], isJson);
+  if (scanResult.exampleWarnings) {
+    printExampleWarnings(scanResult.exampleWarnings);
+  }
 
   // Unused
-  printUnused(
-    scanResult.unused,
-    comparedAgainst,
-    opts.showUnused ?? false,
-    isJson,
-  );
+  if (opts.showUnused ?? true) {
+    printUnused(scanResult.unused, comparedAgainst);
+  }
 
   // Duplicates
   printDuplicates(
@@ -104,10 +87,13 @@ export function printScanResult(
   );
 
   // Print potential secrets found
-  printSecrets(scanResult.secrets ?? [], isJson);
-
+  if (opts.secrets) {
+    printSecrets(scanResult.secrets);
+  }
   // Console log usage warning
-  printConsolelogWarning(scanResult.logged ?? [], isJson);
+  if (scanResult.logged) {
+    printConsolelogWarning(scanResult.logged);
+  }
 
   // Expiration warnings
   printExpireWarnings(scanResult.expireWarnings ?? [], isJson);
@@ -184,11 +170,7 @@ export function printScanResult(
   }
 
   if (opts.fix && fixContext) {
-    printAutoFix(
-      fixContext,
-      comparedAgainst || DEFAULT_ENV_FILE,
-      isJson,
-    );
+    printAutoFix(fixContext, comparedAgainst || DEFAULT_ENV_FILE, isJson);
   }
 
   // Health score
