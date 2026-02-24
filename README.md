@@ -36,7 +36,7 @@ Generate a default configuration file:
 dotenv-diff --init
 ```
 
-→ See [Configuration Documentation](https://dotenv-diff-docs.vercel.app/configuration) for more details.
+→ See [Configuration Documentation](./docs/configuration_and_flags.md#configuration-file) for more details.
 
 ---
 
