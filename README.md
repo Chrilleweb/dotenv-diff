@@ -44,7 +44,7 @@ dotenv-diff --init
 
 Easily integrate dotenv-diff into your Git hooks or CI/CD pipelines to enforce environment variable consistency.
 
-→ See [Git Hooks Documentation](https://dotenv-diff-docs.vercel.app/hooks-ci) for more details.
+→ See [Git Hooks Documentation](./docs/git_hooks_ci.md) for more details.
 
 ## Framework-Specific Warnings
 
@@ -59,7 +59,7 @@ Framework issues (Sveltekit):
     → Variables accessed through import.meta.env must start with "VITE_"
 ```
 
-→ See [Framework Documentation](https://dotenv-diff-docs.vercel.app/sveltekit) for more details.
+→ See [Framework Documentation](./docs/frameworks/index.md) for more details.
 
 ## Ignore Comments 
 
@@ -71,7 +71,7 @@ const apiKey = process.env.API_KEY; // dotenv-diff-ignore
 
 This is helpful when you know a specific warning is safe in your source code.
 
-→ See [Ignore Comments Documentation](https://dotenv-diff-docs.vercel.app/ignore-comments) for more details.
+→ See [Ignore Comments Documentation](./docs/ignore_comments.md) for more details.
 
 ---
 
@@ -84,11 +84,11 @@ Add expiration metadata to your environment variables to get warnings when they 
 API_TOKEN=
 ```
 
-→ See [Expiration Documentation](https://dotenv-diff-docs.vercel.app/expire-warnings) for more details.
+→ See [Expiration Documentation](./docs/expiration_warnings.md) for more details.
 
 ---
 
-## Monorepo (Turborepo) Usage
+## Monorepo support
 
 In monorepos with multiple apps and packages, you can include shared folders:
 
@@ -100,7 +100,7 @@ In monorepos with multiple apps and packages, you can include shared folders:
 }
 ```
 
-→ See [Monorepo Documentation](https://dotenv-diff-docs.vercel.app/monorepo) for more details.
+→ See [Monorepo Documentation](./docs/monorepo_support.md) for more details.
 
 This will:
 - Scan the current app
@@ -122,7 +122,7 @@ Full documentation: https://dotenv-diff-docs.vercel.app
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Issues and pull requests are welcome.  
 → See [CONTRIBUTING](CONTRIBUTING.md) for details.
