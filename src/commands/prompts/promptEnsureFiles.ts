@@ -77,7 +77,7 @@ export async function promptEnsureFiles(
           );
 
     if (!createEnv) {
-      printPrompt.skipCreation(DEFAULT_ENV_FILE);
+      printPrompt.skipCreation(path.basename(envPath));
       return { didCreate: false, shouldExit: true, exitCode: 0 };
     }
 
@@ -104,7 +104,7 @@ export async function promptEnsureFiles(
           );
 
     if (!createExample) {
-      printPrompt.skipCreation(DEFAULT_ENV_FILE + '.example');
+      printPrompt.skipCreation(path.basename(examplePath));
       return { didCreate: false, shouldExit: true, exitCode: 0 };
     }
 
