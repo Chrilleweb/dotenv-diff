@@ -60,6 +60,14 @@ describe('checkGitignore helpers', () => {
     expect(isEnvIgnoredByGit({ cwd })).toBe(true);
   });
 
+  it('returns null when envFile is .env.example', () => {
+    const cwd = makeTmpDir();
+    tmpDirs.push(cwd);
+
+    const result = checkGitignoreStatus({ cwd, envFile: '.env.example' });
+    expect(result).toBeNull();
+  });
+
   it('isEnvIgnoredByGit returns false if a negation for candidate exists', () => {
     const cwd = makeTmpDir();
     tmpDirs.push(cwd);
