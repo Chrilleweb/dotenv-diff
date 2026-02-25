@@ -14,17 +14,7 @@ describe('printExpireWarnings', () => {
   });
 
   it('should not print anything when warnings array is empty', () => {
-    printExpireWarnings([], false);
-
-    expect(consoleLogSpy).not.toHaveBeenCalled();
-  });
-
-  it('should not print anything in JSON mode', () => {
-    const warnings: ExpireWarning[] = [
-      { key: 'API_KEY', date: '2026-01-28', daysLeft: 1 },
-    ];
-
-    printExpireWarnings(warnings, true);
+    printExpireWarnings([]);
 
     expect(consoleLogSpy).not.toHaveBeenCalled();
   });
@@ -34,7 +24,7 @@ describe('printExpireWarnings', () => {
       { key: 'API_KEY', date: '2026-01-28', daysLeft: 1 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       expect.stringContaining('Expiration warnings'),
@@ -46,7 +36,7 @@ describe('printExpireWarnings', () => {
       { key: 'API_KEY', date: '2026-01-28', daysLeft: 1 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('expires tomorrow');
@@ -57,7 +47,7 @@ describe('printExpireWarnings', () => {
       { key: 'API_KEY', date: '2026-01-30', daysLeft: 3 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('expires in 3 days');
@@ -68,7 +58,7 @@ describe('printExpireWarnings', () => {
       { key: 'OLD_KEY', date: '2026-01-26', daysLeft: -1 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('EXPIRED YESTERDAY');
@@ -79,7 +69,7 @@ describe('printExpireWarnings', () => {
       { key: 'OLD_KEY', date: '2026-01-20', daysLeft: -7 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('EXPIRED 7 days ago');
@@ -90,7 +80,7 @@ describe('printExpireWarnings', () => {
       { key: 'URGENT_KEY', date: '2026-01-27', daysLeft: 0 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('EXPIRES TODAY');
@@ -103,7 +93,7 @@ describe('printExpireWarnings', () => {
       { key: 'KEY3', date: '2026-01-20', daysLeft: -7 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('expires tomorrow');
@@ -116,7 +106,7 @@ describe('printExpireWarnings', () => {
       { key: 'MY_API_KEY', date: '2026-02-15', daysLeft: 19 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('MY_API_KEY');
@@ -128,7 +118,7 @@ describe('printExpireWarnings', () => {
       { key: 'API_KEY', date: '2026-02-01', daysLeft: 5 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('expires in 5 days');
@@ -139,7 +129,7 @@ describe('printExpireWarnings', () => {
       { key: 'API_KEY', date: '2026-02-10', daysLeft: 14 },
     ];
 
-    printExpireWarnings(warnings, false);
+    printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('expires in 14 days');

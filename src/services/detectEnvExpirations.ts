@@ -27,7 +27,7 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
     const expireMatch = line.match(reg);
 
     if (expireMatch) {
-      pendingExpire = expireMatch[2] ?? null; // capture dato
+      pendingExpire = expireMatch[2]!; // capture dato
       continue;
     }
 

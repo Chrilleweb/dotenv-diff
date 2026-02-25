@@ -179,4 +179,18 @@ describe('discoverEnvFiles', () => {
     expect(result.primaryEnv).toBe('.env');
     expect(result.envFiles).toContain('.env');
   });
+
+  it('prioritizes DEFAULT_ENV_FILE when sorting', () => {
+    fs.writeFileSync(path.join(cwd, '.env.local'), '');
+    fs.writeFileSync(path.join(cwd, '.env'), '');
+    fs.writeFileSync(path.join(cwd, '.env.example'), '');
+
+    const result = discoverEnvFiles({
+      cwd,
+      envFlag: null,
+      exampleFlag: null,
+    });
+
+    expect(result.envFiles[0]).toBe('.env');
+  });
 });

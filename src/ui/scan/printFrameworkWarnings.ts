@@ -29,7 +29,7 @@ export function printFrameworkWarnings(warnings: FrameworkWarning[]): void {
 
   console.log(
     chalk.yellow(
-      `⚠️  Framework issues (${FRAMEWORK_LABELS[uniqueWarnings[0]?.framework ?? 'unknown']}):`,
+      `⚠️  Framework issues (${FRAMEWORK_LABELS[uniqueWarnings[0]!.framework]}):`,
     ),
   );
 

@@ -220,4 +220,30 @@ describe('Expiration Warnings', () => {
     expect(res.stdout).toContain('EXPIRED_KEY');
     expect(res.stdout).toContain('EXPIRED');
   });
+
+  it('will not print expiration warnings UI, but expireWarnings in json mode', () => {
+    const cwd = tmpDir();
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const expiredDate = yesterday.toISOString().split('T')[0];
+
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      `# @expire ${expiredDate}\nEXPIRED_KEY=secret123\n`,
+    );
+
+    // Create a file that uses the env var
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.js'),
+      'console.log(process.env.EXPIRED_KEY);',
+    );
+
+    const res = runCli(cwd, ['--json']);
+
+    expect(res.status).toBe(0);
+    expect(res.stdout).not.toContain('Expiration warnings');
+    expect(res.stdout).toContain('"expireWarnings"');
+  });
 });

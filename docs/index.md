@@ -22,6 +22,32 @@ npx dotenv-diff --example .env.example
 
 ---
 
+The extension recognises the following patterns:
+
+```typescript
+// Node.js
+process.env.MY_KEY
+
+// Vite / import.meta
+import.meta.env.MY_KEY
+
+// SvelteKit – dynamic (env object)
+import { env } from '$env/dynamic/private';
+import { env } from '$env/dynamic/public';
+env.MY_KEY
+
+// SvelteKit – static (named imports)
+import { MY_KEY } from '$env/static/private';
+import { MY_KEY } from '$env/static/public';
+MY_KEY
+```
+
+Only `UPPER_CASE` key names are matched, which is the standard convention for environment variables.
+
+Scanned file types: .ts, .js, jsx, tsx, vue, .mjs, .cjs, .svelte
+
+---
+
 ## Table of Contents
 
 | Document | Description |
