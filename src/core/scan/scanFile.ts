@@ -19,7 +19,7 @@ export function scanFile(
   const usages: EnvUsage[] = [];
   const lines = content.split('\n');
 
-  // Get relative path from cwd corss-platform compatible
+  // Get relative path from cwd cross-platform compatible
   const relativePath = normalizePath(path.relative(opts.cwd, filePath));
 
   // Collect all $env imports used in this file
@@ -31,9 +31,7 @@ export function scanFile(
   let importMatch: RegExpExecArray | null;
 
   while ((importMatch = importRegex.exec(content)) !== null) {
-    if (importMatch[1]) {
-      envImports.push(importMatch[1]);
-    }
+      envImports.push(importMatch[1]!);
   }
 
   for (const pattern of ENV_PATTERNS) {
@@ -41,8 +39,7 @@ export function scanFile(
     const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
 
     while ((match = regex.exec(content)) !== null) {
-      const variable = match[1];
-      if (!variable) continue;
+      const variable = match[1]!;
       const matchIndex = match.index;
 
       // Find line and column
@@ -55,7 +52,7 @@ export function scanFile(
           : matchIndex - lastNewlineIndex;
 
       // Get the context (the actual line)
-      const contextLine = lines[lineNumber - 1] ?? '';
+      const contextLine = lines[lineNumber - 1]!;
 
       // Determine previous line for ignore detection
       const prevLine = lines[lineNumber - 2] ?? '';
