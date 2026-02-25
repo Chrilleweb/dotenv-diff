@@ -34,13 +34,7 @@ export function discoverEnvFiles({
       (f) =>
         f.startsWith(DEFAULT_ENV_FILE) && !f.startsWith(DEFAULT_EXAMPLE_FILE),
     )
-    .sort((a, b) =>
-      a === DEFAULT_ENV_FILE
-        ? -1
-        : b === DEFAULT_ENV_FILE
-          ? 1
-          : a.localeCompare(b),
-    );
+    .sort((a, b) => (b === DEFAULT_ENV_FILE ? 1 : a.localeCompare(b)));
 
   let primaryEnv = envFiles.includes(DEFAULT_ENV_FILE)
     ? DEFAULT_ENV_FILE
@@ -80,9 +74,7 @@ export function discoverEnvFiles({
 
     if (exampleNameFromFlag.startsWith(DEFAULT_EXAMPLE_FILE)) {
       const suffix = exampleNameFromFlag.slice(DEFAULT_EXAMPLE_FILE.length);
-      const matchedEnv = suffix
-        ? `${DEFAULT_ENV_FILE}${suffix}`
-        : DEFAULT_ENV_FILE;
+      const matchedEnv = `${DEFAULT_ENV_FILE}${suffix}`;
 
       if (fs.existsSync(path.resolve(cwd, matchedEnv))) {
         primaryEnv = matchedEnv;
@@ -95,7 +87,7 @@ export function discoverEnvFiles({
           alreadyWarnedMissingEnv = true;
         } else {
           // Use the first available env file instead
-          primaryEnv = envFiles[0] || DEFAULT_ENV_FILE;
+          primaryEnv = envFiles[0]!;
         }
       }
     } else {
