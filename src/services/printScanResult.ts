@@ -96,8 +96,9 @@ export function printScanResult(
   }
 
   // Expiration warnings
-  printExpireWarnings(scanResult.expireWarnings ?? [], isJson);
-
+  if (scanResult.expireWarnings) {
+    printExpireWarnings(scanResult.expireWarnings);
+  }
   // Check for high severity secrets - ALWAYS exit with error
   const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
     (s) => s.severity === 'high',
@@ -138,7 +139,7 @@ export function printScanResult(
     envFile: DEFAULT_ENV_FILE,
   });
 
-  if (gitignoreIssue && !opts.json) {
+  if (gitignoreIssue) {
     printGitignoreWarning({
       envFile: DEFAULT_ENV_FILE,
       reason: gitignoreIssue.reason,

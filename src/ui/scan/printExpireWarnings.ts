@@ -7,14 +7,7 @@ import type { ExpireWarning } from '../../config/types.js';
  * @param isJson Whether to output in JSON format
  * @returns void
  */
-export function printExpireWarnings(
-  warnings: ExpireWarning[],
-  isJson: boolean,
-) {
-  if (isJson) {
-    return;
-  }
-
+export function printExpireWarnings(warnings: ExpireWarning[]) {
   if (warnings.length === 0) return;
 
   console.log(chalk.yellow('⚠️  Expiration warnings:'));
