@@ -39,45 +39,54 @@ export function scanFile(
     const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
 
     while ((match = regex.exec(content)) !== null) {
-      const variable = match[1]!;
-      const matchIndex = match.index;
+      const variables = pattern.processor
+        ? pattern.processor(match)
+        : [match[1]!];
 
-      // Find line and column
-      const beforeMatch = content.substring(0, matchIndex);
-      const lineNumber = beforeMatch.split('\n').length;
-      const lastNewlineIndex = beforeMatch.lastIndexOf('\n');
-      const column =
-        lastNewlineIndex === -1
-          ? matchIndex + 1
-          : matchIndex - lastNewlineIndex;
+      for (const variable of variables) {
+        if (!variable) continue;
 
-      // Get the context (the actual line)
-      const contextLine = lines[lineNumber - 1]!;
+        const matchIndex = match.index;
 
-      // Determine previous line for ignore detection
-      const prevLine = lines[lineNumber - 2] ?? '';
+        // Find line and column
+        // Note: For destructured variables, this points to the start of the destructuring block
+        // not the specific variable location. Ideally we'd search within the match.
+        const beforeMatch = content.substring(0, matchIndex);
+        const lineNumber = beforeMatch.split('\n').length;
+        const lastNewlineIndex = beforeMatch.lastIndexOf('\n');
+        const column =
+          lastNewlineIndex === -1
+            ? matchIndex + 1
+            : matchIndex - lastNewlineIndex;
 
-      const isIgnored =
-        hasIgnoreComment(contextLine) || hasIgnoreComment(prevLine);
+        // Get the context (the actual line)
+        const contextLine = lines[lineNumber - 1]!;
 
-      // If usage is ignored, skip it entirely
-      if (isIgnored) continue;
+        // Determine previous line for ignore detection
+        const prevLine = lines[lineNumber - 2] ?? '';
 
-      // Check if console.log
-      const isLogged = /\bconsole\.(log|error|warn|info|debug)\s*\(/.test(
-        contextLine,
-      );
+        const isIgnored =
+          hasIgnoreComment(contextLine) || hasIgnoreComment(prevLine);
 
-      usages.push({
-        variable,
-        file: relativePath,
-        line: lineNumber,
-        column,
-        pattern: pattern.name,
-        imports: envImports,
-        context: contextLine,
-        isLogged,
-      });
+        // If usage is ignored, skip it entirely
+        if (isIgnored) continue;
+
+        // Check if console.log
+        const isLogged = /\bconsole\.(log|error|warn|info|debug)\s*\(/.test(
+          contextLine,
+        );
+
+        usages.push({
+          variable,
+          file: relativePath,
+          line: lineNumber,
+          column,
+          pattern: pattern.name,
+          imports: envImports,
+          context: contextLine,
+          isLogged,
+        });
+      }
     }
   }
 
