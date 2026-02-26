@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
+## [2.6.3](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.2...v2.6.3) (2026-02-26)
+
+### 🐛 Bug Fixes
+
+* skip path ([#281](https://github.com/Chrilleweb/dotenv-diff/issues/281)) ([eec0d13](https://github.com/Chrilleweb/dotenv-diff/commit/eec0d13dddb581072f05a1168ad52e65f41693bf))
+* variables patterns ([#282](https://github.com/Chrilleweb/dotenv-diff/issues/282)) ([67515a0](https://github.com/Chrilleweb/dotenv-diff/commit/67515a04c46e1f373041cfe434c4eca01eb36c81))
+
 ## [2.6.2](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.1...v2.6.2) (2026-02-24)
 
 ### 🐛 Bug Fixes
