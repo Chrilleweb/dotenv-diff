@@ -1,18 +1,81 @@
+type Pattern = {
+  name: 'process.env' | 'import.meta.env' | 'sveltekit';
+  regex: RegExp;
+  processor?: (match: RegExpExecArray) => string[];
+};
+
 /**
  * Framework-specific regex patterns for detecting environment variable usage
  * across different runtimes and frameworks.
  */
-export const ENV_PATTERNS = [
-  // process.env.X
+export const ENV_PATTERNS: Pattern[] = [
+  /**
+   * Matches process.env.KEY references in source code.
+   * Supports both dot notation and bracket notation.
+   *
+   * Examples:
+   *   process.env.MY_KEY
+   *   process.env["MY_KEY"]
+   *   process.env['MY_KEY']
+   */
   {
-    name: 'process.env' as const,
-    regex: /process\.env\.([A-Z_][A-Z0-9_]*)/g,
+    name: 'process.env',
+    regex:
+      /process\.env\.([A-Z_][A-Z0-9_]*)|process\.env\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
+    processor: (match) => {
+      // match[1] covers dot notation: process.env.KEY
+      // match[2] covers bracket notation: process.env['KEY']
+      const variable = match[1] || match[2];
+      return variable ? [variable] : [];
+    },
   },
 
-  // import.meta.env.X
+  /**
+   * Matches object destructuring from process.env.
+   * Captures the full object pattern between braces for further parsing.
+   *
+   * Example:
+   *   const { MY_KEY, OTHER_KEY: alias, THIRD_KEY = "fallback" } = process.env
+   */
   {
-    name: 'import.meta.env' as const,
-    regex: /import\.meta\.env\.([A-Z_][A-Z0-9_]*)/g,
+    name: 'process.env',
+    regex: /\{([^}]*)\}\s*=\s*process\.env\b/g,
+    processor: (match) => {
+      const content = match[1];
+      if (!content) return [];
+
+      return content
+        .split(',')
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .map((part) => {
+          // Handle aliases: MY_KEY: alias
+          // Handle defaults: MY_KEY = "value"
+          // We want the left-most identifier
+          const [key] = part.split(/[:=]/);
+          return key ? key.trim() : '';
+        })
+        .filter((key) => /^[A-Z_][A-Z0-9_]*$/.test(key));
+    },
+  },
+
+  /**
+   * Matches import.meta.env.KEY references in source code.
+   * Supports both dot notation and bracket notation.
+   *
+   * Examples:
+   *   import.meta.env.MY_KEY
+   *   import.meta.env["MY_KEY"]
+   *   import.meta.env['MY_KEY']
+   */
+  {
+    name: 'import.meta.env',
+    regex:
+      /import\.meta\.env\.([A-Z_][A-Z0-9_]*)|import\.meta\.env\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
+    processor: (match) => {
+      const variable = match[1] || match[2];
+      return variable ? [variable] : [];
+    },
   },
 
   // SvelteKit static named imports

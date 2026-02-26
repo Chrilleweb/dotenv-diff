@@ -2,7 +2,7 @@
 
 Welcome to the official documentation for `dotenv-diff`.
 
-This section gives you a quick overview of available guides and where to find framework-specific rules.
+This section gives you a quick overview of available guides
 
 ---
 
@@ -17,7 +17,7 @@ npm install dotenv-diff
 Run:
 
 ```bash
-npx dotenv-diff --example .env.example
+npx dotenv-diff
 ```
 
 ---
@@ -25,11 +25,19 @@ npx dotenv-diff --example .env.example
 The extension recognises the following patterns:
 
 ```typescript
-// Node.js
+// Node.js – dot and bracket notation
 process.env.MY_KEY
+process.env["MY_KEY"]
+process.env['MY_KEY']
+
+// Node.js – destructuring
+const { MY_KEY } = process.env
+const { MY_KEY: alias, OTHER_KEY = "fallback" } = process.env
 
 // Vite / import.meta
 import.meta.env.MY_KEY
+import.meta.env["MY_KEY"]
+import.meta.env['MY_KEY']
 
 // SvelteKit – dynamic (env object)
 import { env } from '$env/dynamic/private';
