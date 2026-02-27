@@ -31,29 +31,13 @@ jobs:
       - name: Install diff-cover
         run: pip install diff-cover
 
-      - name: Run coverage (PR branch)
+      - name: Run coverage
         run: pnpm run coverage
-
-      - name: Save PR coverage summary
-        run: |
-          cp coverage/coverage-summary.json pr-coverage-summary.json
-
-      - name: Run coverage (main branch)
-        run: |
-          git stash --include-untracked || true
-          git fetch origin main
-          git checkout origin/main
-          pnpm install --frozen-lockfile --silent
-          pnpm run coverage || true
-          cp coverage/coverage-summary.json main-coverage-summary.json || echo '{"total":{"lines":{"pct":0}}}' > main-coverage-summary.json
-          git checkout ${{ github.event.pull_request.head.sha }}
-          git stash pop || true
-          pnpm install --frozen-lockfile --silent
 
       - name: Fix lcov paths
         run: |
           if [ -f "coverage/lcov.info" ]; then
-            sed -i "s|SF:$(pwd)/||g" coverage/lcov.info
+            sed -i "s|^SF:|SF:|g" coverage/lcov.info
           fi
 
       - name: Run diff-cover analysis
@@ -65,46 +49,19 @@ jobs:
           COVERAGE_THRESHOLD=80
           all_passed=true
 
-          # Overall coverage for PR branch
           overall_coverage="N/A"
-          if [ -f "pr-coverage-summary.json" ]; then
-            overall_coverage=$(jq -r '.total.lines.pct' "pr-coverage-summary.json")
+          if [ -f "coverage/coverage-summary.json" ]; then
+            overall_coverage=$(jq -r '.total.lines.pct' "coverage/coverage-summary.json")
           fi
-
-          # Overall coverage for main branch
-          main_coverage="N/A"
-          if [ -f "main-coverage-summary.json" ]; then
-            main_coverage=$(jq -r '.total.lines.pct' "main-coverage-summary.json")
-          fi
-
-          # Compute delta
-          if [ "$overall_coverage" != "N/A" ] && [ "$main_coverage" != "N/A" ]; then
-            delta=$(echo "$overall_coverage $main_coverage" | awk '{
-              diff = $1 - $2
-              if (diff > 0) printf "+%.2f", diff
-              else printf "%.2f", diff
-            }')
-
-            # Pick emoji based on direction
-            delta_num=$(echo "$overall_coverage $main_coverage" | awk '{print $1 - $2}')
-            delta_emoji=$(echo "$delta_num" | awk '{
-              if ($1 > 0) print "📈"
-              else if ($1 < 0) print "📉"
-              else print "➡️"
-            }')
-
-            echo "**Overall coverage**: ${overall_coverage}% ${delta_emoji} ${delta}% vs \`main\` (${main_coverage}%)" >> comment.md
-          else
-            echo "**Overall coverage**: ${overall_coverage}%" >> comment.md
-          fi
-
-          echo "" >> comment.md
 
           diff-cover coverage/lcov.info \
             --compare-branch=origin/${{ github.event.pull_request.base.ref }} \
             --diff-range-notation=... \
             --json-report diff-coverage.json \
             --fail-under=0 || true
+
+          echo "**Overall coverage**: ${overall_coverage}%" >> comment.md
+          echo "" >> comment.md
 
           if [ -f "diff-coverage.json" ]; then
             total_lines=$(jq -r '.total_num_lines' diff-coverage.json)
