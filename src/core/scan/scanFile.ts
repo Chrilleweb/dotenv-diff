@@ -1,6 +1,6 @@
 import path from 'path';
 import type { EnvUsage, ScanOptions } from '../../config/types.js';
-import { ENV_PATTERNS } from '../patterns.js';
+import { ENV_PATTERNS } from './patterns.js';
 import { hasIgnoreComment } from '../security/secretDetectors.js';
 import { normalizePath } from '../helpers/normalizePath.js';
 

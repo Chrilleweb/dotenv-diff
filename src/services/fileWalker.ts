@@ -4,7 +4,7 @@ import fsSync from 'fs';
 import {
   DEFAULT_INCLUDE_EXTENSIONS,
   DEFAULT_EXCLUDE_PATTERNS,
-} from '../core/patterns.js';
+} from '../core/scan/patterns.js';
 
 /**
  * Options for finding files

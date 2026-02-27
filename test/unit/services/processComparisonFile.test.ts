@@ -58,6 +58,7 @@ vi.mock('../../../src/core/detectInconsistentNaming.js', () => ({
 
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { applyFixes } from '../../../src/core/fixEnv.js';
+import { parseEnvFile } from '../../../src/core/parseEnv.js';
 
 describe('processComparisonFile', () => {
   const baseScanResult: ScanResult = {
@@ -83,6 +84,7 @@ describe('processComparisonFile', () => {
 
   const baseOpts: ScanUsageOptions = {
     cwd: '/root',
+    examplePath: '.env.example',
     include: [],
     exclude: [],
     ignore: [],
@@ -164,6 +166,106 @@ describe('processComparisonFile', () => {
       allowDuplicates: false,
     });
 
+    expect(result.scanResult.duplicates?.env).toBeDefined();
+  });
+
+  it('Will Load .env.example trough examplePath', () => {
+    const exampleFile: ComparisonFile = {
+      path: '/env/.env.example',
+      name: '.env.example',
+    };
+    const result = processComparisonFile(baseScanResult, exampleFile, {
+      ...baseOpts,
+      examplePath: '.env.example',
+    });
+
+    expect(result.comparedAgainst).toBe('.env.example');
+  });
+
+  it('returns error result when file cannot be read', () => {
+    vi.mocked(parseEnvFile).mockImplementationOnce(() => {
+      throw new Error('ENOENT: no such file or directory');
+    });
+
+    const result = processComparisonFile(baseScanResult, compareFile, baseOpts);
+
+    expect(result.error).toBeDefined();
+    expect(result.error?.message).toContain('Could not read .env');
+    expect(result.error?.shouldExit).toBe(false);
+  });
+
+  it('sets shouldExit true on error when isCiMode is enabled', () => {
+    vi.mocked(parseEnvFile).mockImplementationOnce(() => {
+      throw new Error('ENOENT: no such file or directory');
+    });
+
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      isCiMode: true,
+    });
+
+    expect(result.error?.shouldExit).toBe(true);
+  });
+
+  it('works without examplePath option', () => {
+    const opts: ScanUsageOptions = { ...baseOpts, examplePath: undefined };
+
+    const result = processComparisonFile(baseScanResult, compareFile, opts);
+
+    expect(result.error).toBeUndefined();
+    expect(result.exampleFull).toBeUndefined();
+  });
+
+  it('skips example duplicate check when examplePath equals compareFile path', async () => {
+    // resolveFromCwd returns the compareFile path → same file → skip
+    const { resolveFromCwd } =
+      await import('../../../src/core/helpers/resolveFromCwd.js');
+    vi.mocked(resolveFromCwd).mockReturnValue(compareFile.path);
+
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      allowDuplicates: false,
+      examplePath: '.env.example',
+    });
+
+    // dupsEnv still found, but dupsEx should be empty because same file
+    expect(result.dupsEx).toHaveLength(0);
+  });
+
+  it('does not clear state when fix returns changed=false', () => {
+    vi.mocked(applyFixes).mockReturnValueOnce({
+      changed: false,
+      result: {
+        removedDuplicates: [],
+        addedEnv: [],
+        gitignoreUpdated: false,
+      },
+    });
+
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      fix: true,
+      allowDuplicates: false,
+    });
+
+    expect(result.fix.fixApplied).toBe(false);
+    // duplicates should still be present on scanResult
+    expect(result.scanResult.duplicates?.env).toBeDefined();
+  });
+
+  it('initialises scanResult.duplicates if it was undefined before writing', () => {
+    const scanWithNoDuplicates: ScanResult = {
+      ...baseScanResult,
+      duplicates: undefined as any,
+    };
+
+    const result = processComparisonFile(scanWithNoDuplicates, compareFile, {
+      ...baseOpts,
+      allowDuplicates: false,
+      fix: false,
+    });
+
+    expect(result.scanResult.duplicates).toBeDefined();
     expect(result.scanResult.duplicates?.env).toBeDefined();
   });
 });

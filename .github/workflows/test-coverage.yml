@@ -1,0 +1,126 @@
+name: Tests & Coverage
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install diff-cover
+        run: pip install diff-cover
+
+      - name: Run coverage
+        run: pnpm run coverage
+
+      - name: Fix lcov paths
+        run: |
+          if [ -f "coverage/lcov.info" ]; then
+            sed -i "s|^SF:|SF:|g" coverage/lcov.info
+          fi
+
+      - name: Run diff-cover analysis
+        id: diff_cover
+        run: |
+          echo "## 📊 Unit Test Coverage" > comment.md
+          echo "" >> comment.md
+
+          COVERAGE_THRESHOLD=80
+          all_passed=true
+
+          overall_coverage="N/A"
+          if [ -f "coverage/coverage-summary.json" ]; then
+            overall_coverage=$(jq -r '.total.lines.pct' "coverage/coverage-summary.json")
+          fi
+
+          diff-cover coverage/lcov.info \
+            --compare-branch=origin/${{ github.event.pull_request.base.ref }} \
+            --diff-range-notation=... \
+            --json-report diff-coverage.json \
+            --fail-under=0 || true
+
+          echo "**Overall coverage**: ${overall_coverage}%" >> comment.md
+          echo "" >> comment.md
+
+          if [ -f "diff-coverage.json" ]; then
+            total_lines=$(jq -r '.total_num_lines' diff-coverage.json)
+
+            if [ "$total_lines" != "0" ] && [ "$total_lines" != "null" ]; then
+              percent=$(jq -r '.total_percent_covered' diff-coverage.json)
+              violations=$(jq -r '.total_num_violations' diff-coverage.json)
+              covered=$((total_lines - violations))
+
+              if [ "$percent" -lt "$COVERAGE_THRESHOLD" ]; then
+                all_passed=false
+              fi
+
+              if [ "$percent" = "100" ]; then
+                emoji="✅"
+                status="PASS"
+              elif [ "$percent" -ge "$COVERAGE_THRESHOLD" ]; then
+                emoji="⚠️"
+                status="PASS"
+              else
+                emoji="❌"
+                status="FAIL"
+              fi
+
+              echo "**Diff coverage**: $emoji ${percent}% (${covered}/${total_lines} lines) - $status" >> comment.md
+              echo "" >> comment.md
+
+              if [ "$violations" != "0" ]; then
+                echo "<details>" >> comment.md
+                echo "<summary>🔍 Uncovered lines in diff</summary>" >> comment.md
+                echo "" >> comment.md
+                echo '```' >> comment.md
+                jq -r '.src_stats | to_entries[] | .key as $file | .value.violation_lines[] | "\($file):\(.)"' diff-coverage.json >> comment.md
+                echo '```' >> comment.md
+                echo "" >> comment.md
+                echo "</details>" >> comment.md
+              fi
+            else
+              echo "✨ No new testable lines in this PR" >> comment.md
+            fi
+          fi
+
+          echo "---" >> comment.md
+          echo "" >> comment.md
+          if [ "$all_passed" = true ]; then
+            echo "✅ **Coverage threshold met** (≥${COVERAGE_THRESHOLD}%)" >> comment.md
+          else
+            echo "❌ **Coverage threshold not met** (required: ≥${COVERAGE_THRESHOLD}%)" >> comment.md
+          fi
+
+          echo "all_passed=$all_passed" >> $GITHUB_OUTPUT
+
+      - name: Comment PR with coverage
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: comment.md
+
+      - name: Fail if coverage is below threshold
+        if: steps.diff_cover.outputs.all_passed == 'false'
+        run: |
+          echo "❌ Coverage check failed: Coverage below 80%"
+          exit 1
