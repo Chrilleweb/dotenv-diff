@@ -28,6 +28,12 @@ First-class support for SvelteKit and Next.js. Also works well in modern JavaScr
 
 ---
 
+## How It Works
+
+→ See [Capabilities Documentation](./docs/capabilities.md) for details on what the scanner checks for and how it works.
+
+---
+
 ## Configuration (`--init`)
 
 Generate a default configuration file:
