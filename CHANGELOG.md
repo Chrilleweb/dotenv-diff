@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
+## [2.6.4](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.3...v2.6.4) (2026-02-28)
+
+### 🐛 Bug Fixes
+
+* added support for mts and cts ([#288](https://github.com/Chrilleweb/dotenv-diff/issues/288)) ([93874bf](https://github.com/Chrilleweb/dotenv-diff/commit/93874bfeb67999b43bdcb87814fbc080c650f923))
+
+### 📝 Documentation
+
+* updated docs ([#287](https://github.com/Chrilleweb/dotenv-diff/issues/287)) ([d3f36f4](https://github.com/Chrilleweb/dotenv-diff/commit/d3f36f437748218028fe21843aa5b495d31c3639))
+
 ## [2.6.3](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.2...v2.6.3) (2026-02-26)
 
 ### 🐛 Bug Fixes
