@@ -120,7 +120,9 @@ export const DEFAULT_INCLUDE_EXTENSIONS = [
   '.vue',
   '.svelte',
   '.mjs',
+  '.mts',
   '.cjs',
+  '.cts',
 ];
 
 // Default patterns to exclude from scans

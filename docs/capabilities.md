@@ -32,7 +32,7 @@ import { MY_KEY } from '$env/static/public';
 MY_KEY
 ```
 
-Default scanned file types: .ts, .js, jsx, tsx, vue, .mjs, .cjs, .svelte
+Default scanned file types: .ts, .js, jsx, tsx, vue, .mjs, .mts, .cjs, .cts, .svelte
 
 ## What It Checks For
 

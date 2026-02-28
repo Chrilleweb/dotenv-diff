@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { scanFile } from '../../../../src/core/scan/scanFile';
+import { DEFAULT_INCLUDE_EXTENSIONS } from '../../../../src/core/scan/patterns';
 import type { ScanOptions } from '../../../../src/config/types';
 
 describe('scanFile - Pattern Detection', () => {
@@ -155,6 +156,27 @@ describe('scanFile - Pattern Detection', () => {
       expect(result[0]).toMatchObject({
         variable: 'MY_KEY',
         pattern: 'import.meta.env',
+      });
+    });
+  });
+
+  describe('Default include extensions', () => {
+    it('includes .mts in default scan extensions', () => {
+      expect(DEFAULT_INCLUDE_EXTENSIONS).toContain('.mts');
+    });
+
+    it('includes .cts in default scan extensions', () => {
+      expect(DEFAULT_INCLUDE_EXTENSIONS).toContain('.cts');
+    });
+
+    it('will detect patterns in .mts files', () => {
+      const code = 'const val = process.env.MY_KEY;';
+      const result = scanFile('test.mts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'MY_KEY',
+        pattern: 'process.env',
       });
     });
   });
