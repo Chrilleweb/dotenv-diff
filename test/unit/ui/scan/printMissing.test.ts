@@ -58,7 +58,7 @@ describe('printMissing', () => {
     expect(result).toBe(true);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.red('❌ Missing in .env.example:'),
+      chalk.red(' ERROR  Missing in .env.example (defined in code):'),
     );
 
     expect(
@@ -75,13 +75,13 @@ describe('printMissing', () => {
 
     expect(
       logSpy.mock.calls.some((call: [string]) =>
-        String(call[0]).includes('API_KEY: Line 10'),
+        String(call[0]).includes('10:1 API_KEY'),
       ),
     ).toBe(true);
 
     expect(
       logSpy.mock.calls.some((call: [string]) =>
-        String(call[0]).includes('SECRET: Line 20'),
+        String(call[0]).includes('20:1 SECRET'),
       ),
     ).toBe(true);
 
@@ -103,7 +103,7 @@ describe('printMissing', () => {
     printMissing(['A'], used, '');
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.red('❌ Missing in environment file:'),
+      chalk.red(' ERROR  Missing in environment file (defined in code):'),
     );
   });
 
@@ -114,6 +114,6 @@ describe('printMissing', () => {
 
     expect(result).toBe(true);
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.red('❌ Missing in .env:'));
+    expect(logSpy).toHaveBeenCalledWith(chalk.red(' ERROR  Missing in .env (defined in code):'));
   });
 });

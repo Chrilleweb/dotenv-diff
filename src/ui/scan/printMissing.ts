@@ -18,7 +18,10 @@ export function printMissing(
   if (missing.length === 0) return false;
 
   const fileType = comparedAgainst || 'environment file';
-  console.log(chalk.red(`❌ Missing in ${fileType}:`));
+  const label = chalk.bgRed.white.bold(' ERROR ');
+  console.log(
+    `${label} ${chalk.red(`Missing in ${fileType} (defined in code):`)}`,
+  );
 
   // Group by variable → find their usages
   const grouped = missing.reduce((acc: VariableUsages, variable: string) => {
@@ -43,11 +46,16 @@ export function printMissing(
 
   // Print grouped by file
   for (const [file, items] of byFile) {
-    console.log(chalk.bold(`   ${file}`));
+    console.log();
+    console.log(chalk.bold(`${file}`));
 
     for (const { variable, usage } of items) {
-      console.log(chalk.red(`    ${variable}: Line ${usage.line}`));
-      console.log(chalk.red.dim(`    ${usage.context.trim()}`));
+      const line = usage.line ?? 0;
+      const column = (usage as any).column ?? 0;
+
+      const position = column > 0 ? `${line}:${column}` : `${line}`;
+
+      console.log(`${chalk.gray(position)} ${chalk.red(variable)}`);
     }
   }
   console.log();
