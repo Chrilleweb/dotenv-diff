@@ -51,7 +51,7 @@ export function printMissing(
 
     for (const { variable, usage } of items) {
       const line = usage.line ?? 0;
-      const column = (usage as any).column ?? 0;
+      const column = (usage as EnvUsage).column ?? 0;
 
       const position = column > 0 ? `${line}:${column}` : `${line}`;
 
