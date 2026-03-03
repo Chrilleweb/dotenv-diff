@@ -84,6 +84,8 @@ export function printScanResult(
     scanResult.duplicates?.env ?? [],
     scanResult.duplicates?.example ?? [],
     isJson,
+    opts.fix ?? false,
+    opts.strict
   );
 
   // Print potential secrets found

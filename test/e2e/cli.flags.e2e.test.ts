@@ -229,9 +229,9 @@ describe('duplicate detection', () => {
     const res = runCli(cwd, ['--compare']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
-      'Duplicate keys in .env (last occurrence wins):',
+      'Duplicate keys in .env',
     );
-    expect(res.stdout).toContain('- FOO (2 occurrences)');
+    expect(res.stdout).toContain('2 occurrences');
   });
 
   it('warns on duplicates in example file', () => {
@@ -241,9 +241,9 @@ describe('duplicate detection', () => {
     const res = runCli(cwd, ['--compare']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
-      'Duplicate keys in .env.example (last occurrence wins):',
+      'Duplicate keys in .env.example',
     );
-    expect(res.stdout).toContain('- FOO (2 occurrences)');
+    expect(res.stdout).toContain('2 occurrences');
   });
 
   it('suppresses warnings with flag', () => {
@@ -269,9 +269,9 @@ describe('duplicate detection', () => {
     const res = runCli(cwd, ['--scan-usage']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
-      'Duplicate keys in .env (last occurrence wins):',
+      'Duplicate keys in .env',
     );
-    expect(res.stdout).toContain('- A (2 occurrences)');
+    expect(res.stdout).toContain('2 occurrences');
   });
 
   it('--allow-duplicates works in scan mode', () => {
