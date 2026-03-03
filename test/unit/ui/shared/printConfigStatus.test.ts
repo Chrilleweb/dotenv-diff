@@ -5,78 +5,55 @@ import {
 } from '../../../../src/ui/shared/printConfigStatus.js';
 
 describe('printConfigStatus', () => {
-  let consoleLogSpy: ReturnType<typeof vi.spyOn>;
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    consoleLogSpy.mockRestore();
-    consoleErrorSpy.mockRestore();
+    logSpy.mockRestore();
   });
 
   describe('printConfigLoaded', () => {
     it('prints success message with config file name', () => {
       printConfigLoaded('/path/to/dotenv-diff.config.json');
 
-      expect(consoleLogSpy).toHaveBeenCalledWith();
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Loaded config:'),
-      );
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('dotenv-diff.config.json'),
-      );
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Config'));
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Loaded'));
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('dotenv-diff.config.json'));
     });
   });
 
   describe('printConfigLoadError', () => {
     it('prints error message when Error instance is thrown', () => {
-      const error = new Error('Invalid JSON syntax');
-      printConfigLoadError(error);
+      const err = new Error('Invalid JSON syntax');
+      printConfigLoadError(err);
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to parse dotenv-diff.config.json'),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Invalid JSON syntax'),
-      );
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Config Error'));
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to parse'));
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid JSON syntax'));
     });
 
     it('prints error message when non-Error value is thrown', () => {
-      const error = 'Something went wrong';
-      printConfigLoadError(error);
+      printConfigLoadError('Something went wrong');
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to parse dotenv-diff.config.json'),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Something went wrong'),
-      );
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to parse'));
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Something went wrong'));
     });
 
     it('handles null as error value', () => {
       printConfigLoadError(null);
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to parse dotenv-diff.config.json'),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('null'),
-      );
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to parse'));
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('null'));
     });
 
     it('handles number as error value', () => {
       printConfigLoadError(404);
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to parse dotenv-diff.config.json'),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('404'),
-      );
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to parse'));
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('404'));
     });
   });
 });
