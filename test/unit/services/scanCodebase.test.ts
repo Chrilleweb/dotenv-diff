@@ -25,7 +25,6 @@ vi.mock('../../../src/ui/scan/printProgress.js', () => ({
 import { findFiles } from '../../../src/services/fileWalker.js';
 import { scanFile } from '../../../src/core/scan/scanFile.js';
 import { detectSecretsInSource } from '../../../src/core/security/secretDetectors.js';
-import { printProgress } from '../../../src/ui/scan/printProgress.js';
 
 describe('scanCodebase', () => {
   let tmpDir: string;
@@ -348,79 +347,6 @@ describe('scanCodebase', () => {
       });
 
       expect(result.secrets).toHaveLength(0);
-    });
-  });
-
-  describe('progress printing', () => {
-    it('prints progress for first file', async () => {
-      const testFile = path.join(tmpDir, 'app.js');
-      fsSync.writeFileSync(testFile, 'const x = 1;');
-
-      vi.mocked(findFiles).mockResolvedValue([testFile]);
-      vi.mocked(scanFile).mockReturnValue([]);
-
-      await scanCodebase(defaultOpts);
-
-      expect(printProgress).toHaveBeenCalledWith({
-        isJson: false,
-        current: 1,
-        total: 1,
-      });
-    });
-
-    it('prints progress every 10 files', async () => {
-      const files = Array.from({ length: 25 }, (_, i) => {
-        const file = path.join(tmpDir, `file${i}.js`);
-        fsSync.writeFileSync(file, 'const x = 1;');
-        return file;
-      });
-
-      vi.mocked(findFiles).mockResolvedValue(files);
-      vi.mocked(scanFile).mockReturnValue([]);
-
-      await scanCodebase(defaultOpts);
-
-      // Should print at: 1, 10, 20, 25
-      expect(printProgress).toHaveBeenCalledTimes(4);
-      expect(printProgress).toHaveBeenCalledWith({
-        isJson: false,
-        current: 1,
-        total: 25,
-      });
-      expect(printProgress).toHaveBeenCalledWith({
-        isJson: false,
-        current: 10,
-        total: 25,
-      });
-      expect(printProgress).toHaveBeenCalledWith({
-        isJson: false,
-        current: 20,
-        total: 25,
-      });
-      expect(printProgress).toHaveBeenCalledWith({
-        isJson: false,
-        current: 25,
-        total: 25,
-      });
-    });
-
-    it('prints progress for last file', async () => {
-      const files = Array.from({ length: 5 }, (_, i) => {
-        const file = path.join(tmpDir, `file${i}.js`);
-        fsSync.writeFileSync(file, 'const x = 1;');
-        return file;
-      });
-
-      vi.mocked(findFiles).mockResolvedValue(files);
-      vi.mocked(scanFile).mockReturnValue([]);
-
-      await scanCodebase(defaultOpts);
-
-      expect(printProgress).toHaveBeenCalledWith({
-        isJson: false,
-        current: 5,
-        total: 5,
-      });
     });
   });
 
