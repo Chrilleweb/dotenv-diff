@@ -74,7 +74,7 @@ export function printScanResult(
 
   // Unused
   if (opts.showUnused ?? true) {
-    printUnused(scanResult.unused, comparedAgainst);
+    printUnused(scanResult.unused, comparedAgainst, opts.strict);
   }
 
   // Duplicates

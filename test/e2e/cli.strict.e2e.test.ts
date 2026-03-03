@@ -35,7 +35,7 @@ describe('--strict mode', () => {
 
     const res = runCli(cwd, ['--strict']);
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Unused in codebase');
+    expect(res.stdout).toContain('▸ Unused in .env');
   });
 
   it('fails on duplicate variables in .env', () => {
