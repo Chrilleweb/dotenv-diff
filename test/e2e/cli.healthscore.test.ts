@@ -93,7 +93,7 @@ describe('Health Score', () => {
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain('Variables not using uppercase naming');
+    expect(res.stdout).toContain('▸ Uppercase warnings (.env)');
     expect(res.stdout).toContain('Project Health Score:');
 
     const match = res.stdout.match(/(\d{1,3})\/100/);

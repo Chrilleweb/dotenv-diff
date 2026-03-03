@@ -48,7 +48,6 @@ export function printMissing(
   }
 
   console.log(`${divider}`);
-  console.log();
 
   return true;
 }

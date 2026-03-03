@@ -61,7 +61,7 @@ export function printScanResult(
   }
 
   if (scanResult.uppercaseWarnings) {
-    printUppercaseWarning(scanResult.uppercaseWarnings, comparedAgainst);
+    printUppercaseWarning(scanResult.uppercaseWarnings, comparedAgainst, opts.strict);
   }
 
   if (scanResult.inconsistentNamingWarnings) {

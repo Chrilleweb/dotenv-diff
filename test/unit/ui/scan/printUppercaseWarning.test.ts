@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
 import { printUppercaseWarning } from '../../../../src/ui/scan/printUppercaseWarning.js';
+import {
+  accent,
+  error,
+  label,
+  value,
+  divider,
+  header,
+} from '../../../../src/ui/theme.js';
 import type { UppercaseWarning } from '../../../../src/config/types.js';
 
 describe('printUppercaseWarning', () => {
@@ -26,17 +33,31 @@ describe('printUppercaseWarning', () => {
 
     printUppercaseWarning(warnings, '.env');
 
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('Variables not using uppercase naming (.env):'),
+    expect(logSpy).toHaveBeenNthCalledWith(1);
+    expect(logSpy).toHaveBeenNthCalledWith(
+      2,
+      `${accent('▸')} ${header('Uppercase warnings (.env)')}`,
     );
-
-    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('   - apiKey'));
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow.dim('     Consider naming it: API_KEY'),
+    expect(logSpy).toHaveBeenNthCalledWith(3, `${divider}`);
+    expect(logSpy).toHaveBeenNthCalledWith(
+      4,
+      `${label('apiKey'.padEnd(26))}${value('API_KEY')}`,
     );
+    expect(logSpy).toHaveBeenNthCalledWith(5, `${divider}`);
+    expect(logSpy).toHaveBeenNthCalledWith(6);
+  });
 
-    expect(logSpy).toHaveBeenLastCalledWith();
+  it('prints with error accent in strict mode', () => {
+    const warnings: UppercaseWarning[] = [
+      { key: 'apiKey', suggestion: 'API_KEY' },
+    ];
+
+    printUppercaseWarning(warnings, '.env', true);
+
+    expect(logSpy).toHaveBeenNthCalledWith(
+      2,
+      `${error('▸')} ${header('Uppercase warnings (.env)')}`,
+    );
   });
 
   it('prints multiple uppercase warnings', () => {
@@ -47,10 +68,11 @@ describe('printUppercaseWarning', () => {
 
     printUppercaseWarning(warnings, '.env');
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('   - secretKey'));
-
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow.dim('     Consider naming it: SECRET_KEY'),
+      `${label('apiKey'.padEnd(26))}${value('API_KEY')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('secretKey'.padEnd(26))}${value('SECRET_KEY')}`,
     );
   });
 });
