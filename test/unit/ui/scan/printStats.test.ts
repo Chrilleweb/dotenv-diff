@@ -34,7 +34,7 @@ describe('printStats (scan)', () => {
     const label = chalk.hex('#888888');
     const value = chalk.hex('#e0e0e0').bold;
     const accent = chalk.hex('#00d4aa');
-    const divider = dim('─'.repeat(36));
+    const divider = dim('─'.repeat(46));
 
     // Leading blank line
     expect(logSpy).toHaveBeenNthCalledWith(1);

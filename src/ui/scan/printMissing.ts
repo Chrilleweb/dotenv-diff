@@ -44,7 +44,6 @@ export function printMissing(
     for (const { variable, usage } of items) {
       console.log(`${label(variable.padEnd(26))}${value(`${normalizePath(usage.file)}:${usage.line}`)}`);
     }
-    console.log();
   }
 
   console.log(`${divider}`);
