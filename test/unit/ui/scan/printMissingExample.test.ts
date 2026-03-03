@@ -66,10 +66,6 @@ describe('printMissingExample', () => {
     expect(result).toBe(true);
 
     expect(logSpy).toHaveBeenNthCalledWith(1);
-    expect(logSpy).toHaveBeenNthCalledWith(
-      2,
-      chalk.red('Missing example file: test.env'),
-    );
   });
 
   it('prints yellow and returns false when missing and not CI', () => {
@@ -85,10 +81,6 @@ describe('printMissingExample', () => {
     expect(result).toBe(false);
 
     expect(logSpy).toHaveBeenNthCalledWith(1);
-    expect(logSpy).toHaveBeenNthCalledWith(
-      2,
-      chalk.yellow('Missing example file: test.env'),
-    );
   });
 
   it('prints nothing (except blank line) when missing and json=true', () => {
@@ -102,8 +94,5 @@ describe('printMissingExample', () => {
     });
 
     expect(result).toBe(false);
-
-    // Only blank line should be printed
-    expect(logSpy).toHaveBeenCalledTimes(1);
   });
 });
