@@ -94,7 +94,7 @@ export function printScanResult(
   }
   // Console log usage warning
   if (scanResult.logged) {
-    printConsolelogWarning(scanResult.logged);
+    printConsolelogWarning(scanResult.logged, opts.strict);
   }
 
   // Expiration warnings

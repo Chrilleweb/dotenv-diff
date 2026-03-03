@@ -57,9 +57,9 @@ describe('Environment variable console.log detection', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Environment variables logged to console:');
+    expect(res.stdout).toContain('Environment variables logged to console');
     expect(res.stdout).toContain('API_URL');
-    expect(res.stdout).toContain('Logged at:');
+    expect(res.stdout).toContain('src/index.ts:1');
   });
 
   it('warns when multiple env vars are logged', () => {
@@ -120,8 +120,8 @@ describe('Environment variable console.log detection', () => {
 
     expect(res.stdout).toContain('DEBUG_FLAG');
 
-    // Should show 3 locations, but summarize the 4th
-    expect(res.stdout).toContain('... and 1 more locations');
+    // New compact overflow format
+    expect(res.stdout).toContain('+1 more');
   });
 
   it('strict mode: exits with code 1 when logs are found', () => {
@@ -169,7 +169,6 @@ describe('Environment variable console.log detection', () => {
     const res = runCli(cwd, ['--scan-usage']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('CROSS_PLATFORM_VAR');
-
-    expect(res.stdout).toContain('Logged at: src/crossPlatform.ts:1');
+    expect(res.stdout).toContain('src/crossPlatform.ts:1');
   });
 });
