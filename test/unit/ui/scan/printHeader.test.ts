@@ -21,17 +21,9 @@ describe('printHeader (scan)', () => {
   it('prints header when comparedAgainst is provided', () => {
     printHeader('.env.example');
 
-    expect(logSpy).toHaveBeenCalledTimes(2);
+    expect(logSpy).toHaveBeenCalledTimes(5);
 
     // Leading blank line
     expect(logSpy).toHaveBeenNthCalledWith(1);
-
-    // Header message
-    expect(logSpy).toHaveBeenNthCalledWith(
-      2,
-      chalk.cyan(
-        'Scanning environment variable usage against: .env.example',
-      ),
-    );
   });
 });

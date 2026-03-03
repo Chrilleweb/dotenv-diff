@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { accent, label, value, divider, header } from '../theme.js';
 
 /**
  * Prints the header for the scanning output.
@@ -6,10 +6,13 @@ import chalk from 'chalk';
  * @returns void
  */
 export function printHeader(comparedAgainst?: string): void {
-  if (comparedAgainst) {
-    console.log();
-    console.log(
-      chalk.white(`Scanning environment variable usage against: ${comparedAgainst}`),
-    );
-  }
+  if (!comparedAgainst) return;
+
+  console.log();
+  console.log(`${accent('▸')} ${header('dotenv-diff')}`);
+  console.log(`${divider}`);
+  console.log(
+    `${label('Comparing against'.padEnd(26))}${value(comparedAgainst)}`,
+  );
+  console.log(`${divider}`);
 }

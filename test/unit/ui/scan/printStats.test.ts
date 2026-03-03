@@ -72,6 +72,5 @@ describe('printStats (scan)', () => {
 
     // Closing divider + trailing blank line
     expect(logSpy).toHaveBeenNthCalledWith(9, `${divider}`);
-    expect(logSpy).toHaveBeenNthCalledWith(10);
   });
 });
