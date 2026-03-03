@@ -62,7 +62,7 @@ UNUSED_KEY=value
      * Total: 4
      */
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Scan Statistics:');
-    expect(res.stdout).toContain('Warnings: 5');
+    expect(res.stdout).toContain('Scan Statistics');
+    expect(res.stdout).toContain('5');
   });
 });

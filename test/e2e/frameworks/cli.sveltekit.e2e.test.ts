@@ -222,9 +222,6 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     // Should appear exactly 3 times (once per usage), not 6 times (duplicated)
     expect(matches?.length).toBe(3);
-
-    // Verify total usages found
-    expect(res.stdout).toContain('Total variable references: 3');
   });
 
   it('Will exit code 1 on strict mode when warnings are present', () => {

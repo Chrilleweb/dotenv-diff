@@ -30,42 +30,48 @@ describe('printStats (scan)', () => {
   it('prints scan statistics when showStats is true', () => {
     printStats(stats, true);
 
+    const dim = chalk.hex('#555555');
+    const label = chalk.hex('#888888');
+    const value = chalk.hex('#e0e0e0').bold;
+    const accent = chalk.hex('#00d4aa');
+    const divider = dim('─'.repeat(36));
+
     // Leading blank line
     expect(logSpy).toHaveBeenNthCalledWith(1);
 
     // Header
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.magenta('Scan Statistics:'),
+      `${accent('▸')} ${chalk.white.bold('Scan Statistics')}`,
     );
+
+    // Divider
+    expect(logSpy).toHaveBeenNthCalledWith(3, `${divider}`);
 
     // Values
     expect(logSpy).toHaveBeenNthCalledWith(
-      3,
-      chalk.magenta.dim('   Files scanned: 10'),
-    );
-
-    expect(logSpy).toHaveBeenNthCalledWith(
       4,
-      chalk.magenta.dim('   Total variable references: 50'),
+      `${label('Files scanned'.padEnd(26))}${value('10')}`,
     );
-
     expect(logSpy).toHaveBeenNthCalledWith(
       5,
-      chalk.magenta.dim('   Unique variables: 8'),
+      `${label('Variable references'.padEnd(26))}${value('50')}`,
     );
-
     expect(logSpy).toHaveBeenNthCalledWith(
       6,
-      chalk.magenta.dim('   Warnings: 3'),
+      `${label('Unique variables'.padEnd(26))}${value('8')}`,
     );
-
     expect(logSpy).toHaveBeenNthCalledWith(
       7,
-      chalk.magenta.dim('   Scan duration: 1.23s'),
+      `${label('Warnings'.padEnd(26))}${value('3')}`,
+    );
+    expect(logSpy).toHaveBeenNthCalledWith(
+      8,
+      `${label('Duration'.padEnd(26))}${value('1.23s')}`,
     );
 
-    // Trailing blank line
-    expect(logSpy).toHaveBeenNthCalledWith(8);
+    // Closing divider + trailing blank line
+    expect(logSpy).toHaveBeenNthCalledWith(9, `${divider}`);
+    expect(logSpy).toHaveBeenNthCalledWith(10);
   });
 });
