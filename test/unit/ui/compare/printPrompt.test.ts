@@ -21,7 +21,7 @@ describe('printPrompt', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       chalk.yellow(
-        '⚠️  No .env* or .env.example file found. Skipping comparison.',
+        'No .env* or .env.example file found. Skipping comparison.',
       ),
     );
   });
@@ -33,7 +33,7 @@ describe('printPrompt', () => {
     expect(logSpy).toHaveBeenNthCalledWith(1);
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.yellow('📄 .env.production file not found.'),
+      chalk.yellow('.env.production file not found.'),
     );
   });
 
@@ -44,7 +44,7 @@ describe('printPrompt', () => {
     expect(logSpy).toHaveBeenNthCalledWith(1);
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.gray('🚫 Skipping .env creation.'),
+      chalk.gray('Skipping .env creation.'),
     );
   });
 
@@ -55,7 +55,7 @@ describe('printPrompt', () => {
     expect(logSpy).toHaveBeenNthCalledWith(1);
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.green('✅ .env file created successfully from .env.example.'),
+      chalk.green('.env file created successfully from .env.example.'),
     );
   });
 
@@ -66,7 +66,7 @@ describe('printPrompt', () => {
     expect(logSpy).toHaveBeenNthCalledWith(1);
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.green('✅ .env.example file created successfully from .env.'),
+      chalk.green('.env.example file created successfully from .env.'),
     );
   });
 });

@@ -13,7 +13,7 @@ export function printInconsistentNamingWarning(
     return;
   }
 
-  console.log(chalk.yellow('⚠️  Inconsistent naming found:'));
+  console.log(chalk.yellow('Inconsistent naming found:'));
 
   for (const { key1, key2, suggestion } of warnings) {
     console.log(chalk.yellow(`   - ${chalk.cyan(key1)} ↔ ${chalk.cyan(key2)}`));

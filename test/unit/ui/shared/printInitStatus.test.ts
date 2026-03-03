@@ -27,7 +27,7 @@ describe('printInitSuccess', () => {
     // Success message
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.green('✅ Created dotenv-diff.config.json'),
+      chalk.green('Created dotenv-diff.config.json'),
     );
 
     // Path line
@@ -63,7 +63,7 @@ describe('printInitExists', () => {
     // Warning message
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.yellow('⚠️  dotenv-diff.config.json already exists.'),
+      chalk.yellow('dotenv-diff.config.json already exists.'),
     );
 
     // Path line

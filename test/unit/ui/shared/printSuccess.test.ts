@@ -21,7 +21,7 @@ describe('printSuccess', () => {
   it('prints compare success message', () => {
     printSuccess(false, 'compare');
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.green('✅ All keys match.'));
+    expect(logSpy).toHaveBeenCalledWith(chalk.green('All keys match.'));
 
     expect(logSpy).toHaveBeenLastCalledWith();
   });
@@ -31,7 +31,7 @@ describe('printSuccess', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.green(
-        '✅ All used environment variables are defined in .env.example',
+        'All used environment variables are defined in .env.example',
       ),
     );
 
@@ -42,7 +42,7 @@ describe('printSuccess', () => {
     printSuccess(false, 'scan', '.env.example', [], true);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.green('✅ No unused environment variables found'),
+      chalk.green('No unused environment variables found'),
     );
   });
 

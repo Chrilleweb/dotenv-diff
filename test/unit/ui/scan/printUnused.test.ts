@@ -23,7 +23,7 @@ describe('printUnused', () => {
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
-      chalk.yellow('⚠️  Unused in codebase (defined in .env):'),
+      chalk.yellow('Unused in codebase (defined in .env):'),
     );
 
     expect(logSpy).toHaveBeenNthCalledWith(2, chalk.yellow('   - API_KEY'));
@@ -37,7 +37,7 @@ describe('printUnused', () => {
     printUnused(['A'], '');
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Unused in codebase (defined in environment file):'),
+      chalk.yellow('Unused in codebase (defined in environment file):'),
     );
   });
 });

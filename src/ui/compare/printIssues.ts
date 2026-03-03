@@ -15,23 +15,23 @@ export function printIssues(
 ): void {
   if (json) return;
   if (filtered.missing.length && !fix) {
-    const header = chalk.red('❌ Missing keys:');
+    const header = chalk.red('Missing keys:');
     console.log(header);
     filtered.missing.forEach((key) => console.log(chalk.red(`  - ${key}`)));
     console.log();
   }
   if (filtered.extra?.length) {
-    console.log(chalk.yellow('⚠️  Extra keys (not in example):'));
+    console.log(chalk.yellow('Extra keys (not in example):'));
     filtered.extra.forEach((key) => console.log(chalk.yellow(`  - ${key}`)));
     console.log();
   }
   if (filtered.empty?.length) {
-    console.log(chalk.yellow('⚠️  Empty values:'));
+    console.log(chalk.yellow('Empty values:'));
     filtered.empty.forEach((key) => console.log(chalk.yellow(`  - ${key}`)));
     console.log();
   }
   if (filtered.mismatches?.length) {
-    console.log(chalk.yellow('⚠️  Value mismatches:'));
+    console.log(chalk.yellow('Value mismatches:'));
     filtered.mismatches.forEach(({ key, expected, actual }) =>
       console.log(
         chalk.yellow(`  - ${key}: expected '${expected}', but got '${actual}'`),

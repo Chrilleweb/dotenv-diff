@@ -36,7 +36,7 @@ describe('printStats (scan)', () => {
     // Header
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.magenta('📊 Scan Statistics:'),
+      chalk.magenta('Scan Statistics:'),
     );
 
     // Values

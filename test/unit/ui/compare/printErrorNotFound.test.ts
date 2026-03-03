@@ -20,7 +20,7 @@ describe('printErrorNotFound', () => {
 
     expect(consoleSpy).toHaveBeenNthCalledWith(
       1,
-      chalk.red('❌ Error: --env file not found: .env'),
+      chalk.red('Error: --env file not found: .env'),
     );
 
     expect(consoleSpy).toHaveBeenNthCalledWith(
@@ -38,7 +38,7 @@ describe('printErrorNotFound', () => {
 
     expect(consoleSpy).toHaveBeenNthCalledWith(
       1,
-      chalk.red('❌ Error: --example file not found: .env.example'),
+      chalk.red('Error: --example file not found: .env.example'),
     );
 
     expect(consoleSpy).toHaveBeenNthCalledWith(
@@ -56,12 +56,12 @@ describe('printErrorNotFound', () => {
 
     expect(consoleSpy).toHaveBeenNthCalledWith(
       1,
-      chalk.red('❌ Error: --env file not found: .env'),
+      chalk.red('Error: --env file not found: .env'),
     );
 
     expect(consoleSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.red('❌ Error: --example file not found: .env.example'),
+      chalk.red('Error: --example file not found: .env.example'),
     );
 
     expect(consoleSpy).toHaveBeenNthCalledWith(

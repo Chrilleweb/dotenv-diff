@@ -19,7 +19,7 @@ export function printSuccess(
   if (json) return;
 
   if (mode === 'compare') {
-    console.log(chalk.green('✅ All keys match.'));
+    console.log(chalk.green('All keys match.'));
     console.log();
     return;
   }
@@ -27,12 +27,12 @@ export function printSuccess(
   if (mode === 'scan' && comparedAgainst) {
     console.log(
       chalk.green(
-        `✅ All used environment variables are defined in ${comparedAgainst}`,
+        `All used environment variables are defined in ${comparedAgainst}`,
       ),
     );
 
     if (showUnused && unused.length === 0) {
-      console.log(chalk.green('✅ No unused environment variables found'));
+      console.log(chalk.green('No unused environment variables found'));
     }
     console.log();
   }

@@ -11,7 +11,7 @@ import { normalizePath } from '../../core/helpers/normalizePath.js';
 export function printConsolelogWarning(logged: EnvUsage[]): boolean {
   if (!logged || logged.length === 0) return false;
 
-  console.log(chalk.yellow(`⚠️  Environment variables logged to console:`));
+  console.log(chalk.yellow(`Environment variables logged to console:`));
 
   const grouped = logged.reduce((acc: VariableUsages, entry) => {
     if (!acc[entry.variable]) acc[entry.variable] = [];

@@ -38,7 +38,7 @@ describe('printFrameworkWarnings', () => {
     printFrameworkWarnings(warnings);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Framework issues (Next.js):'),
+      chalk.yellow('Framework issues (Next.js):'),
     );
 
     expect(logSpy).toHaveBeenCalledWith(
@@ -62,7 +62,7 @@ describe('printFrameworkWarnings', () => {
     printFrameworkWarnings(warnings);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Framework issues (SvelteKit):'),
+      chalk.yellow('Framework issues (SvelteKit):'),
     );
   });
 

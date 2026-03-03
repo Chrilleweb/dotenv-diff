@@ -22,7 +22,7 @@ describe('printGitignoreWarning', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.yellow(
-        `⚠️  No .gitignore found – your .env may be committed.\n` +
+        `No .gitignore found – your .env may be committed.\n` +
           `   Add:\n` +
           `     .env\n`,
       ),
@@ -37,7 +37,7 @@ describe('printGitignoreWarning', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.yellow(
-        `⚠️  .env is not ignored by Git (.gitignore).\n` +
+        `.env is not ignored by Git (.gitignore).\n` +
           `   Consider adding:\n` +
           `     .env\n`,
       ),

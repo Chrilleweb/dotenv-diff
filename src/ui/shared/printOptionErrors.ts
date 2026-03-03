@@ -13,7 +13,7 @@ export function printInvalidCategory(
 ): never {
   console.error(
     chalk.red(
-      `❌ Error: invalid ${flagName} value(s): ${bad.join(', ')}.\n` +
+      `Error: invalid ${flagName} value(s): ${bad.join(', ')}.\n` +
         `   Allowed: ${allowed.join(', ')}`,
     ),
   );
@@ -26,7 +26,7 @@ export function printInvalidCategory(
  */
 export function printInvalidRegex(pattern: string): never {
   console.error(
-    chalk.red(`❌ Error: invalid --ignore-regex pattern: ${pattern}`),
+    chalk.red(`Error: invalid --ignore-regex pattern: ${pattern}`),
   );
   process.exit(1);
 }
@@ -37,6 +37,6 @@ export function printInvalidRegex(pattern: string): never {
  */
 export function printCiYesWarning(): void {
   console.log(
-    chalk.yellow('⚠️  Both --ci and --yes provided; proceeding with --yes.'),
+    chalk.yellow('Both --ci and --yes provided; proceeding with --yes.'),
   );
 }

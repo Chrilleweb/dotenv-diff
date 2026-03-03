@@ -16,13 +16,13 @@ export function printErrorNotFound(
 ): void {
   if (!envExists) {
     console.error(
-      chalk.red(`❌ Error: --env file not found: ${path.basename(envFlag)}`),
+      chalk.red(`Error: --env file not found: ${path.basename(envFlag)}`),
     );
   }
   if (!exExists) {
     console.error(
       chalk.red(
-        `❌ Error: --example file not found: ${path.basename(exampleFlag)}`,
+        `Error: --example file not found: ${path.basename(exampleFlag)}`,
       ),
     );
   }

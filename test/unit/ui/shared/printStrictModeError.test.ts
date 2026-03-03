@@ -57,7 +57,7 @@ describe('printStrictModeError', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.red(
-        '💥 Strict mode: Error on warnings → ' +
+        'Strict mode: Error on warnings → ' +
           [
             'unused variables',
             'duplicate keys in env',

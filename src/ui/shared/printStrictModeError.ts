@@ -50,7 +50,7 @@ export function printStrictModeError(
   if (warnings.length === 0) return false;
 
   console.log(
-    chalk.red(`💥 Strict mode: Error on warnings → ${warnings.join(', ')}`),
+    chalk.red(`Strict mode: Error on warnings → ${warnings.join(', ')}`),
   );
   console.log();
 

@@ -26,7 +26,7 @@ describe('printInvalidCategory', () => {
 
     expect(errorSpy).toHaveBeenCalledWith(
       chalk.red(
-        `❌ Error: invalid --only value(s): bad1, bad2.\n` +
+        `Error: invalid --only value(s): bad1, bad2.\n` +
           `   Allowed: allowed1, allowed2`,
       ),
     );
@@ -54,7 +54,7 @@ describe('printInvalidRegex', () => {
     printInvalidRegex('[abc');
 
     expect(errorSpy).toHaveBeenCalledWith(
-      chalk.red('❌ Error: invalid --ignore-regex pattern: [abc'),
+      chalk.red('Error: invalid --ignore-regex pattern: [abc'),
     );
 
     expect(exitSpy).toHaveBeenCalledWith(1);
@@ -76,7 +76,7 @@ describe('printCiYesWarning', () => {
     printCiYesWarning();
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Both --ci and --yes provided; proceeding with --yes.'),
+      chalk.yellow('Both --ci and --yes provided; proceeding with --yes.'),
     );
   });
 });

@@ -37,7 +37,7 @@ describe('printExampleWarnings', () => {
     printExampleWarnings(warnings);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('🚨 Potential real secrets found in .env.example:'),
+      chalk.yellow('Potential real secrets found in .env.example:'),
     );
 
     expect(logSpy).toHaveBeenCalledWith(

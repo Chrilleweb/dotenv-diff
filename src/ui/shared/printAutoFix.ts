@@ -16,7 +16,7 @@ export function printAutoFix(
   if (json) return;
 
   if (result.fixApplied) {
-    console.log(chalk.green('✅ Auto-fix applied:'));
+    console.log(chalk.green('Auto-fix applied:'));
     if (result.removedDuplicates.length) {
       console.log(
         chalk.green(
@@ -35,7 +35,7 @@ export function printAutoFix(
       console.log(chalk.green(`  - Added ${envName} to .gitignore`));
     }
   } else {
-    console.log(chalk.green('✅ Auto-fix applied: no changes needed.'));
+    console.log(chalk.green('Auto-fix applied: no changes needed.'));
   }
   console.log();
 }

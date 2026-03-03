@@ -34,7 +34,7 @@ describe('printIssues', () => {
 
     printIssues(filtered, false, false);
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.red('❌ Missing keys:'));
+    expect(logSpy).toHaveBeenCalledWith(chalk.red('Missing keys:'));
     expect(logSpy).toHaveBeenCalledWith(chalk.red('  - A'));
     expect(logSpy).toHaveBeenCalledWith(chalk.red('  - B'));
   });
@@ -59,7 +59,7 @@ describe('printIssues', () => {
     printIssues(filtered, false);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Extra keys (not in example):'),
+      chalk.yellow('Extra keys (not in example):'),
     );
     expect(logSpy).toHaveBeenCalledWith(chalk.yellow('  - X'));
   });
@@ -72,7 +72,7 @@ describe('printIssues', () => {
 
     printIssues(filtered, false);
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('⚠️  Empty values:'));
+    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('Empty values:'));
     expect(logSpy).toHaveBeenCalledWith(chalk.yellow('  - EMPTY_KEY'));
   });
 
@@ -90,7 +90,7 @@ describe('printIssues', () => {
 
     printIssues(filtered, false);
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('⚠️  Value mismatches:'));
+    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('Value mismatches:'));
     expect(logSpy).toHaveBeenCalledWith(
       chalk.yellow("  - API_KEY: expected '123', but got '456'"),
     );

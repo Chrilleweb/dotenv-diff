@@ -26,7 +26,7 @@ describe('printHealthScore', () => {
     expect(result).toBe(true);
 
     expect(logSpy).toHaveBeenCalledWith(
-      `💚 ${chalk.green('Project Health Score:')} (95/100)`,
+      `${chalk.green('Project Health Score:')} (95/100)`,
     );
 
     expect(logSpy).toHaveBeenCalledWith(
@@ -38,7 +38,7 @@ describe('printHealthScore', () => {
     printHealthScore(80, false);
 
     expect(logSpy).toHaveBeenCalledWith(
-      `💛 ${chalk.yellow('Project Health Score:')} (80/100)`,
+      `${chalk.yellow('Project Health Score:')} (80/100)`,
     );
 
     expect(logSpy).toHaveBeenCalledWith(`   ${chalk.yellow('Can improve')}`);
@@ -48,7 +48,7 @@ describe('printHealthScore', () => {
     printHealthScore(60, false);
 
     expect(logSpy).toHaveBeenCalledWith(
-      `🧡 ${chalk.redBright('Project Health Score:')} (60/100)`,
+      `${chalk.redBright('Project Health Score:')} (60/100)`,
     );
 
     expect(logSpy).toHaveBeenCalledWith(
@@ -60,7 +60,7 @@ describe('printHealthScore', () => {
     printHealthScore(30, false);
 
     expect(logSpy).toHaveBeenCalledWith(
-      `🚨 ${chalk.red('Project Health Score:')} (30/100)`,
+      `${chalk.red('Project Health Score:')} (30/100)`,
     );
 
     expect(logSpy).toHaveBeenCalledWith(`   ${chalk.red('Poor health')}`);

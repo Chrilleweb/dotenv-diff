@@ -12,10 +12,10 @@ export function printComparisonError(
   shouldExit: boolean,
   json: boolean,
 ): { exit: boolean } {
-  const errorMessage = `⚠️  ${message}`;
+  const errorMessage = `${message}`;
 
   if (shouldExit) {
-    console.log(chalk.red(errorMessage.replace('⚠️', '❌')));
+    console.log(chalk.red(errorMessage));
     return { exit: true };
   }
 

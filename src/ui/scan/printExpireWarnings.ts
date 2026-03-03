@@ -10,7 +10,7 @@ import type { ExpireWarning } from '../../config/types.js';
 export function printExpireWarnings(warnings: ExpireWarning[]) {
   if (warnings.length === 0) return;
 
-  console.log(chalk.yellow('⚠️  Expiration warnings:'));
+  console.log(chalk.yellow('Expiration warnings:'));
 
   for (const warn of warnings) {
     const severity =

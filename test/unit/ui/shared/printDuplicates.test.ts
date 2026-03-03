@@ -29,7 +29,7 @@ describe('printDuplicates', () => {
     );
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Duplicate keys in .env (last occurrence wins):'),
+      chalk.yellow('Duplicate keys in .env (last occurrence wins):'),
     );
 
     expect(logSpy).toHaveBeenCalledWith(
@@ -71,7 +71,7 @@ describe('printDuplicates', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.yellow(
-        '⚠️  Duplicate keys in .env.example (last occurrence wins):',
+        'Duplicate keys in .env.example (last occurrence wins):',
       ),
     );
 

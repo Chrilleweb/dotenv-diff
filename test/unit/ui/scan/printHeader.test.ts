@@ -30,7 +30,7 @@ describe('printHeader (scan)', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       chalk.cyan(
-        '📋 Scanning environment variable usage against: .env.example',
+        'Scanning environment variable usage against: .env.example',
       ),
     );
   });

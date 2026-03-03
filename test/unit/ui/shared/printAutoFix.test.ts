@@ -36,7 +36,7 @@ describe('printAutoFix', () => {
 
     printAutoFix(context, '.env', false);
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.green('✅ Auto-fix applied:'));
+    expect(logSpy).toHaveBeenCalledWith(chalk.green('Auto-fix applied:'));
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.green('  - Removed 2 duplicate keys from .env: A, B'),
@@ -84,7 +84,7 @@ describe('printAutoFix', () => {
     printAutoFix(context, '.env', false);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.green('✅ Auto-fix applied: no changes needed.'),
+      chalk.green('Auto-fix applied: no changes needed.'),
     );
   });
 

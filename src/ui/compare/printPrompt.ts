@@ -19,26 +19,26 @@ export const printPrompt = {
     console.log();
     console.log(
       chalk.yellow(
-        '⚠️  No .env* or .env.example file found. Skipping comparison.',
+        'No .env* or .env.example file found. Skipping comparison.',
       ),
     );
   },
 
   missingEnv(envPath: string) {
     console.log();
-    console.log(chalk.yellow(`📄 ${path.basename(envPath)} file not found.`));
+    console.log(chalk.yellow(`${path.basename(envPath)} file not found.`));
   },
 
   skipCreation(fileType: string) {
     console.log();
-    console.log(chalk.gray(`🚫 Skipping ${fileType} creation.`));
+    console.log(chalk.gray(`Skipping ${fileType} creation.`));
   },
 
   envCreated(envPath: string, examplePath: string) {
     console.log();
     console.log(
       chalk.green(
-        `✅ ${path.basename(envPath)} file created successfully from ${path.basename(examplePath)}.`,
+        `${path.basename(envPath)} file created successfully from ${path.basename(examplePath)}.`,
       ),
     );
   },
@@ -47,7 +47,7 @@ export const printPrompt = {
     console.log();
     console.log(
       chalk.green(
-        `✅ ${path.basename(examplePath)} file created successfully from ${path.basename(envPath)}.`,
+        `${path.basename(examplePath)} file created successfully from ${path.basename(envPath)}.`,
       ),
     );
   },

@@ -9,7 +9,7 @@ export function printHeader(comparedAgainst?: string): void {
   if (comparedAgainst) {
     console.log();
     console.log(
-      chalk.cyan(`📋 Scanning environment variable usage against: ${comparedAgainst}`),
+      chalk.white(`Scanning environment variable usage against: ${comparedAgainst}`),
     );
   }
 }

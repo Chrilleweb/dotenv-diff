@@ -15,6 +15,6 @@ export function printHeader(
 ): void {
   if (json) return;
   console.log();
-  console.log(chalk.blue(`🔍 Comparing ${envName} ↔ ${exampleName}...`));
+  console.log(chalk.blue(`Comparing ${envName} ↔ ${exampleName}...`));
   console.log();
 }

@@ -15,7 +15,7 @@ export function printUppercaseWarning(
 
   console.log(
     chalk.yellow(
-      `⚠️  Variables not using uppercase naming (${comparedAgainst}):`,
+      `Variables not using uppercase naming (${comparedAgainst}):`,
     ),
   );
 

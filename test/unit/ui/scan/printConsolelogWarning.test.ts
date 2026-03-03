@@ -49,7 +49,7 @@ describe('printConsolelogWarning', () => {
     expect(result).toBe(true);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Environment variables logged to console:'),
+      chalk.yellow('Environment variables logged to console:'),
     );
 
     expect(logSpy).toHaveBeenCalledWith(chalk.yellow('   - API_KEY'));

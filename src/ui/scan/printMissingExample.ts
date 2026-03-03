@@ -24,12 +24,12 @@ export function printMissingExample(opts: ScanUsageOptions): boolean {
   console.log();
 
   if (opts.isCiMode) {
-    console.log(chalk.red(`❌ ${msgText}`));
+    console.log(chalk.red(`${msgText}`));
     return true;
   }
 
   if (!opts.json) {
-    console.log(chalk.yellow(`⚠️  ${msgText}`));
+    console.log(chalk.yellow(`${msgText}`));
   }
 
   return false;

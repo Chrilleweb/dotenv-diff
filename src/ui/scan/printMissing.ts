@@ -18,7 +18,7 @@ export function printMissing(
   if (missing.length === 0) return false;
 
   const fileType = comparedAgainst || 'environment file';
-  console.log(chalk.red(`❌ Missing in ${fileType}:`));
+  console.log(chalk.red(`Missing in ${fileType}:`));
 
   // Group by variable → find their usages
   const grouped = missing.reduce((acc: VariableUsages, variable: string) => {

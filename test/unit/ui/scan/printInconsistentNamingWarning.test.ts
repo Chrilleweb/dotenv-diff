@@ -31,7 +31,7 @@ describe('printInconsistentNamingWarning', () => {
     printInconsistentNamingWarning(warnings);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Inconsistent naming found:'),
+      chalk.yellow('Inconsistent naming found:'),
     );
 
     expect(logSpy).toHaveBeenCalledWith(

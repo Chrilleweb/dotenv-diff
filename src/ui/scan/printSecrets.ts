@@ -43,7 +43,7 @@ export function printSecrets(secrets: SecretFinding[]): void {
     (a, b) => severityOrder[a.severity] - severityOrder[b.severity],
   );
 
-  console.log(chalk.yellow('🔒 Potential secrets detected in codebase:'));
+  console.log(chalk.yellow('Potential secrets detected in codebase:'));
 
   // Group by file
   const byFile = new Map<string, SecretFinding[]>();

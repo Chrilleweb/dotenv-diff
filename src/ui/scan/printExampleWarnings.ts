@@ -10,7 +10,7 @@ export function printExampleWarnings(
 ): void {
   if (!warnings || warnings.length === 0) return;
 
-  console.log(chalk.yellow('🚨 Potential real secrets found in .env.example:'));
+  console.log(chalk.yellow('Potential real secrets found in .env.example:'));
   for (const w of warnings) {
     console.log(
       chalk.yellow(

@@ -11,28 +11,24 @@ export function printHealthScore(
   json: boolean = false,
 ): boolean {
   let color = chalk.green;
-  let emoji = '💚';
   let label = 'Excellent health';
 
   if (json) return false;
 
   if (score < 90) {
     color = chalk.yellow;
-    emoji = '💛';
     label = 'Can improve';
   }
   if (score < 70) {
     color = chalk.redBright;
-    emoji = '🧡';
     label = 'Needs attention';
   }
   if (score < 40) {
     color = chalk.red;
-    emoji = '🚨';
     label = 'Poor health';
   }
 
-  console.log(`${emoji} ${color('Project Health Score:')} (${score}/100)`);
+  console.log(`${color('Project Health Score:')} (${score}/100)`);
   console.log(`   ${color(label)}`); 
   console.log('');
   return true;

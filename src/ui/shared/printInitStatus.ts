@@ -7,7 +7,7 @@ import chalk from 'chalk';
  */
 export function printInitSuccess(path: string): void {
   console.log();
-  console.log(chalk.green('✅ Created dotenv-diff.config.json'));
+  console.log(chalk.green('Created dotenv-diff.config.json'));
   console.log(chalk.dim(`   → ${path}`));
   console.log();
 }
@@ -19,7 +19,7 @@ export function printInitSuccess(path: string): void {
  */
 export function printInitExists(path: string): void {
   console.log();
-  console.log(chalk.yellow('⚠️  dotenv-diff.config.json already exists.'));
+  console.log(chalk.yellow('dotenv-diff.config.json already exists.'));
   console.log(chalk.dim(`   → ${path}`));
   console.log();
 }

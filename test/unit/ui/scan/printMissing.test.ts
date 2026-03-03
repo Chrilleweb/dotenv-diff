@@ -58,7 +58,7 @@ describe('printMissing', () => {
     expect(result).toBe(true);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.red('❌ Missing in .env.example:'),
+      chalk.red('Missing in .env.example:'),
     );
 
     expect(
@@ -103,7 +103,7 @@ describe('printMissing', () => {
     printMissing(['A'], used, '');
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.red('❌ Missing in environment file:'),
+      chalk.red('Missing in environment file:'),
     );
   });
 
@@ -114,6 +114,6 @@ describe('printMissing', () => {
 
     expect(result).toBe(true);
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.red('❌ Missing in .env:'));
+    expect(logSpy).toHaveBeenCalledWith(chalk.red('Missing in .env:'));
   });
 });

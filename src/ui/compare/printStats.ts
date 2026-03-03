@@ -37,7 +37,7 @@ export function printStats(
   checkValues: boolean,
 ): void {
   if (json || !showStats) return;
-  console.log(chalk.magenta('📊 Compare Statistics:'));
+  console.log(chalk.magenta('Compare Statistics:'));
   console.log(chalk.magenta.dim(`   Keys in ${envName}: ${s.envCount}`));
   console.log(
     chalk.magenta.dim(`   Keys in ${exampleName}: ${s.exampleCount}`),

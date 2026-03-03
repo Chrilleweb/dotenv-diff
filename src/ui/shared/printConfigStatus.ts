@@ -10,7 +10,7 @@ export function printConfigLoaded(filePath: string): void {
   const fileName = path.basename(filePath);
 
   console.log();
-  console.log(`${chalk.cyan('🧩 Loaded config:')} ${chalk.dim(fileName)}`);
+  console.log(`${chalk.white('Loaded config:')} ${chalk.dim(fileName)}`);
 }
 
 /**
@@ -19,7 +19,7 @@ export function printConfigLoaded(filePath: string): void {
  * @returns void
  */
 export function printConfigLoadError(error: unknown): void {
-  console.error(chalk.red('❌ Failed to parse dotenv-diff.config.json:'));
+  console.error(chalk.red('Failed to parse dotenv-diff.config.json:'));
   if (error instanceof Error) {
     console.error(chalk.red(`  ${error.message}`));
   } else {

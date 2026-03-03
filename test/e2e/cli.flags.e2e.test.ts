@@ -341,7 +341,7 @@ describe('duplicate detection', () => {
 
       expect(res.status).toBe(1);
       expect(res.stdout).toContain('Comparing .env ↔ .env.example');
-      expect(res.stdout).toContain('❌ Missing keys:');
+      expect(res.stdout).toContain('Missing keys:');
       expect(res.stdout).not.toContain('Extra keys');
     });
     it('warns on flag only extra', () => {
@@ -353,8 +353,8 @@ describe('duplicate detection', () => {
 
       expect(res.status).toBe(0);
       expect(res.stdout).toContain('Comparing .env ↔ .env.example');
-      expect(res.stdout).not.toContain('❌ Missing keys:');
-      expect(res.stdout).toContain('⚠️  Extra keys (not in example):');
+      expect(res.stdout).not.toContain('Missing keys:');
+      expect(res.stdout).toContain('Extra keys (not in example):');
     });
   });
   describe('--fix flag', () => {

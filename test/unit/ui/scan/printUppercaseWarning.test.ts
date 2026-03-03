@@ -27,7 +27,7 @@ describe('printUppercaseWarning', () => {
     printUppercaseWarning(warnings, '.env');
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Variables not using uppercase naming (.env):'),
+      chalk.yellow('Variables not using uppercase naming (.env):'),
     );
 
     expect(logSpy).toHaveBeenCalledWith(chalk.yellow('   - apiKey'));

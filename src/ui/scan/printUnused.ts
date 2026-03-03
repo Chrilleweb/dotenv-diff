@@ -11,7 +11,7 @@ export function printUnused(unused: string[], comparedAgainst: string): void {
   if (unused.length === 0) return;
 
   const fileType = comparedAgainst || 'environment file';
-  console.log(chalk.yellow(`⚠️  Unused in codebase (defined in ${fileType}):`));
+  console.log(chalk.yellow(`Unused in codebase (defined in ${fileType}):`));
 
   unused.forEach((variable) => {
     console.log(chalk.yellow(`   - ${variable}`));

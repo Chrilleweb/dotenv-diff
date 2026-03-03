@@ -61,7 +61,7 @@ describe('printSecrets', () => {
 
     // Header printed
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('🔒 Potential secrets detected in codebase:'),
+      chalk.yellow('Potential secrets detected in codebase:'),
     );
 
     // Files grouped and normalized

@@ -352,7 +352,6 @@ describe('no-flag autoscan', () => {
 
     expect(res.status).toBe(0);
 
-    expect(res.stdout).toContain('🔍');
     expect(res.stdout).toMatch(/█|░/);
 
     expect(res.stdout).toContain('Scan Statistics');

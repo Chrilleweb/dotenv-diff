@@ -21,7 +21,7 @@ export function printDuplicates(
   if (json) return;
   if (dEnv.length && !fix) {
     console.log(
-      chalk.yellow(`⚠️  Duplicate keys in ${envName} (last occurrence wins):`),
+      chalk.yellow(`Duplicate keys in ${envName} (last occurrence wins):`),
     );
     dEnv.forEach(({ key, count }) =>
       console.log(chalk.yellow(`    - ${key} (${count} occurrences)`)),
@@ -31,7 +31,7 @@ export function printDuplicates(
   if (dEx.length) {
     console.log(
       chalk.yellow(
-        `⚠️  Duplicate keys in ${exampleName} (last occurrence wins):`,
+        `Duplicate keys in ${exampleName} (last occurrence wins):`,
       ),
     );
     dEx.forEach(({ key, count }) =>

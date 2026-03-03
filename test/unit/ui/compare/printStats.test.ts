@@ -61,7 +61,7 @@ describe('printStats', () => {
     printStats('.env', '.env.example', baseStats, filtered, false, true, true);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta('📊 Compare Statistics:'),
+      chalk.magenta('Compare Statistics:'),
     );
 
     expect(logSpy).toHaveBeenCalledWith(

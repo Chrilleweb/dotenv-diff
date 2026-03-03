@@ -68,7 +68,7 @@ describe('printMissingExample', () => {
     expect(logSpy).toHaveBeenNthCalledWith(1);
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.red('❌ Missing example file: test.env'),
+      chalk.red('Missing example file: test.env'),
     );
   });
 
@@ -87,7 +87,7 @@ describe('printMissingExample', () => {
     expect(logSpy).toHaveBeenNthCalledWith(1);
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.yellow('⚠️  Missing example file: test.env'),
+      chalk.yellow('Missing example file: test.env'),
     );
   });
 

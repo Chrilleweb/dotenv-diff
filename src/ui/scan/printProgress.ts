@@ -51,7 +51,7 @@ export function printProgress(options: ProgressOptions): void {
   const countLabel = chalk.dim(`(${clampedCurrent}/${total} files)`);
 
   process.stdout.write(
-    `\r${chalk.cyan('🔍 ' + label)} ${chalk.dim('▸')} [${bar}] ${percentLabel} ${countLabel}`,
+    `\r${chalk.white(label)} ${chalk.dim('▸')} [${bar}] ${percentLabel} ${countLabel}`,
   );
 
   if (clampedCurrent === total) {
