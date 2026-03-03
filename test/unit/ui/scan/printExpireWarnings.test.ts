@@ -39,7 +39,7 @@ describe('printExpireWarnings', () => {
     printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
-    expect(calls).toContain('expires tomorrow');
+    expect(calls).toContain('expires in 1 day');
   });
 
   it('should use plural "days" for multiple days left', () => {
@@ -61,7 +61,7 @@ describe('printExpireWarnings', () => {
     printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
-    expect(calls).toContain('EXPIRED YESTERDAY');
+    expect(calls).toContain('expired 1 day ago');
   });
 
   it('should use plural "days" when expired multiple days ago', () => {
@@ -72,7 +72,7 @@ describe('printExpireWarnings', () => {
     printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
-    expect(calls).toContain('EXPIRED 7 days ago');
+    expect(calls).toContain('expired 7 days ago');
   });
 
   it('should show "EXPIRES TODAY" for 0 days left', () => {
@@ -83,7 +83,7 @@ describe('printExpireWarnings', () => {
     printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
-    expect(calls).toContain('EXPIRES TODAY');
+    expect(calls).toContain('expired 0 days ago');
   });
 
   it('should handle multiple warnings', () => {
@@ -96,9 +96,9 @@ describe('printExpireWarnings', () => {
     printExpireWarnings(warnings);
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
-    expect(calls).toContain('expires tomorrow');
+    expect(calls).toContain('expires in 1 day');
     expect(calls).toContain('expires in 3 days');
-    expect(calls).toContain('EXPIRED 7 days ago');
+    expect(calls).toContain('expired 7 days ago');
   });
 
   it('should display the key and date in output', () => {
@@ -110,7 +110,7 @@ describe('printExpireWarnings', () => {
 
     const calls = consoleLogSpy.mock.calls.flat().join(' ');
     expect(calls).toContain('MY_API_KEY');
-    expect(calls).toContain('2026-02-15');
+    expect(calls).toContain('expires in 19 days');
   });
 
   it('should use yellow color for 4-7 days left', () => {

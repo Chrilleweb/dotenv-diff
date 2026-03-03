@@ -6,7 +6,7 @@ import type {
   ExitResult,
   FixContext,
 } from '../config/types.js';
-import { DEFAULT_ENV_FILE } from '../config/constants.js';
+import { DEFAULT_ENV_FILE, EXPIRE_THRESHOLD_DAYS } from '../config/constants.js';
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
 import { printMissing } from '../ui/scan/printMissing.js';
@@ -162,7 +162,7 @@ export function printScanResult(
         frameworkWarnings: scanResult.frameworkWarnings?.length ?? 0,
         logged: scanResult.logged?.length ?? 0,
         uppercaseWarnings: scanResult.uppercaseWarnings?.length ?? 0,
-        expireWarnings: scanResult.expireWarnings?.length ?? 0,
+        expireWarnings: scanResult.expireWarnings?.filter((w) => w.daysLeft <= EXPIRE_THRESHOLD_DAYS).length ?? 0,
         inconsistentNamingWarnings:
           scanResult.inconsistentNamingWarnings?.length ?? 0,
       },
