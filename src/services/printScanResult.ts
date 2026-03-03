@@ -65,7 +65,7 @@ export function printScanResult(
   }
 
   if (scanResult.inconsistentNamingWarnings) {
-    printInconsistentNamingWarning(scanResult.inconsistentNamingWarnings);
+    printInconsistentNamingWarning(scanResult.inconsistentNamingWarnings, opts.strict);
   }
 
   if (scanResult.exampleWarnings) {

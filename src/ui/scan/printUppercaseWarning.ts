@@ -26,5 +26,4 @@ export function printUppercaseWarning(
   }
 
   console.log(`${divider}`);
-  console.log();
 }

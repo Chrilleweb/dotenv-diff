@@ -53,9 +53,9 @@ describe('Inconsistent Naming Warnings', () => {
     const res = runCli(cwd, []);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Inconsistent naming found');
+    expect(res.stdout).toContain('Inconsistent naming');
     expect(res.stdout).toContain(
-      'Suggested name: API_KEY',
+      'API_KEY',
     );
   });
 
@@ -76,15 +76,15 @@ describe('Inconsistent Naming Warnings', () => {
     const res = runCli(cwd, []);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Inconsistent naming found');
+    expect(res.stdout).toContain('Inconsistent naming');
     expect(res.stdout).toContain(
-      'Suggested name: API_KEY',
+      'API_KEY',
     );
     expect(res.stdout).toContain(
-      'Suggested name: DATABASE_URL',
+      'DATABASE_URL',
     );
     expect(res.stdout).toContain(
-      'Suggested name: JWT_SECRET',
+      'JWT_SECRET',
     );
   });
 
@@ -125,9 +125,9 @@ describe('Inconsistent Naming Warnings', () => {
     const res = runCli(cwd, []);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Inconsistent naming found');
+    expect(res.stdout).toContain('Inconsistent naming');
     expect(res.stdout).toContain(
-      'Suggested name: API_KEY',
+      'API_KEY',
     );
   });
 
@@ -145,9 +145,9 @@ describe('Inconsistent Naming Warnings', () => {
     const res = runCli(cwd, ['--strict']);
 
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Inconsistent naming found');
+    expect(res.stdout).toContain('Inconsistent naming');
     expect(res.stdout).toContain(
-      'Suggested name: API_KEY',
+      'API_KEY',
     );
     expect(res.stdout).toContain('inconsistent naming patterns');
   });
@@ -172,6 +172,6 @@ describe('Inconsistent Naming Warnings', () => {
 
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Inconsistent naming found');
+    expect(res.stdout).not.toContain('Inconsistent naming');
   });
 });

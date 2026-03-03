@@ -44,7 +44,6 @@ describe('printUppercaseWarning', () => {
       `${label('apiKey'.padEnd(26))}${value('API_KEY')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(5, `${divider}`);
-    expect(logSpy).toHaveBeenNthCalledWith(6);
   });
 
   it('prints with error accent in strict mode', () => {
