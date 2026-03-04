@@ -1,5 +1,5 @@
-import chalk from 'chalk';
 import path from 'path';
+import { label, value, error, divider, header } from '../theme.js';
 
 /**
  * Prints error messages if env/example files are missing.
@@ -14,23 +14,19 @@ export function printErrorNotFound(
   envFlag: string,
   exampleFlag: string,
 ): void {
+  if (envExists && exExists) return;
+
+  console.log();
+  console.log(`${error('▸')} ${header('File not found')}`);
+  console.log(`${divider}`);
+
   if (!envExists) {
-    console.error(
-      chalk.red(`Error: --env file not found: ${path.basename(envFlag)}`),
-    );
+    console.log(`${label('Missing env'.padEnd(26))}${error(path.basename(envFlag))}`);
   }
   if (!exExists) {
-    console.error(
-      chalk.red(
-        `Error: --example file not found: ${path.basename(exampleFlag)}`,
-      ),
-    );
+    console.log(`${label('Missing example'.padEnd(26))}${error(path.basename(exampleFlag))}`);
   }
-  if (!envExists || !exExists) {
-    console.error(
-      chalk.red(
-        'Please ensure both files exist before running the comparison.',
-      ),
-    );
-  }
+
+  console.log(`${label('Suggestion'.padEnd(26))}${value('ensure both files exist before comparing')}`);
+  console.log(`${divider}`);
 }
