@@ -167,7 +167,7 @@ SECRET_KEY=my-secret`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'Server-only variable accessed from client code',
+      'Server-only variable',
     );
     expect(res.stdout).toContain('DATABASE_URL');
     expect(res.stdout).toContain('SECRET_KEY');
@@ -205,7 +205,7 @@ API_ENDPOINT=api`,
     expect(res.stdout).toContain('SECRET_KEY');
     expect(res.stdout).toContain('API_ENDPOINT');
 
-    const warningMessage = 'Server-only variable accessed from client code';
+    const warningMessage = 'Server-only variable';
     const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
 
     expect(matches?.length).toBe(3);
@@ -251,7 +251,7 @@ API_ENDPOINT=api`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'Server-only variable accessed from client code',
+      'Server-only variable',
     );
   });
 

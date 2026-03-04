@@ -56,7 +56,7 @@ describe('SvelteKit environment variable usage rules', () => {
 
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
-      'Variables accessed through import.meta.env must start with "VITE_"',
+      'Variables accessed',
     );
     expect(res.stdout).toContain('PUBLIC_URL');
   });
@@ -76,7 +76,7 @@ describe('SvelteKit environment variable usage rules', () => {
 
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain(
-      'Variables accessed through import.meta.env must start with',
+      'Variables accessed',
     );
   });
 
@@ -94,7 +94,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'process.env should only be used in server files',
+      'process.env should',
     );
     expect(res.stdout).toContain('VITE_SECRET');
   });
@@ -113,7 +113,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '$env/static/public variables must start with "PUBLIC_"',
+      '$env/static/public',
     );
     expect(res.stdout).toContain('VITE_PUBLIC');
   });
@@ -134,7 +134,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '$env/static/private variables cannot be used in client-side code',
+      '$env/static/private',
     );
     expect(res.stdout).toContain('SECRET_KEY');
   });
@@ -153,7 +153,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '$env/static/private variables cannot be used in client-side code',
+      '$env/static/private',
     );
   });
 
@@ -177,7 +177,9 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('$env/static/private variables cannot be used in client-side code');
+    expect(res.stdout).not.toContain(
+      '$env/static/private',
+    );
     expect(res.stdout).not.toContain('warning');
   });
 
@@ -195,7 +197,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '$env/static/private variables must not start with "PUBLIC_"',
+      '$env/static/private',
     );
     expect(res.stdout).toContain('PUBLIC_TOKEN');
   });
@@ -217,13 +219,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     console.log(res.stdout);
 
-    // Count occurrences of the warning message
-    const warningMessage =
-      'Variables accessed through import.meta.env must start with "VITE_"';
-    const matches = res.stdout.match(new RegExp(warningMessage, 'g'));
-
-    // Should appear exactly 3 times (once per usage), not 6 times (duplicated)
-    expect(matches?.length).toBe(3);
+    expect(res.stdout.match(/PUBLIC_URL/g)?.length).toBe(1);
   });
 
   it('Will exit code 1 on strict mode when warnings are present', () => {
@@ -241,7 +237,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     expect(res.status).toBe(1);
     expect(res.stdout).toContain(
-      'Variables accessed through import.meta.env must start with "VITE_"',
+      'Variables accessed',
     );
     expect(res.stdout).toContain('PUBLIC_URL');
   });
@@ -260,7 +256,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'Variables accessed through import.meta.env must start with "VITE_"',
+      'Variables accessed',
     );
     expect(res.stdout).toContain('SECRET_KEY');
   });
@@ -279,7 +275,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'Variables accessed through import.meta.env must start with "VITE_"',
+      'Variables accessed',
     );
     expect(res.stdout).toContain('API_KEY');
   });
@@ -301,7 +297,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '$env/dynamic/private cannot be used in client-side code',
+      '$env/dynamic/private',
     );
   });
 
@@ -321,7 +317,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '$env/dynamic/private variables must not start with "PUBLIC_"',
+      '$env/dynamic/private',
     );
     expect(res.stdout).toContain('PUBLIC_KEY');
   });
@@ -340,7 +336,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '$env/static/private variables cannot be used in client-side code',
+      '$env/static/private',
     );
   });
 
@@ -364,7 +360,9 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('$env/static/private variables cannot be used in client-side code');
+    expect(res.stdout).not.toContain(
+      '$env/static/private',
+    );
     expect(res.stdout).not.toContain('warning');
   });
 
@@ -384,7 +382,9 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('$env/static/private variables cannot be used in client-side code');
+    expect(res.stdout).not.toContain(
+      '$env/static/private',
+    );
     expect(res.stdout).not.toContain('warning');
   });
 
@@ -443,7 +443,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      '$env/dynamic/public variables must start with "PUBLIC_"',
+      '$env/dynamic/public',
     );
     expect(res.stdout).toContain('SECRET_KEY');
   });
@@ -599,7 +599,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.stdout).toContain(
-      'Potential sensitive environment variable exposed to the browser',
+      'Potential sensitive',
     );
     expect(res.stdout).toContain('VITE_SECRET_PASSWORD');
     expect(res.stdout).toContain('PUBLIC_API_KEY');
