@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { label, value, accent, warning, divider, header } from '../theme.js';
 
 /**
  * Printed when the config file is successfully created
@@ -7,9 +7,10 @@ import chalk from 'chalk';
  */
 export function printInitSuccess(path: string): void {
   console.log();
-  console.log(chalk.green('Created dotenv-diff.config.json'));
-  console.log(chalk.dim(`   → ${path}`));
-  console.log();
+  console.log(`${accent('▸')} ${header('Config created')}`);
+  console.log(`${divider}`);
+  console.log(`${label('Path'.padEnd(26))}${value(path)}`);
+  console.log(`${divider}`);
 }
 
 /**
@@ -19,7 +20,8 @@ export function printInitSuccess(path: string): void {
  */
 export function printInitExists(path: string): void {
   console.log();
-  console.log(chalk.yellow('dotenv-diff.config.json already exists.'));
-  console.log(chalk.dim(`   → ${path}`));
-  console.log();
+  console.log(`${warning('▸')} ${header('Config already exists')}`);
+  console.log(`${divider}`);
+  console.log(`${label('Path'.padEnd(26))}${value(path)}`);
+  console.log(`${divider}`);
 }

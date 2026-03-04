@@ -131,7 +131,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--init']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Created dotenv-diff.config.json');
+    expect(res.stdout).toContain('▸ Config created');
 
     const configPath = path.join(cwd, 'dotenv-diff.config.json');
     expect(fs.existsSync(configPath)).toBe(true);
@@ -154,7 +154,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--init']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('dotenv-diff.config.json already exists');
+    expect(res.stdout).toContain('▸ Config already exists');
   });
   it('will apply all options from dotenv-diff.config.json correctly', () => {
     const cwd = tmpDir();
