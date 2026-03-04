@@ -6,15 +6,16 @@ import type {
   ExitResult,
   FixContext,
 } from '../config/types.js';
-import { DEFAULT_ENV_FILE } from '../config/constants.js';
+import {
+  DEFAULT_ENV_FILE,
+  EXPIRE_THRESHOLD_DAYS,
+} from '../config/constants.js';
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
 import { printMissing } from '../ui/scan/printMissing.js';
 import { printUnused } from '../ui/scan/printUnused.js';
 import { printDuplicates } from '../ui/shared/printDuplicates.js';
 import { printSecrets } from '../ui/scan/printSecrets.js';
-import { printSuccess } from '../ui/shared/printSuccess.js';
-import { printStrictModeError } from '../ui/shared/printStrictModeError.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
@@ -57,24 +58,31 @@ export function printScanResult(
   }
 
   if (scanResult.frameworkWarnings) {
-    printFrameworkWarnings(scanResult.frameworkWarnings);
+    printFrameworkWarnings(scanResult.frameworkWarnings, opts.strict);
   }
 
   if (scanResult.uppercaseWarnings) {
-    printUppercaseWarning(scanResult.uppercaseWarnings, comparedAgainst);
+    printUppercaseWarning(
+      scanResult.uppercaseWarnings,
+      comparedAgainst,
+      opts.strict,
+    );
   }
 
   if (scanResult.inconsistentNamingWarnings) {
-    printInconsistentNamingWarning(scanResult.inconsistentNamingWarnings);
+    printInconsistentNamingWarning(
+      scanResult.inconsistentNamingWarnings,
+      opts.strict,
+    );
   }
 
   if (scanResult.exampleWarnings) {
-    printExampleWarnings(scanResult.exampleWarnings);
+    printExampleWarnings(scanResult.exampleWarnings, opts.strict);
   }
 
   // Unused
   if (opts.showUnused ?? true) {
-    printUnused(scanResult.unused, comparedAgainst);
+    printUnused(scanResult.unused, comparedAgainst, opts.strict);
   }
 
   // Duplicates
@@ -84,15 +92,17 @@ export function printScanResult(
     scanResult.duplicates?.env ?? [],
     scanResult.duplicates?.example ?? [],
     isJson,
+    opts.fix ?? false,
+    opts.strict,
   );
 
   // Print potential secrets found
   if (opts.secrets) {
-    printSecrets(scanResult.secrets);
+    printSecrets(scanResult.secrets, opts.strict);
   }
   // Console log usage warning
   if (scanResult.logged) {
-    printConsolelogWarning(scanResult.logged);
+    printConsolelogWarning(scanResult.logged, opts.strict);
   }
 
   // Expiration warnings
@@ -117,22 +127,6 @@ export function printScanResult(
     exitWithError = true;
   }
 
-  // Success message for env file comparison
-  if (
-    comparedAgainst &&
-    scanResult.missing.length === 0 &&
-    (scanResult.secrets?.length ?? 0) === 0 &&
-    scanResult.used.length > 0
-  ) {
-    printSuccess(
-      isJson,
-      'scan',
-      comparedAgainst,
-      scanResult.unused,
-      opts.showUnused ?? true,
-    );
-  }
-
   // Gitignore check
   const gitignoreIssue = checkGitignoreStatus({
     cwd: opts.cwd,
@@ -149,25 +143,22 @@ export function printScanResult(
   const hasGitignoreIssue = gitignoreIssue !== null;
 
   if (opts.strict) {
-    const exit = printStrictModeError(
-      {
-        unused: scanResult.unused.length,
-        duplicatesEnv: scanResult.duplicates?.env?.length ?? 0,
-        duplicatesEx: scanResult.duplicates?.example?.length ?? 0,
-        secrets: scanResult.secrets?.length ?? 0,
-        exampleSecrets: scanResult.exampleWarnings?.length ?? 0,
-        hasGitignoreIssue,
-        frameworkWarnings: scanResult.frameworkWarnings?.length ?? 0,
-        logged: scanResult.logged?.length ?? 0,
-        uppercaseWarnings: scanResult.uppercaseWarnings?.length ?? 0,
-        expireWarnings: scanResult.expireWarnings?.length ?? 0,
-        inconsistentNamingWarnings:
-          scanResult.inconsistentNamingWarnings?.length ?? 0,
-      },
-      isJson,
-    );
+    const hasStrictViolations =
+      scanResult.unused.length > 0 ||
+      (scanResult.duplicates?.env?.length ?? 0) > 0 ||
+      (scanResult.duplicates?.example?.length ?? 0) > 0 ||
+      (scanResult.secrets?.length ?? 0) > 0 ||
+      (scanResult.exampleWarnings?.length ?? 0) > 0 ||
+      hasGitignoreIssue ||
+      (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
+      (scanResult.logged?.length ?? 0) > 0 ||
+      (scanResult.uppercaseWarnings?.length ?? 0) > 0 ||
+      (scanResult.expireWarnings?.filter(
+        (w) => w.daysLeft <= EXPIRE_THRESHOLD_DAYS,
+      ).length ?? 0) > 0 ||
+      (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0;
 
-    if (exit) exitWithError = true;
+    if (hasStrictViolations) exitWithError = true;
   }
 
   if (opts.fix && fixContext) {

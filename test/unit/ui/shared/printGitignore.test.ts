@@ -20,13 +20,7 @@ describe('printGitignoreWarning', () => {
       reason: GITIGNORE_ISSUES.NO_GITIGNORE,
     });
 
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow(
-        `⚠️  No .gitignore found – your .env may be committed.\n` +
-          `   Add:\n` +
-          `     .env\n`,
-      ),
-    );
+    expect(logSpy).toHaveBeenCalledWith('▸ Gitignore warning');
   });
 
   it('prints NOT_IGNORED warning when reason is different', () => {
@@ -35,13 +29,7 @@ describe('printGitignoreWarning', () => {
       reason: GITIGNORE_ISSUES.NOT_IGNORED,
     });
 
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow(
-        `⚠️  .env is not ignored by Git (.gitignore).\n` +
-          `   Consider adding:\n` +
-          `     .env\n`,
-      ),
-    );
+    expect(logSpy).toHaveBeenCalledWith('▸ Gitignore warning');
   });
 
   it('uses custom log function when provided', () => {

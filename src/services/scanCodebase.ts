@@ -8,7 +8,6 @@ import {
 import { DEFAULT_EXCLUDE_PATTERNS } from '../core/scan/patterns.js';
 import { scanFile } from '../core/scan/scanFile.js';
 import { findFiles } from './fileWalker.js';
-import { printProgress } from '../ui/scan/printProgress.js';
 import { normalizePath } from '../core/helpers/normalizePath.js';
 
 /**
@@ -46,14 +45,6 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
 
     // Count successfully scanned files
     filesScanned++;
-
-    if (shouldPrintProgress(filesScanned, files.length)) {
-      printProgress({
-        isJson: opts.json,
-        current: filesScanned,
-        total: files.length,
-      });
-    }
   }
 
   // Filter out ignored variables
@@ -122,13 +113,4 @@ async function safeReadFile(filePath: string): Promise<string | null> {
   } catch {
     return null;
   }
-}
-
-/** * Determines whether to print progress based on the number of files scanned.
- * @param scanned - The number of files scanned so far.
- * @param total - The total number of files to scan.
- * @returns True if progress should be printed, false otherwise.
- */
-function shouldPrintProgress(scanned: number, total: number): boolean {
-  return scanned === 1 || scanned % 10 === 0 || scanned === total;
 }

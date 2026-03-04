@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
 import { printIssues } from '../../../../src/ui/compare/printIssues.js';
+import { error, warning, label, dim, header } from '../../../../src/ui/theme.js';
 import type { Filtered } from '../../../../src/config/types.js';
 
 describe('printIssues', () => {
@@ -27,23 +27,17 @@ describe('printIssues', () => {
   });
 
   it('prints missing keys when present and fix=false', () => {
-    const filtered: Filtered = {
-      ...baseFiltered,
-      missing: ['A', 'B'],
-    };
+    const filtered: Filtered = { ...baseFiltered, missing: ['A', 'B'] };
 
     printIssues(filtered, false, false);
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.red('❌ Missing keys:'));
-    expect(logSpy).toHaveBeenCalledWith(chalk.red('  - A'));
-    expect(logSpy).toHaveBeenCalledWith(chalk.red('  - B'));
+    expect(logSpy).toHaveBeenCalledWith(`${error('▸')} ${header('Missing keys')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('A'.padEnd(26))}${error('missing')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('B'.padEnd(26))}${error('missing')}`);
   });
 
   it('does not print missing keys when fix=true', () => {
-    const filtered: Filtered = {
-      ...baseFiltered,
-      missing: ['A'],
-    };
+    const filtered: Filtered = { ...baseFiltered, missing: ['A'] };
 
     printIssues(filtered, false, true);
 
@@ -51,48 +45,34 @@ describe('printIssues', () => {
   });
 
   it('prints extra keys', () => {
-    const filtered: Filtered = {
-      ...baseFiltered,
-      extra: ['X'],
-    };
+    const filtered: Filtered = { ...baseFiltered, extra: ['X'] };
 
     printIssues(filtered, false);
 
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Extra keys (not in example):'),
-    );
-    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('  - X'));
+    expect(logSpy).toHaveBeenCalledWith(`${warning('▸')} ${header('Extra keys (not in example)')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('X'.padEnd(26))}${warning('extra')}`);
   });
 
   it('prints empty keys', () => {
-    const filtered: Filtered = {
-      ...baseFiltered,
-      empty: ['EMPTY_KEY'],
-    };
+    const filtered: Filtered = { ...baseFiltered, empty: ['EMPTY_KEY'] };
 
     printIssues(filtered, false);
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('⚠️  Empty values:'));
-    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('  - EMPTY_KEY'));
+    expect(logSpy).toHaveBeenCalledWith(`${warning('▸')} ${header('Empty values')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('EMPTY_KEY'.padEnd(26))}${warning('empty')}`);
   });
 
   it('prints mismatches', () => {
     const filtered: Filtered = {
       ...baseFiltered,
-      mismatches: [
-        {
-          key: 'API_KEY',
-          expected: '123',
-          actual: '456',
-        },
-      ],
+      mismatches: [{ key: 'API_KEY', expected: '123', actual: '456' }],
     };
 
     printIssues(filtered, false);
 
-    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('⚠️  Value mismatches:'));
+    expect(logSpy).toHaveBeenCalledWith(`${warning('▸')} ${header('Value mismatches')}`);
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow("  - API_KEY: expected '123', but got '456'"),
+      `${label('API_KEY'.padEnd(26))}${warning('expected: 123')}  ${dim('got: 456')}`,
     );
   });
 
@@ -109,7 +89,6 @@ describe('printIssues', () => {
 
     printIssues(filtered, false);
 
-    // Just ensure everything was printed
     expect(logSpy).toHaveBeenCalled();
   });
 });

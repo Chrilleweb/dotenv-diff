@@ -1,8 +1,8 @@
-import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
 import { resolveFromCwd } from '../../core/helpers/resolveFromCwd.js';
 import type { ScanUsageOptions } from '../../config/types.js';
+import { label, error, warning, divider, header } from '../theme.js';
 
 /**
  * Print message if the specified example file is missing.
@@ -19,18 +19,13 @@ export function printMissingExample(opts: ScanUsageOptions): boolean {
   if (!missing) return false;
 
   const fileName = path.basename(opts.examplePath);
-  const msgText = `Missing example file: ${fileName}`;
+  const indicator = opts.isCiMode ? error('▸') : warning('▸');
 
   console.log();
+  console.log(`${indicator} ${header('Missing example file')}`);
+  console.log(`${divider}`);
+  console.log(`${label('File'.padEnd(26))}${(opts.isCiMode ? error : warning)(fileName)}`);
+  console.log(`${divider}`);
 
-  if (opts.isCiMode) {
-    console.log(chalk.red(`❌ ${msgText}`));
-    return true;
-  }
-
-  if (!opts.json) {
-    console.log(chalk.yellow(`⚠️  ${msgText}`));
-  }
-
-  return false;
+  return opts.isCiMode ?? false;
 }

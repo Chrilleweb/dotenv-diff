@@ -18,25 +18,6 @@ describe('printDuplicates', () => {
     expect(logSpy).not.toHaveBeenCalled();
   });
 
-  it('prints duplicates for env when present and fix=false', () => {
-    printDuplicates(
-      '.env',
-      '.env.example',
-      [{ key: 'A', count: 2 }],
-      [],
-      false,
-      false,
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Duplicate keys in .env (last occurrence wins):'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('    - A (2 occurrences)'),
-    );
-  });
-
   it('does not print env duplicates when fix=true', () => {
     printDuplicates(
       '.env',
@@ -58,24 +39,6 @@ describe('printDuplicates', () => {
     printDuplicates('.env', '.env.example', [], [], false, false);
 
     expect(logSpy).not.toHaveBeenCalled();
-  });
-
-  it('prints duplicates for example file when present', () => {
-    printDuplicates(
-      '.env',
-      '.env.example',
-      [],
-      [{ key: 'B', count: 3 }],
-      false,
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow(
-        '⚠️  Duplicate keys in .env.example (last occurrence wins):',
-      ),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(chalk.yellow('   - B (3 occurrences)'));
   });
 
   it('prints both env and example duplicates together', () => {

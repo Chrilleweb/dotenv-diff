@@ -1,20 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
 import {
   printInvalidCategory,
   printInvalidRegex,
   printCiYesWarning,
 } from '../../../../src/ui/shared/printOptionErrors.js';
+import { error, warning, value, label, divider, header } from '../../../../src/ui/theme.js';
 
 describe('printInvalidCategory', () => {
-  let errorSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: ReturnType<typeof vi.spyOn>;
   let exitSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation(() => undefined as never);
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
   });
 
   afterEach(() => {
@@ -24,26 +22,20 @@ describe('printInvalidCategory', () => {
   it('prints error and exits with code 1', () => {
     printInvalidCategory('--only', ['bad1', 'bad2'], ['allowed1', 'allowed2']);
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      chalk.red(
-        `❌ Error: invalid --only value(s): bad1, bad2.\n` +
-          `   Allowed: allowed1, allowed2`,
-      ),
-    );
-
+    expect(logSpy).toHaveBeenCalledWith(`${error('▸')} ${header('Invalid flag')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Invalid values'.padEnd(26))}${error('bad1, bad2')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Allowed'.padEnd(26))}${value('allowed1, allowed2')}`);
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
 });
 
 describe('printInvalidRegex', () => {
-  let errorSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: ReturnType<typeof vi.spyOn>;
   let exitSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    exitSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation(() => undefined as never);
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
   });
 
   afterEach(() => {
@@ -53,10 +45,8 @@ describe('printInvalidRegex', () => {
   it('prints regex error and exits with code 1', () => {
     printInvalidRegex('[abc');
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      chalk.red('❌ Error: invalid --ignore-regex pattern: [abc'),
-    );
-
+    expect(logSpy).toHaveBeenCalledWith(`${error('▸')} ${header('Invalid regex')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Pattern'.padEnd(26))}${error('[abc')}`);
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
 });
@@ -75,8 +65,7 @@ describe('printCiYesWarning', () => {
   it('prints warning message', () => {
     printCiYesWarning();
 
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Both --ci and --yes provided; proceeding with --yes.'),
-    );
+    expect(logSpy).toHaveBeenCalledWith(`${warning('▸')} ${header('Flag conflict')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Resolution'.padEnd(26))}${value('proceeding with --yes')}`);
   });
 });

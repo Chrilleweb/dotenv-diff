@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
 import { printStats } from '../../../../src/ui/compare/printStats.js';
+import { label, value, accent, header } from '../../../../src/ui/theme.js';
 
 describe('printStats', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
@@ -13,9 +13,7 @@ describe('printStats', () => {
     valueMismatchCount: 2,
   };
 
-  const baseFiltered = {
-    missing: ['A'],
-  };
+  const baseFiltered = { missing: ['A'] };
 
   beforeEach(() => {
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -26,91 +24,37 @@ describe('printStats', () => {
   });
 
   it('does nothing when json is true', () => {
-    printStats(
-      '.env',
-      '.env.example',
-      baseStats,
-      baseFiltered,
-      true,
-      true,
-      true,
-    );
+    printStats('.env', '.env.example', baseStats, baseFiltered, true, true, true);
     expect(logSpy).not.toHaveBeenCalled();
   });
 
   it('does nothing when showStats is false', () => {
-    printStats(
-      '.env',
-      '.env.example',
-      baseStats,
-      baseFiltered,
-      false,
-      false,
-      true,
-    );
+    printStats('.env', '.env.example', baseStats, baseFiltered, false, false, true);
     expect(logSpy).not.toHaveBeenCalled();
   });
 
   it('prints full statistics with extra, empty and checkValues enabled', () => {
-    const filtered = {
-      missing: ['A'],
-      extra: ['B'],
-      empty: ['C'],
-    };
+    const filtered = { missing: ['A'], extra: ['B'], empty: ['C'] };
 
     printStats('.env', '.env.example', baseStats, filtered, false, true, true);
 
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta('📊 Compare Statistics:'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta.dim('   Keys in .env: 5'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta.dim('   Keys in .env.example: 4'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(chalk.magenta.dim('   Shared keys: 3'));
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta.dim('   Missing (in .env): 1'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta.dim('   Extra (not in .env.example): 1'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta.dim('   Empty values: 1'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta.dim('   Duplicate keys: 1'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta.dim('   Value mismatches: 2'),
-    );
+    expect(logSpy).toHaveBeenCalledWith(`${accent('▸')} ${header('Compare Statistics')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Keys in .env'.padEnd(26))}${value('5')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Keys in .env.example'.padEnd(26))}${value('4')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Shared keys'.padEnd(26))}${value('3')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Missing in .env'.padEnd(26))}${value('1')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Extra (not in .env.example)'.padEnd(26))}${value('1')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Empty values'.padEnd(26))}${value('1')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Duplicate keys'.padEnd(26))}${value('1')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Value mismatches'.padEnd(26))}${value('2')}`);
   });
 
   it('skips optional branches when extra/empty missing and checkValues=false', () => {
-    const filtered = {
-      missing: [],
-    };
+    printStats('.env', '.env.example', baseStats, { missing: [] }, false, true, false);
 
-    printStats('.env', '.env.example', baseStats, filtered, false, true, false);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Missing in .env'.padEnd(26))}${value('0')}`);
+    expect(logSpy).toHaveBeenCalledWith(`${label('Duplicate keys'.padEnd(26))}${value('1')}`);
 
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta.dim('   Missing (in .env): 0'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.magenta.dim('   Duplicate keys: 1'),
-    );
-
-    // ensure no value mismatch printed
     expect(
       logSpy.mock.calls.some(([msg]: [string]) =>
         String(msg).includes('Value mismatches'),
@@ -118,13 +62,8 @@ describe('printStats', () => {
     ).toBe(false);
   });
 
-  it('handles undefined extra and empty safely (optional chaining branch)', () => {
-    const filtered = {
-      missing: [],
-    };
-
-    printStats('.env', '.env.example', baseStats, filtered, false, true, true);
-
+  it('handles undefined extra and empty safely', () => {
+    printStats('.env', '.env.example', baseStats, { missing: [] }, false, true, true);
     expect(logSpy).toHaveBeenCalled();
   });
 });

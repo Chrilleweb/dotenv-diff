@@ -64,3 +64,9 @@ export const ALLOWED_CATEGORIES = [
   'duplicate',
   'gitignore',
 ] as const;
+
+
+/** * Threshold in days for showing expiration warnings for environment variables.
+ * Variables expiring within this number of days or already expired will trigger a warning.
+ */
+export const EXPIRE_THRESHOLD_DAYS = 60;

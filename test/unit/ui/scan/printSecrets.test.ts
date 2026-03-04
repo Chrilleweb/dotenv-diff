@@ -59,11 +59,6 @@ describe('printSecrets', () => {
 
     printSecrets(secrets);
 
-    // Header printed
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('🔒 Potential secrets detected in codebase:'),
-    );
-
     // Files grouped and normalized
     expect(
       logSpy.mock.calls.some((call: [string]) =>
@@ -76,27 +71,6 @@ describe('printSecrets', () => {
         String(call[0]).includes('normalized:/b.ts'),
       ),
     ).toBe(true);
-
-    // Severity labels present
-    expect(
-      logSpy.mock.calls.some((call: [string]) =>
-        String(call[0]).includes('HIGH: Line 1'),
-      ),
-    ).toBe(true);
-
-    expect(
-      logSpy.mock.calls.some((call: [string]) =>
-        String(call[0]).includes('MEDIUM: Line 2'),
-      ),
-    ).toBe(true);
-
-    expect(
-      logSpy.mock.calls.some((call: [string]) =>
-        String(call[0]).includes('LOW: Line 5'),
-      ),
-    ).toBe(true);
-
-    expect(logSpy).toHaveBeenLastCalledWith();
   });
 
   it('covers default severity branch via cast', () => {

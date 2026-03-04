@@ -137,7 +137,7 @@ describe('Expiration Warnings', () => {
     expect(res.stdout).toContain('Expiration warnings');
     expect(res.stdout).toContain('OLD_TOKEN');
     expect(res.stdout).toContain('NEW_TOKEN');
-    expect(res.stdout).toContain('EXPIRED');
+    expect(res.stdout).toContain('expired');
     expect(res.stdout).toContain('expires in 7 days');
   });
 

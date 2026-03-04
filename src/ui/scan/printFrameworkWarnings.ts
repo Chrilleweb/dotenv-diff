@@ -1,43 +1,53 @@
-import chalk from 'chalk';
-import type {
-  FrameworkWarning,
-  DetectedFramework,
-} from '../../config/types.js';
+import type { FrameworkWarning, DetectedFramework } from '../../config/types.js';
+import { label, warning, error, dim, divider, header, wrapReason } from '../theme.js';
+import { normalizePath } from '../../core/helpers/normalizePath.js';
 
 /**
  * Labels for detected frameworks to display in warnings
  */
 const FRAMEWORK_LABELS: Record<DetectedFramework, string> = {
-  nextjs: 'Next.js',
+  nextjs:    'Next.js',
   sveltekit: 'SvelteKit',
-  unknown: 'Unknown Framework',
+  unknown:   'Unknown Framework',
 };
 
 /**
  * Prints environment variable usage warnings to the console.
  * @param warnings - List of environment variable warnings
+ * @param strict - Whether strict mode is enabled
  */
-export function printFrameworkWarnings(warnings: FrameworkWarning[]): void {
+export function printFrameworkWarnings(
+  warnings: FrameworkWarning[],
+  strict = false,
+): void {
   if (!warnings || warnings.length === 0) return;
 
-  // Deduplicate warnings by variable + file + line + reason
-  const uniqueWarnings = Array.from(
-    new Map(
-      warnings.map((w) => [`${w.variable}:${w.file}:${w.line}:${w.reason}`, w]),
-    ).values(),
-  );
+  const frameworkLabel = FRAMEWORK_LABELS[warnings[0]!.framework];
+  const indicator = strict ? error('▸') : warning('▸');
+  const textColor = strict ? error : warning;
 
-  console.log(
-    chalk.yellow(
-      `⚠️  Framework issues (${FRAMEWORK_LABELS[uniqueWarnings[0]!.framework]}):`,
-    ),
-  );
-
-  for (const w of uniqueWarnings) {
-    console.log(
-      chalk.yellow(`   - ${w.variable} (${w.file}:${w.line}) → ${w.reason}`),
-    );
+  // Group by variable+reason, collect unique locations
+  const grouped = new Map<string, { w: FrameworkWarning; locations: string[] }>();
+  for (const w of warnings) {
+    const key = `${w.variable}:${w.reason}`;
+    if (!grouped.has(key)) grouped.set(key, { w, locations: [] });
+    const loc = `${normalizePath(w.file)}:${w.line}`;
+    if (!grouped.get(key)!.locations.includes(loc)) {
+      grouped.get(key)!.locations.push(loc);
+    }
   }
 
+  console.log();
+  console.log(`${indicator} ${header(`Framework issues (${frameworkLabel})`)}`);
+  console.log(`${divider}`);
+
+  for (const { w, locations } of grouped.values()) {
+    console.log(`${label(w.variable.padEnd(26))}${textColor(wrapReason(w.reason, 26))}`);
+    for (const loc of locations) {
+      console.log(`${label(''.padEnd(26))}${dim(loc)}`);
+    }
+  }
+
+  console.log(`${divider}`);
   console.log();
 }

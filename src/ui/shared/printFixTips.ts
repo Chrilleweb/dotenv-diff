@@ -23,21 +23,21 @@ export function printFixTips(
   let tip: string | null = null;
   if (hasMissing && hasDupEnv && envNotIgnored) {
     tip =
-      '💡 Tip: Run with `--fix` to add missing keys, remove duplicates and add .env to .gitignore';
+      'Tip: Run with `--fix` to add missing keys, remove duplicates and add .env to .gitignore';
   } else if (hasMissing && hasDupEnv) {
-    tip = '💡 Tip: Run with `--fix` to add missing keys and remove duplicates';
+    tip = 'Tip: Run with `--fix` to add missing keys and remove duplicates';
   } else if (hasDupEnv && envNotIgnored) {
     tip =
-      '💡 Tip: Run with `--fix` to remove duplicate keys and add .env to .gitignore';
+      'Tip: Run with `--fix` to remove duplicate keys and add .env to .gitignore';
   } else if (hasMissing && envNotIgnored) {
     tip =
-      '💡 Tip: Run with `--fix` to add missing keys and add .env to .gitignore';
+      'Tip: Run with `--fix` to add missing keys and add .env to .gitignore';
   } else if (hasMissing) {
-    tip = '💡 Tip: Run with `--fix` to add missing keys';
+    tip = 'Tip: Run with `--fix` to add missing keys';
   } else if (hasDupEnv) {
-    tip = '💡 Tip: Run with `--fix` to remove duplicate keys';
+    tip = 'Tip: Run with `--fix` to remove duplicate keys';
   } else if (envNotIgnored) {
-    tip = '💡 Tip: Run with `--fix` to ensure .env is added to .gitignore';
+    tip = 'Tip: Run with `--fix` to ensure .env is added to .gitignore';
   }
 
   if (tip) {

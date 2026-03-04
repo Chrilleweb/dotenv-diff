@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { error, warning, divider, header } from '../theme.js';
 
 /**
  * Prints a comparison error message.
@@ -12,16 +12,16 @@ export function printComparisonError(
   shouldExit: boolean,
   json: boolean,
 ): { exit: boolean } {
-  const errorMessage = `⚠️  ${message}`;
+  if (json) return { exit: false };
 
-  if (shouldExit) {
-    console.log(chalk.red(errorMessage.replace('⚠️', '❌')));
-    return { exit: true };
-  }
+  const indicator = shouldExit ? error('▸') : warning('▸');
+  const colorFn = shouldExit ? error : warning;
 
-  if (!json) {
-    console.log(chalk.yellow(errorMessage));
-  }
+  console.log();
+  console.log(`${indicator} ${header('Error')}`);
+  console.log(`${divider}`);
+  console.log(`${colorFn(message)}`);
+  console.log(`${divider}`);
 
-  return { exit: false };
+  return { exit: shouldExit };
 }

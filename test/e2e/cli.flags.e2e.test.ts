@@ -33,7 +33,7 @@ describe('non-interactive flags', () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
     const res = runCli(cwd, ['--compare', '--ci']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Skipping .env creation.');
+    expect(res.stdout).toContain('▸ Skipping .env creation');
     expect(fs.existsSync(path.join(cwd, '.env'))).toBe(false);
   });
 
@@ -44,7 +44,7 @@ describe('non-interactive flags', () => {
     expect(res.status).toBe(0);
     expect(fs.readFileSync(path.join(cwd, '.env'), 'utf8')).toBe('A=1\n');
     expect(res.stdout).toContain(
-      '.env file created successfully from .env.example',
+      '▸ File created',
     );
   });
 
@@ -53,7 +53,7 @@ describe('non-interactive flags', () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
     const res = runCli(cwd, ['--compare', '--ci']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Skipping .env.example creation.');
+    expect(res.stdout).toContain('▸ Skipping .env.example creation');
     expect(fs.existsSync(path.join(cwd, '.env.example'))).toBe(false);
   });
 
@@ -68,7 +68,7 @@ describe('non-interactive flags', () => {
     );
     expect(exampleContent).toBe('A=\nB=\n');
     expect(res.stdout).toContain(
-      '.env.example file created successfully from .env',
+      '▸ File created',
     );
   });
 
@@ -86,7 +86,7 @@ describe('non-interactive flags', () => {
     const res = runCli(cwd, ['--compare', '--ci']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
-      'No .env* or .env.example file found. Skipping comparison.',
+      '▸ No env files found',
     );
   });
 });
@@ -155,7 +155,7 @@ describe('--env and --example flags', () => {
     ]);
     expect(res.status).toBe(0);
     expect(fs.existsSync(path.join(cwd, '.env.staging'))).toBe(true);
-    expect(res.stdout).toContain('.env.staging file created successfully');
+    expect(res.stdout).toContain('▸ File created');
   });
 
   it('Both flags - example missing, should be created with --yes flag', () => {
@@ -172,7 +172,7 @@ describe('--env and --example flags', () => {
     expect(res.status).toBe(0);
     expect(fs.existsSync(path.join(cwd, '.env.example.staging'))).toBe(true);
     expect(res.stdout).toContain(
-      '.env.example.staging file created successfully',
+      '▸ File created',
     );
   });
 
@@ -206,7 +206,7 @@ describe('--env and --example flags', () => {
       'utf8',
     );
     expect(exampleContent).toBe('A=\nB=\n');
-    expect(res.stdout).toContain('.env.example file created successfully');
+    expect(res.stdout).toContain('▸ File created');
   });
 
   it('Only --example - matching env exists', () => {
@@ -229,9 +229,9 @@ describe('duplicate detection', () => {
     const res = runCli(cwd, ['--compare']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
-      'Duplicate keys in .env (last occurrence wins):',
+      '▸ Duplicate keys in .env',
     );
-    expect(res.stdout).toContain('- FOO (2 occurrences)');
+    expect(res.stdout).toContain('2 occurrences');
   });
 
   it('warns on duplicates in example file', () => {
@@ -241,9 +241,9 @@ describe('duplicate detection', () => {
     const res = runCli(cwd, ['--compare']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
-      'Duplicate keys in .env.example (last occurrence wins):',
+      '▸ Duplicate keys in .env.example',
     );
-    expect(res.stdout).toContain('- FOO (2 occurrences)');
+    expect(res.stdout).toContain('2 occurrences');
   });
 
   it('suppresses warnings with flag', () => {
@@ -252,7 +252,7 @@ describe('duplicate detection', () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=\n');
     const res = runCli(cwd, ['--compare', '--allow-duplicates']);
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Duplicate keys in .env');
+    expect(res.stdout).not.toContain('▸ Duplicate keys in .env');
   });
 
   it('will detect duplicates in scan mode', () => {
@@ -269,9 +269,9 @@ describe('duplicate detection', () => {
     const res = runCli(cwd, ['--scan-usage']);
     expect(res.status).toBe(0);
     expect(res.stdout).toContain(
-      'Duplicate keys in .env (last occurrence wins):',
+      '▸ Duplicate keys in .env',
     );
-    expect(res.stdout).toContain('- A (2 occurrences)');
+    expect(res.stdout).toContain('2 occurrences');
   });
 
   it('--allow-duplicates works in scan mode', () => {
@@ -341,7 +341,7 @@ describe('duplicate detection', () => {
 
       expect(res.status).toBe(1);
       expect(res.stdout).toContain('Comparing .env ↔ .env.example');
-      expect(res.stdout).toContain('❌ Missing keys:');
+      expect(res.stdout).toContain('Missing keys');
       expect(res.stdout).not.toContain('Extra keys');
     });
     it('warns on flag only extra', () => {
@@ -353,8 +353,8 @@ describe('duplicate detection', () => {
 
       expect(res.status).toBe(0);
       expect(res.stdout).toContain('Comparing .env ↔ .env.example');
-      expect(res.stdout).not.toContain('❌ Missing keys:');
-      expect(res.stdout).toContain('⚠️  Extra keys (not in example):');
+      expect(res.stdout).not.toContain('Missing keys');
+      expect(res.stdout).toContain('extra');
     });
   });
   describe('--fix flag', () => {
@@ -392,9 +392,9 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env');
-    expect(res.stdout).toContain('Removed 1 duplicate keys from .env');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
+    expect(res.stdout).toContain('Removed duplicates');
   });
 
   it('when adding missing keys, remove duplicates and add .env til gitignore dont print issues in --compare', () => {
@@ -405,9 +405,9 @@ describe('duplicate detection', () => {
     );
     fs.writeFileSync(path.join(cwd, '.env.example'), 'EXISTING=\nNEW_KEY=\n');
     const res = runCli(cwd, ['--compare', '--fix']);
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env');
-    expect(res.stdout).toContain('Removed 1 duplicate keys from .env');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
+    expect(res.stdout).toContain('Removed duplicates');
   });
 
   it('does not duplicate keys in .env.example when they already exist', () => {
@@ -423,8 +423,8 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
     expect(res.stdout).not.toContain('Synced'); // Should not sync since key already exists
 
     const exampleContent = fs.readFileSync(
@@ -449,7 +449,7 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied: no changes needed');
+    expect(res.stdout).toContain('no changes needed');
   });
 
   it('works with custom env file path in scan mode', () => {
@@ -464,8 +464,8 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix', '--env', '.env.local']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env.local');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
 
     const envContent = fs.readFileSync(path.join(cwd, '.env.local'), 'utf-8');
     expect(envContent).toContain('NEW_VAR=');
@@ -489,7 +489,7 @@ describe('duplicate detection', () => {
       'IGNORED_VAR',
     ]);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied');
+    expect(res.stdout).toContain('Auto-fix');
     expect(res.stdout).toContain('INCLUDED_VAR');
     expect(res.stdout).not.toContain('IGNORED_VAR');
 
@@ -512,8 +512,8 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix']);
     expect(res.status).toBe(0); // exit clean
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
     expect(res.stdout).not.toContain('MODE');
 
     const envContent = fs.readFileSync(path.join(cwd, '.env'), 'utf-8');

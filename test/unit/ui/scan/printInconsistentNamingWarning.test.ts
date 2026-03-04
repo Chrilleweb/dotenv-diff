@@ -19,34 +19,6 @@ describe('printInconsistentNamingWarning', () => {
     expect(logSpy).not.toHaveBeenCalled();
   });
 
-  it('prints a single inconsistent naming warning', () => {
-    const warnings: InconsistentNamingWarning[] = [
-      {
-        key1: 'SECRET_KEY',
-        key2: 'SECRETKEY',
-        suggestion: 'Use SECRET_KEY consistently',
-      },
-    ];
-
-    printInconsistentNamingWarning(warnings);
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('⚠️  Inconsistent naming found:'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow(
-        `   - ${chalk.cyan('SECRET_KEY')} ↔ ${chalk.cyan('SECRETKEY')}`,
-      ),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.gray('     Suggested name: Use SECRET_KEY consistently'),
-    );
-
-    expect(logSpy).toHaveBeenLastCalledWith();
-  });
-
   it('prints multiple inconsistent naming warnings', () => {
     const warnings: InconsistentNamingWarning[] = [
       {

@@ -43,7 +43,9 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   let scanResult = await scanCodebase(opts);
 
   // Filter out commented usages
-  scanResult.used = skipCommentedUsages(scanResult.used);
+  const filteredUsages = skipCommentedUsages(scanResult.used);
+  scanResult.used = filteredUsages;
+  scanResult.logged = filteredUsages.filter((usage) => usage.isLogged);
 
   // Measure duration
   const endTime = performance.now();

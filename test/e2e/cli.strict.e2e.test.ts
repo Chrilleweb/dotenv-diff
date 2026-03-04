@@ -35,7 +35,7 @@ describe('--strict mode', () => {
 
     const res = runCli(cwd, ['--strict']);
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain('⚠️  Unused in codebase');
+    expect(res.stdout).toContain('▸ Unused in .env');
   });
 
   it('fails on duplicate variables in .env', () => {
@@ -45,7 +45,7 @@ describe('--strict mode', () => {
 
     const res = runCli(cwd, ['--strict']);
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain('⚠️  Duplicate keys');
+    expect(res.stdout).toContain('Duplicate keys');
   });
 
   it('fails on duplicate variables in .env.example', () => {
@@ -55,7 +55,7 @@ describe('--strict mode', () => {
 
     const res = runCli(cwd, ['--strict', '--example', '.env.example']);
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain('⚠️  Duplicate keys in .env.example');
+    expect(res.stdout).toContain('Duplicate keys in .env.example');
   });
 
   it('succeeds when there are no warnings', () => {
@@ -76,7 +76,7 @@ describe('--strict mode with --compare', () => {
 
     const res = runCli(cwd, ['--strict', '--compare']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('⚠️  Duplicate keys');
+    expect(res.stdout).toContain('Duplicate keys');
   });
 
   it('warns on duplicate variables in .env.example', () => {
@@ -86,6 +86,6 @@ describe('--strict mode with --compare', () => {
 
     const res = runCli(cwd, ['--strict', '--compare']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('⚠️  Duplicate keys in .env.example');
+    expect(res.stdout).toContain('Duplicate keys in .env.example');
   });
 });

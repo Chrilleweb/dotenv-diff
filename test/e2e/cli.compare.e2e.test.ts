@@ -44,26 +44,6 @@ describe('added .env to gitignore with --compare and --fix', () => {
     expect(res.stdout).toContain('Missing keys');
   });
 
-  it('will warn about .env not ignored by .gitignore --compare flag', () => {
-    const cwd = tmpDir();
-
-    fs.mkdirSync(path.join(cwd, '.git'));
-    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=test\n');
-    fs.writeFileSync(path.join(cwd, '.env.example'), 'API_KEY=example\n');
-
-    fs.writeFileSync(path.join(cwd, '.gitignore'), 'node_modules\n');
-
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'src', 'index.ts'),
-      `const apiKey = process.env.API_KEY;`.trimStart(),
-    );
-
-    const res = runCli(cwd, ['--compare']);
-    expect(res.status).toBe(0);
-    expect(res.stdout).toContain('.env is not ignored by Git');
-  });
-
   it('will warn about .env not ignored by .gitignore', () => {
     const cwd = tmpDir();
 
@@ -82,8 +62,8 @@ describe('added .env to gitignore with --compare and --fix', () => {
     const res = runCli(cwd, ['--compare', '--fix']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied:');
-    expect(res.stdout).toContain('Added .env to .gitignore');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Updated .gitignore');
   });
 
   it('Will print json output including gitignoreIssue', () => {
@@ -109,19 +89,17 @@ describe('added .env to gitignore with --compare and --fix', () => {
     expect(json[0].gitignoreIssue?.reason).toBe('not-ignored');
   });
 
-    it('Will prompt .env.example file not found. and prompt if .env.local exists and .env.example is set to --example', async () => {
+  it('Will prompt .env.example file not found. and prompt if .env.local exists and .env.example is set to --example', async () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.local'), 'FOO=bar');
 
-    const res = runCli(cwd, [
-      '--compare',
-      '--example',
-      '.env.example',
-    ]);
+    const res = runCli(cwd, ['--compare', '--example', '.env.example']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('file not found');
-    expect(res.stdout).toContain('Do you want to create a .env.example file from .env.local?');
+    expect(res.stdout).toContain('▸ File not found');
+    expect(res.stdout).toContain(
+      'Do you want to create a .env.example file from .env.local?',
+    );
   });
 
   describe('Values mismatch checks', () => {

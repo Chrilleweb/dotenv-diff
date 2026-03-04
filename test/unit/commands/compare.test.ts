@@ -91,7 +91,6 @@ import { printDuplicates } from '../../../src/ui/shared/printDuplicates.js';
 import { printHeader } from '../../../src/ui/compare/printHeader.js';
 import { printAutoFix } from '../../../src/ui/shared/printAutoFix.js';
 import { printIssues } from '../../../src/ui/compare/printIssues.js';
-import { printSuccess } from '../../../src/ui/shared/printSuccess.js';
 import { printGitignoreWarning } from '../../../src/ui/shared/printGitignore.js';
 import { compareJsonOutput } from '../../../src/ui/compare/compareJsonOutput.js';
 import { printErrorNotFound } from '../../../src/ui/compare/printErrorNotFound.js';
@@ -116,7 +115,6 @@ describe('compareMany', () => {
   const mockPrintHeader = printHeader as ReturnType<typeof vi.fn>;
   const mockPrintAutoFix = printAutoFix as ReturnType<typeof vi.fn>;
   const mockPrintIssues = printIssues as ReturnType<typeof vi.fn>;
-  const mockPrintSuccess = printSuccess as ReturnType<typeof vi.fn>;
   const mockPrintGitignoreWarning = printGitignoreWarning as ReturnType<
     typeof vi.fn
   >;
@@ -181,7 +179,6 @@ describe('compareMany', () => {
 
     expect(result.exitWithError).toBe(false);
     expect(mockPrintHeader).toHaveBeenCalledWith('.env', '.env.example', false);
-    expect(mockPrintSuccess).toHaveBeenCalledWith(false, 'compare');
   });
 
   it('returns exitWithError true when both files do not exist', async () => {
@@ -649,21 +646,6 @@ describe('compareMany', () => {
       [],
       [/^TEST_/],
     );
-  });
-
-  it('does not print success when issues exist', async () => {
-    mockDiffEnv.mockReturnValue({
-      missing: ['MISSING'],
-      extra: [],
-      valueMismatches: [],
-    });
-
-    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
-    const opts = createOptions();
-
-    await compareMany(pairs, opts);
-
-    expect(mockPrintSuccess).not.toHaveBeenCalled();
   });
 
   it('prints fix tips when issues exist and fix is not enabled', async () => {

@@ -1,6 +1,7 @@
-import chalk from 'chalk';
 import type { EnvUsage, VariableUsages } from '../../config/types.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
+import { label, value, error, divider } from '../theme.js';
+
 
 /**
  * Print missing environment variables (used in code but not in env file).
@@ -18,20 +19,18 @@ export function printMissing(
   if (missing.length === 0) return false;
 
   const fileType = comparedAgainst || 'environment file';
-  console.log(chalk.red(`❌ Missing in ${fileType}:`));
 
-  // Group by variable → find their usages
+  console.log();
+  console.log(`${error('▸')} ${value.bold(`Missing in ${fileType}`)}`);
+  console.log(`${divider}`);
+
   const grouped = missing.reduce((acc: VariableUsages, variable: string) => {
     const usages = used.filter((u: EnvUsage) => u.variable === variable);
     acc[variable] = usages;
     return acc;
   }, {});
 
-  // Group by file first
-  const byFile = new Map<
-    string,
-    Array<{ variable: string; usage: EnvUsage }>
-  >();
+  const byFile = new Map<string, Array<{ variable: string; usage: EnvUsage }>>();
 
   for (const [variable, usages] of Object.entries(grouped)) {
     for (const usage of usages) {
@@ -41,16 +40,13 @@ export function printMissing(
     }
   }
 
-  // Print grouped by file
   for (const [file, items] of byFile) {
-    console.log(chalk.bold(`   ${file}`));
-
     for (const { variable, usage } of items) {
-      console.log(chalk.red(`    ${variable}: Line ${usage.line}`));
-      console.log(chalk.red.dim(`    ${usage.context.trim()}`));
+      console.log(`${label(variable.padEnd(26))}${error(`${normalizePath(usage.file)}:${usage.line}`)}`);
     }
   }
-  console.log();
+
+  console.log(`${divider}`);
 
   return true;
 }

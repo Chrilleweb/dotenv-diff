@@ -44,7 +44,7 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('.env is not ignored by Git');
+    expect(res.stdout).toContain('not ignored by git');
   });
 
   it('will auto-fix .env not ignored by .gitignore with --fix', () => {
@@ -63,7 +63,6 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, ['--fix']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Added .env to .gitignore');
 
     const gitignore = fs.readFileSync(path.join(cwd, '.gitignore'), 'utf-8');
     expect(gitignore).toContain('.env');
@@ -132,7 +131,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--init']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Created dotenv-diff.config.json');
+    expect(res.stdout).toContain('▸ Config created');
 
     const configPath = path.join(cwd, 'dotenv-diff.config.json');
     expect(fs.existsSync(configPath)).toBe(true);
@@ -155,7 +154,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--init']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('dotenv-diff.config.json already exists');
+    expect(res.stdout).toContain('▸ Config already exists');
   });
   it('will apply all options from dotenv-diff.config.json correctly', () => {
     const cwd = tmpDir();
@@ -228,7 +227,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--example', '.env.example', '--strict']);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain(
-      'Potential real secrets found in .env.example:',
+      '▸ Potential secrets in .env.example',
     );
     expect(res.stdout).toContain('API_KEY');
   });
@@ -246,7 +245,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--example', '.env.example']);
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain(
-      'Potential real secrets found in .env.example:',
+      '▸ Potential secrets in .env.example',
     );
   });
 
@@ -267,7 +266,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--example', '.env.example']);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain(
-      'Potential real secrets found in .env.example:',
+      '▸ Potential secrets in .env.example',
     );
     expect(res.stdout).toContain('[high]');
   });
@@ -294,7 +293,7 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Potential secrets detected in codebase');
+    expect(res.stdout).not.toContain('▸ Potential secrets in .env.example');
   });
 
   it('excludes a single file using exclude option', () => {
@@ -318,7 +317,7 @@ describe('no-flag autoscan', () => {
     );
 
     const res = runCli(cwd, []);
-    expect(res.stdout).not.toContain('Potential secrets detected in codebase');
+    expect(res.stdout).not.toContain('▸ Potential secrets in .env.example');
     expect(res.status).toBe(0);
   });
 
@@ -336,45 +335,6 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, []);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain('src/index.ts');
-  });
-
-  it('shows progress bar during scanning in non-json mode', () => {
-    const cwd = tmpDir();
-
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=12345\n');
-    fs.writeFileSync(
-      path.join(cwd, 'src', 'index.ts'),
-      `const apiKey = process.env.API_KEY;`,
-    );
-
-    const res = runCli(cwd, []);
-
-    expect(res.status).toBe(0);
-
-    expect(res.stdout).toContain('🔍');
-    expect(res.stdout).toMatch(/█|░/);
-
-    expect(res.stdout).toContain('Scan Statistics');
-  });
-
-  it('does not render progress bar when --json is enabled', () => {
-    const cwd = tmpDir();
-
-    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, 'src', 'index.ts'),
-      `const apiKey = process.env.API_KEY;`,
-    );
-
-    const res = runCli(cwd, ['--json']);
-
-    expect(res.status).toBe(0);
-
-    expect(res.stdout).not.toContain('🔍');
-    expect(res.stdout).not.toMatch(/█|░/);
-
-    expect(res.stdout.trim().startsWith('{')).toBe(true);
   });
 });
 

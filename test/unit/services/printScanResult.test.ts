@@ -78,8 +78,6 @@ vi.mock('../../../src/git.js', () => ({
 
 import { printScanResult } from '../../../src/services/printScanResult.js';
 import { printMissing } from '../../../src/ui/scan/printMissing.js';
-import { printStrictModeError } from '../../../src/ui/shared/printStrictModeError.js';
-import { printSuccess } from '../../../src/ui/shared/printSuccess.js';
 import { printAutoFix } from '../../../src/ui/shared/printAutoFix.js';
 
 describe('printScanResult', () => {
@@ -112,7 +110,6 @@ describe('printScanResult', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(printMissing).mockReturnValue(false);
-    vi.mocked(printStrictModeError).mockReturnValue(false);
   });
 
   it('returns exitWithError true when missing variables exist', () => {
@@ -137,28 +134,16 @@ describe('printScanResult', () => {
   });
 
   it('returns exitWithError true when strict mode triggers exit', () => {
-    vi.mocked(printStrictModeError).mockReturnValue(true);
-
     const result = printScanResult(
-      baseScanResult,
+      {
+        ...baseScanResult,
+        unused: ['SOME_VAR'],
+      },
       { ...baseOpts, strict: true },
       '.env',
     );
 
     expect(result.exitWithError).toBe(true);
-  });
-
-  it('calls success message when conditions met', () => {
-    printScanResult(
-      {
-        ...baseScanResult,
-        used: [{ variable: 'A' } as any],
-      },
-      baseOpts,
-      '.env',
-    );
-
-    expect(printSuccess).toHaveBeenCalled();
   });
 
   it('calls printAutoFix when fix enabled', () => {

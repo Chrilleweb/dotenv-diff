@@ -41,7 +41,7 @@ describe('printFixTips', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.gray(
-        '💡 Tip: Run with `--fix` to add missing keys, remove duplicates and add .env to .gitignore',
+        'Tip: Run with `--fix` to add missing keys, remove duplicates and add .env to .gitignore',
       ),
     );
   });
@@ -56,7 +56,7 @@ describe('printFixTips', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.gray(
-        '💡 Tip: Run with `--fix` to add missing keys and remove duplicates',
+        'Tip: Run with `--fix` to add missing keys and remove duplicates',
       ),
     );
   });
@@ -71,7 +71,7 @@ describe('printFixTips', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.gray(
-        '💡 Tip: Run with `--fix` to remove duplicate keys and add .env to .gitignore',
+        'Tip: Run with `--fix` to remove duplicate keys and add .env to .gitignore',
       ),
     );
   });
@@ -86,7 +86,7 @@ describe('printFixTips', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.gray(
-        '💡 Tip: Run with `--fix` to add missing keys and add .env to .gitignore',
+        'Tip: Run with `--fix` to add missing keys and add .env to .gitignore',
       ),
     );
   });
@@ -100,7 +100,7 @@ describe('printFixTips', () => {
     );
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.gray('💡 Tip: Run with `--fix` to add missing keys'),
+      chalk.gray('Tip: Run with `--fix` to add missing keys'),
     );
   });
 
@@ -113,7 +113,7 @@ describe('printFixTips', () => {
     );
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.gray('💡 Tip: Run with `--fix` to remove duplicate keys'),
+      chalk.gray('Tip: Run with `--fix` to remove duplicate keys'),
     );
   });
 
@@ -122,7 +122,7 @@ describe('printFixTips', () => {
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.gray(
-        '💡 Tip: Run with `--fix` to ensure .env is added to .gitignore',
+        'Tip: Run with `--fix` to ensure .env is added to .gitignore',
       ),
     );
   });

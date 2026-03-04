@@ -389,6 +389,47 @@ it('skips prompt when type is none and json is true', async () => {
     );
   });
 
+  it('removes logged warning for block-commented console env usage', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      used: [
+        {
+          variable: 'TEST_KEY',
+          file: 'src/index.ts',
+          line: 4,
+          column: 1,
+          pattern: 'process.env',
+          context: '/* console.log(process.env.TEST_KEY); */',
+          isLogged: true,
+        },
+      ],
+      logged: [
+        {
+          variable: 'TEST_KEY',
+          file: 'src/index.ts',
+          line: 4,
+          column: 1,
+          pattern: 'process.env',
+          context: '/* console.log(process.env.TEST_KEY); */',
+          isLogged: true,
+        },
+      ],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    await scanUsage({ ...baseOpts, isCiMode: true });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({
+        logged: [],
+        used: [],
+      }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
   it('returns exitWithError true in JSON strict mode for each warning type', async () => {
     const cases: Partial<ScanResult>[] = [
       { duplicates: { env: [{ key: 'A', count: 2 }] } },

@@ -35,9 +35,9 @@ describe('Uppercase Warnings', () => {
     const res = runCli(cwd, []);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Variables not using uppercase naming');
+    expect(res.stdout).toContain('▸ Uppercase warnings (.env)');
     expect(res.stdout).toContain('api_key');
-    expect(res.stdout).toContain('Consider naming it: API_KEY');
+    expect(res.stdout).toContain('API_KEY');
   });
 
   it('does not warn when variable key is already uppercase', () => {
@@ -48,21 +48,19 @@ describe('Uppercase Warnings', () => {
     const res = runCli(cwd, []);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Variables not using uppercase naming');
-    expect(res.stdout).not.toContain('Consider naming it');
+    expect(res.stdout).not.toContain('▸ Uppercase warnings (.env)');
   });
 
   it('exits with error in strict mode when non-uppercase env vars are used', () => {
     const cwd = tmpDir();
-
     fs.writeFileSync(path.join(cwd, '.env'), `api_key=123`);
 
     const res = runCli(cwd, ['--strict']);
 
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Variables not using uppercase naming');
+    expect(res.stdout).toContain('▸ Uppercase warnings (.env)');
     expect(res.stdout).toContain('api_key');
-    expect(res.stdout).toContain('Consider naming it: API_KEY');
+    expect(res.stdout).toContain('API_KEY');
   });
 
   it('does not warn about uppercase when --no-uppercase-keys is not enabled', () => {
@@ -73,6 +71,6 @@ describe('Uppercase Warnings', () => {
     const res = runCli(cwd, ['--no-uppercase-keys']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Variables not using uppercase naming');
+    expect(res.stdout).not.toContain('▸ Uppercase warnings (.env)');
   });
 });

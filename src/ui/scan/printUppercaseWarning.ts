@@ -1,28 +1,31 @@
-import chalk from 'chalk';
 import type { UppercaseWarning } from '../../config/types.js';
+import { label, value, error, divider, header, warning } from '../theme.js';
 
 /**
  * Print warnings for environment variable keys that are not uppercase.
  *
  * @param warnings - List of non-uppercase env keys
  * @param comparedAgainst - The .env file name being checked
+ * @param strict - Whether strict mode is enabled
  */
 export function printUppercaseWarning(
   warnings: UppercaseWarning[],
   comparedAgainst: string,
+  strict = false,
 ): void {
   if (warnings.length === 0) return;
 
-  console.log(
-    chalk.yellow(
-      `⚠️  Variables not using uppercase naming (${comparedAgainst}):`,
-    ),
-  );
+  const indicator = strict ? error('▸') : warning('▸');
 
-  warnings.forEach((w) => {
-    console.log(chalk.yellow(`   - ${w.key}`));
-    console.log(chalk.yellow.dim(`     Consider naming it: ${w.suggestion}`));
-  });
+  const textColor = strict ? error : warning;
 
   console.log();
+  console.log(`${indicator} ${header(`Uppercase warnings (${comparedAgainst})`)}`);
+  console.log(`${divider}`);
+
+  for (const w of warnings) {
+    console.log(`${label(w.key.padEnd(26))}${textColor(w.suggestion)}`);
+  }
+
+  console.log(`${divider}`);
 }

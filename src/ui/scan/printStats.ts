@@ -1,10 +1,9 @@
-import chalk from 'chalk';
 import type { ScanStats } from '../../config/types.js';
+import { label, value, accent, divider, header } from '../theme.js';
 
 /**
  * Print scan statistics for codebase scanning.
  * @param stats The scan statistics
- * @param json Whether to output in JSON format
  * @param showStats Whether to show statistics
  */
 export function printStats(
@@ -12,18 +11,17 @@ export function printStats(
   showStats: boolean,
 ): void {
   if (!showStats) return;
+
+  const row = (lbl: string, val: string | number) =>
+    console.log(`${label(lbl.padEnd(26))}${value(String(val))}`);
+
   console.log();
-  console.log(chalk.magenta('📊 Scan Statistics:'));
-  console.log(chalk.magenta.dim(`   Files scanned: ${stats.filesScanned}`));
-  console.log(
-    chalk.magenta.dim(`   Total variable references: ${stats.totalUsages}`),
-  );
-  console.log(
-    chalk.magenta.dim(`   Unique variables: ${stats.uniqueVariables}`),
-  );
-  console.log(chalk.magenta.dim(`   Warnings: ${stats.warningsCount}`));
-  console.log(
-    chalk.magenta.dim(`   Scan duration: ${stats.duration.toFixed(2)}s`),
-  );
-  console.log();
+  console.log(`${accent('▸')} ${header('Scan Statistics')}`);
+  console.log(`${divider}`);
+  row('Files scanned',       stats.filesScanned);
+  row('Variable references', stats.totalUsages);
+  row('Unique variables',    stats.uniqueVariables);
+  row('Warnings',            stats.warningsCount);
+  row('Duration',            `${stats.duration.toFixed(2)}s`);
+  console.log(`${divider}`);
 }

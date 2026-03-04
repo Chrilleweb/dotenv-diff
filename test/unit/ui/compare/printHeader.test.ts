@@ -27,8 +27,7 @@ describe('printHeader', () => {
     expect(logSpy).toHaveBeenNthCalledWith(1);
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
-      chalk.blue('🔍 Comparing .env ↔ .env.example...'),
+      chalk.blue('▸ Comparing .env ↔ .env.example'),
     );
-    expect(logSpy).toHaveBeenNthCalledWith(3);
   });
 });
