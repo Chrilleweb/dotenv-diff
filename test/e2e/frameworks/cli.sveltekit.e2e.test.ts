@@ -215,6 +215,8 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
+    console.log(res.stdout);
+
     // Count occurrences of the warning message
     const warningMessage =
       'Variables accessed through import.meta.env must start with "VITE_"';

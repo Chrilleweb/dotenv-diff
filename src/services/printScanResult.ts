@@ -57,7 +57,7 @@ export function printScanResult(
   }
 
   if (scanResult.frameworkWarnings) {
-    printFrameworkWarnings(scanResult.frameworkWarnings);
+    printFrameworkWarnings(scanResult.frameworkWarnings, opts.strict);
   }
 
   if (scanResult.uppercaseWarnings) {
