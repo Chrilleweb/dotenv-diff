@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { label, value, warning, error, divider, header } from '../theme.js';
 
 /**
  * Prints an error for invalid --only categories and exits.
@@ -11,12 +11,13 @@ export function printInvalidCategory(
   bad: string[],
   allowed: readonly string[],
 ): never {
-  console.error(
-    chalk.red(
-      `Error: invalid ${flagName} value(s): ${bad.join(', ')}.\n` +
-        `   Allowed: ${allowed.join(', ')}`,
-    ),
-  );
+  console.log();
+  console.log(`${error('▸')} ${header('Invalid flag')}`);
+  console.log(`${divider}`);
+  console.log(`${label('Flag'.padEnd(26))}${error(flagName)}`);
+  console.log(`${label('Invalid values'.padEnd(26))}${error(bad.join(', '))}`);
+  console.log(`${label('Allowed'.padEnd(26))}${value(allowed.join(', '))}`);
+  console.log(`${divider}`);
   process.exit(1);
 }
 
@@ -25,9 +26,11 @@ export function printInvalidCategory(
  * @param pattern - The invalid regex pattern.
  */
 export function printInvalidRegex(pattern: string): never {
-  console.error(
-    chalk.red(`Error: invalid --ignore-regex pattern: ${pattern}`),
-  );
+  console.log();
+  console.log(`${error('▸')} ${header('Invalid regex')}`);
+  console.log(`${divider}`);
+  console.log(`${label('Pattern'.padEnd(26))}${error(pattern)}`);
+  console.log(`${divider}`);
   process.exit(1);
 }
 
@@ -36,7 +39,10 @@ export function printInvalidRegex(pattern: string): never {
  * @returns void
  */
 export function printCiYesWarning(): void {
-  console.log(
-    chalk.yellow('Both --ci and --yes provided; proceeding with --yes.'),
-  );
+  console.log();
+  console.log(`${warning('▸')} ${header('Flag conflict')}`);
+  console.log(`${divider}`);
+  console.log(`${label('Issue'.padEnd(26))}${warning('Both --ci and --yes provided')}`);
+  console.log(`${label('Resolution'.padEnd(26))}${value('proceeding with --yes')}`);
+  console.log(`${divider}`);
 }

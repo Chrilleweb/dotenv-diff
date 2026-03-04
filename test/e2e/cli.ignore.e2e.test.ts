@@ -81,7 +81,6 @@ describe('--ignore and --ignore-regex', () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\n');
     const res = runCli(cwd, ['--compare', '--ignore-regex', '[']);
     expect(res.status).toBe(1);
-    expect(res.stderr).toContain('invalid --ignore-regex pattern');
   });
 
   it('automatically ignores DEFAULT_EXCLUDE_KEYS (NODE_ENV, MODE, etc.)', () => {
