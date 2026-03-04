@@ -17,7 +17,7 @@ describe('printInitSuccess', () => {
   });
 
   it('prints success message with path', () => {
-    printInitSuccess('/path/to/dotenv-diff.config.json');
+    printInitSuccess('dotenv-diff.config.json');
 
     expect(logSpy).toHaveBeenCalledTimes(5);
 
@@ -25,15 +25,12 @@ describe('printInitSuccess', () => {
     expect(logSpy).toHaveBeenNthCalledWith(1);
 
     // Success message
-    expect(logSpy).toHaveBeenNthCalledWith(
-      2,
-      ('▸ Config created'),
-    );
+    expect(logSpy).toHaveBeenNthCalledWith(2, '▸ Config created');
 
     // Path line
     expect(logSpy).toHaveBeenNthCalledWith(
       4,
-      ('Path                      /path/to/dotenv-diff.config.json'),
+      'Path                      dotenv-diff.config.json',
     );
   });
 });
@@ -50,7 +47,7 @@ describe('printInitExists', () => {
   });
 
   it('prints already exists warning with path', () => {
-    printInitExists('/path/to/dotenv-diff.config.json');
+    printInitExists('dotenv-diff.config.json');
 
     expect(logSpy).toHaveBeenCalledTimes(5);
 
@@ -66,7 +63,7 @@ describe('printInitExists', () => {
     // Path line
     expect(logSpy).toHaveBeenNthCalledWith(
       4,
-      chalk.dim('Path                      /path/to/dotenv-diff.config.json'),
+      chalk.dim('Path                      dotenv-diff.config.json'),
     );
   });
 });
