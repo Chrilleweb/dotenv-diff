@@ -60,8 +60,6 @@ export function printSecrets(secrets: SecretFinding[], strict = false): void {
         `${label(f.severity.toUpperCase().padEnd(26))}${color(`${normalizePath(f.file)}:${f.line}`)}`,
       );
     }
-
-    console.log();
   }
 
   console.log(`${divider}`);
