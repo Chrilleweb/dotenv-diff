@@ -1,5 +1,5 @@
 import type { Filtered } from '../../config/types.js';
-import { label, value, accent, warning, error, dim, divider, header } from '../theme.js';
+import { label, warning, error, dim, divider, header } from '../theme.js';
 
 /**
  * Prints the issues found during the comparison.
