@@ -90,7 +90,7 @@ export function printScanResult(
 
   // Print potential secrets found
   if (opts.secrets) {
-    printSecrets(scanResult.secrets);
+    printSecrets(scanResult.secrets, opts.strict);
   }
   // Console log usage warning
   if (scanResult.logged) {
