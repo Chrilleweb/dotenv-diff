@@ -1,6 +1,6 @@
-import chalk from 'chalk';
 import type { GitignoreIssue } from '../../config/types.js';
 import { GITIGNORE_ISSUES } from '../../config/constants.js';
+import { label, value, warning, error, divider, header } from '../theme.js';
 
 /**
  * Options for printing gitignore warnings to the user.
@@ -10,6 +10,8 @@ interface GitignoreWarningOptions {
   envFile: string;
   /** The reason for the gitignore warning */
   reason: GitignoreIssue;
+  /** Whether strict mode is enabled */
+  strict?: boolean;
   /** Optional custom log function (defaults to console.log) */
   log?: (msg: string) => void;
 }
@@ -20,23 +22,20 @@ interface GitignoreWarningOptions {
  * @returns void
  */
 export function printGitignoreWarning(options: GitignoreWarningOptions): void {
-  const { envFile, reason, log = console.log } = options;
+  const { envFile, reason, strict = false, log = console.log } = options;
 
-  if (reason === GITIGNORE_ISSUES.NO_GITIGNORE) {
-    log(
-      chalk.yellow(
-        `No .gitignore found – your ${envFile} may be committed.\n` +
-          `   Add:\n` +
-          `     ${envFile}\n`,
-      ),
-    );
-  } else {
-    log(
-      chalk.yellow(
-        `${envFile} is not ignored by Git (.gitignore).\n` +
-          `   Consider adding:\n` +
-          `     ${envFile}\n`,
-      ),
-    );
-  }
+  const indicator = strict ? error('▸') : warning('▸');
+
+  const issue =
+    reason === GITIGNORE_ISSUES.NO_GITIGNORE
+      ? 'no .gitignore found'
+      : 'not ignored by git';
+
+  log('');
+  log(`${indicator} ${header('Gitignore warning')}`);
+  log(`${divider}`);
+  log(`${label('File'.padEnd(26))}${(strict ? error : warning)(envFile)}`);
+  log(`${label('Issue'.padEnd(26))}${(strict ? error : warning)(issue)}`);
+  log(`${label('Suggestion'.padEnd(26))}${value(`add ${envFile} to .gitignore`)}`);
+  log(`${divider}`);
 }

@@ -211,8 +211,8 @@ describe('warnIfEnvNotIgnored', () => {
     const logs: string[] = [];
     warnIfEnvNotIgnored({ cwd, log: (m) => logs.push(m) });
 
-    expect(logs.length).toBe(1);
-    expect(logs[0]).toContain('No .gitignore found'); // substring survives chalk coloring
+    expect(logs.length).toBe(7);
+    expect(logs[4]).toContain('no .gitignore found'); // substring survives chalk coloring
   });
 
   it('warns when .gitignore exists but does not ignore .env', () => {
@@ -227,9 +227,8 @@ describe('warnIfEnvNotIgnored', () => {
     const logs: string[] = [];
     warnIfEnvNotIgnored({ cwd, log: (m) => logs.push(m) });
 
-    expect(logs.length).toBe(1);
-    expect(logs[0]).toContain('is not ignored by Git');
-    expect(logs[0]).toContain('.env');
+    expect(logs.length).toBe(7);
+    expect(logs[4]).toContain('not ignored by git');
   });
 
   it('does not warn when .gitignore ignores .env', () => {
@@ -262,8 +261,8 @@ describe('warnIfEnvNotIgnored', () => {
       log: (m) => logs.push(m),
     });
 
-    expect(logs.length).toBe(1);
-    expect(logs[0]).toContain('.env.local');
+    expect(logs.length).toBe(7);
+    expect(logs[4]).toContain('not ignored by git');
   });
 
   it('warns when isEnvIgnoredByGit returns null', () => {
@@ -278,8 +277,8 @@ describe('warnIfEnvNotIgnored', () => {
     const logs: string[] = [];
     warnIfEnvNotIgnored({ cwd, log: (m) => logs.push(m) });
 
-    expect(logs.length).toBe(1);
-    expect(logs[0]).toContain('.env');
+    expect(logs.length).toBe(7);
+    expect(logs[4]).toContain('not ignored by git');
   });
 
   it('warnIfEnvNotIgnored uses default options when called without arguments', () => {

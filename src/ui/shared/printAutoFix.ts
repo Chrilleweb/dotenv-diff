@@ -1,5 +1,5 @@
 import type { FixContext } from '../../config/types.js';
-import { label, value, accent, dim, divider, header } from '../theme.js';
+import { label, value, accent, divider, header } from '../theme.js';
 
 /**
  * Prints the result of the auto-fix operation.

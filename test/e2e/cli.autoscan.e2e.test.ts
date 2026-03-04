@@ -44,7 +44,7 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('.env is not ignored by Git');
+    expect(res.stdout).toContain('not ignored by git');
   });
 
   it('will auto-fix .env not ignored by .gitignore with --fix', () => {
