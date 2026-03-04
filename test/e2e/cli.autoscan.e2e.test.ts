@@ -63,7 +63,6 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, ['--fix']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Added .env to .gitignore');
 
     const gitignore = fs.readFileSync(path.join(cwd, '.gitignore'), 'utf-8');
     expect(gitignore).toContain('.env');

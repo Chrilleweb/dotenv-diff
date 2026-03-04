@@ -392,9 +392,9 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env');
-    expect(res.stdout).toContain('Removed 1 duplicate keys from .env');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
+    expect(res.stdout).toContain('Removed duplicates');
   });
 
   it('when adding missing keys, remove duplicates and add .env til gitignore dont print issues in --compare', () => {
@@ -405,9 +405,9 @@ describe('duplicate detection', () => {
     );
     fs.writeFileSync(path.join(cwd, '.env.example'), 'EXISTING=\nNEW_KEY=\n');
     const res = runCli(cwd, ['--compare', '--fix']);
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env');
-    expect(res.stdout).toContain('Removed 1 duplicate keys from .env');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
+    expect(res.stdout).toContain('Removed duplicates');
   });
 
   it('does not duplicate keys in .env.example when they already exist', () => {
@@ -423,8 +423,8 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
     expect(res.stdout).not.toContain('Synced'); // Should not sync since key already exists
 
     const exampleContent = fs.readFileSync(
@@ -449,7 +449,7 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied: no changes needed');
+    expect(res.stdout).toContain('no changes needed');
   });
 
   it('works with custom env file path in scan mode', () => {
@@ -464,8 +464,8 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix', '--env', '.env.local']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env.local');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
 
     const envContent = fs.readFileSync(path.join(cwd, '.env.local'), 'utf-8');
     expect(envContent).toContain('NEW_VAR=');
@@ -489,7 +489,7 @@ describe('duplicate detection', () => {
       'IGNORED_VAR',
     ]);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Auto-fix applied');
+    expect(res.stdout).toContain('Auto-fix');
     expect(res.stdout).toContain('INCLUDED_VAR');
     expect(res.stdout).not.toContain('IGNORED_VAR');
 
@@ -512,8 +512,8 @@ describe('duplicate detection', () => {
 
     const res = runCli(cwd, ['--scan-usage', '--fix']);
     expect(res.status).toBe(0); // exit clean
-    expect(res.stdout).toContain('Auto-fix applied');
-    expect(res.stdout).toContain('Added 1 missing keys to .env');
+    expect(res.stdout).toContain('Auto-fix');
+    expect(res.stdout).toContain('Added missing keys');
     expect(res.stdout).not.toContain('MODE');
 
     const envContent = fs.readFileSync(path.join(cwd, '.env'), 'utf-8');

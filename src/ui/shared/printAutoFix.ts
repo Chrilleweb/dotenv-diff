@@ -1,5 +1,5 @@
-import chalk from 'chalk';
 import type { FixContext } from '../../config/types.js';
+import { label, value, accent, dim, divider, header } from '../theme.js';
 
 /**
  * Prints the result of the auto-fix operation.
@@ -15,27 +15,23 @@ export function printAutoFix(
 ): void {
   if (json) return;
 
-  if (result.fixApplied) {
-    console.log(chalk.green('Auto-fix applied:'));
+  console.log();
+  console.log(`${accent('▸')} ${header('Auto-fix')}`);
+  console.log(`${divider}`);
+
+  if (!result.fixApplied) {
+    console.log(`${label('Status'.padEnd(26))}${value('no changes needed')}`);
+  } else {
     if (result.removedDuplicates.length) {
-      console.log(
-        chalk.green(
-          `  - Removed ${result.removedDuplicates.length} duplicate keys from ${envName}: ${result.removedDuplicates.join(', ')}`,
-        ),
-      );
+      console.log(`${label('Removed duplicates'.padEnd(26))}${value(result.removedDuplicates.join(', '))}`);
     }
     if (result.addedEnv.length) {
-      console.log(
-        chalk.green(
-          `  - Added ${result.addedEnv.length} missing keys to ${envName}: ${result.addedEnv.join(', ')}`,
-        ),
-      );
+      console.log(`${label('Added missing keys'.padEnd(26))}${value(result.addedEnv.join(', '))}`);
     }
     if (result.gitignoreUpdated) {
-      console.log(chalk.green(`  - Added ${envName} to .gitignore`));
+      console.log(`${label('Updated .gitignore'.padEnd(26))}${value(envName)}`);
     }
-  } else {
-    console.log(chalk.green('Auto-fix applied: no changes needed.'));
   }
-  console.log();
+
+  console.log(`${divider}`);
 }
