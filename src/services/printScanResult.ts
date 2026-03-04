@@ -69,7 +69,7 @@ export function printScanResult(
   }
 
   if (scanResult.exampleWarnings) {
-    printExampleWarnings(scanResult.exampleWarnings);
+    printExampleWarnings(scanResult.exampleWarnings, opts.strict);
   }
 
   // Unused

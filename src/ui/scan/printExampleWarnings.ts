@@ -1,22 +1,27 @@
-import chalk from 'chalk';
 import type { ExampleSecretWarning } from '../../config/types.js';
+import { label, value, accent, warning, error, divider, header } from '../theme.js';
 
 /**
  * Prints example file secret warnings to the console.
  * @param warnings - List of example file secret warnings
+ * @param strict - Whether strict mode is enabled
  */
 export function printExampleWarnings(
   warnings: ExampleSecretWarning[],
+  strict = false,
 ): void {
   if (!warnings || warnings.length === 0) return;
 
-  console.log(chalk.yellow('Potential real secrets found in .env.example:'));
-  for (const w of warnings) {
-    console.log(
-      chalk.yellow(
-        `   - ${w.key} = "${w.value}" → ${w.reason} [${w.severity}]`,
-      ),
-    );
-  }
+  const indicator = strict ? error('▸') : warning('▸');
+
   console.log();
+  console.log(`${indicator} ${header('Potential secrets in .env.example')}`);
+  console.log(`${divider}`);
+
+  for (const w of warnings) {
+    const severityColor = w.severity === 'high' ? error : warning;
+    console.log(`${label(w.key.padEnd(26))}${severityColor(`${w.reason} [${w.severity}]`)}`);
+  }
+
+  console.log(`${divider}`);
 }

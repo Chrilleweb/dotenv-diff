@@ -27,7 +27,7 @@ describe('detectSecretsInExample', () => {
     expect(warnings).toHaveLength(3);
     for (const warning of warnings) {
       expect(warning.severity).toBe('high');
-      expect(warning.reason).toContain('known provider key pattern');
+      expect(warning.reason).toContain('Pattern');
     }
   });
 
@@ -40,7 +40,7 @@ describe('detectSecretsInExample', () => {
 
     expect(warnings).toHaveLength(1);
     expect(warnings[0].severity).toBe('medium');
-    expect(warnings[0].reason).toContain('High entropy value');
+    expect(warnings[0].reason).toContain('Entropy');
   });
 
   it('detects very high entropy values as high severity', () => {
@@ -53,6 +53,7 @@ describe('detectSecretsInExample', () => {
 
     expect(warnings).toHaveLength(1);
     expect(warnings[0].severity).toBe('high');
+    expect(warnings[0].reason).toContain('Entropy');
   });
 
   it('returns no warnings when nothing matches', () => {

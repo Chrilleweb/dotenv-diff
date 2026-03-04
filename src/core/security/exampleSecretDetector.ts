@@ -35,7 +35,7 @@ export function detectSecretsInExample(
         warnings.push({
           key,
           value,
-          reason: 'Value in .env.example matches a known provider key pattern',
+          reason: 'Pattern',
           severity: 'high',
         });
         continue;
@@ -49,7 +49,7 @@ export function detectSecretsInExample(
         warnings.push({
           key,
           value,
-          reason: `High entropy value in .env.example (≈${entropy.toFixed(2)})`,
+          reason: `Entropy`,
           severity: entropy > 0.92 ? 'high' : 'medium',
         });
       }

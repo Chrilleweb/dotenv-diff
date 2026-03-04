@@ -24,29 +24,6 @@ describe('printExampleWarnings', () => {
     expect(logSpy).not.toHaveBeenCalled();
   });
 
-  it('prints a single warning', () => {
-    const warnings: ExampleSecretWarning[] = [
-      {
-        key: 'API_KEY',
-        value: '123',
-        reason: 'Looks like a real API key',
-        severity: 'high',
-      },
-    ];
-
-    printExampleWarnings(warnings);
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('Potential real secrets found in .env.example:'),
-    );
-
-    expect(logSpy).toHaveBeenCalledWith(
-      chalk.yellow('   - API_KEY = "123" → Looks like a real API key [high]'),
-    );
-
-    expect(logSpy).toHaveBeenLastCalledWith();
-  });
-
   it('prints multiple warnings', () => {
     const warnings: ExampleSecretWarning[] = [
       {

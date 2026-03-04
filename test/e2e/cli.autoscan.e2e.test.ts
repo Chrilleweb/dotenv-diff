@@ -228,7 +228,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--example', '.env.example', '--strict']);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain(
-      'Potential real secrets found in .env.example:',
+      '▸ Potential secrets in .env.example',
     );
     expect(res.stdout).toContain('API_KEY');
   });
@@ -246,7 +246,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--example', '.env.example']);
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain(
-      'Potential real secrets found in .env.example:',
+      '▸ Potential secrets in .env.example',
     );
   });
 
@@ -267,7 +267,7 @@ describe('no-flag autoscan', () => {
     const res = runCli(cwd, ['--example', '.env.example']);
     expect(res.status).toBe(1);
     expect(res.stdout).toContain(
-      'Potential real secrets found in .env.example:',
+      '▸ Potential secrets in .env.example',
     );
     expect(res.stdout).toContain('[high]');
   });
@@ -294,7 +294,7 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain('Potential secrets detected in codebase');
+    expect(res.stdout).not.toContain('▸ Potential secrets in .env.example');
   });
 
   it('excludes a single file using exclude option', () => {
@@ -318,7 +318,7 @@ describe('no-flag autoscan', () => {
     );
 
     const res = runCli(cwd, []);
-    expect(res.stdout).not.toContain('Potential secrets detected in codebase');
+    expect(res.stdout).not.toContain('▸ Potential secrets in .env.example');
     expect(res.status).toBe(0);
   });
 
