@@ -54,9 +54,7 @@ describe('Inconsistent Naming Warnings', () => {
 
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Inconsistent naming');
-    expect(res.stdout).toContain(
-      'API_KEY',
-    );
+    expect(res.stdout).toContain('API_KEY');
   });
 
   it('warns about multiple inconsistent patterns in the same file', () => {
@@ -77,15 +75,9 @@ describe('Inconsistent Naming Warnings', () => {
 
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Inconsistent naming');
-    expect(res.stdout).toContain(
-      'API_KEY',
-    );
-    expect(res.stdout).toContain(
-      'DATABASE_URL',
-    );
-    expect(res.stdout).toContain(
-      'JWT_SECRET',
-    );
+    expect(res.stdout).toContain('API_KEY');
+    expect(res.stdout).toContain('DATABASE_URL');
+    expect(res.stdout).toContain('JWT_SECRET');
   });
 
   it('does not warn when all names are consistent', () => {
@@ -126,9 +118,7 @@ describe('Inconsistent Naming Warnings', () => {
 
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('Inconsistent naming');
-    expect(res.stdout).toContain(
-      'API_KEY',
-    );
+    expect(res.stdout).toContain('API_KEY');
   });
 
   it('exits with error in strict mode when inconsistent naming exists', () => {
@@ -145,11 +135,8 @@ describe('Inconsistent Naming Warnings', () => {
     const res = runCli(cwd, ['--strict']);
 
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain('Inconsistent naming');
-    expect(res.stdout).toContain(
-      'API_KEY',
-    );
-    expect(res.stdout).toContain('inconsistent naming patterns');
+    expect(res.stdout).toContain('▸ Inconsistent naming');
+    expect(res.stdout).toContain('API_KEY');
   });
 
   it('Will disable inconsistent naming warnings when config is set to false', () => {
