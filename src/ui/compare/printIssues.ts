@@ -1,5 +1,5 @@
-import chalk from 'chalk';
 import type { Filtered } from '../../config/types.js';
+import { label, value, accent, warning, error, dim, divider, header } from '../theme.js';
 
 /**
  * Prints the issues found during the comparison.
@@ -14,29 +14,44 @@ export function printIssues(
   fix = false,
 ): void {
   if (json) return;
+
   if (filtered.missing.length && !fix) {
-    const header = chalk.red('Missing keys:');
-    console.log(header);
-    filtered.missing.forEach((key) => console.log(chalk.red(`  - ${key}`)));
     console.log();
+    console.log(`${error('▸')} ${header('Missing keys')}`);
+    console.log(`${divider}`);
+    for (const key of filtered.missing) {
+      console.log(`${label(key.padEnd(26))}${error('missing')}`);
+    }
+    console.log(`${divider}`);
   }
+
   if (filtered.extra?.length) {
-    console.log(chalk.yellow('Extra keys (not in example):'));
-    filtered.extra.forEach((key) => console.log(chalk.yellow(`  - ${key}`)));
     console.log();
+    console.log(`${warning('▸')} ${header('Extra keys (not in example)')}`);
+    console.log(`${divider}`);
+    for (const key of filtered.extra) {
+      console.log(`${label(key.padEnd(26))}${warning('extra')}`);
+    }
+    console.log(`${divider}`);
   }
+
   if (filtered.empty?.length) {
-    console.log(chalk.yellow('Empty values:'));
-    filtered.empty.forEach((key) => console.log(chalk.yellow(`  - ${key}`)));
     console.log();
+    console.log(`${warning('▸')} ${header('Empty values')}`);
+    console.log(`${divider}`);
+    for (const key of filtered.empty) {
+      console.log(`${label(key.padEnd(26))}${warning('empty')}`);
+    }
+    console.log(`${divider}`);
   }
+
   if (filtered.mismatches?.length) {
-    console.log(chalk.yellow('Value mismatches:'));
-    filtered.mismatches.forEach(({ key, expected, actual }) =>
-      console.log(
-        chalk.yellow(`  - ${key}: expected '${expected}', but got '${actual}'`),
-      ),
-    );
     console.log();
+    console.log(`${warning('▸')} ${header('Value mismatches')}`);
+    console.log(`${divider}`);
+    for (const { key, expected, actual } of filtered.mismatches) {
+      console.log(`${label(key.padEnd(26))}${warning(`expected: ${expected}`)}  ${dim(`got: ${actual}`)}`);
+    }
+    console.log(`${divider}`);
   }
 }
