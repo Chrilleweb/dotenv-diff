@@ -96,7 +96,7 @@ describe('added .env to gitignore with --compare and --fix', () => {
     const res = runCli(cwd, ['--compare', '--example', '.env.example']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('file not found');
+    expect(res.stdout).toContain('▸ File not found');
     expect(res.stdout).toContain(
       'Do you want to create a .env.example file from .env.local?',
     );

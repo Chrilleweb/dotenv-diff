@@ -1,12 +1,20 @@
-import chalk from 'chalk';
 import path from 'path';
+import {
+  label,
+  value,
+  accent,
+  warning,
+  dim,
+  divider,
+  header,
+} from '../theme.js';
 
 /**
  * User interface messages for environment file operations.
  *
  * @description Provides formatted console output for various environment file
  * comparison and creation scenarios. All methods output styled messages using
- * chalk for enhanced readability.
+ * theme tokens for enhanced readability.
  *
  * @property {Function} noEnvFound - Displays warning when no environment files are detected
  * @property {Function} missingEnv - Displays warning for a specific missing environment file
@@ -17,38 +25,53 @@ import path from 'path';
 export const printPrompt = {
   noEnvFound() {
     console.log();
+    console.log(`${warning('▸')} ${header('No env files found')}`);
+    console.log(`${divider}`);
     console.log(
-      chalk.yellow(
-        'No .env* or .env.example file found. Skipping comparison.',
-      ),
+      `${label('Status'.padEnd(26))}${warning('no .env* or .env.example found')}`,
     );
+    console.log(`${label('Action'.padEnd(26))}${dim('skipping comparison')}`);
+    console.log(`${divider}`);
   },
 
   missingEnv(envPath: string) {
     console.log();
-    console.log(chalk.yellow(`${path.basename(envPath)} file not found.`));
+    console.log(`${warning('▸')} ${header('File not found')}`);
+    console.log(`${divider}`);
+    console.log(
+      `${label('File'.padEnd(26))}${warning(path.basename(envPath))}`,
+    );
+    console.log(`${divider}`);
   },
 
   skipCreation(fileType: string) {
     console.log();
-    console.log(chalk.gray(`Skipping ${fileType} creation.`));
+    console.log(`${dim('▸')} ${header(`Skipping ${fileType} creation`)}`);
+    console.log(`${divider}`);
+    console.log(`${divider}`);
   },
 
   envCreated(envPath: string, examplePath: string) {
     console.log();
+    console.log(`${accent('▸')} ${header('File created')}`);
+    console.log(`${divider}`);
     console.log(
-      chalk.green(
-        `${path.basename(envPath)} file created successfully from ${path.basename(examplePath)}.`,
-      ),
+      `${label('Created'.padEnd(26))}${value(path.basename(envPath))}`,
     );
+    console.log(
+      `${label('From'.padEnd(26))}${dim(path.basename(examplePath))}`,
+    );
+    console.log(`${divider}`);
   },
 
   exampleCreated(examplePath: string, envPath: string) {
     console.log();
+    console.log(`${accent('▸')} ${header('File created')}`);
+    console.log(`${divider}`);
     console.log(
-      chalk.green(
-        `${path.basename(examplePath)} file created successfully from ${path.basename(envPath)}.`,
-      ),
+      `${label('Created'.padEnd(26))}${value(path.basename(examplePath))}`,
     );
+    console.log(`${label('From'.padEnd(26))}${dim(path.basename(envPath))}`);
+    console.log(`${divider}`);
   },
 };
