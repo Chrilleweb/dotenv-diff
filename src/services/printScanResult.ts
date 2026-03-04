@@ -16,7 +16,6 @@ import { printMissing } from '../ui/scan/printMissing.js';
 import { printUnused } from '../ui/scan/printUnused.js';
 import { printDuplicates } from '../ui/shared/printDuplicates.js';
 import { printSecrets } from '../ui/scan/printSecrets.js';
-import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
@@ -126,22 +125,6 @@ export function printScanResult(
 
   if (hasHighSeverityExampleSecrets) {
     exitWithError = true;
-  }
-
-  // Success message for env file comparison
-  if (
-    comparedAgainst &&
-    scanResult.missing.length === 0 &&
-    (scanResult.secrets?.length ?? 0) === 0 &&
-    scanResult.used.length > 0
-  ) {
-    printSuccess(
-      isJson,
-      'scan',
-      comparedAgainst,
-      scanResult.unused,
-      opts.showUnused ?? true,
-    );
   }
 
   // Gitignore check

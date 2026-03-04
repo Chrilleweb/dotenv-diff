@@ -78,7 +78,6 @@ vi.mock('../../../src/git.js', () => ({
 
 import { printScanResult } from '../../../src/services/printScanResult.js';
 import { printMissing } from '../../../src/ui/scan/printMissing.js';
-import { printSuccess } from '../../../src/ui/shared/printSuccess.js';
 import { printAutoFix } from '../../../src/ui/shared/printAutoFix.js';
 
 describe('printScanResult', () => {
@@ -145,19 +144,6 @@ describe('printScanResult', () => {
     );
 
     expect(result.exitWithError).toBe(true);
-  });
-
-  it('calls success message when conditions met', () => {
-    printScanResult(
-      {
-        ...baseScanResult,
-        used: [{ variable: 'A' } as any],
-      },
-      baseOpts,
-      '.env',
-    );
-
-    expect(printSuccess).toHaveBeenCalled();
   });
 
   it('calls printAutoFix when fix enabled', () => {

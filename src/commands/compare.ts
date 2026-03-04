@@ -20,7 +20,6 @@ import { printDuplicates } from '../ui/shared/printDuplicates.js';
 import { printHeader } from '../ui/compare/printHeader.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
 import { printIssues } from '../ui/compare/printIssues.js';
-import { printSuccess } from '../ui/shared/printSuccess.js';
 import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
 import { compareJsonOutput } from '../ui/compare/compareJsonOutput.js';
 import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
@@ -123,10 +122,6 @@ export async function compareMany(
 
     // Check if all is OK
     const allOk = isAllOk(filtered);
-
-    if (allOk) {
-      printSuccess(opts.json ?? false, 'compare');
-    }
 
     // Print duplicates
     printDuplicates(
