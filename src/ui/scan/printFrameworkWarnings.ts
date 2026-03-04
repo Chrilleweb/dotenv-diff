@@ -39,6 +39,7 @@ export function printFrameworkWarnings(
 
   const frameworkLabel = FRAMEWORK_LABELS[uniqueWarnings[0]!.framework];
   const indicator = strict ? error('▸') : warning('▸');
+  const textColor = strict ? error : warning;
 
   console.log();
   console.log(`${indicator} ${header(`Framework issues (${frameworkLabel})`)}`);
@@ -46,7 +47,7 @@ export function printFrameworkWarnings(
 
   for (const w of uniqueWarnings) {
     console.log(
-      `${label(w.variable.padEnd(26))}${warning(`${normalizePath(w.file)}:${w.line}  ${w.reason}`)}`,
+      `${label(w.variable.padEnd(26))}${textColor(`${normalizePath(w.file)}:${w.line}  ${w.reason}`)}`,
     );
   }
 

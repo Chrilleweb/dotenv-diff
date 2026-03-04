@@ -16,13 +16,14 @@ export function printUnused(
 
   const fileType = comparedAgainst || 'environment file';
   const indicator = strict ? error('▸') : warning('▸');
+  const textColor = strict ? error : warning;
 
   console.log();
   console.log(`${indicator} ${header(`Unused in ${fileType}`)}`);
   console.log(`${divider}`);
 
   for (const variable of unused) {
-    console.log(`${label(variable.padEnd(26))}${value('unused')}`);
+    console.log(`${label(variable.padEnd(26))}${textColor('unused')}`);
   }
 
   console.log(`${divider}`);

@@ -17,6 +17,8 @@ export function printConsolelogWarning(
 
   const indicator = strict ? error('▸') : warning('▸');
 
+  const textColor = strict ? error : warning;
+
   console.log();
   console.log(`${indicator} ${header('Environment variables logged to console')}`);
   console.log(`${divider}`);
@@ -36,7 +38,7 @@ export function printConsolelogWarning(
 
     uniqueUsages.slice(0, maxShow).forEach((usage) => {
       const normalizedFile = normalizePath(usage.file);
-      console.log(`${label(variable.padEnd(26))}${value(`${normalizedFile}:${usage.line}`)}`);
+      console.log(`${label(variable.padEnd(26))}${textColor(`${normalizedFile}:${usage.line}`)}`);
     });
 
     if (uniqueUsages.length > maxShow) {

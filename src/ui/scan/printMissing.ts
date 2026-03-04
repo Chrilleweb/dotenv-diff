@@ -42,7 +42,7 @@ export function printMissing(
 
   for (const [file, items] of byFile) {
     for (const { variable, usage } of items) {
-      console.log(`${label(variable.padEnd(26))}${value(`${normalizePath(usage.file)}:${usage.line}`)}`);
+      console.log(`${label(variable.padEnd(26))}${error(`${normalizePath(usage.file)}:${usage.line}`)}`);
     }
   }
 

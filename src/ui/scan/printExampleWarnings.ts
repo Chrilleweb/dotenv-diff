@@ -1,5 +1,5 @@
 import type { ExampleSecretWarning } from '../../config/types.js';
-import { label, value, accent, warning, error, divider, header } from '../theme.js';
+import { label, warning, error, divider, header } from '../theme.js';
 
 /**
  * Prints example file secret warnings to the console.

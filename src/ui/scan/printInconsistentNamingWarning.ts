@@ -14,13 +14,14 @@ export function printInconsistentNamingWarning(
   if (warnings.length === 0) return;
 
   const indicator = strict ? error('▸') : warning('▸');
+  const textColor = strict ? error : warning;
 
   console.log();
   console.log(`${indicator} ${header('Inconsistent naming')}`);
   console.log(`${divider}`);
 
   for (const { key1, key2, suggestion } of warnings) {
-    console.log(`${label(`${key1} ↔ ${key2}`.padEnd(26))}${value(suggestion)}`);
+    console.log(`${label(`${key1} ↔ ${key2}`.padEnd(26))}${textColor(suggestion)}`);
   }
 
   console.log(`${divider}`);

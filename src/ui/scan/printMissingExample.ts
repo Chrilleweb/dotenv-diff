@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { resolveFromCwd } from '../../core/helpers/resolveFromCwd.js';
 import type { ScanUsageOptions } from '../../config/types.js';
-import { label, value, accent, error, warning, divider, header } from '../theme.js';
+import { label, error, warning, divider, header } from '../theme.js';
 
 /**
  * Print message if the specified example file is missing.
