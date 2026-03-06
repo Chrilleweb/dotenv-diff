@@ -160,6 +160,24 @@ describe('scanUsage', () => {
     expect(result.exitWithError).toBe(true);
   });
 
+  it('does not return error in JSON mode for non-high example warnings when strict is false', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      exampleWarnings: [
+        {
+          key: 'EXAMPLE_KEY',
+          value: 'placeholder-but-flagged',
+          reason: 'Entropy',
+          severity: 'medium',
+        },
+      ],
+    } as any);
+
+    const result = await scanUsage({ ...baseOpts, json: true, strict: false });
+
+    expect(result.exitWithError).toBe(false);
+  });
+
   it('returns strict error in JSON mode when strict violations exist', async () => {
     vi.mocked(scanCodebase).mockResolvedValue({
       ...baseScanResult,
