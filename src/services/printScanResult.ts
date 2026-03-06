@@ -9,6 +9,7 @@ import type {
 import {
   DEFAULT_ENV_FILE,
   EXPIRE_THRESHOLD_DAYS,
+  URGENT_EXPIRE_DAYS,
 } from '../config/constants.js';
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
@@ -107,7 +108,7 @@ export function printScanResult(
 
   // Expiration warnings
   if (scanResult.expireWarnings) {
-    printExpireWarnings(scanResult.expireWarnings);
+    printExpireWarnings(scanResult.expireWarnings, opts.strict);
   }
   // Check for high severity secrets - ALWAYS exit with error
   const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
@@ -124,6 +125,14 @@ export function printScanResult(
   );
 
   if (hasHighSeverityExampleSecrets) {
+    exitWithError = true;
+  }
+
+  const hasUrgentExpireWarnings = (scanResult.expireWarnings ?? []).some(
+    (w) => w.daysLeft <= URGENT_EXPIRE_DAYS,
+  );
+
+  if (hasUrgentExpireWarnings) {
     exitWithError = true;
   }
 

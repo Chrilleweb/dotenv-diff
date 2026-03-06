@@ -108,7 +108,9 @@ describe('scanUsage', () => {
     vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
     vi.mocked(printScanResult).mockReturnValue({ exitWithError: false });
     vi.mocked(printMissingExample).mockReturnValue(false);
-    vi.mocked(promptNoEnvScenario).mockResolvedValue({ compareFile: undefined });
+    vi.mocked(promptNoEnvScenario).mockResolvedValue({
+      compareFile: undefined,
+    });
   });
 
   it('returns early when example missing in CI mode', async () => {
@@ -158,6 +160,24 @@ describe('scanUsage', () => {
     expect(result.exitWithError).toBe(true);
   });
 
+  it('does not return error in JSON mode for non-high example warnings when strict is false', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      exampleWarnings: [
+        {
+          key: 'EXAMPLE_KEY',
+          value: 'placeholder-but-flagged',
+          reason: 'Entropy',
+          severity: 'medium',
+        },
+      ],
+    } as any);
+
+    const result = await scanUsage({ ...baseOpts, json: true, strict: false });
+
+    expect(result.exitWithError).toBe(false);
+  });
+
   it('returns strict error in JSON mode when strict violations exist', async () => {
     vi.mocked(scanCodebase).mockResolvedValue({
       ...baseScanResult,
@@ -173,40 +193,56 @@ describe('scanUsage', () => {
     expect(result.exitWithError).toBe(true);
   });
 
-it('skips prompt when type is none and isCiMode is true', async () => {
-  vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+  it('returns error in JSON mode when expiration warning is urgent (<=7 days)', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      expireWarnings: [{ key: 'TOKEN', date: '2026-03-10', daysLeft: 7 }],
+    });
 
-  const result = await scanUsage({ ...baseOpts, isCiMode: true });
+    const result = await scanUsage({ ...baseOpts, json: true, strict: false });
 
-  expect(promptNoEnvScenario).not.toHaveBeenCalled();
-  expect(result.exitWithError).toBe(false);
-});
+    expect(result.exitWithError).toBe(true);
+  });
 
-it('skips prompt when type is none and json is true', async () => {
-  vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+  it('skips prompt when type is none and isCiMode is true', async () => {
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
 
-  const result = await scanUsage({ ...baseOpts, json: true });
+    const result = await scanUsage({ ...baseOpts, isCiMode: true });
 
-  expect(promptNoEnvScenario).not.toHaveBeenCalled();
-  expect(result.exitWithError).toBe(false);
-});
+    expect(promptNoEnvScenario).not.toHaveBeenCalled();
+    expect(result.exitWithError).toBe(false);
+  });
+
+  it('skips prompt when type is none and json is true', async () => {
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    const result = await scanUsage({ ...baseOpts, json: true });
+
+    expect(promptNoEnvScenario).not.toHaveBeenCalled();
+    expect(result.exitWithError).toBe(false);
+  });
 
   it('calls promptNoEnvScenario when type is none and not CI/json', async () => {
-  vi.mocked(promptNoEnvScenario).mockResolvedValue({
-    compareFile: { path: '/env/.env', name: '.env' },
+    vi.mocked(promptNoEnvScenario).mockResolvedValue({
+      compareFile: { path: '/env/.env', name: '.env' },
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+    vi.mocked(processComparisonFile).mockReturnValue({
+      scanResult: { ...baseScanResult },
+      comparedAgainst: '.env',
+      fix: {
+        fixApplied: false,
+        removedDuplicates: [],
+        addedEnv: [],
+        gitignoreUpdated: false,
+      },
+    } as any);
+
+    await scanUsage({ ...baseOpts, isCiMode: false, json: false });
+
+    expect(promptNoEnvScenario).toHaveBeenCalled();
+    expect(processComparisonFile).toHaveBeenCalled();
   });
-  vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
-  vi.mocked(processComparisonFile).mockReturnValue({
-    scanResult: { ...baseScanResult },
-    comparedAgainst: '.env',
-    fix: { fixApplied: false, removedDuplicates: [], addedEnv: [], gitignoreUpdated: false },
-  } as any);
-
-  await scanUsage({ ...baseOpts, isCiMode: false, json: false });
-
-  expect(promptNoEnvScenario).toHaveBeenCalled();
-  expect(processComparisonFile).toHaveBeenCalled();
-});
 
   it('sets frameworkWarnings on scanResult when frameworkValidator returns results', async () => {
     const { frameworkValidator } =

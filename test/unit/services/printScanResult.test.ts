@@ -301,6 +301,19 @@ describe('printScanResult', () => {
     expect(result.exitWithError).toBe(true);
   });
 
+  it('returns exitWithError true when expiration warning is urgent (<=7 days)', () => {
+    const result = printScanResult(
+      {
+        ...baseScanResult,
+        expireWarnings: [{ key: 'TOKEN', daysLeft: 7 } as any],
+      },
+      baseOpts,
+      '.env',
+    );
+
+    expect(result.exitWithError).toBe(true);
+  });
+
   it('checks gitignore status with cwd and default env file', () => {
     printScanResult(baseScanResult, baseOpts, '.env');
 

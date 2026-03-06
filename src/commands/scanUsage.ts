@@ -15,7 +15,11 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/security/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
-import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
+import {
+  DEFAULT_EXAMPLE_FILE,
+  URGENT_EXPIRE_DAYS,
+  EXPIRE_THRESHOLD_DAYS,
+} from '../config/constants.js';
 import { promptNoEnvScenario } from './prompts/promptNoEnvScenario.js';
 
 /**
@@ -145,23 +149,30 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
       scanResult.exampleWarnings ?? []
     ).some((w) => w.severity === 'high');
 
+    const hasUrgentExpireWarnings = (scanResult.expireWarnings ?? []).some(
+      (w) => w.daysLeft <= URGENT_EXPIRE_DAYS,
+    );
+
     return {
       exitWithError:
         scanResult.missing.length > 0 ||
         hasHighSeveritySecrets ||
+        hasUrgentExpireWarnings ||
         hasHighSeverityExampleWarnings ||
         !!(
-          (opts.strict &&
-            (scanResult.unused.length > 0 ||
-              (scanResult.duplicates?.env?.length ?? 0) > 0 ||
-              (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-              (scanResult.secrets?.length ?? 0) > 0 ||
-              (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
-              (scanResult.logged?.length ?? 0) > 0 ||
-              (scanResult.uppercaseWarnings?.length ?? 0) > 0 ||
-              (scanResult.expireWarnings?.length ?? 0) > 0 ||
-              (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0)) ||
-          (scanResult.exampleWarnings?.length ?? 0) > 0
+          opts.strict &&
+          (scanResult.unused.length > 0 ||
+            (scanResult.duplicates?.env?.length ?? 0) > 0 ||
+            (scanResult.duplicates?.example?.length ?? 0) > 0 ||
+            (scanResult.secrets?.length ?? 0) > 0 ||
+            (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
+            (scanResult.logged?.length ?? 0) > 0 ||
+            (scanResult.uppercaseWarnings?.length ?? 0) > 0 ||
+            (scanResult.expireWarnings?.filter(
+              (w) => w.daysLeft <= EXPIRE_THRESHOLD_DAYS,
+            ).length ?? 0) > 0 ||
+            (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0 ||
+            (scanResult.exampleWarnings?.length ?? 0) > 0)
         ),
     };
   }
