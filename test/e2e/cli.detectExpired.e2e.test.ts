@@ -50,7 +50,7 @@ describe('Expiration Warnings', () => {
 
     const res = runCli(cwd, []);
 
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).toContain('Expiration warnings');
     expect(res.stdout).toContain('EXPIRED_API_KEY');
     expect(res.stdout).toContain('EXPIRED');
@@ -78,7 +78,7 @@ describe('Expiration Warnings', () => {
 
     const res = runCli(cwd, []);
 
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).toContain('Expiration warnings');
     expect(res.stdout).toContain('SOON_EXPIRED_KEY');
     expect(res.stdout).toContain('expires in 3 days');
@@ -133,7 +133,7 @@ describe('Expiration Warnings', () => {
 
     const res = runCli(cwd, []);
 
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).toContain('Expiration warnings');
     expect(res.stdout).toContain('OLD_TOKEN');
     expect(res.stdout).toContain('NEW_TOKEN');
@@ -187,7 +187,7 @@ describe('Expiration Warnings', () => {
 
     const res = runCli(cwd, []);
 
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).toContain('Expiration warnings');
     expect(res.stdout).toContain('JS_STYLE_KEY');
     expect(res.stdout).toContain('SHELL_STYLE_KEY');
@@ -242,7 +242,7 @@ describe('Expiration Warnings', () => {
 
     const res = runCli(cwd, ['--json']);
 
-    expect(res.status).toBe(0);
+    expect(res.status).toBe(1);
     expect(res.stdout).not.toContain('Expiration warnings');
     expect(res.stdout).toContain('"expireWarnings"');
   });

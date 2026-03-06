@@ -15,7 +15,7 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { hasIgnoreComment } from '../core/security/secretDetectors.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
-import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
+import { DEFAULT_EXAMPLE_FILE, URGENT_EXPIRE_DAYS } from '../config/constants.js';
 import { promptNoEnvScenario } from './prompts/promptNoEnvScenario.js';
 
 /**
@@ -145,10 +145,15 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
       scanResult.exampleWarnings ?? []
     ).some((w) => w.severity === 'high');
 
+    const hasUrgentExpireWarnings = (scanResult.expireWarnings ?? []).some(
+      (w) => w.daysLeft <= URGENT_EXPIRE_DAYS,
+    );
+
     return {
       exitWithError:
         scanResult.missing.length > 0 ||
         hasHighSeveritySecrets ||
+        hasUrgentExpireWarnings ||
         hasHighSeverityExampleWarnings ||
         !!(
           (opts.strict &&
