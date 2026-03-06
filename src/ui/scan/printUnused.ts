@@ -23,7 +23,7 @@ export function printUnused(
   console.log(`${divider}`);
 
   for (const variable of unused) {
-    console.log(`${label(variable.padEnd(26))}${textColor('unused')}`);
+    console.log(`${label(variable.padEnd(26))}${textColor('Unused')}`);
   }
 
   console.log(`${divider}`);
