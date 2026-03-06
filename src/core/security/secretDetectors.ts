@@ -327,17 +327,27 @@ export function detectSecretsInSource(
       }
     }
   }
-  const uniqueFindings = findings.filter(
-    (f, idx, arr) =>
-      idx ===
-      arr.findIndex(
-        (other) =>
-          other.file === f.file &&
-          other.line === f.line &&
-          other.snippet === f.snippet &&
-          other.kind === f.kind,
-      ),
-  );
+  const severityRank: Record<SecretSeverity, number> = {
+    low: 0,
+    medium: 1,
+    high: 2,
+  };
 
-  return uniqueFindings;
+  const deduped = new Map<string, SecretFinding>();
+
+  for (const finding of findings) {
+    const key = `${finding.file}|${finding.line}|${finding.snippet}|${finding.kind}`;
+    const existing = deduped.get(key);
+
+    if (!existing) {
+      deduped.set(key, finding);
+      continue;
+    }
+
+    if (severityRank[finding.severity] > severityRank[existing.severity]) {
+      deduped.set(key, finding);
+    }
+  }
+
+  return Array.from(deduped.values());
 }
