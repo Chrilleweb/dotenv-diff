@@ -59,7 +59,7 @@ describe('printUnused', () => {
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       4,
-      expect.stringContaining('unused'),
+      expect.stringContaining('Unused'),
     );
   });
 });
