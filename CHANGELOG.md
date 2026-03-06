@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - "You miss 100 percent of the chances you don't take. — Wayne Gretzky" — Michael Scott
 
+## [2.7.1](https://github.com/Chrilleweb/dotenv-diff/compare/v2.7.0...v2.7.1) (2026-03-06)
+
+### 🐛 Bug Fixes
+
+* expire warning ([#299](https://github.com/Chrilleweb/dotenv-diff/issues/299)) ([be0700f](https://github.com/Chrilleweb/dotenv-diff/commit/be0700f4fb27a63da1703f70d2be792e00d84731))
+* minor strict ui bug ([#294](https://github.com/Chrilleweb/dotenv-diff/issues/294)) ([7feb116](https://github.com/Chrilleweb/dotenv-diff/commit/7feb116217a5cacbff095dad2b745bdb2348c924))
+* removed white space ([#295](https://github.com/Chrilleweb/dotenv-diff/issues/295)) ([015afcc](https://github.com/Chrilleweb/dotenv-diff/commit/015afcc7ff593601d9ba7b87e6e162581180c16b))
+* secret detection bug ([#296](https://github.com/Chrilleweb/dotenv-diff/issues/296)) ([be5442b](https://github.com/Chrilleweb/dotenv-diff/commit/be5442b78a6ae99abcfe7eb682c6b1903cdf823f))
+* text for inco naming ([#297](https://github.com/Chrilleweb/dotenv-diff/issues/297)) ([8e2a9be](https://github.com/Chrilleweb/dotenv-diff/commit/8e2a9bebfbd07bcb43c364f8295900ad467a5337))
+* typo in print unused ([#298](https://github.com/Chrilleweb/dotenv-diff/issues/298)) ([fe56942](https://github.com/Chrilleweb/dotenv-diff/commit/fe56942c4caa3efebc0ee53bc313dbf6449f4484))
+
 ## [2.7.0](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.4...v2.7.0) (2026-03-04)
 
 ### ✨ Features
