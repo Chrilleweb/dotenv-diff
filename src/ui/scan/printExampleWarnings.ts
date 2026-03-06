@@ -12,7 +12,7 @@ export function printExampleWarnings(
 ): void {
   if (!warnings || warnings.length === 0) return;
 
-  const indicator = strict ? error('▸') : warning('▸');
+  const indicator = strict || warnings.some(w => w.severity === 'high') ? error('▸') : warning('▸');
 
   console.log();
   console.log(`${indicator} ${header('Potential secrets in .env.example')}`);

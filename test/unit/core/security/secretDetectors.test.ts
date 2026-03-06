@@ -65,6 +65,16 @@ describe('secretDetectors', () => {
       expect(findings[0].severity).toBe('high');
     });
 
+    it('should keep high severity when provider pattern and suspicious key overlap on same line', () => {
+      const source =
+        'const secret = "ghp_1234567890abcdefghijklmnopqrstuvwxyz";';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(findings).toHaveLength(1);
+      expect(findings[0].severity).toBe('high');
+      expect(findings[0].message).toContain('known provider key pattern');
+    });
+
     it('should detect Stripe live key pattern', () => {
       const source =
         'const value = "sk_live_abcdefghijklmnopqrstuvwxyz123456";';
@@ -130,22 +140,22 @@ describe('secretDetectors', () => {
       }
     });
 
-it('should detect medium-entropy strings (32-47 chars)', () => {
-  // High-entropy string using allowed chars: A-Za-z0-9+/_-
-  const literal = "aB3xK9m+QwP2z/LsR8tY-u5nV7cJ4hFgD6eS1iO0p";
-  const source = `const key = "${literal}";`;
-  
-  console.log('Entropy:', shannonEntropyNormalized(literal));
-  console.log('Length:', literal.length);
-  
-  const findings = detectSecretsInSource('test.ts', source);
-  console.log('Findings:', findings);
+    it('should detect medium-entropy strings (32-47 chars)', () => {
+      // High-entropy string using allowed chars: A-Za-z0-9+/_-
+      const literal = 'aB3xK9m+QwP2z/LsR8tY-u5nV7cJ4hFgD6eS1iO0p';
+      const source = `const key = "${literal}";`;
 
-  const entropyFinding = findings.find((f) => f.kind === 'entropy');
-  expect(entropyFinding).toBeDefined();
-  expect(entropyFinding?.severity).toBe('medium');
-  expect(entropyFinding?.message).toContain('found high-entropy string');
-});
+      console.log('Entropy:', shannonEntropyNormalized(literal));
+      console.log('Length:', literal.length);
+
+      const findings = detectSecretsInSource('test.ts', source);
+      console.log('Findings:', findings);
+
+      const entropyFinding = findings.find((f) => f.kind === 'entropy');
+      expect(entropyFinding).toBeDefined();
+      expect(entropyFinding?.severity).toBe('medium');
+      expect(entropyFinding?.message).toContain('found high-entropy string');
+    });
 
     it('should skip lines with ignore comment', () => {
       const source = 'const password = "secret123"; // dotenv-diff-ignore';
