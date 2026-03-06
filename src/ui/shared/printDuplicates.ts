@@ -34,7 +34,6 @@ export function printDuplicates(
     }
 
     console.log(`${divider}`);
-    console.log();
   }
 
   if (dEx.length) {
