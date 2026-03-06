@@ -43,7 +43,7 @@ export function printScanResult(
   let exitWithError = false;
 
   // Determine if output should be in JSON format
-  const isJson = opts.json ?? false;
+  const isJson = opts.json;
 
   printHeader(comparedAgainst);
 
@@ -137,6 +137,7 @@ export function printScanResult(
     printGitignoreWarning({
       envFile: DEFAULT_ENV_FILE,
       reason: gitignoreIssue.reason,
+      strict: opts.strict ?? false,
     });
   }
 
