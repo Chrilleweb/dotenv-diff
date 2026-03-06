@@ -137,6 +137,7 @@ export function printScanResult(
     printGitignoreWarning({
       envFile: DEFAULT_ENV_FILE,
       reason: gitignoreIssue.reason,
+      strict: opts.strict ?? false,
     });
   }
 
