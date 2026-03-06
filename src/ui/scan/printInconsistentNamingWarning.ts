@@ -1,5 +1,13 @@
 import type { InconsistentNamingWarning } from '../../config/types.js';
-import { label, value, warning, error, divider, header } from '../theme.js';
+import {
+  label,
+  value,
+  warning,
+  error,
+  divider,
+  header,
+  wrapReason,
+} from '../theme.js';
 
 /**
  * Prints warnings about inconsistent naming patterns in environment variables.
@@ -21,7 +29,10 @@ export function printInconsistentNamingWarning(
   console.log(`${divider}`);
 
   for (const { key1, key2, suggestion } of warnings) {
-    console.log(`${label(`${key1} ↔ ${key2}`.padEnd(26))}${textColor(suggestion)}`);
+    const suggestionText = `Use only: ${suggestion}`;
+    console.log(
+      `${label(`${key1} ↔ ${key2}`.padEnd(26))}${textColor(wrapReason(suggestionText, 26))}`,
+    );
   }
 
   console.log(`${divider}`);
