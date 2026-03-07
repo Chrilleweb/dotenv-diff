@@ -10,7 +10,7 @@ import { label, warning, error, divider, header } from '../theme.js';
 export function printUnused(
   unused: string[],
   comparedAgainst: string,
-  strict = false,
+  strict: boolean = false,
 ): void {
   if (unused.length === 0) return;
 

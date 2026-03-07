@@ -11,7 +11,7 @@ import { label, warning, error, dim, divider, header } from '../theme.js';
  */
 export function printConsolelogWarning(
   logged: EnvUsage[],
-  strict = false,
+  strict: boolean = false,
 ): boolean {
   if (!logged || logged.length === 0) return false;
 

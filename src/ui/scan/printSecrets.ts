@@ -26,7 +26,10 @@ function getSeverityColor(
  * @param strict - Whether strict mode is enabled
  * @returns void
  */
-export function printSecrets(secrets: SecretFinding[], strict = false): void {
+export function printSecrets(
+  secrets: SecretFinding[],
+  strict: boolean = false,
+): void {
   if (!secrets || secrets.length === 0) return;
 
   const severityOrder = { high: 0, medium: 1, low: 2 };

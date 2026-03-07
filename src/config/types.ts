@@ -31,7 +31,12 @@ export interface FrameworkWarning {
 /**
  * Type representing a duplicate entry
  */
-export type Duplicate = { key: string; count: number };
+export interface Duplicate {
+  /** The environment variable key that is duplicated */
+  key: string;
+  /** The number of times this key is duplicated */
+  count: number;
+}
 
 /**
  * Type representing the result of duplicate detection

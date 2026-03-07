@@ -11,7 +11,7 @@ import { label, warning, error, dim, divider, header } from '../theme.js';
 export function printIssues(
   filtered: Filtered,
   json: boolean,
-  fix = false,
+  fix: boolean = false,
 ): void {
   if (json) return;
 

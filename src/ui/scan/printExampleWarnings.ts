@@ -8,7 +8,7 @@ import { label, warning, error, divider, header } from '../theme.js';
  */
 export function printExampleWarnings(
   warnings: ExampleSecretWarning[],
-  strict = false,
+  strict: boolean = false,
 ): void {
   if (!warnings || warnings.length === 0) return;
 

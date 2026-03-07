@@ -11,7 +11,7 @@ import { label, error, divider, header, warning } from '../theme.js';
 export function printUppercaseWarning(
   warnings: UppercaseWarning[],
   comparedAgainst: string,
-  strict = false,
+  strict: boolean = false,
 ): void {
   if (warnings.length === 0) return;
 

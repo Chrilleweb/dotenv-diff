@@ -29,7 +29,7 @@ const FRAMEWORK_LABELS: Record<DetectedFramework, string> = {
  */
 export function printFrameworkWarnings(
   warnings: FrameworkWarning[],
-  strict = false,
+  strict: boolean = false,
 ): void {
   if (!warnings || warnings.length === 0) return;
 
