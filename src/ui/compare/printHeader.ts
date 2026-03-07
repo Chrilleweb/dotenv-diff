@@ -15,6 +15,8 @@ export function printHeader(
   if (json) return;
 
   console.log();
-  console.log(`${accent('▸')} ${header(`Comparing ${envName} ↔ ${exampleName}`)}`);
+  console.log(
+    `${accent('▸')} ${header(`Comparing ${envName} ↔ ${exampleName}`)}`,
+  );
   console.log(`${divider}`);
 }

@@ -55,9 +55,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain(
-      'Variables accessed',
-    );
+    expect(res.stdout).toContain('Variables accessed');
     expect(res.stdout).toContain('PUBLIC_URL');
   });
 
@@ -75,9 +73,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain(
-      'Variables accessed',
-    );
+    expect(res.stdout).not.toContain('Variables accessed');
   });
 
   it('warns when using process.env with a VITE_ prefixed variable', () => {
@@ -93,9 +89,7 @@ describe('SvelteKit environment variable usage rules', () => {
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      'process.env should',
-    );
+    expect(res.stdout).toContain('process.env should');
     expect(res.stdout).toContain('VITE_SECRET');
   });
 
@@ -112,9 +106,7 @@ describe('SvelteKit environment variable usage rules', () => {
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      '$env/static/public',
-    );
+    expect(res.stdout).toContain('$env/static/public');
     expect(res.stdout).toContain('VITE_PUBLIC');
   });
 
@@ -133,9 +125,7 @@ describe('SvelteKit environment variable usage rules', () => {
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      '$env/static/private',
-    );
+    expect(res.stdout).toContain('$env/static/private');
     expect(res.stdout).toContain('SECRET_KEY');
   });
 
@@ -152,9 +142,7 @@ describe('SvelteKit environment variable usage rules', () => {
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      '$env/static/private',
-    );
+    expect(res.stdout).toContain('$env/static/private');
   });
 
   it('does not warn when using $env/static/private in +page.server.ts', () => {
@@ -177,9 +165,7 @@ describe('SvelteKit environment variable usage rules', () => {
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain(
-      '$env/static/private',
-    );
+    expect(res.stdout).not.toContain('$env/static/private');
     expect(res.stdout).not.toContain('warning');
   });
 
@@ -196,9 +182,7 @@ describe('SvelteKit environment variable usage rules', () => {
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      '$env/static/private',
-    );
+    expect(res.stdout).toContain('$env/static/private');
     expect(res.stdout).toContain('PUBLIC_TOKEN');
   });
 
@@ -236,9 +220,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage', '--strict']);
 
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain(
-      'Variables accessed',
-    );
+    expect(res.stdout).toContain('Variables accessed');
     expect(res.stdout).toContain('PUBLIC_URL');
   });
 
@@ -255,9 +237,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      'Variables accessed',
-    );
+    expect(res.stdout).toContain('Variables accessed');
     expect(res.stdout).toContain('SECRET_KEY');
   });
 
@@ -274,9 +254,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      'Variables accessed',
-    );
+    expect(res.stdout).toContain('Variables accessed');
     expect(res.stdout).toContain('API_KEY');
   });
 
@@ -296,9 +274,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      '$env/dynamic/private',
-    );
+    expect(res.stdout).toContain('$env/dynamic/private');
   });
 
   it('Will warn when variable starts with PUBLIC_ inside $env/dynamic/private import', () => {
@@ -316,9 +292,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      '$env/dynamic/private',
-    );
+    expect(res.stdout).toContain('$env/dynamic/private');
     expect(res.stdout).toContain('PUBLIC_KEY');
   });
 
@@ -335,9 +309,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      '$env/static/private',
-    );
+    expect(res.stdout).toContain('$env/static/private');
   });
 
   it('does not warn when using $env/dynamic/private in +page.server.ts', () => {
@@ -360,9 +332,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain(
-      '$env/static/private',
-    );
+    expect(res.stdout).not.toContain('$env/static/private');
     expect(res.stdout).not.toContain('warning');
   });
 
@@ -382,9 +352,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
     const res = runCli(cwd, ['--scan-usage']);
 
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain(
-      '$env/static/private',
-    );
+    expect(res.stdout).not.toContain('$env/static/private');
     expect(res.stdout).not.toContain('warning');
   });
 
@@ -442,9 +410,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      '$env/dynamic/public',
-    );
+    expect(res.stdout).toContain('$env/dynamic/public');
     expect(res.stdout).toContain('SECRET_KEY');
   });
 
@@ -598,9 +564,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      'Potential sensitive',
-    );
+    expect(res.stdout).toContain('Potential sensitive');
     expect(res.stdout).toContain('VITE_SECRET_PASSWORD');
     expect(res.stdout).toContain('PUBLIC_API_KEY');
   });

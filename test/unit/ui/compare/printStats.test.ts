@@ -24,12 +24,28 @@ describe('printStats', () => {
   });
 
   it('does nothing when json is true', () => {
-    printStats('.env', '.env.example', baseStats, baseFiltered, true, true, true);
+    printStats(
+      '.env',
+      '.env.example',
+      baseStats,
+      baseFiltered,
+      true,
+      true,
+      true,
+    );
     expect(logSpy).not.toHaveBeenCalled();
   });
 
   it('does nothing when showStats is false', () => {
-    printStats('.env', '.env.example', baseStats, baseFiltered, false, false, true);
+    printStats(
+      '.env',
+      '.env.example',
+      baseStats,
+      baseFiltered,
+      false,
+      false,
+      true,
+    );
     expect(logSpy).not.toHaveBeenCalled();
   });
 
@@ -38,22 +54,52 @@ describe('printStats', () => {
 
     printStats('.env', '.env.example', baseStats, filtered, false, true, true);
 
-    expect(logSpy).toHaveBeenCalledWith(`${accent('▸')} ${header('Compare Statistics')}`);
-    expect(logSpy).toHaveBeenCalledWith(`${label('Keys in .env'.padEnd(26))}${value('5')}`);
-    expect(logSpy).toHaveBeenCalledWith(`${label('Keys in .env.example'.padEnd(26))}${value('4')}`);
-    expect(logSpy).toHaveBeenCalledWith(`${label('Shared keys'.padEnd(26))}${value('3')}`);
-    expect(logSpy).toHaveBeenCalledWith(`${label('Missing in .env'.padEnd(26))}${value('1')}`);
-    expect(logSpy).toHaveBeenCalledWith(`${label('Extra (not in .env.example)'.padEnd(26))}${value('1')}`);
-    expect(logSpy).toHaveBeenCalledWith(`${label('Empty values'.padEnd(26))}${value('1')}`);
-    expect(logSpy).toHaveBeenCalledWith(`${label('Duplicate keys'.padEnd(26))}${value('1')}`);
-    expect(logSpy).toHaveBeenCalledWith(`${label('Value mismatches'.padEnd(26))}${value('2')}`);
+    expect(logSpy).toHaveBeenCalledWith(
+      `${accent('▸')} ${header('Compare Statistics')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Keys in .env'.padEnd(26))}${value('5')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Keys in .env.example'.padEnd(26))}${value('4')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Shared keys'.padEnd(26))}${value('3')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Missing in .env'.padEnd(26))}${value('1')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Extra (not in .env.example)'.padEnd(26))}${value('1')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Empty values'.padEnd(26))}${value('1')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Duplicate keys'.padEnd(26))}${value('1')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Value mismatches'.padEnd(26))}${value('2')}`,
+    );
   });
 
   it('skips optional branches when extra/empty missing and checkValues=false', () => {
-    printStats('.env', '.env.example', baseStats, { missing: [] }, false, true, false);
+    printStats(
+      '.env',
+      '.env.example',
+      baseStats,
+      { missing: [] },
+      false,
+      true,
+      false,
+    );
 
-    expect(logSpy).toHaveBeenCalledWith(`${label('Missing in .env'.padEnd(26))}${value('0')}`);
-    expect(logSpy).toHaveBeenCalledWith(`${label('Duplicate keys'.padEnd(26))}${value('1')}`);
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Missing in .env'.padEnd(26))}${value('0')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('Duplicate keys'.padEnd(26))}${value('1')}`,
+    );
 
     expect(
       logSpy.mock.calls.some(([msg]: [string]) =>
@@ -63,7 +109,15 @@ describe('printStats', () => {
   });
 
   it('handles undefined extra and empty safely', () => {
-    printStats('.env', '.env.example', baseStats, { missing: [] }, false, true, true);
+    printStats(
+      '.env',
+      '.env.example',
+      baseStats,
+      { missing: [] },
+      false,
+      true,
+      true,
+    );
     expect(logSpy).toHaveBeenCalled();
   });
 });

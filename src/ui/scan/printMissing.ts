@@ -2,7 +2,6 @@ import type { EnvUsage, VariableUsages } from '../../config/types.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
 import { label, value, error, divider } from '../theme.js';
 
-
 /**
  * Print missing environment variables (used in code but not in env file).
  *
@@ -30,7 +29,10 @@ export function printMissing(
     return acc;
   }, {});
 
-  const byFile = new Map<string, Array<{ variable: string; usage: EnvUsage }>>();
+  const byFile = new Map<
+    string,
+    Array<{ variable: string; usage: EnvUsage }>
+  >();
 
   for (const [variable, usages] of Object.entries(grouped)) {
     for (const usage of usages) {
@@ -40,9 +42,11 @@ export function printMissing(
     }
   }
 
-  for (const [file, items] of byFile) {
+  for (const [, items] of byFile) {
     for (const { variable, usage } of items) {
-      console.log(`${label(variable.padEnd(26))}${error(`${normalizePath(usage.file)}:${usage.line}`)}`);
+      console.log(
+        `${label(variable.padEnd(26))}${error(`${normalizePath(usage.file)}:${usage.line}`)}`,
+      );
     }
   }
 

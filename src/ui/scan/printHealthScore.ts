@@ -1,4 +1,4 @@
-import { accent, warning, error, divider, header, dim, value } from '../theme.js';
+import { accent, warning, error, divider, header } from '../theme.js';
 import chalk from 'chalk';
 
 /**
@@ -14,15 +14,20 @@ export function printHealthScore(
   if (json) return false;
 
   const [indicator, scoreColor, lbl] =
-    score >= 90 ? [accent('▸'),   accent,  'Excellent health']
-  : score >= 70 ? [warning('▸'),  warning, 'Can improve']
-  : score >= 40 ? [error('▸'),    error,   'Needs attention']
-  :               [error('▸'),    error,   'Poor health'];
+    score >= 90
+      ? [accent('▸'), accent, 'Excellent health']
+      : score >= 70
+        ? [warning('▸'), warning, 'Can improve']
+        : score >= 40
+          ? [error('▸'), error, 'Needs attention']
+          : [error('▸'), error, 'Poor health'];
 
   console.log();
   console.log(`${indicator} ${header('Project Health Score')}`);
   console.log(`${divider}`);
-  console.log(`${chalk.hex('#888888')('Score'.padEnd(26))}${scoreColor(`${score}/100`)}`);
+  console.log(
+    `${chalk.hex('#888888')('Score'.padEnd(26))}${scoreColor(`${score}/100`)}`,
+  );
   console.log(`${chalk.hex('#888888')('Status'.padEnd(26))}${scoreColor(lbl)}`);
   console.log(`${divider}`);
   console.log();

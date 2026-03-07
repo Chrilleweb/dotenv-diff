@@ -36,6 +36,8 @@ export function printGitignoreWarning(options: GitignoreWarningOptions): void {
   log(`${divider}`);
   log(`${label('File'.padEnd(26))}${(strict ? error : warning)(envFile)}`);
   log(`${label('Issue'.padEnd(26))}${(strict ? error : warning)(issue)}`);
-  log(`${label('Suggestion'.padEnd(26))}${value(`add ${envFile} to .gitignore`)}`);
+  log(
+    `${label('Suggestion'.padEnd(26))}${value(`add ${envFile} to .gitignore`)}`,
+  );
   log(`${divider}`);
 }

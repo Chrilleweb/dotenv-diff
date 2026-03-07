@@ -78,14 +78,8 @@ describe('parseAndFilterEnv', () => {
   });
 
   it('filters keys with both ignore and ignoreRegex', () => {
-    fs.writeFileSync(
-      envPath,
-      'FOO=bar\nIGNORED=1\nTEST_VAR=2\nKEEP=3\n',
-    );
-    fs.writeFileSync(
-      examplePath,
-      'FOO=\nIGNORED=\nTEST_VAR=\nKEEP=\n',
-    );
+    fs.writeFileSync(envPath, 'FOO=bar\nIGNORED=1\nTEST_VAR=2\nKEEP=3\n');
+    fs.writeFileSync(examplePath, 'FOO=\nIGNORED=\nTEST_VAR=\nKEEP=\n');
 
     const opts: ComparisonOptions = {
       checkValues: false,
@@ -287,10 +281,7 @@ BAZ=
       envPath,
       'API_KEY=secret\nAPI_URL=url\nDB_HOST=host\nDB_PORT=5432\n',
     );
-    fs.writeFileSync(
-      examplePath,
-      'API_KEY=\nAPI_URL=\nDB_HOST=\nDB_PORT=\n',
-    );
+    fs.writeFileSync(examplePath, 'API_KEY=\nAPI_URL=\nDB_HOST=\nDB_PORT=\n');
 
     const opts: ComparisonOptions = {
       checkValues: false,

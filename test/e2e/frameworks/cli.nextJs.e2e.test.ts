@@ -119,7 +119,10 @@ console.log(process.env.SECRET_TOKEN);`,
       }`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `NEXT_PUBLIC_SECRET_PASSWORD=secret123`);
+    fs.writeFileSync(
+      path.join(cwd, '.env'),
+      `NEXT_PUBLIC_SECRET_PASSWORD=secret123`,
+    );
     const res = runCli(cwd, ['--scan-usage', '--json']);
 
     console.log(res.stdout);
@@ -135,7 +138,9 @@ console.log(process.env.SECRET_TOKEN);`,
     const warning = json.frameworkWarnings[0];
     expect(warning.variable).toBe('NEXT_PUBLIC_SECRET_PASSWORD');
     expect(warning.framework).toBe('nextjs');
-    expect(warning.reason).toContain('Potential sensitive environment variable exposed to the browser');
+    expect(warning.reason).toContain(
+      'Potential sensitive environment variable exposed to the browser',
+    );
     expect(warning.file).toContain('app/api/test/route.ts');
     expect(warning.line).toBeGreaterThan(0);
   });
@@ -166,9 +171,7 @@ SECRET_KEY=my-secret`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      'Server-only variable',
-    );
+    expect(res.stdout).toContain('Server-only variable');
     expect(res.stdout).toContain('DATABASE_URL');
     expect(res.stdout).toContain('SECRET_KEY');
   });
@@ -250,9 +253,7 @@ API_ENDPOINT=api`,
 
     const res = runCli(cwd, ['--scan-usage']);
 
-    expect(res.stdout).toContain(
-      'Server-only variable',
-    );
+    expect(res.stdout).toContain('Server-only variable');
   });
 
   it('does not warn in pages/api routes', () => {

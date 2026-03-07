@@ -33,7 +33,11 @@ describe('printFixTips', () => {
 
   it('prints combined tip for missing + duplicates + envNotIgnored', () => {
     printFixTips(
-      { ...baseFiltered, missing: ['A'], duplicatesEnv: [{ key: 'X', count: 2 }] },
+      {
+        ...baseFiltered,
+        missing: ['A'],
+        duplicatesEnv: [{ key: 'X', count: 2 }],
+      },
       true,
       false,
       false,
@@ -48,7 +52,11 @@ describe('printFixTips', () => {
 
   it('prints tip for missing + duplicates', () => {
     printFixTips(
-      { ...baseFiltered, missing: ['A'], duplicatesEnv: [{ key: 'X', count: 2 }] },
+      {
+        ...baseFiltered,
+        missing: ['A'],
+        duplicatesEnv: [{ key: 'X', count: 2 }],
+      },
       false,
       false,
       false,
@@ -77,12 +85,7 @@ describe('printFixTips', () => {
   });
 
   it('prints tip for missing + envNotIgnored', () => {
-    printFixTips(
-      { ...baseFiltered, missing: ['A'] },
-      true,
-      false,
-      false,
-    );
+    printFixTips({ ...baseFiltered, missing: ['A'] }, true, false, false);
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.gray(
@@ -92,12 +95,7 @@ describe('printFixTips', () => {
   });
 
   it('prints tip for missing only', () => {
-    printFixTips(
-      { ...baseFiltered, missing: ['A'] },
-      false,
-      false,
-      false,
-    );
+    printFixTips({ ...baseFiltered, missing: ['A'] }, false, false, false);
 
     expect(logSpy).toHaveBeenCalledWith(
       chalk.gray('Tip: Run with `--fix` to add missing keys'),
@@ -121,9 +119,7 @@ describe('printFixTips', () => {
     printFixTips(baseFiltered, true, false, false);
 
     expect(logSpy).toHaveBeenCalledWith(
-      chalk.gray(
-        'Tip: Run with `--fix` to ensure .env is added to .gitignore',
-      ),
+      chalk.gray('Tip: Run with `--fix` to ensure .env is added to .gitignore'),
     );
   });
 

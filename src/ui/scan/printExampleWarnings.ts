@@ -8,11 +8,14 @@ import { label, warning, error, divider, header } from '../theme.js';
  */
 export function printExampleWarnings(
   warnings: ExampleSecretWarning[],
-  strict = false,
+  strict: boolean = false,
 ): void {
   if (!warnings || warnings.length === 0) return;
 
-  const indicator = strict || warnings.some(w => w.severity === 'high') ? error('▸') : warning('▸');
+  const indicator =
+    strict || warnings.some((w) => w.severity === 'high')
+      ? error('▸')
+      : warning('▸');
 
   console.log();
   console.log(`${indicator} ${header('Potential secrets in .env.example')}`);
@@ -20,7 +23,9 @@ export function printExampleWarnings(
 
   for (const w of warnings) {
     const severityColor = w.severity === 'high' ? error : warning;
-    console.log(`${label(w.key.padEnd(26))}${severityColor(`${w.reason} [${w.severity}]`)}`);
+    console.log(
+      `${label(w.key.padEnd(26))}${severityColor(`${w.reason} [${w.severity}]`)}`,
+    );
   }
 
   console.log(`${divider}`);

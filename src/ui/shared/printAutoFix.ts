@@ -23,13 +23,19 @@ export function printAutoFix(
     console.log(`${label('Status'.padEnd(26))}${value('no changes needed')}`);
   } else {
     if (result.removedDuplicates.length) {
-      console.log(`${label('Removed duplicates'.padEnd(26))}${value(wrapReason(result.removedDuplicates.join(', '), 26))}`);
+      console.log(
+        `${label('Removed duplicates'.padEnd(26))}${value(wrapReason(result.removedDuplicates.join(', '), 26))}`,
+      );
     }
     if (result.addedEnv.length) {
-      console.log(`${label('Added missing keys'.padEnd(26))}${value(wrapReason(result.addedEnv.join(', '), 26))}`);
+      console.log(
+        `${label('Added missing keys'.padEnd(26))}${value(wrapReason(result.addedEnv.join(', '), 26))}`,
+      );
     }
     if (result.gitignoreUpdated) {
-      console.log(`${label('Updated .gitignore'.padEnd(26))}${value(wrapReason(envName, 26))}`);
+      console.log(
+        `${label('Updated .gitignore'.padEnd(26))}${value(wrapReason(envName, 26))}`,
+      );
     }
   }
 

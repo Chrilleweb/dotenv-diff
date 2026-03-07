@@ -1,7 +1,6 @@
 import type { InconsistentNamingWarning } from '../../config/types.js';
 import {
   label,
-  value,
   warning,
   error,
   divider,
@@ -17,7 +16,7 @@ import {
  */
 export function printInconsistentNamingWarning(
   warnings: InconsistentNamingWarning[],
-  strict = false,
+  strict: boolean = false,
 ): void {
   if (warnings.length === 0) return;
 

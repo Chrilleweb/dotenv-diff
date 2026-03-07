@@ -1,4 +1,5 @@
 import { label, value, warning, error, divider, header } from '../theme.js';
+import type { Duplicate } from '../../config/types.js';
 
 /**
  * Prints duplicate keys found in the environment and example files.
@@ -14,11 +15,11 @@ import { label, value, warning, error, divider, header } from '../theme.js';
 export function printDuplicates(
   envName: string,
   exampleName: string,
-  dEnv: Array<{ key: string; count: number }>,
-  dEx: Array<{ key: string; count: number }>,
+  dEnv: Duplicate[],
+  dEx: Duplicate[],
   json: boolean,
-  fix = false,
-  strict = false,
+  fix: boolean = false,
+  strict: boolean = false,
 ): void {
   if (json) return;
 

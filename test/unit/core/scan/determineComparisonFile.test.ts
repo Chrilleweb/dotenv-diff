@@ -157,7 +157,9 @@ describe('determineComparisonFile', () => {
   });
 
   it('resolves relative paths correctly', async () => {
-    const expectedPath = normalizePath(path.resolve('/home/user/project/config/.env.example'));
+    const expectedPath = normalizePath(
+      path.resolve('/home/user/project/config/.env.example'),
+    );
     mockExistsSync.mockReturnValue(true);
 
     const opts: ScanUsageOptions = {

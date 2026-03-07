@@ -1,5 +1,5 @@
 import type { UppercaseWarning } from '../../config/types.js';
-import { label, value, error, divider, header, warning } from '../theme.js';
+import { label, error, divider, header, warning } from '../theme.js';
 
 /**
  * Print warnings for environment variable keys that are not uppercase.
@@ -11,7 +11,7 @@ import { label, value, error, divider, header, warning } from '../theme.js';
 export function printUppercaseWarning(
   warnings: UppercaseWarning[],
   comparedAgainst: string,
-  strict = false,
+  strict: boolean = false,
 ): void {
   if (warnings.length === 0) return;
 
@@ -20,7 +20,9 @@ export function printUppercaseWarning(
   const textColor = strict ? error : warning;
 
   console.log();
-  console.log(`${indicator} ${header(`Uppercase warnings (${comparedAgainst})`)}`);
+  console.log(
+    `${indicator} ${header(`Uppercase warnings (${comparedAgainst})`)}`,
+  );
   console.log(`${divider}`);
 
   for (const w of warnings) {

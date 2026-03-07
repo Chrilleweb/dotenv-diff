@@ -27,7 +27,9 @@ export function printConfigLoadError(err: unknown): void {
   console.log();
   console.log(`${error('▸')} ${header('Config Error')}`);
   console.log(`${divider}`);
-  console.log(`${label('Failed to parse'.padEnd(26))}${error('dotenv-diff.config.json')}`);
+  console.log(
+    `${label('Failed to parse'.padEnd(26))}${error('dotenv-diff.config.json')}`,
+  );
   console.log(`${label('Reason'.padEnd(26))}${error(message)}`);
   console.log(`${divider}`);
 }
