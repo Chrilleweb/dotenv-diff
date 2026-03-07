@@ -1,14 +1,25 @@
-import type { FrameworkWarning, DetectedFramework } from '../../config/types.js';
-import { label, warning, error, dim, divider, header, wrapReason } from '../theme.js';
+import type {
+  FrameworkWarning,
+  DetectedFramework,
+} from '../../config/types.js';
+import {
+  label,
+  warning,
+  error,
+  dim,
+  divider,
+  header,
+  wrapReason,
+} from '../theme.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
 
 /**
  * Labels for detected frameworks to display in warnings
  */
 const FRAMEWORK_LABELS: Record<DetectedFramework, string> = {
-  nextjs:    'Next.js',
+  nextjs: 'Next.js',
   sveltekit: 'SvelteKit',
-  unknown:   'Unknown Framework',
+  unknown: 'Unknown Framework',
 };
 
 /**
@@ -27,7 +38,10 @@ export function printFrameworkWarnings(
   const textColor = strict ? error : warning;
 
   // Group by variable+reason, collect unique locations
-  const grouped = new Map<string, { w: FrameworkWarning; locations: string[] }>();
+  const grouped = new Map<
+    string,
+    { w: FrameworkWarning; locations: string[] }
+  >();
   for (const w of warnings) {
     const key = `${w.variable}:${w.reason}`;
     if (!grouped.has(key)) grouped.set(key, { w, locations: [] });
@@ -42,7 +56,9 @@ export function printFrameworkWarnings(
   console.log(`${divider}`);
 
   for (const { w, locations } of grouped.values()) {
-    console.log(`${label(w.variable.padEnd(26))}${textColor(wrapReason(w.reason, 26))}`);
+    console.log(
+      `${label(w.variable.padEnd(26))}${textColor(wrapReason(w.reason, 26))}`,
+    );
     for (const loc of locations) {
       console.log(`${label(''.padEnd(26))}${dim(loc)}`);
     }

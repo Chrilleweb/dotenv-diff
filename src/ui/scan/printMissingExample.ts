@@ -24,7 +24,9 @@ export function printMissingExample(opts: ScanUsageOptions): boolean {
   console.log();
   console.log(`${indicator} ${header('Missing example file')}`);
   console.log(`${divider}`);
-  console.log(`${label('File'.padEnd(26))}${(opts.isCiMode ? error : warning)(fileName)}`);
+  console.log(
+    `${label('File'.padEnd(26))}${(opts.isCiMode ? error : warning)(fileName)}`,
+  );
   console.log(`${divider}`);
 
   return opts.isCiMode ?? false;
