@@ -49,7 +49,7 @@ export function detectSecretsInExample(
         warnings.push({
           key,
           value,
-          reason: `Entropy`,
+          reason: 'Entropy',
           severity: entropy > 0.92 ? 'high' : 'medium',
         });
       }
