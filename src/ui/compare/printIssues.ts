@@ -50,7 +50,9 @@ export function printIssues(
     console.log(`${warning('▸')} ${header('Value mismatches')}`);
     console.log(`${divider}`);
     for (const { key, expected, actual } of filtered.mismatches) {
-      console.log(`${label(key.padEnd(26))}${warning(`expected: ${expected}`)}  ${dim(`got: ${actual}`)}`);
+      console.log(
+        `${label(key.padEnd(26))}${warning(`expected: ${expected}`)}  ${dim(`got: ${actual}`)}`,
+      );
     }
     console.log(`${divider}`);
   }

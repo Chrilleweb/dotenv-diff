@@ -65,7 +65,6 @@ export const ALLOWED_CATEGORIES = [
   'gitignore',
 ] as const;
 
-
 /** * Threshold in days for showing expiration warnings for environment variables.
  * Variables expiring within this number of days or already expired will trigger a warning.
  */

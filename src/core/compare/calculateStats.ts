@@ -30,7 +30,7 @@ export function calculateStats(
   );
 
   const valueMismatchCount = checkValues
-    ? filtered.mismatches?.length ?? 0
+    ? (filtered.mismatches?.length ?? 0)
     : 0;
 
   return {

@@ -52,6 +52,7 @@ chore: refactor parser internals
 ```bash
 feat!: change CLI output format
 ```
+
 or
 
 ```bash

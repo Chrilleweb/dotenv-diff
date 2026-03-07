@@ -37,9 +37,7 @@ describe('printFrameworkWarnings', () => {
 
     printFrameworkWarnings(warnings);
 
-    expect(logSpy).toHaveBeenCalledWith(
-      ('▸ Framework issues (Next.js)'),
-    );
+    expect(logSpy).toHaveBeenCalledWith('▸ Framework issues (Next.js)');
   });
 
   it('prints warnings for SvelteKit framework', () => {
@@ -55,9 +53,7 @@ describe('printFrameworkWarnings', () => {
 
     printFrameworkWarnings(warnings);
 
-    expect(logSpy).toHaveBeenCalledWith(
-      ('▸ Framework issues (SvelteKit)'),
-    );
+    expect(logSpy).toHaveBeenCalledWith('▸ Framework issues (SvelteKit)');
   });
 
   it('deduplicates identical warnings', () => {

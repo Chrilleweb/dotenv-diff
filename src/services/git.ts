@@ -10,7 +10,7 @@ import {
 } from '../config/constants.js';
 import type { GitignoreIssue } from '../config/types.js';
 
-/** 
+/**
  * Options for checking gitignore status
  */
 interface GitignoreCheckOptions {

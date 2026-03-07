@@ -20,7 +20,9 @@ export function printConsolelogWarning(
   const textColor = strict ? error : warning;
 
   console.log();
-  console.log(`${indicator} ${header('Environment variables logged to console')}`);
+  console.log(
+    `${indicator} ${header('Environment variables logged to console')}`,
+  );
   console.log(`${divider}`);
 
   const grouped = logged.reduce((acc: VariableUsages, entry) => {
@@ -38,11 +40,15 @@ export function printConsolelogWarning(
 
     uniqueUsages.slice(0, maxShow).forEach((usage) => {
       const normalizedFile = normalizePath(usage.file);
-      console.log(`${label(variable.padEnd(26))}${textColor(`${normalizedFile}:${usage.line}`)}`);
+      console.log(
+        `${label(variable.padEnd(26))}${textColor(`${normalizedFile}:${usage.line}`)}`,
+      );
     });
 
     if (uniqueUsages.length > maxShow) {
-      console.log(`${label(''.padEnd(26))}${dim(`+${uniqueUsages.length - maxShow} more`)}`);
+      console.log(
+        `${label(''.padEnd(26))}${dim(`+${uniqueUsages.length - maxShow} more`)}`,
+      );
     }
   }
 

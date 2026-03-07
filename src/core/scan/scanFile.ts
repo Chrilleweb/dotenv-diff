@@ -31,7 +31,7 @@ export function scanFile(
   let importMatch: RegExpExecArray | null;
 
   while ((importMatch = importRegex.exec(content)) !== null) {
-      envImports.push(importMatch[1]!);
+    envImports.push(importMatch[1]!);
   }
 
   for (const pattern of ENV_PATTERNS) {

@@ -41,7 +41,14 @@ describe('filterIgnoredKeys', () => {
   });
 
   it('filters combination of ignore list, regex, and DEFAULT_EXCLUDE_KEYS', () => {
-    const keys = ['API_KEY', 'NODE_ENV', 'SECRET_TOKEN', 'MODE', 'DEBUG', 'PWD'];
+    const keys = [
+      'API_KEY',
+      'NODE_ENV',
+      'SECRET_TOKEN',
+      'MODE',
+      'DEBUG',
+      'PWD',
+    ];
     const ignore = ['DEBUG'];
     const regex = [/^SECRET_/];
     const res = filterIgnoredKeys(keys, ignore, regex);

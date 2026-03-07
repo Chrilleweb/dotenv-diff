@@ -36,7 +36,7 @@ describe('printAutoFix', () => {
 
     printAutoFix(context, '.env', false);
 
-    expect(logSpy).toHaveBeenCalledWith(('▸ Auto-fix'));
+    expect(logSpy).toHaveBeenCalledWith('▸ Auto-fix');
   });
 
   it('does not print added keys when addedEnv is empty', () => {

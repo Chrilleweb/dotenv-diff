@@ -21,12 +21,18 @@ export function printErrorNotFound(
   console.log(`${divider}`);
 
   if (!envExists) {
-    console.log(`${label('Missing env'.padEnd(26))}${error(path.basename(envFlag))}`);
+    console.log(
+      `${label('Missing env'.padEnd(26))}${error(path.basename(envFlag))}`,
+    );
   }
   if (!exExists) {
-    console.log(`${label('Missing example'.padEnd(26))}${error(path.basename(exampleFlag))}`);
+    console.log(
+      `${label('Missing example'.padEnd(26))}${error(path.basename(exampleFlag))}`,
+    );
   }
 
-  console.log(`${label('Suggestion'.padEnd(26))}${value('ensure both files exist before comparing')}`);
+  console.log(
+    `${label('Suggestion'.padEnd(26))}${value('ensure both files exist before comparing')}`,
+  );
   console.log(`${divider}`);
 }

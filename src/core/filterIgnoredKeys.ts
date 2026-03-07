@@ -1,6 +1,6 @@
-/** 
+/**
  * default exclude environment variable keys (not expected in .env files)
- * But may be used in code. 
+ * But may be used in code.
  */
 export const DEFAULT_EXCLUDE_KEYS = [
   'PWD',
@@ -26,6 +26,9 @@ export function filterIgnoredKeys(
   ignoreRegex: RegExp[],
 ): string[] {
   return keys.filter(
-    (k) => !ignore.includes(k) && !DEFAULT_EXCLUDE_KEYS.includes(k) && !ignoreRegex.some((rx) => rx.test(k)),
+    (k) =>
+      !ignore.includes(k) &&
+      !DEFAULT_EXCLUDE_KEYS.includes(k) &&
+      !ignoreRegex.some((rx) => rx.test(k)),
   );
 }

@@ -226,9 +226,7 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, ['--example', '.env.example', '--strict']);
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain(
-      '▸ Potential secrets in .env.example',
-    );
+    expect(res.stdout).toContain('▸ Potential secrets in .env.example');
     expect(res.stdout).toContain('API_KEY');
   });
   it('should not warn about potential secret found in .env.example', () => {
@@ -244,9 +242,7 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, ['--example', '.env.example']);
     expect(res.status).toBe(0);
-    expect(res.stdout).not.toContain(
-      '▸ Potential secrets in .env.example',
-    );
+    expect(res.stdout).not.toContain('▸ Potential secrets in .env.example');
   });
 
   it('exit code if potential real secrets found in .env.example is high', () => {
@@ -265,9 +261,7 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, ['--example', '.env.example']);
     expect(res.status).toBe(1);
-    expect(res.stdout).toContain(
-      '▸ Potential secrets in .env.example',
-    );
+    expect(res.stdout).toContain('▸ Potential secrets in .env.example');
     expect(res.stdout).toContain('[high]');
   });
 
@@ -403,10 +397,10 @@ describe('It will prompt to ask to create .env file is no .env files are found',
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Created empty .env');
     expect(fs.existsSync(path.join(cwd, '.env'))).toBe(false);
-    
+
     // Should still output JSON
     const lines = res.stdout.split('\n');
-    const jsonLine = lines.find(line => line.trim().startsWith('{'));
+    const jsonLine = lines.find((line) => line.trim().startsWith('{'));
     expect(jsonLine).toBeDefined();
   });
 

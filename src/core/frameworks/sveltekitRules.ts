@@ -39,7 +39,8 @@ export function applySvelteKitRules(
   if (u.pattern === 'import.meta.env' && !u.variable.startsWith('VITE_')) {
     warnings.push({
       variable: u.variable,
-      reason: 'Variables accessed through import.meta.env must start with "VITE_"',
+      reason:
+        'Variables accessed through import.meta.env must start with "VITE_"',
       file: normalizedFile,
       line: u.line,
       framework: 'sveltekit',
@@ -124,7 +125,8 @@ export function applySvelteKitRules(
     if (isSvelteFile || isClientFile) {
       warnings.push({
         variable: u.variable,
-        reason: '$env/static/private variables cannot be used in client-side code',
+        reason:
+          '$env/static/private variables cannot be used in client-side code',
         file: normalizedFile,
         line: u.line,
         framework: 'sveltekit',
@@ -150,7 +152,7 @@ export function applySvelteKitRules(
   }
 
   // Warn if PUBLIC_ or VITE_ contains sensitive keywords
-    if (
+  if (
     (u.variable.startsWith('PUBLIC_') || u.variable.startsWith('VITE_')) &&
     /SECRET|PRIVATE|PASSWORD/.test(u.variable)
   ) {
