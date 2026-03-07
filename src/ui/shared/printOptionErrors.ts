@@ -42,7 +42,11 @@ export function printCiYesWarning(): void {
   console.log();
   console.log(`${warning('▸')} ${header('Flag conflict')}`);
   console.log(`${divider}`);
-  console.log(`${label('Issue'.padEnd(26))}${warning('Both --ci and --yes provided')}`);
-  console.log(`${label('Resolution'.padEnd(26))}${value('proceeding with --yes')}`);
+  console.log(
+    `${label('Issue'.padEnd(26))}${warning('Both --ci and --yes provided')}`,
+  );
+  console.log(
+    `${label('Resolution'.padEnd(26))}${value('proceeding with --yes')}`,
+  );
   console.log(`${divider}`);
 }

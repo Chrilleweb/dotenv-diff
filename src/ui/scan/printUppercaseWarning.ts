@@ -20,7 +20,9 @@ export function printUppercaseWarning(
   const textColor = strict ? error : warning;
 
   console.log();
-  console.log(`${indicator} ${header(`Uppercase warnings (${comparedAgainst})`)}`);
+  console.log(
+    `${indicator} ${header(`Uppercase warnings (${comparedAgainst})`)}`,
+  );
   console.log(`${divider}`);
 
   for (const w of warnings) {
