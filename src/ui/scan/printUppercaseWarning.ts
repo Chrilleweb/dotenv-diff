@@ -1,5 +1,5 @@
 import type { UppercaseWarning } from '../../config/types.js';
-import { label, value, error, divider, header, warning } from '../theme.js';
+import { label, error, divider, header, warning } from '../theme.js';
 
 /**
  * Print warnings for environment variable keys that are not uppercase.

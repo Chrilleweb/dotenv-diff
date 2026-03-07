@@ -1,4 +1,4 @@
-import { label, value, warning, error, divider, header } from '../theme.js';
+import { label, warning, error, divider, header } from '../theme.js';
 
 /**
  * Print unused environment variables (defined in env but not used in code).

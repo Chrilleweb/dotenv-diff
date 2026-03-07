@@ -1,6 +1,6 @@
 import type { EnvUsage, VariableUsages } from '../../config/types.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
-import { label, warning, error, dim, divider, header, value } from '../theme.js';
+import { label, warning, error, dim, divider, header } from '../theme.js';
 
 /**
  * Print environment variables that were logged using console.log / warn / error.

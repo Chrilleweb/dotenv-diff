@@ -1,4 +1,4 @@
-import { accent, warning, error, divider, header, dim, value } from '../theme.js';
+import { accent, warning, error, divider, header} from '../theme.js';
 import chalk from 'chalk';
 
 /**

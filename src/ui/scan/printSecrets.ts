@@ -1,13 +1,6 @@
 import type { SecretFinding } from '../../core/security/secretDetectors.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
-import {
-  label,
-  accent,
-  warning,
-  error,
-  divider,
-  header,
-} from '../theme.js';
+import { label, accent, warning, error, divider, header } from '../theme.js';
 
 /**
  * Get the color function for the severity level.
@@ -53,7 +46,7 @@ export function printSecrets(secrets: SecretFinding[], strict = false): void {
     byFile.get(f.file)!.push(f);
   }
 
-  for (const [file, findings] of byFile) {
+  for (const [, findings] of byFile) {
     for (const f of findings) {
       const color = getSeverityColor(f.severity);
       console.log(
