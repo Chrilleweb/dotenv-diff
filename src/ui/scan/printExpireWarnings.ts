@@ -34,12 +34,7 @@ export function printExpireWarnings(
         ? `expired ${days(Math.abs(warn.daysLeft))} ago`
         : `expires in ${days(warn.daysLeft)}`;
 
-    const rowColor =
-      strict || warn.daysLeft <= 7
-        ? error
-        : warn.daysLeft <= EXPIRE_THRESHOLD_DAYS
-          ? warning
-          : value;
+    const rowColor = strict || warn.daysLeft <= 7 ? error : warning;
 
     console.log(`${label(warn.key.padEnd(26))}${rowColor(statusText)}`);
   }

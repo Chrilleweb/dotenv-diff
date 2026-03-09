@@ -1,5 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
+
+vi.mock('../../../../src/ui/theme.js', () => ({
+  label: (text: string) => `L(${text})`,
+  warning: (text: string) => `W(${text})`,
+  error: (text: string) => `E(${text})`,
+  divider: '---',
+  header: (text: string) => `H(${text})`,
+  wrapReason: (text: string) => `WRAP(${text})`,
+}));
+
 import { printInconsistentNamingWarning } from '../../../../src/ui/scan/printInconsistentNamingWarning.js';
 import type { InconsistentNamingWarning } from '../../../../src/config/types.js';
 
@@ -46,6 +55,25 @@ describe('printInconsistentNamingWarning', () => {
       logSpy.mock.calls.some(
         (call: [string]) =>
           String(call[0]).includes('X') && String(call[0]).includes('Y'),
+      ),
+    ).toBe(true);
+  });
+
+  it('uses strict indicator and error text color in strict mode', () => {
+    const warnings: InconsistentNamingWarning[] = [
+      {
+        key1: 'API_KEY',
+        key2: 'apiKey',
+        suggestion: 'API_KEY',
+      },
+    ];
+
+    printInconsistentNamingWarning(warnings, true);
+
+    expect(logSpy).toHaveBeenCalledWith('E(▸) H(Inconsistent naming)');
+    expect(
+      logSpy.mock.calls.some((call: [string]) =>
+        String(call[0]).includes('E(WRAP(Use only: API_KEY))'),
       ),
     ).toBe(true);
   });

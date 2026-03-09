@@ -55,4 +55,19 @@ describe('printAutoFix', () => {
       ),
     ).toBe(false);
   });
+
+  it('no changes message is printed when fixApplied is false', () => {
+    const context = {
+      fixApplied: false,
+      removedDuplicates: [],
+      addedEnv: [],
+      gitignoreUpdated: false,
+    };
+
+    printAutoFix(context, '.env', false);
+
+    expect(logSpy).toHaveBeenCalledWith(
+      'Status                    no changes needed',
+    );
+  });
 });

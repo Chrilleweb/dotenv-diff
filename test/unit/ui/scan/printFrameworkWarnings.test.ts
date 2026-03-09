@@ -1,5 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
+
+vi.mock('../../../../src/ui/theme.js', () => ({
+  label: (text: string) => `L(${text})`,
+  warning: (text: string) => `W(${text})`,
+  error: (text: string) => `E(${text})`,
+  dim: (text: string) => `D(${text})`,
+  divider: '---',
+  header: (text: string) => `H(${text})`,
+  wrapReason: (text: string) => `WRAP(${text})`,
+}));
+
+vi.mock('../../../../src/core/helpers/normalizePath.js', () => ({
+  normalizePath: (path: string) => `normalized:${path}`,
+}));
+
 import { printFrameworkWarnings } from '../../../../src/ui/scan/printFrameworkWarnings.js';
 import type { FrameworkWarning } from '../../../../src/config/types.js';
 
@@ -37,7 +51,7 @@ describe('printFrameworkWarnings', () => {
 
     printFrameworkWarnings(warnings);
 
-    expect(logSpy).toHaveBeenCalledWith('▸ Framework issues (Next.js)');
+    expect(logSpy).toHaveBeenCalledWith('W(▸) H(Framework issues (Next.js))');
   });
 
   it('prints warnings for SvelteKit framework', () => {
@@ -53,7 +67,9 @@ describe('printFrameworkWarnings', () => {
 
     printFrameworkWarnings(warnings);
 
-    expect(logSpy).toHaveBeenCalledWith('▸ Framework issues (SvelteKit)');
+    expect(logSpy).toHaveBeenCalledWith(
+      'W(▸) H(Framework issues (SvelteKit))',
+    );
   });
 
   it('deduplicates identical warnings', () => {
@@ -81,5 +97,26 @@ describe('printFrameworkWarnings', () => {
     );
 
     expect(occurrences.length).toBe(1);
+  });
+
+  it('uses strict indicator and error text color in strict mode', () => {
+    const warnings: FrameworkWarning[] = [
+      {
+        variable: 'API_KEY',
+        reason: 'Not allowed in client bundle',
+        file: 'src/page.ts',
+        line: 7,
+        framework: 'nextjs',
+      },
+    ];
+
+    printFrameworkWarnings(warnings, true);
+
+    expect(logSpy).toHaveBeenCalledWith('E(▸) H(Framework issues (Next.js))');
+    expect(
+      logSpy.mock.calls.some((call: [string]) =>
+        String(call[0]).includes('E(WRAP(Not allowed in client bundle))'),
+      ),
+    ).toBe(true);
   });
 });
