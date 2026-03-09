@@ -29,5 +29,5 @@ export function printMissingExample(opts: ScanUsageOptions): boolean {
   );
   console.log(`${divider}`);
 
-  return opts.isCiMode ?? false;
+  return opts.isCiMode!;
 }
