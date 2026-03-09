@@ -49,163 +49,253 @@ export async function compareMany(
     gitignore: 0,
   };
 
-  for (const { envName, envPath, examplePath } of pairs) {
-    const exampleName = path.basename(examplePath);
-
-    // Check if files exist
-    const envExists = fs.existsSync(envPath);
-    const exampleExists = fs.existsSync(examplePath);
-
-    if (!envExists || !exampleExists) {
-      printErrorNotFound(envExists, exampleExists, envPath, examplePath);
-      exitWithError = true;
-      continue;
-    }
-
-    printHeader(envName, exampleName, opts.json ?? false);
-
-    // Parse and filter env files
-    const { current, example, currentKeys, exampleKeys } = parseAndFilterEnv(
-      envPath,
-      examplePath,
-      opts,
-    );
-
-    // Run checks
-    const diff = diffEnv(current, example, opts.checkValues);
-
-    // Find empty keys in current env
-    const emptyKeys = Object.entries(current)
-      .filter(([, v]) => (v ?? '').trim() === '')
-      .map(([k]) => k);
-
-    // Find duplicates
-    const { dupsEnv, dupsEx } = findDuplicates(envPath, examplePath, opts, run);
-
-    // Check gitignore status
-    const gitignoreIssue = run('gitignore')
-      ? checkGitignoreStatus({ cwd: opts.cwd, envFile: envName })
-      : null;
-
-    // Collect filtered results
-    const filtered: Filtered = {
-      missing: run('missing') ? diff.missing : [],
-      extra: run('extra') ? diff.extra : [],
-      empty: run('empty') ? emptyKeys : [],
-      mismatches: opts.checkValues ? diff.valueMismatches : [],
-      duplicatesEnv: run('duplicate') ? dupsEnv : [],
-      duplicatesEx: run('duplicate') ? dupsEx : [],
-      gitignoreIssue,
-    };
-
-    // Print stats if requested
-    if (opts.showStats && !opts.json) {
-      const stats = calculateStats(
-        currentKeys,
-        exampleKeys,
-        dupsEnv,
-        dupsEx,
-        filtered,
-        opts.checkValues,
-      );
-
-      printStats(
-        envName,
-        exampleName,
-        stats,
-        filtered,
-        opts.json ?? false,
-        opts.showStats ?? true,
-        opts.checkValues ?? false,
-      );
-    }
-
-    // Check if all is OK
-    const allOk = isAllOk(filtered);
-
-    // Print duplicates
-    printDuplicates(
-      envName,
-      exampleName,
-      dupsEnv,
-      dupsEx,
-      opts.json ?? false,
-      opts.fix ?? false,
-    );
-
-    // Calculate stats for JSON entry
-    const stats = calculateStats(
-      currentKeys,
-      exampleKeys,
-      dupsEnv,
-      dupsEx,
-      filtered,
-      opts.checkValues,
-    );
-
-    // Build JSON entry with all the data
-    const entry = compareJsonOutput({
-      envName,
-      exampleName,
-      dupsEnv,
-      dupsEx,
-      gitignoreIssue,
-      ok: allOk,
-      filtered,
-      stats,
-    });
-
-    // Track errors and update totals
-    const shouldExit = updateTotals(filtered, totals, entry);
-    if (shouldExit) {
-      exitWithError = true;
-    }
-
-    // Print all issues
-    printIssues(filtered, opts.json ?? false, opts.fix ?? false);
-
-    if (filtered.gitignoreIssue && !opts.json && !opts.fix) {
-      printGitignoreWarning({
-        envFile: envName,
-        reason: filtered.gitignoreIssue.reason,
-      });
-    }
-
-    const hasGitignoreIssue: boolean = filtered.gitignoreIssue !== null;
-
-    printFixTips(
-      filtered,
-      hasGitignoreIssue,
-      opts.json ?? false,
-      opts.fix ?? false,
-    );
-
-    // Apply auto-fix if requested
-    if (opts.fix) {
-      const { changed, result } = applyFixes({
-        envPath,
-        missingKeys: filtered.missing,
-        duplicateKeys: dupsEnv.map((d) => d.key),
-        ensureGitignore: hasGitignoreIssue,
-      });
-
-      const fixContext = {
-        ...result,
-        fixApplied: changed,
-      };
-
-      printAutoFix(fixContext, envName, opts.json ?? false);
-    }
-
-    opts.collect?.(entry);
-
-    // In strict mode, any issue (not just errors) causes exit with error
-    if (opts.strict && !allOk) {
+  for (const pair of pairs) {
+    if (processPair(pair, opts, run, totals)) {
       exitWithError = true;
     }
   }
 
   return { exitWithError };
+}
+
+interface PairComputation {
+  /** Basename of the example file for display and JSON output */
+  exampleName: string;
+  /** Filtered comparison results for the active pair */
+  filtered: Filtered;
+  /** Duplicate keys found in the env file */
+  dupsEnv: ReturnType<typeof findDuplicateKeys>;
+  /** Duplicate keys found in the example file */
+  dupsEx: ReturnType<typeof findDuplicateKeys>;
+  /** Parsed key list from env file */
+  currentKeys: string[];
+  /** Parsed key list from example file */
+  exampleKeys: string[];
+  /** Gitignore issue for the env file, if any */
+  gitignoreIssue: Filtered['gitignoreIssue'];
+}
+
+/**
+ * Processes a single env/example pair end-to-end.
+ * Handles validation, comparison, output, totals update and strict-mode exit logic.
+ * @param pair The env/example pair to process.
+ * @param opts The comparison options.
+ * @param run Category filter function.
+ * @param totals Running totals used for final summary.
+ * @returns True if this pair should cause exit with error.
+ */
+function processPair(
+  pair: FilePair,
+  opts: Readonly<ComparisonOptions>,
+  run: (category: Category) => boolean,
+  totals: Record<Category, number>,
+): boolean {
+  const { envName, envPath, examplePath } = pair;
+
+  if (!validatePairFiles(envPath, examplePath)) {
+    return true;
+  }
+
+  const computation = computePairComparison(pair, opts, run);
+  const { exampleName, filtered, dupsEnv, dupsEx, currentKeys, exampleKeys } =
+    computation;
+
+  printHeader(envName, exampleName, opts.json ?? false);
+
+  const stats = calculateStats(
+    currentKeys,
+    exampleKeys,
+    dupsEnv,
+    dupsEx,
+    filtered,
+    opts.checkValues,
+  );
+
+  maybePrintStats(envName, exampleName, stats, filtered, opts);
+
+  const allOk = isAllOk(filtered);
+
+  printDuplicates(
+    envName,
+    exampleName,
+    dupsEnv,
+    dupsEx,
+    opts.json ?? false,
+    opts.fix ?? false,
+  );
+
+  const entry = compareJsonOutput({
+    envName,
+    exampleName,
+    dupsEnv,
+    dupsEx,
+    gitignoreIssue: computation.gitignoreIssue,
+    ok: allOk,
+    filtered,
+    stats,
+  });
+
+  const shouldExitFromTotals = updateTotals(filtered, totals, entry);
+
+  printPairOutputs(envName, envPath, filtered, dupsEnv, opts);
+
+  opts.collect?.(entry);
+
+  const shouldExitFromStrict = Boolean(opts.strict && !allOk);
+  return shouldExitFromTotals || shouldExitFromStrict;
+}
+
+/**
+ * Validates that both input files exist before comparison.
+ * Prints a not-found error when either file is missing.
+ * @param envPath Path to the env file.
+ * @param examplePath Path to the example file.
+ * @returns True when both files exist, otherwise false.
+ */
+function validatePairFiles(envPath: string, examplePath: string): boolean {
+  const envExists = fs.existsSync(envPath);
+  const exampleExists = fs.existsSync(examplePath);
+
+  if (!envExists || !exampleExists) {
+    printErrorNotFound(envExists, exampleExists, envPath, examplePath);
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Computes all comparison data for a single file pair.
+ * Includes parsed keys, diffs, empty keys, duplicates and optional gitignore status.
+ * @param pair The env/example pair to compare.
+ * @param opts The comparison options.
+ * @param run Category filter function.
+ * @returns Structured comparison data used by output and summary steps.
+ */
+function computePairComparison(
+  pair: FilePair,
+  opts: Readonly<ComparisonOptions>,
+  run: (category: Category) => boolean,
+): PairComputation {
+  const { envName, envPath, examplePath } = pair;
+  const exampleName = path.basename(examplePath);
+
+  const { current, example, currentKeys, exampleKeys } = parseAndFilterEnv(
+    envPath,
+    examplePath,
+    opts,
+  );
+
+  const diff = diffEnv(current, example, opts.checkValues);
+  const emptyKeys = Object.entries(current)
+    .filter(([, v]) => (v ?? '').trim() === '')
+    .map(([k]) => k);
+
+  const { dupsEnv, dupsEx } = findDuplicates(envPath, examplePath, opts, run);
+
+  const gitignoreIssue = run('gitignore')
+    ? checkGitignoreStatus({ cwd: opts.cwd, envFile: envName })
+    : null;
+
+  const filtered: Filtered = {
+    missing: run('missing') ? diff.missing : [],
+    extra: run('extra') ? diff.extra : [],
+    empty: run('empty') ? emptyKeys : [],
+    mismatches: opts.checkValues ? diff.valueMismatches : [],
+    duplicatesEnv: run('duplicate') ? dupsEnv : [],
+    duplicatesEx: run('duplicate') ? dupsEx : [],
+    gitignoreIssue,
+  };
+
+  return {
+    exampleName,
+    filtered,
+    dupsEnv,
+    dupsEx,
+    currentKeys,
+    exampleKeys,
+    gitignoreIssue,
+  };
+}
+
+/**
+ * Prints stats for a pair when stats output is enabled and JSON output is disabled.
+ * @param envName Name of the env file.
+ * @param exampleName Name of the example file.
+ * @param stats Computed stats for this comparison.
+ * @param filtered Filtered result payload for issue counts.
+ * @param opts Comparison options controlling output behavior.
+ * @returns void
+ */
+function maybePrintStats(
+  envName: string,
+  exampleName: string,
+  stats: ReturnType<typeof calculateStats>,
+  filtered: Filtered,
+  opts: Readonly<ComparisonOptions>,
+): void {
+  if (!opts.showStats || opts.json) return;
+
+  printStats(
+    envName,
+    exampleName,
+    stats,
+    filtered,
+    opts.json ?? false,
+    opts.showStats ?? true,
+    opts.checkValues ?? false,
+  );
+}
+
+/**
+ * Prints issue/fix related outputs for a pair and optionally runs auto-fix.
+ * @param envName Name of the env file.
+ * @param envPath Path to the env file.
+ * @param filtered Filtered comparison results for this pair.
+ * @param dupsEnv Duplicate key entries found in env file.
+ * @param opts Comparison options controlling output and fix behavior.
+ * @returns void
+ */
+function printPairOutputs(
+  envName: string,
+  envPath: string,
+  filtered: Filtered,
+  dupsEnv: ReturnType<typeof findDuplicateKeys>,
+  opts: Readonly<ComparisonOptions>,
+): void {
+  printIssues(filtered, opts.json ?? false, opts.fix ?? false);
+
+  if (filtered.gitignoreIssue && !opts.json && !opts.fix) {
+    printGitignoreWarning({
+      envFile: envName,
+      reason: filtered.gitignoreIssue.reason,
+    });
+  }
+
+  const hasGitignoreIssue = filtered.gitignoreIssue !== null;
+
+  printFixTips(
+    filtered,
+    hasGitignoreIssue,
+    opts.json ?? false,
+    opts.fix ?? false,
+  );
+
+  if (!opts.fix) return;
+
+  const { changed, result } = applyFixes({
+    envPath,
+    missingKeys: filtered.missing,
+    duplicateKeys: dupsEnv.map((d) => d.key),
+    ensureGitignore: hasGitignoreIssue,
+  });
+
+  const fixContext = {
+    ...result,
+    fixApplied: changed,
+  };
+
+  printAutoFix(fixContext, envName, opts.json ?? false);
 }
 
 /**
