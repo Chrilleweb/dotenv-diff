@@ -1,5 +1,5 @@
 import type { ExpireWarning } from '../../config/types.js';
-import { label, value, error, warning, divider, header } from '../theme.js';
+import { label, error, warning, divider, header } from '../theme.js';
 import { EXPIRE_THRESHOLD_DAYS } from '../../config/constants.js';
 
 /**
