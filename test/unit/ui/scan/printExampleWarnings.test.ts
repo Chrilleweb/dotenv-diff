@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
+
+vi.mock('../../../../src/ui/theme.js', () => ({
+  label: (text: string) => `L(${text})`,
+  warning: (text: string) => `W(${text})`,
+  error: (text: string) => `E(${text})`,
+  divider: '---',
+  header: (text: string) => `H(${text})`,
+}));
+
 import { printExampleWarnings } from '../../../../src/ui/scan/printExampleWarnings.js';
 import type { ExampleSecretWarning } from '../../../../src/config/types.js';
 
@@ -53,5 +61,22 @@ describe('printExampleWarnings', () => {
         String(call[0]).includes('TOKEN'),
       ),
     ).toBe(true);
+  });
+
+  it('uses warning indicator when strict is false and no high severity exists', () => {
+    const warnings: ExampleSecretWarning[] = [
+      {
+        key: 'TOKEN',
+        value: 'abc',
+        reason: 'Suspicious token pattern',
+        severity: 'medium',
+      },
+    ];
+
+    printExampleWarnings(warnings, false);
+
+    expect(logSpy).toHaveBeenCalledWith(
+      'W(▸) H(Potential secrets in .env.example)',
+    );
   });
 });
