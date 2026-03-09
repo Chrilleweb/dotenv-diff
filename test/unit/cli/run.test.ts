@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Command } from 'commander';
-import type { Options, RawOptions } from '../../../src/config/types.js';
+import type {
+  Options,
+  RawOptions,
+  CompareJsonEntry,
+} from '../../../src/config/types.js';
 import fs from 'fs';
 
 vi.mock('../../../src/config/options.js', () => ({
@@ -279,5 +283,160 @@ describe('run', () => {
     await run(program);
 
     expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it('covers direct comparison guard when flags become missing at runtime', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ compare: true })),
+    } as unknown as Command;
+
+    const dynamicOptions = createBaseOptions({ compare: true });
+    let envReads = 0;
+    Object.defineProperty(dynamicOptions, 'envFlag', {
+      configurable: true,
+      get: () => {
+        envReads += 1;
+        return envReads === 1 ? 'a.env' : undefined;
+      },
+    });
+    Object.defineProperty(dynamicOptions, 'exampleFlag', {
+      configurable: true,
+      get: () => 'b.env',
+    });
+
+    mockNormalizeOptions.mockReturnValue(dynamicOptions);
+
+    await run(program);
+
+    expect(mockCompareMany).not.toHaveBeenCalled();
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it('continues interactive missing-file flow when prompt does not request exit', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ compare: true })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(
+      createBaseOptions({
+        compare: true,
+        envFlag: 'a.env',
+        exampleFlag: 'b.env',
+        isCiMode: false,
+      }),
+    );
+
+    const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
+    mockPromptEnsureFiles.mockResolvedValue({
+      shouldExit: false,
+      exitCode: 0,
+    });
+    mockCompareMany.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    expect(mockPromptEnsureFiles).toHaveBeenCalled();
+    expect(mockCompareMany).toHaveBeenCalledOnce();
+    expect(exitSpy).toHaveBeenCalledWith(0);
+    existsSpy.mockRestore();
+  });
+
+  it('passes envFlag string directly to scanUsage envPath', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ compare: false })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(
+      createBaseOptions({ compare: false, envFlag: 'custom.env' }),
+    );
+    mockScanUsage.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    expect(mockScanUsage).toHaveBeenCalledWith(
+      expect.objectContaining({ envPath: 'custom.env' }),
+    );
+  });
+
+  it('uses undefined envPath when no env flag and default env file is missing', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ compare: false })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(createBaseOptions({ compare: false }));
+    const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
+    mockScanUsage.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    expect(mockScanUsage).toHaveBeenCalledWith(
+      expect.objectContaining({ envPath: undefined }),
+    );
+    existsSpy.mockRestore();
+  });
+
+  it('prints JSON report output and uses collect callback in compare mode', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ compare: true })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(
+      createBaseOptions({
+        compare: true,
+        json: true,
+        envFlag: 'a.env',
+        exampleFlag: 'b.env',
+      }),
+    );
+
+    const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    mockCompareMany.mockImplementation(async (_pairs, options) => {
+      options.collect?.({ ok: true } as CompareJsonEntry);
+      return { exitWithError: false };
+    });
+
+    await run(program);
+
+    expect(logSpy).toHaveBeenCalledWith(
+      JSON.stringify([{ ok: true }], null, 2),
+    );
+    expect(exitSpy).toHaveBeenCalledWith(0);
+
+    logSpy.mockRestore();
+    existsSpy.mockRestore();
+  });
+
+  it('does not include only in compare options when opts.only is undefined', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ compare: true })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(
+      createBaseOptions({
+        compare: true,
+        envFlag: 'a.env',
+        exampleFlag: 'b.env',
+        only: undefined,
+      } as Partial<Options>),
+    );
+
+    const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
+    mockCompareMany.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    const compareOptions = mockCompareMany.mock.calls[0]?.[1];
+    expect(compareOptions).toBeDefined();
+    expect('only' in compareOptions).toBe(false);
+
+    existsSpy.mockRestore();
   });
 });
