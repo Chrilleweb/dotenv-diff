@@ -1,11 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
 import { printSecrets } from '../../../../src/ui/scan/printSecrets.js';
 import type { SecretFinding } from '../../../../src/core/security/secretDetectors.js';
 
 // Mock normalizePath
 vi.mock('../../../../src/core/helpers/normalizePath.js', () => ({
   normalizePath: (p: string) => `normalized:${p}`,
+}));
+
+vi.mock('../../../../src/ui/theme.js', () => ({
+  label: (text: string) => `L(${text})`,
+  accent: (text: string) => `A(${text})`,
+  warning: (text: string) => `W(${text})`,
+  error: (text: string) => `E(${text})`,
+  divider: '---',
+  header: (text: string) => `H(${text})`,
 }));
 
 describe('printSecrets', () => {
@@ -92,5 +100,22 @@ describe('printSecrets', () => {
         String(call[0]).includes('STRANGE'),
       ),
     ).toBe(true);
+  });
+
+  it('uses strict indicator when strict mode is enabled', () => {
+    const secrets: SecretFinding[] = [
+      {
+        file: '/strict.ts',
+        line: 3,
+        kind: 'pattern',
+        message: 'Strict issue',
+        snippet: 'strict snippet',
+        severity: 'high',
+      },
+    ];
+
+    printSecrets(secrets, true);
+
+    expect(logSpy).toHaveBeenCalledWith('E(▸) H(Potential secrets detected)');
   });
 });
