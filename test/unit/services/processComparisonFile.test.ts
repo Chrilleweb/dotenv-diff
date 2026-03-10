@@ -11,7 +11,7 @@ vi.mock('fs', () => ({
   },
 }));
 
-vi.mock('../../../src/core/parseEnv.js', () => ({
+vi.mock('../../../src/services/parseEnvFile.js', () => ({
   parseEnvFile: vi.fn(() => ({ A: '1', bKey: '2' })),
 }));
 
@@ -58,7 +58,7 @@ vi.mock('../../../src/core/detectInconsistentNaming.js', () => ({
 
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { applyFixes } from '../../../src/core/fixEnv.js';
-import { parseEnvFile } from '../../../src/core/parseEnv.js';
+import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
 
 describe('processComparisonFile', () => {
   const baseScanResult: ScanResult = {

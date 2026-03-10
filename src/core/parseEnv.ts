@@ -1,16 +1,13 @@
-import fs from 'fs';
-
 /**
- * Parses a `.env` file and returns an object with key-value pairs.
+ * Parses dotenv file content and returns an object with key-value pairs.
  *
- * @param path - The file path to the `.env` file.
+ * @param content - The raw dotenv file content.
  * @returns A record object representing parsed environment variables.
  *
  * Lines that are empty or start with `#` (comments) are ignored.
  * Multi-line or quoted values are not supported.
  */
-export function parseEnvFile(path: string): Record<string, string> {
-  const content = safeFileSync(path);
+export function parseEnvContent(content: string): Record<string, string> {
   const lines = content.split('\n');
 
   const result: Record<string, string> = {};
@@ -29,19 +26,4 @@ export function parseEnvFile(path: string): Record<string, string> {
   }
 
   return result;
-}
-
-/**
- * Safely reads a file and returns its content as a string.
- * If the file does not exist or cannot be read, returns an empty string.
- *
- * @param path - The file path to read.
- * @returns The file content as a string, or an empty string if unreadable.
- */
-function safeFileSync(path: string): string {
-  try {
-    return fs.readFileSync(path, 'utf-8');
-  } catch {
-    return '';
-  }
 }

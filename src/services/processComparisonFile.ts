@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { parseEnvFile } from '../core/parseEnv.js';
+import { parseEnvFile } from './parseEnvFile.js';
 import { filterIgnoredKeys } from '../core/filterIgnoredKeys.js';
 import { compareWithEnvFiles } from '../core/scan/compareScan.js';
 import { findDuplicateKeys } from '../core/duplicates.js';

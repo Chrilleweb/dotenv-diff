@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import path from 'path';
 import { makeTmpDir, touch, rmrf } from '../utils/fs-helpers.js';
-import { parseEnvFile } from '../../src/core/parseEnv.js';
+import { parseEnvFile } from '../../src/services/parseEnvFile.js';
 import { diffEnv } from '../../src/core/diffEnv.js';
 
 const tmpDirs: string[] = [];
