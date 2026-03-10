@@ -8,7 +8,9 @@
  * Multi-line or quoted values are not supported.
  */
 export function parseEnvContent(content: string): Record<string, string> {
-  const lines = content.split('\n');
+  // Strip UTF-8 BOM if present to prevent corrupting the first key
+  const cleaned = content.startsWith('\uFEFF') ? content.slice(1) : content;
+  const lines = cleaned.split('\n');
 
   const result: Record<string, string> = {};
 
