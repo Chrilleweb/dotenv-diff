@@ -216,4 +216,15 @@ ANOTHER=test`,
       CHINESE: '你好',
     });
   });
+
+  it('handles UTF-8 BOM without corrupting the first key', () => {
+    const envPath = path.join(dir, '.env');
+    fs.writeFileSync(envPath, '\uFEFFAPI_KEY=secret\nOTHER=value', 'utf-8');
+
+    const result = parseEnvFile(envPath);
+    expect(result).toEqual({
+      API_KEY: 'secret',
+      OTHER: 'value',
+    });
+  });
 });
