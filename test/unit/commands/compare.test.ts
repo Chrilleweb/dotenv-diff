@@ -10,7 +10,7 @@ import type {
 } from '../../../src/config/types.js';
 
 // ---- mocks ----
-vi.mock('../../../src/core/parseEnv.js', () => ({
+vi.mock('../../../src/services/parseEnvFile.js', () => ({
   parseEnvFile: vi.fn(),
 }));
 
@@ -78,7 +78,7 @@ vi.mock('../../../src/ui/compare/printErrorNotFound.js', () => ({
   printErrorNotFound: vi.fn(),
 }));
 
-import { parseEnvFile } from '../../../src/core/parseEnv.js';
+import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
 import { diffEnv } from '../../../src/core/diffEnv.js';
 import { checkGitignoreStatus } from '../../../src/services/git.js';
 import { findDuplicateKeys } from '../../../src/core/duplicates.js';
