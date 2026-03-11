@@ -4,15 +4,17 @@
 
 ### Please don't delete this checklist! Before submitting the PR, please make sure you do the following:
 
-- [ ] Changes are small and focused
-- [ ] No breaking behavior or exit code changes
-- [ ] CLI output follows existing style
+- [ ] Changes are small, focused, and easy to review
 - [ ] Link to related issues (if applicable)
+- [ ] The existing code style and project structure are followed
 
 ### Tests
 
-- [ ] Tests pass (`pnpm run test`)
-- [ ] Ideally, include a test that fails without this PR but passes with it.
+- [ ] Relevant tests have been added or updated
+
+### Documentation
+
+- [ ] Documentation has been updated if necessary (e.g., README, docs folder)
 
 ---
 
