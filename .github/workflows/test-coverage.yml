@@ -115,6 +115,7 @@ jobs:
           echo "all_passed=$all_passed" >> $GITHUB_OUTPUT
 
       - name: Comment PR with coverage
+        if: github.event.pull_request.head.repo.fork == false
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           path: comment.md
