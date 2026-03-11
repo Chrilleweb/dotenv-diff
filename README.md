@@ -133,6 +133,12 @@ This will:
 Issues and pull requests are welcome.  
 → See [CONTRIBUTING](CONTRIBUTING.md) for details.
 
+Thanks to these amazing people for contributing to this project:
+
+<a href="https://github.com/Chrilleweb/dotenv-diff/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Chrilleweb/dotenv-diff" />
+</a>
+
 ---
 
 ## License
