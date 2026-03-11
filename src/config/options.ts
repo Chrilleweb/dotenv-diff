@@ -39,7 +39,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const noColor = toBool(raw.noColor);
   const compare = toBool(raw.compare);
   const strict = toBool(raw.strict);
-  const scanUsage = raw.scanUsage ?? !compare;
+  const scanUsage = raw.scanUsage != null ? toBool(raw.scanUsage) : !compare;
 
   const showUnused = raw.showUnused !== false;
   const showStats = raw.showStats !== false;
