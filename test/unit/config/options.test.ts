@@ -84,4 +84,9 @@ describe('normalizeOptions', () => {
     expect(normalizeOptions({}).scanUsage).toBe(true);
     expect(normalizeOptions({ compare: true }).scanUsage).toBe(false);
   });
+
+  it('normalizes scanUsage string values to boolean', () => {
+    expect(normalizeOptions({ scanUsage: 'true' as unknown as boolean }).scanUsage).toBe(true);
+    expect(normalizeOptions({ scanUsage: 'false' as unknown as boolean }).scanUsage).toBe(false);
+  });
 });
