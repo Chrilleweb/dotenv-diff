@@ -193,4 +193,35 @@ describe('discoverEnvFiles', () => {
 
     expect(result.envFiles[0]).toBe('.env');
   });
+
+  it('preserves subdirectory when --example points to a nested path', () => {
+    const subdir = path.join(cwd, 'config');
+    fs.mkdirSync(subdir, { recursive: true });
+    fs.writeFileSync(path.join(subdir, '.env.example.prod'), '');
+    fs.writeFileSync(path.join(cwd, '.env.prod'), '');
+
+    const result = discoverEnvFiles({
+      cwd,
+      envFlag: null,
+      exampleFlag: path.join(cwd, 'config', '.env.example.prod'),
+    });
+
+    expect(result.primaryExample).toBe('config/.env.example.prod');
+    expect(result.primaryEnv).toBe('.env.prod');
+  });
+
+  it('preserves subdirectory when --env points to a nested path', () => {
+    const subdir = path.join(cwd, 'envs');
+    fs.mkdirSync(subdir, { recursive: true });
+    fs.writeFileSync(path.join(subdir, '.env.prod'), '');
+
+    const result = discoverEnvFiles({
+      cwd,
+      envFlag: path.join(cwd, 'envs', '.env.prod'),
+      exampleFlag: null,
+    });
+
+    expect(result.primaryEnv).toBe('envs/.env.prod');
+    expect(result.envFiles[0]).toBe('envs/.env.prod');
+  });
 });

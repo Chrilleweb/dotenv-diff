@@ -45,11 +45,12 @@ export function discoverEnvFiles({
   // --env (without --example): force primaryEnv and try to find a matching example name via suffix
   if (envFlag && !exampleFlag) {
     const envNameFromFlag = path.basename(envFlag);
-    primaryEnv = envNameFromFlag;
+    const envRelPath = path.relative(cwd, path.resolve(cwd, envFlag));
+    primaryEnv = envRelPath;
 
     // If the specified --env actually exists, make sure it's in the list (first) without duplicates
     if (fs.existsSync(envFlag)) {
-      const set = new Set([envNameFromFlag, ...envFiles]);
+      const set = new Set([envRelPath, ...envFiles]);
       envFiles.length = 0;
       envFiles.push(...Array.from(set));
     }
@@ -70,7 +71,7 @@ export function discoverEnvFiles({
   // --example (without --env): force primaryExample and try to find a matching env name via suffix
   if (exampleFlag && !envFlag) {
     const exampleNameFromFlag = path.basename(exampleFlag);
-    primaryExample = exampleNameFromFlag;
+    primaryExample = path.relative(cwd, path.resolve(cwd, exampleFlag));
 
     if (exampleNameFromFlag.startsWith(DEFAULT_EXAMPLE_FILE)) {
       const suffix = exampleNameFromFlag.slice(DEFAULT_EXAMPLE_FILE.length);
