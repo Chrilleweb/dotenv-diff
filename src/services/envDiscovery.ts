@@ -70,7 +70,7 @@ export function discoverEnvFiles({
   // --example (without --env): force primaryExample and try to find a matching env name via suffix
   if (exampleFlag && !envFlag) {
     const exampleNameFromFlag = path.basename(exampleFlag);
-    primaryExample = exampleNameFromFlag;
+    primaryExample = exampleFlag;
 
     if (exampleNameFromFlag.startsWith(DEFAULT_EXAMPLE_FILE)) {
       const suffix = exampleNameFromFlag.slice(DEFAULT_EXAMPLE_FILE.length);
@@ -91,7 +91,7 @@ export function discoverEnvFiles({
         }
       }
     } else {
-      //  If the example file is not a standard .env.example, we just use it as is
+      // If the example file is not a standard .env.example, we just use the provided path as-is.
       if (envFiles.length === 0) envFiles.push(primaryEnv);
     }
   }
