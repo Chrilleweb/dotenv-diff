@@ -62,57 +62,61 @@ describe('discoverEnvFiles', () => {
   it('handles --example flag and finds matching env via suffix', () => {
     fs.writeFileSync(path.join(cwd, '.env.staging'), '');
     fs.writeFileSync(path.join(cwd, '.env.example.staging'), '');
+    const examplePath = path.join(cwd, '.env.example.staging');
 
     const result = discoverEnvFiles({
       cwd,
       envFlag: null,
-      exampleFlag: path.join(cwd, '.env.example.staging'),
+      exampleFlag: examplePath,
     });
 
-    expect(result.primaryExample).toBe('.env.example.staging');
+    expect(result.primaryExample).toBe(examplePath);
     expect(result.primaryEnv).toBe('.env.staging');
     expect(result.envFiles).toEqual(['.env.staging']);
   });
 
   it('sets alreadyWarnedMissingEnv when example has no matching env', () => {
-    fs.writeFileSync(path.join(cwd, '.env.example.prod'), '');
+    const examplePath = path.join(cwd, '.env.example.prod');
+    fs.writeFileSync(examplePath, '');
 
     const result = discoverEnvFiles({
       cwd,
       envFlag: null,
-      exampleFlag: path.join(cwd, '.env.example.prod'),
+      exampleFlag: examplePath,
     });
 
     expect(result.alreadyWarnedMissingEnv).toBe(true);
-    expect(result.primaryExample).toBe('.env.example.prod');
+    expect(result.primaryExample).toBe(examplePath);
   });
 
   it('uses first available env file when --example has no matching env but other env files exist', () => {
     fs.writeFileSync(path.join(cwd, '.env.local'), '');
-    fs.writeFileSync(path.join(cwd, '.env.example.prod'), '');
+    const examplePath = path.join(cwd, '.env.example.prod');
+    fs.writeFileSync(examplePath, '');
 
     const result = discoverEnvFiles({
       cwd,
       envFlag: null,
-      exampleFlag: path.join(cwd, '.env.example.prod'),
+      exampleFlag: examplePath,
     });
 
     expect(result.primaryEnv).toBe('.env.local');
-    expect(result.primaryExample).toBe('.env.example.prod');
+    expect(result.primaryExample).toBe(examplePath);
     expect(result.alreadyWarnedMissingEnv).toBe(false);
     expect(result.envFiles).toEqual(['.env.local']);
   });
 
   it('uses non-standard example file as-is', () => {
-    fs.writeFileSync(path.join(cwd, 'custom.example'), '');
+    const examplePath = path.join(cwd, 'custom.example');
+    fs.writeFileSync(examplePath, '');
 
     const result = discoverEnvFiles({
       cwd,
       envFlag: null,
-      exampleFlag: path.join(cwd, 'custom.example'),
+      exampleFlag: examplePath,
     });
 
-    expect(result.primaryExample).toBe('custom.example');
+    expect(result.primaryExample).toBe(examplePath);
     expect(result.envFiles.length).toBe(1);
   });
 
@@ -167,15 +171,16 @@ describe('discoverEnvFiles', () => {
 
   it('handles non-standard example file that does not start with .env.example', () => {
     fs.writeFileSync(path.join(cwd, '.env'), '');
-    fs.writeFileSync(path.join(cwd, 'my-custom.env'), '');
+    const examplePath = path.join(cwd, 'my-custom.env');
+    fs.writeFileSync(examplePath, '');
 
     const result = discoverEnvFiles({
       cwd,
       envFlag: null,
-      exampleFlag: path.join(cwd, 'my-custom.env'),
+      exampleFlag: examplePath,
     });
 
-    expect(result.primaryExample).toBe('my-custom.env');
+    expect(result.primaryExample).toBe(examplePath);
     expect(result.primaryEnv).toBe('.env');
     expect(result.envFiles).toContain('.env');
   });
