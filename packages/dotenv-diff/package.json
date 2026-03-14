@@ -84,7 +84,6 @@
     "eslint": "^9.39.4",
     "@repo/eslint-config": "workspace:*",
     "husky": "^9.1.7",
-    "prettier": "^3.8.1",
     "release-it": "^19.2.4",
     "turbo": "^2.8.16",
     "typescript": "^5.9.3",

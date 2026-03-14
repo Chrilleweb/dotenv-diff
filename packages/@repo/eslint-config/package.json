@@ -8,7 +8,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yml}\""
   },
   "devDependencies": {
     "eslint": "^9.39.4",

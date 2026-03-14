@@ -4,25 +4,27 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm --filter dotenv-diff build",
-    "test": "pnpm --filter dotenv-diff test",
-    "coverage": "pnpm --filter dotenv-diff coverage",
-    "dev": "pnpm --filter dotenv-diff dev",
-    "lint": "pnpm --filter dotenv-diff lint",
-    "format": "pnpm --filter dotenv-diff format",
+    "build": "turbo build",
+    "test": "turbo test",
+    "coverage": "turbo coverage",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "format": "turbo format",
     "release:npm": "pnpm --filter dotenv-diff release"
   },
   "devDependencies": {
     "lint-staged": "^16.2.7",
-    "@repo/eslint-config": "workspace:*"
+    "@repo/eslint-config": "workspace:*",
+    "prettier": "^3.8.1",
+    "turbo": "^2.8.16"
   },
   "lint-staged": {
     "*.{ts,js}": [
-      "pnpm --filter dotenv-diff exec eslint --fix",
-      "pnpm --filter dotenv-diff exec prettier --write"
+      "sh -c 'turbo lint -- --fix'",
+      "sh -c 'turbo format'"
     ],
     "*.{json,md,yml}": [
-      "pnpm --filter dotenv-diff exec prettier --write"
+      "sh -c 'turbo format'"
     ]
   },
   "packageManager": "pnpm@10.30.3"
