@@ -67,9 +67,7 @@ describe('printFrameworkWarnings', () => {
 
     printFrameworkWarnings(warnings);
 
-    expect(logSpy).toHaveBeenCalledWith(
-      'W(▸) H(Framework issues (SvelteKit))',
-    );
+    expect(logSpy).toHaveBeenCalledWith('W(▸) H(Framework issues (SvelteKit))');
   });
 
   it('deduplicates identical warnings', () => {
