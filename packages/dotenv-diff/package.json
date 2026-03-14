@@ -75,6 +75,7 @@
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^10.0.5",
+    "@repo/tsconfig": "workspace:*",
     "@types/node": "^25.3.5",
     "@types/prompts": "^2.4.9",
     "@typescript-eslint/eslint-plugin": "^8.57.0",

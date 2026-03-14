@@ -1,22 +1,9 @@
 {
+  "extends": "@repo/tsconfig/base.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "verbatimModuleSyntax": true,
-    "declarationMap": true,
-    "sourceMap": true,
     "rootDir": ".",
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true,
     "outDir": "dist",
-    "declaration": true,
     "declarationDir": "dist",
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
     "types": ["node"]
   },
   "include": ["src/**/*.ts", "bin/**/*.ts", "types/**/*.d.ts"]
