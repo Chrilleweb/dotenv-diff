@@ -25,7 +25,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc",
-    "dev": "vitest --watch",
+    "dev": "npx dotenv-diff",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
     "test:unit": "vitest run ../../test/unit",
