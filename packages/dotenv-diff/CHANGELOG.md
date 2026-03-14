@@ -13,133 +13,133 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🐛 Bug Fixes
 
-* expire warning ([#299](https://github.com/Chrilleweb/dotenv-diff/issues/299)) ([be0700f](https://github.com/Chrilleweb/dotenv-diff/commit/be0700f4fb27a63da1703f70d2be792e00d84731))
-* minor strict ui bug ([#294](https://github.com/Chrilleweb/dotenv-diff/issues/294)) ([7feb116](https://github.com/Chrilleweb/dotenv-diff/commit/7feb116217a5cacbff095dad2b745bdb2348c924))
-* removed white space ([#295](https://github.com/Chrilleweb/dotenv-diff/issues/295)) ([015afcc](https://github.com/Chrilleweb/dotenv-diff/commit/015afcc7ff593601d9ba7b87e6e162581180c16b))
-* secret detection bug ([#296](https://github.com/Chrilleweb/dotenv-diff/issues/296)) ([be5442b](https://github.com/Chrilleweb/dotenv-diff/commit/be5442b78a6ae99abcfe7eb682c6b1903cdf823f))
-* text for inco naming ([#297](https://github.com/Chrilleweb/dotenv-diff/issues/297)) ([8e2a9be](https://github.com/Chrilleweb/dotenv-diff/commit/8e2a9bebfbd07bcb43c364f8295900ad467a5337))
-* typo in print unused ([#298](https://github.com/Chrilleweb/dotenv-diff/issues/298)) ([fe56942](https://github.com/Chrilleweb/dotenv-diff/commit/fe56942c4caa3efebc0ee53bc313dbf6449f4484))
+- expire warning ([#299](https://github.com/Chrilleweb/dotenv-diff/issues/299)) ([be0700f](https://github.com/Chrilleweb/dotenv-diff/commit/be0700f4fb27a63da1703f70d2be792e00d84731))
+- minor strict ui bug ([#294](https://github.com/Chrilleweb/dotenv-diff/issues/294)) ([7feb116](https://github.com/Chrilleweb/dotenv-diff/commit/7feb116217a5cacbff095dad2b745bdb2348c924))
+- removed white space ([#295](https://github.com/Chrilleweb/dotenv-diff/issues/295)) ([015afcc](https://github.com/Chrilleweb/dotenv-diff/commit/015afcc7ff593601d9ba7b87e6e162581180c16b))
+- secret detection bug ([#296](https://github.com/Chrilleweb/dotenv-diff/issues/296)) ([be5442b](https://github.com/Chrilleweb/dotenv-diff/commit/be5442b78a6ae99abcfe7eb682c6b1903cdf823f))
+- text for inco naming ([#297](https://github.com/Chrilleweb/dotenv-diff/issues/297)) ([8e2a9be](https://github.com/Chrilleweb/dotenv-diff/commit/8e2a9bebfbd07bcb43c364f8295900ad467a5337))
+- typo in print unused ([#298](https://github.com/Chrilleweb/dotenv-diff/issues/298)) ([fe56942](https://github.com/Chrilleweb/dotenv-diff/commit/fe56942c4caa3efebc0ee53bc313dbf6449f4484))
 
 ## [2.7.0](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.4...v2.7.0) (2026-03-04)
 
 ### ✨ Features
 
-* new UI design ([#293](https://github.com/Chrilleweb/dotenv-diff/issues/293)) ([417b8ef](https://github.com/Chrilleweb/dotenv-diff/commit/417b8ef678bbdf2a8e12b36b030df4bfb8dba8d7))
+- new UI design ([#293](https://github.com/Chrilleweb/dotenv-diff/issues/293)) ([417b8ef](https://github.com/Chrilleweb/dotenv-diff/commit/417b8ef678bbdf2a8e12b36b030df4bfb8dba8d7))
 
 ## [2.6.4](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.3...v2.6.4) (2026-02-28)
 
 ### 🐛 Bug Fixes
 
-* added support for mts and cts ([#288](https://github.com/Chrilleweb/dotenv-diff/issues/288)) ([93874bf](https://github.com/Chrilleweb/dotenv-diff/commit/93874bfeb67999b43bdcb87814fbc080c650f923))
+- added support for mts and cts ([#288](https://github.com/Chrilleweb/dotenv-diff/issues/288)) ([93874bf](https://github.com/Chrilleweb/dotenv-diff/commit/93874bfeb67999b43bdcb87814fbc080c650f923))
 
 ### 📝 Documentation
 
-* updated docs ([#287](https://github.com/Chrilleweb/dotenv-diff/issues/287)) ([d3f36f4](https://github.com/Chrilleweb/dotenv-diff/commit/d3f36f437748218028fe21843aa5b495d31c3639))
+- updated docs ([#287](https://github.com/Chrilleweb/dotenv-diff/issues/287)) ([d3f36f4](https://github.com/Chrilleweb/dotenv-diff/commit/d3f36f437748218028fe21843aa5b495d31c3639))
 
 ## [2.6.3](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.2...v2.6.3) (2026-02-26)
 
 ### 🐛 Bug Fixes
 
-* skip path ([#281](https://github.com/Chrilleweb/dotenv-diff/issues/281)) ([eec0d13](https://github.com/Chrilleweb/dotenv-diff/commit/eec0d13dddb581072f05a1168ad52e65f41693bf))
-* variables patterns ([#282](https://github.com/Chrilleweb/dotenv-diff/issues/282)) ([67515a0](https://github.com/Chrilleweb/dotenv-diff/commit/67515a04c46e1f373041cfe434c4eca01eb36c81))
+- skip path ([#281](https://github.com/Chrilleweb/dotenv-diff/issues/281)) ([eec0d13](https://github.com/Chrilleweb/dotenv-diff/commit/eec0d13dddb581072f05a1168ad52e65f41693bf))
+- variables patterns ([#282](https://github.com/Chrilleweb/dotenv-diff/issues/282)) ([67515a0](https://github.com/Chrilleweb/dotenv-diff/commit/67515a04c46e1f373041cfe434c4eca01eb36c81))
 
 ## [2.6.2](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.1...v2.6.2) (2026-02-24)
 
 ### 🐛 Bug Fixes
 
-* emoji health score ([#275](https://github.com/Chrilleweb/dotenv-diff/issues/275)) ([b7d8499](https://github.com/Chrilleweb/dotenv-diff/commit/b7d84997286e44a249461554b6deb55e90d10c8c))
-* updated dependencies ([#278](https://github.com/Chrilleweb/dotenv-diff/issues/278)) ([f172462](https://github.com/Chrilleweb/dotenv-diff/commit/f17246285556769996273e090649bf44c838920f))
+- emoji health score ([#275](https://github.com/Chrilleweb/dotenv-diff/issues/275)) ([b7d8499](https://github.com/Chrilleweb/dotenv-diff/commit/b7d84997286e44a249461554b6deb55e90d10c8c))
+- updated dependencies ([#278](https://github.com/Chrilleweb/dotenv-diff/issues/278)) ([f172462](https://github.com/Chrilleweb/dotenv-diff/commit/f17246285556769996273e090649bf44c838920f))
 
 ### 📝 Documentation
 
-* interface docs ([#276](https://github.com/Chrilleweb/dotenv-diff/issues/276)) ([c6789e7](https://github.com/Chrilleweb/dotenv-diff/commit/c6789e75dfe3eae1801cbce52cc6425555a79ab1))
-* updated docs ([#279](https://github.com/Chrilleweb/dotenv-diff/issues/279)) ([a2bfeea](https://github.com/Chrilleweb/dotenv-diff/commit/a2bfeea14dec18dc927e902bf2f6e4c9b86c729a))
+- interface docs ([#276](https://github.com/Chrilleweb/dotenv-diff/issues/276)) ([c6789e7](https://github.com/Chrilleweb/dotenv-diff/commit/c6789e75dfe3eae1801cbce52cc6425555a79ab1))
+- updated docs ([#279](https://github.com/Chrilleweb/dotenv-diff/issues/279)) ([a2bfeea](https://github.com/Chrilleweb/dotenv-diff/commit/a2bfeea14dec18dc927e902bf2f6e4c9b86c729a))
 
 ## [2.6.1](https://github.com/Chrilleweb/dotenv-diff/compare/v2.6.0...v2.6.1) (2026-02-13)
 
 ### 🐛 Bug Fixes
 
-* Expire env warning json ([#267](https://github.com/Chrilleweb/dotenv-diff/issues/267)) ([c029e4c](https://github.com/Chrilleweb/dotenv-diff/commit/c029e4ccbfedfdc630afaf28b7dd37b867aa734f))
-* logged json output ([#268](https://github.com/Chrilleweb/dotenv-diff/issues/268)) ([4a9107a](https://github.com/Chrilleweb/dotenv-diff/commit/4a9107a9167ab086d13ee4be6f91fe8f0015eeee))
+- Expire env warning json ([#267](https://github.com/Chrilleweb/dotenv-diff/issues/267)) ([c029e4c](https://github.com/Chrilleweb/dotenv-diff/commit/c029e4ccbfedfdc630afaf28b7dd37b867aa734f))
+- logged json output ([#268](https://github.com/Chrilleweb/dotenv-diff/issues/268)) ([4a9107a](https://github.com/Chrilleweb/dotenv-diff/commit/4a9107a9167ab086d13ee4be6f91fe8f0015eeee))
 
 ## [2.6.0](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.9...v2.6.0) (2026-02-06)
 
 ### ✨ Features
 
-* prompt if no env file is found ([#262](https://github.com/Chrilleweb/dotenv-diff/issues/262)) ([c14adf4](https://github.com/Chrilleweb/dotenv-diff/commit/c14adf4206fc045833d985f1d599b5ac92a2a399))
+- prompt if no env file is found ([#262](https://github.com/Chrilleweb/dotenv-diff/issues/262)) ([c14adf4](https://github.com/Chrilleweb/dotenv-diff/commit/c14adf4206fc045833d985f1d599b5ac92a2a399))
 
 ### 🐛 Bug Fixes
 
-* Added more space after prompt ([#263](https://github.com/Chrilleweb/dotenv-diff/issues/263)) ([c5e5770](https://github.com/Chrilleweb/dotenv-diff/commit/c5e57700dabb25ef43635c7a53b7d903244fadc0))
+- Added more space after prompt ([#263](https://github.com/Chrilleweb/dotenv-diff/issues/263)) ([c5e5770](https://github.com/Chrilleweb/dotenv-diff/commit/c5e57700dabb25ef43635c7a53b7d903244fadc0))
 
 ### 📝 Documentation
 
-* moved -y flag up ([#261](https://github.com/Chrilleweb/dotenv-diff/issues/261)) ([08d0530](https://github.com/Chrilleweb/dotenv-diff/commit/08d0530a5c4f5aa183540b4b4afd647894f019ca))
+- moved -y flag up ([#261](https://github.com/Chrilleweb/dotenv-diff/issues/261)) ([08d0530](https://github.com/Chrilleweb/dotenv-diff/commit/08d0530a5c4f5aa183540b4b4afd647894f019ca))
 
 ## [2.5.9](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.8...v2.5.9) (2026-02-02)
 
 ### 🐛 Bug Fixes
 
-* removed ci warning on missing - duplicate ([#254](https://github.com/Chrilleweb/dotenv-diff/issues/254)) ([b9e70f0](https://github.com/Chrilleweb/dotenv-diff/commit/b9e70f03eeaa764176ae67d4b2b16e6b58cd5c9c))
-* **scan:** json output order ([#255](https://github.com/Chrilleweb/dotenv-diff/issues/255)) ([db3fd14](https://github.com/Chrilleweb/dotenv-diff/commit/db3fd1469603e33347bb91da83dded90bb0fefb4))
+- removed ci warning on missing - duplicate ([#254](https://github.com/Chrilleweb/dotenv-diff/issues/254)) ([b9e70f0](https://github.com/Chrilleweb/dotenv-diff/commit/b9e70f03eeaa764176ae67d4b2b16e6b58cd5c9c))
+- **scan:** json output order ([#255](https://github.com/Chrilleweb/dotenv-diff/issues/255)) ([db3fd14](https://github.com/Chrilleweb/dotenv-diff/commit/db3fd1469603e33347bb91da83dded90bb0fefb4))
 
 ### 📝 Documentation
 
-* Config and flags  ([#256](https://github.com/Chrilleweb/dotenv-diff/issues/256)) ([996e636](https://github.com/Chrilleweb/dotenv-diff/commit/996e6366bea9a0392d029d1f29835c5779ac2556))
+- Config and flags ([#256](https://github.com/Chrilleweb/dotenv-diff/issues/256)) ([996e636](https://github.com/Chrilleweb/dotenv-diff/commit/996e6366bea9a0392d029d1f29835c5779ac2556))
 
 ## [2.5.8](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.7...v2.5.8) (2026-02-01)
 
 ### 🐛 Bug Fixes
 
-* Fixed --allow-duplicates flag in default ([#249](https://github.com/Chrilleweb/dotenv-diff/issues/249)) ([3cccc35](https://github.com/Chrilleweb/dotenv-diff/commit/3cccc3523cb6c54ea48f3a22a895b887dea58098))
-* Fixed bug in --fix for compare mode ([#251](https://github.com/Chrilleweb/dotenv-diff/issues/251)) ([a26d6b5](https://github.com/Chrilleweb/dotenv-diff/commit/a26d6b51f440cede84381c0ea065bc2106979189))
-* removed mismatch from only flag ([#250](https://github.com/Chrilleweb/dotenv-diff/issues/250)) ([a4ee8c2](https://github.com/Chrilleweb/dotenv-diff/commit/a4ee8c27ca62c380f9bee7e0444c2c9488a6b7c9))
+- Fixed --allow-duplicates flag in default ([#249](https://github.com/Chrilleweb/dotenv-diff/issues/249)) ([3cccc35](https://github.com/Chrilleweb/dotenv-diff/commit/3cccc3523cb6c54ea48f3a22a895b887dea58098))
+- Fixed bug in --fix for compare mode ([#251](https://github.com/Chrilleweb/dotenv-diff/issues/251)) ([a26d6b5](https://github.com/Chrilleweb/dotenv-diff/commit/a26d6b51f440cede84381c0ea065bc2106979189))
+- removed mismatch from only flag ([#250](https://github.com/Chrilleweb/dotenv-diff/issues/250)) ([a4ee8c2](https://github.com/Chrilleweb/dotenv-diff/commit/a4ee8c27ca62c380f9bee7e0444c2c9488a6b7c9))
 
 ### 📝 Documentation
 
-* **contribution:** updated PR guidelines ([#248](https://github.com/Chrilleweb/dotenv-diff/issues/248)) ([f3a8209](https://github.com/Chrilleweb/dotenv-diff/commit/f3a8209f22a810b34240250976f18e0c428669e1))
+- **contribution:** updated PR guidelines ([#248](https://github.com/Chrilleweb/dotenv-diff/issues/248)) ([f3a8209](https://github.com/Chrilleweb/dotenv-diff/commit/f3a8209f22a810b34240250976f18e0c428669e1))
 
 ## [2.5.7](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.6...v2.5.7) (2026-01-29)
 
 ### 🐛 Bug Fixes
 
-* Updated inconsistent name text ([#243](https://github.com/Chrilleweb/dotenv-diff/issues/243)) ([c400aac](https://github.com/Chrilleweb/dotenv-diff/commit/c400aac46b434d7525d9ad75a135d374ab737b13))
+- Updated inconsistent name text ([#243](https://github.com/Chrilleweb/dotenv-diff/issues/243)) ([c400aac](https://github.com/Chrilleweb/dotenv-diff/commit/c400aac46b434d7525d9ad75a135d374ab737b13))
 
 ## [2.5.6](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.5...v2.5.6) (2026-01-29)
 
 ### 🐛 Bug Fixes
 
-* inconsistent naming warning ui ([#241](https://github.com/Chrilleweb/dotenv-diff/issues/241)) ([b672b12](https://github.com/Chrilleweb/dotenv-diff/commit/b672b1206a94b375df1db23a8c0ba4acaa675b84))
+- inconsistent naming warning ui ([#241](https://github.com/Chrilleweb/dotenv-diff/issues/241)) ([b672b12](https://github.com/Chrilleweb/dotenv-diff/commit/b672b1206a94b375df1db23a8c0ba4acaa675b84))
 
 ## [v2.5.5](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.4...v2.5.5) (2026-01-28)
 
 ### Bug Fixes
 
-* Updated UI for missing env variables ([#238](https://github.com/Chrilleweb/dotenv-diff/issues/238)) ([d87eac0](https://github.com/Chrilleweb/dotenv-diff/commit/d87eac002b6b18dc9962c77d1df3d3941ce73587))
+- Updated UI for missing env variables ([#238](https://github.com/Chrilleweb/dotenv-diff/issues/238)) ([d87eac0](https://github.com/Chrilleweb/dotenv-diff/commit/d87eac002b6b18dc9962c77d1df3d3941ce73587))
 
 ## [v2.5.4](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.3...v2.5.4) (2026-01-28)
 
 ### Bug Fixes
 
-* default exclude keys where not ignored in scan mode ([#236](https://github.com/Chrilleweb/dotenv-diff/issues/236)) ([593e69b](https://github.com/Chrilleweb/dotenv-diff/commit/593e69b3a12273c445fa2b365b683cfbe5af283f))
+- default exclude keys where not ignored in scan mode ([#236](https://github.com/Chrilleweb/dotenv-diff/issues/236)) ([593e69b](https://github.com/Chrilleweb/dotenv-diff/commit/593e69b3a12273c445fa2b365b683cfbe5af283f))
 
 ## [v2.5.3](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.2...v2.5.3) (2026-01-27)
 
 ### Bug Fixes
 
-* changed color of scanning header to cyan ([ed6cad1](https://github.com/Chrilleweb/dotenv-diff/commit/ed6cad1502a8c340ddcbcb45a63c20d1ba9feb26))
-* Expire warning text ui ([90caa27](https://github.com/Chrilleweb/dotenv-diff/commit/90caa27762cb1e1a7a81ec4fa978e26af8e46a5c))
+- changed color of scanning header to cyan ([ed6cad1](https://github.com/Chrilleweb/dotenv-diff/commit/ed6cad1502a8c340ddcbcb45a63c20d1ba9feb26))
+- Expire warning text ui ([90caa27](https://github.com/Chrilleweb/dotenv-diff/commit/90caa27762cb1e1a7a81ec4fa978e26af8e46a5c))
 
 ### Documentation
 
-* docs folder instead of public ([f88ad42](https://github.com/Chrilleweb/dotenv-diff/commit/f88ad422a5119cf50b6e27e2ddb7ffd7489e28d4))
-* updated readme gif links ([c45c2df](https://github.com/Chrilleweb/dotenv-diff/commit/c45c2df166139ad2c7a83af3df56032d4f81b310))
+- docs folder instead of public ([f88ad42](https://github.com/Chrilleweb/dotenv-diff/commit/f88ad422a5119cf50b6e27e2ddb7ffd7489e28d4))
+- updated readme gif links ([c45c2df](https://github.com/Chrilleweb/dotenv-diff/commit/c45c2df166139ad2c7a83af3df56032d4f81b310))
 
 ## [v2.5.2](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.1...v2.5.2) (2026-01-26)
 
 ### Bug Fixes
 
-* scanning color magenta ([b90107b](https://github.com/Chrilleweb/dotenv-diff/commit/b90107b0163de3e0ce5def6f235bc40510be71b7))
+- scanning color magenta ([b90107b](https://github.com/Chrilleweb/dotenv-diff/commit/b90107b0163de3e0ce5def6f235bc40510be71b7))
 
 #### [v2.5.1](https://github.com/Chrilleweb/dotenv-diff/compare/v2.5.0...v2.5.1)
 
@@ -246,7 +246,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - exitresult + type + exit decision [`#160`](https://github.com/Chrilleweb/dotenv-diff/pull/160)
 - interfaces, types and documentation + constants [`#159`](https://github.com/Chrilleweb/dotenv-diff/pull/159)
 - Fixed path normalization issue [`#158`](https://github.com/Chrilleweb/dotenv-diff/pull/158)
-- Added PR template  [`#156`](https://github.com/Chrilleweb/dotenv-diff/pull/156)
+- Added PR template [`#156`](https://github.com/Chrilleweb/dotenv-diff/pull/156)
 - moved scanjson output out of types [`e0d80c0`](https://github.com/Chrilleweb/dotenv-diff/commit/e0d80c09c1d6d8d3a62a1e606cad4bf5ae22bd1b)
 - Moved types arround for better readability [`e9d6424`](https://github.com/Chrilleweb/dotenv-diff/commit/e9d6424477a702798182efee46f7634996310471)
 - framework rules cross-platform consistency. [`4939788`](https://github.com/Chrilleweb/dotenv-diff/commit/4939788e120fb17fcb0d807ade599bf9f7af88ad)
@@ -298,7 +298,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > 27 December 2025
 
 - v2.4.1 [`#140`](https://github.com/Chrilleweb/dotenv-diff/pull/140)
-- T3-env bug fix på false positive in secret detection  [`#139`](https://github.com/Chrilleweb/dotenv-diff/pull/139)
+- T3-env bug fix på false positive in secret detection [`#139`](https://github.com/Chrilleweb/dotenv-diff/pull/139)
 - Scan stats [`#138`](https://github.com/Chrilleweb/dotenv-diff/pull/138)
 - fixed t3env mutible bug + secret detection false potitive warning [`01f0c13`](https://github.com/Chrilleweb/dotenv-diff/commit/01f0c1313b8449d33e6f91ddfd738f614df5856d)
 - changed scan stats name [`c821d85`](https://github.com/Chrilleweb/dotenv-diff/commit/c821d8564bfef9c6826c7d00a357022b507cc745)
