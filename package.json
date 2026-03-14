@@ -6,6 +6,7 @@
   "scripts": {
     "build": "pnpm --filter dotenv-diff build",
     "test": "pnpm --filter dotenv-diff test",
+    "coverage": "pnpm --filter dotenv-diff coverage",
     "dev": "pnpm --filter dotenv-diff dev",
     "lint": "pnpm --filter dotenv-diff lint",
     "format": "pnpm --filter dotenv-diff format",
