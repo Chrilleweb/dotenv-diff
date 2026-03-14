@@ -55,15 +55,10 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-          run_install: false
-
-      - run: pnpm install --frozen-lockfile
+        # We use npm to publish since release-it doesn't support pnpm for publishing yet
+      - run: npm install
 
       - name: Run release-it
-        run: pnpm release:npm -- --ci
+        run: npm run release:npm -- --ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
