@@ -55,10 +55,10 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-
+        # We use npm to publish since release-it doesn't support pnpm for publishing yet
       - run: npm install
 
       - name: Run release-it
-        run: npm run release -- --ci
+        run: npm run release:npm -- --ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
