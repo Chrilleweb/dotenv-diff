@@ -1,6 +1,6 @@
 packages:
   - packages/@repo/*
-  - packages/dotenv-diff
+  - packages/cli
 
 # The minimum age of a release before it can be automatically updated by pnpm.
 minimumReleaseAge: 4320
