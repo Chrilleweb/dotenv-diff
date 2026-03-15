@@ -11,7 +11,9 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "changeset": "changeset",
-    "version": "changeset version",
+    "release:notes": "node scripts/update-root-changelog.mjs",
+    "changelog:root": "node scripts/update-root-changelog.mjs --write",
+    "version": "pnpm changelog:root && changeset version",
     "release": "changeset publish"
   },
   "devDependencies": {
