@@ -20,7 +20,8 @@
     "@repo/eslint-config": "workspace:*",
     "lint-staged": "^16.3.3",
     "prettier": "^3.8.1",
-    "turbo": "^2.8.16"
+    "turbo": "^2.8.16",
+    "@changesets/cli": "^2.30.0"
   },
   "lint-staged": {
     "*.{ts,js}": [
@@ -31,8 +32,5 @@
       "sh -c 'turbo format'"
     ]
   },
-  "packageManager": "pnpm@10.30.3",
-  "dependencies": {
-    "@changesets/cli": "^2.30.0"
-  }
+  "packageManager": "pnpm@10.30.3"
 }
