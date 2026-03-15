@@ -21,6 +21,10 @@
       "cache": false,
       "persistent": true
     },
+    "coverage": {
+      "cache": false,
+      "persistent": true
+    },
     "lint-staged": {
       "cache": false,
       "persistent": true
