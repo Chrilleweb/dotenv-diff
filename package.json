@@ -10,7 +10,9 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo format",
-    "release:npm": "pnpm --filter dotenv-diff release"
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

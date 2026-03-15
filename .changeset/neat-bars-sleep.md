@@ -1,7 +1,7 @@
 ---
-'@repo/eslint-config': major
-'@repo/tsconfig': major
-'dotenv-diff': major
+'@repo/eslint-config': patch
+'@repo/tsconfig': patch
+'dotenv-diff': patch
 ---
 
-Test
+Updated dependencies and release scripts for all packages.

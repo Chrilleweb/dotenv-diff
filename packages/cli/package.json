@@ -30,8 +30,6 @@
     "coverage": "vitest run --coverage",
     "test:unit": "vitest run ../../test/unit",
     "test:e2e": "vitest run ../../test/e2e",
-    "release": "release-it",
-    "release:dry": "release-it --dry-run",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"**/*.{ts,js,json,md,yml}\"",
     "start": "node dist/bin/dotenv-diff.js",
