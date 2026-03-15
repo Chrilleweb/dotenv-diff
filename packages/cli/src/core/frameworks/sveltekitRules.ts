@@ -1,5 +1,5 @@
 import type { EnvUsage, FrameworkWarning } from '../../config/types.js';
-import { normalizePath } from './../helpers/normalizePath.js';
+import { normalizePath } from '../helpers/normalizePath.js';
 
 /**
  * Applies SvelteKit specific rules to environment variable usage

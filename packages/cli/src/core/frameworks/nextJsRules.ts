@@ -1,5 +1,5 @@
 import type { EnvUsage, FrameworkWarning } from '../../config/types.js';
-import { normalizePath } from './../helpers/normalizePath.js';
+import { normalizePath } from '../helpers/normalizePath.js';
 
 /**
  * Next.js environment variable validation rules
