@@ -16,13 +16,6 @@
     "version": "pnpm changelog:root && changeset version",
     "release": "changeset publish"
   },
-  "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "lint-staged": "^16.3.3",
-    "prettier": "^3.8.1",
-    "turbo": "^2.8.16",
-    "@changesets/cli": "^2.30.0"
-  },
   "lint-staged": {
     "*.{ts,js}": [
       "prettier --write",
@@ -31,6 +24,16 @@
     "*.{json,md,yml}": [
       "prettier --write"
     ]
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "lint-staged": "^16.3.3",
+    "eslint": "^9.39.4",
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "prettier": "^3.8.1",
+    "turbo": "^2.8.16",
+    "@changesets/cli": "^2.30.0"
   },
   "packageManager": "pnpm@10.30.3"
 }
