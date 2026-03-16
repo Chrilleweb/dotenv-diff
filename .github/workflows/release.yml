@@ -51,7 +51,7 @@ jobs:
         with:
           version: pnpm run version
           publish: pnpm run release
-          commit: 'chore: release packages'
-          title: 'chore: release packages'
+          commit: 'chore(release): publish to npm'
+          title: 'chore(release): publish to npm'
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
