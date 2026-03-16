@@ -12,11 +12,11 @@ First-class support for SvelteKit and Next.js. Also works well in modern JavaScr
 
 ### Warnings & errors detection
 
-![Demo](./docs/assets/demo.gif)
+![Demo](../../docs/assets/demo.gif)
 
 ### Clean / successful scan
 
-![Successful Scan](./docs/assets/success.png)
+![Successful Scan](../../docs/assets/success.png)
 
 ---
 
@@ -32,7 +32,7 @@ First-class support for SvelteKit and Next.js. Also works well in modern JavaScr
 
 ## How It Works
 
-→ See [Capabilities Documentation](./docs/capabilities.md) for details on what the scanner checks for and how it works.
+→ See [Capabilities Documentation](../../docs/capabilities.md) for details on what the scanner checks for and how it works.
 
 ---
 
@@ -44,7 +44,7 @@ Generate a default configuration file:
 dotenv-diff --init
 ```
 
-→ See [Configuration Documentation](./docs/configuration_and_flags.md#configuration-file) for more details.
+→ See [Configuration Documentation](../../docs/configuration_and_flags.md#configuration-file) for more details.
 
 ---
 
@@ -52,7 +52,7 @@ dotenv-diff --init
 
 Easily integrate dotenv-diff into your Git hooks or CI/CD pipelines to enforce environment variable consistency.
 
-→ See [Git Hooks Documentation](./docs/git_hooks_ci.md) for more details.
+→ See [Git Hooks Documentation](../../docs/git_hooks_ci.md) for more details.
 
 ## Framework-Specific Warnings
 
@@ -67,7 +67,7 @@ Framework issues (Sveltekit):
     → Variables accessed through import.meta.env must start with "VITE_"
 ```
 
-→ See [Framework Documentation](./docs/frameworks/index.md) for more details.
+→ See [Framework Documentation](../../docs/frameworks/index.md) for more details.
 
 ## Ignore Comments
 
@@ -79,7 +79,7 @@ const apiKey = process.env.API_KEY; // dotenv-diff-ignore
 
 This is helpful when you know a specific warning is safe in your source code.
 
-→ See [Ignore Comments Documentation](./docs/ignore_comments.md) for more details.
+→ See [Ignore Comments Documentation](../../docs/ignore_comments.md) for more details.
 
 ---
 
@@ -92,7 +92,7 @@ Add expiration metadata to your environment variables to get warnings when they 
 API_TOKEN=
 ```
 
-→ See [Expiration Documentation](./docs/expiration_warnings.md) for more details.
+→ See [Expiration Documentation](../../docs/expiration_warnings.md) for more details.
 
 ---
 
@@ -108,7 +108,7 @@ In monorepos with multiple apps and packages, you can include shared folders:
 }
 ```
 
-→ See [Monorepo Documentation](./docs/monorepo_support.md) for more details.
+→ See [Monorepo Documentation](../../docs/monorepo_support.md) for more details.
 
 This will:
 
@@ -127,14 +127,14 @@ This will:
 
 ## Documentation
 
-→ See [dotenv-diff Documentation](./docs/index.md) for full documentation
+→ See [dotenv-diff Documentation](../../docs/index.md) for full documentation
 
 ---
 
 ## Contributing
 
 Issues and pull requests are welcome.  
-→ See [CONTRIBUTING](CONTRIBUTING.md) for details.
+→ See [CONTRIBUTING](../../CONTRIBUTING.md) for details.
 
 Thanks to these amazing people for contributing to this project:
 
