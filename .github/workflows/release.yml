@@ -61,6 +61,17 @@ jobs:
           echo ""
           echo "=== git log (last 5) ==="
           git log --oneline -5
+      
+      - name: Debug changelog marker
+        run: |
+          echo "=== CHANGELOG marker check ==="
+          grep -n "neat-bars-sleep\|tangy-ideas-mate" CHANGELOG.md || echo "Marker NOT found in CHANGELOG"
+          echo ""
+          echo "=== Run pnpm version manually ==="
+          pnpm version
+          echo ""
+          echo "=== git status after version ==="
+          git status --porcelain
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
