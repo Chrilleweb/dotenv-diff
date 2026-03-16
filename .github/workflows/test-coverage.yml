@@ -116,7 +116,7 @@ jobs:
 
       - name: Comment PR with coverage
         if: github.event.pull_request.head.repo.fork == false
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           path: comment.md
 
