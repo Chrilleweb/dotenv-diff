@@ -5,35 +5,53 @@ on:
     branches:
       - main
 
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
   release:
+    name: Release
+    # Prevent releases from forks
+    if: github.repository == 'Chrilleweb/dotenv-diff'
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
       pull-requests: write
       id-token: write
 
     steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: 24
+          registry-url: 'https://registry.npmjs.org'
 
-      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - run: pnpm install --frozen-lockfile
+      - name: Build packages
+        run: pnpm build
 
-      - name: Version Or Release
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
         uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf
         with:
-          version: pnpm version
-          publish: pnpm release
-          createGithubReleases: true
-          title: 'chore: release'
-          commit: 'chore: release'
+          version: pnpm run version
+          publish: pnpm run release
+          commit: 'chore: release packages'
+          title: 'chore: release packages'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
