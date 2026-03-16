@@ -9,6 +9,8 @@
     "coverage": "turbo coverage",
     "dev": "turbo dev",
     "lint": "turbo lint",
+    "prepare": "husky",
+    "lint-staged": "lint-staged",
     "format": "turbo format",
     "changeset": "changeset",
     "release:notes": "node scripts/update-root-changelog.mjs",
@@ -32,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.57.0",
     "prettier": "^3.8.1",
+    "husky": "^9.1.7",
     "turbo": "^2.8.16",
     "@changesets/cli": "^2.30.0"
   },

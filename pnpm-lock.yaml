@@ -23,6 +23,9 @@ importers:
       eslint:
         specifier: ^9.39.4
         version: 9.39.4(jiti@2.6.1)
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
       lint-staged:
         specifier: ^16.3.3
         version: 16.3.3
