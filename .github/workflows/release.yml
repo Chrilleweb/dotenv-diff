@@ -30,10 +30,10 @@ jobs:
       - name: Version Or Release
         uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf
         with:
-          version: pnpm version-packages
+          version: pnpm version
           publish: pnpm release
           createGithubReleases: true
-          title: 'chore: version packages'
-          commit: 'chore: version packages'
+          title: 'chore: release'
+          commit: 'chore: release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
