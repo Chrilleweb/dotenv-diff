@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -6,18 +7,13 @@
     "verbatimModuleSyntax": true,
     "declarationMap": true,
     "sourceMap": true,
-    "rootDir": ".",
     "exactOptionalPropertyTypes": true,
     "noUncheckedIndexedAccess": true,
-    "outDir": "dist",
     "declaration": true,
-    "declarationDir": "dist",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "types": ["node"]
-  },
-  "include": ["src/**/*.ts", "bin/**/*.ts", "types/**/*.d.ts"]
+    "resolveJsonModule": true
+  }
 }

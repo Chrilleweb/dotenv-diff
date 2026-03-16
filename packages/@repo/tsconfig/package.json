@@ -1,0 +1,10 @@
+{
+  "name": "@repo/tsconfig",
+  "version": "2.7.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.json": "./base.json",
+    "./package.json": "./package.json"
+  }
+}

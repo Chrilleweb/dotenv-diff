@@ -86,7 +86,11 @@ describe('normalizeOptions', () => {
   });
 
   it('normalizes scanUsage string values to boolean', () => {
-    expect(normalizeOptions({ scanUsage: 'true' as unknown as boolean }).scanUsage).toBe(true);
-    expect(normalizeOptions({ scanUsage: 'false' as unknown as boolean }).scanUsage).toBe(false);
+    expect(
+      normalizeOptions({ scanUsage: 'true' as unknown as boolean }).scanUsage,
+    ).toBe(true);
+    expect(
+      normalizeOptions({ scanUsage: 'false' as unknown as boolean }).scanUsage,
+    ).toBe(false);
   });
 });

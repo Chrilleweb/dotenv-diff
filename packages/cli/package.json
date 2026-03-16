@@ -1,0 +1,90 @@
+{
+  "name": "dotenv-diff",
+  "version": "2.7.1",
+  "type": "module",
+  "description": "Detects environment variable issues, usage, and potential security risks.",
+  "bin": {
+    "dotenv-diff": "dist/bin/dotenv-diff.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/",
+    "docs/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc",
+    "dev": "npx dotenv-diff",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "test:unit": "vitest run ../../test/unit",
+    "test:e2e": "vitest run ../../test/e2e",
+    "lint": "eslint ./src --ext .ts",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yml}\"",
+    "start": "node dist/bin/dotenv-diff.js",
+    "dotenv-diff": "dotenv-diff",
+    "prepublishOnly": "npm run lint && npm test && npm run build",
+    "prepare": "husky"
+  },
+  "author": "Chrilleweb",
+  "license": "MIT",
+  "keywords": [
+    "dotenv",
+    "env",
+    "dotenv-diff",
+    "env-check",
+    "env-validate",
+    "env-scan",
+    "cli",
+    "config",
+    "security",
+    "ci",
+    "monorepo",
+    "sveltekit",
+    "nextjs",
+    "node"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chrilleweb/dotenv-diff.git"
+  },
+  "homepage": "https://dotenv-diff-docs.vercel.app",
+  "bugs": {
+    "url": "https://github.com/Chrilleweb/dotenv-diff/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "chalk": "5.6.2",
+    "commander": "^14.0.3",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.5",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "^25.5.0",
+    "@types/prompts": "^2.4.9",
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "@vitest/coverage-v8": "4.0.18",
+    "eslint": "^9.39.4",
+    "husky": "^9.1.7",
+    "release-it": "^19.2.4",
+    "turbo": "^2.8.16",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  }
+}
