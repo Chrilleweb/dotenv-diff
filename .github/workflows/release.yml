@@ -45,6 +45,23 @@ jobs:
       - name: Build packages
         run: pnpm build
 
+      - name: Debug changesets
+        run: |
+          echo "=== .changeset files ==="
+          ls -la .changeset/
+          echo ""
+          echo "=== Contents of changeset files ==="
+          for f in .changeset/*.md; do
+            echo "--- $f ---"
+            cat "$f"
+          done
+          echo ""
+          echo "=== git status ==="
+          git status
+          echo ""
+          echo "=== git log (last 5) ==="
+          git log --oneline -5
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf
