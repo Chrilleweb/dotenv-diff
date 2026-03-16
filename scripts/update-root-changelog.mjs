@@ -11,6 +11,7 @@ const shouldWrite = args.has('--write');
 try {
 	await access(changesetDir);
 } catch {
+	console.error('No .changeset directory found.');
 	process.exit(0);
 }
 
@@ -19,6 +20,7 @@ const changesetFiles = (await readdir(changesetDir))
 	.sort();
 
 if (changesetFiles.length === 0) {
+	console.error('No changeset files found.');
 	process.exit(0);
 }
 
@@ -55,6 +57,7 @@ const parsed = await Promise.all(changesetFiles.map(parseChangeset));
 const packageBumps = parsed.flatMap((entry) => entry.packages);
 
 if (packageBumps.length === 0) {
+	console.error('No package bumps found.');
 	process.exit(0);
 }
 
@@ -108,6 +111,7 @@ try {
 	existing = await readFile(changelogPath, 'utf8');
 } catch {
 	await writeFile(changelogPath, `${header}${section}`, 'utf8');
+	console.error('No existing changelog found. A new one has been created.');
 	process.exit(0);
 }
 
