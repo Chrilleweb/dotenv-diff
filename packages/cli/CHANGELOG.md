@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.3
+
+### Patch Changes
+
+- b448130: Fixed readme links
+
 ## 2.7.2
 
 ### Patch Changes

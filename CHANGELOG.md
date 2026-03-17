@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: long-squids-warn.md -->
+## 2026-03-17
+
+### Highlights
+- Fixed readme links
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: neat-bars-sleep.md,tangy-ideas-mate.md -->
 ## 2026-03-17
 
