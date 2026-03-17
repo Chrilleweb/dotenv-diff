@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.7.2
+
+### Patch Changes
+
+- 41f8e5c: Updated dependencies and release scripts for all packages.
+- da6fbaf: fixed preserve nested example paths
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
