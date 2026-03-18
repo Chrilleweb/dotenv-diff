@@ -34,4 +34,24 @@ describe('createProgram', () => {
     expect(opts.color).toBe(false);
     expect(opts.strict).toBe(true);
   });
+
+  it('ignores extra positional arguments', () => {
+    const program = createProgram();
+
+    expect(() => {
+      program.parse([
+        'node',
+        'dotenv-diff',
+        '--compare',
+        '--example',
+        '.env.example',
+        'file1.ts',
+        'file2.ts',
+      ]);
+    }).not.toThrow();
+
+    const opts = program.opts();
+    expect(opts.compare).toBe(true);
+    expect(opts.example).toBe('.env.example');
+  });
 });
