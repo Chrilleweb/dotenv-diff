@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: brown-chicken-look.md -->
+## 2026-03-18
+
+### Highlights
+- Added support for lint-staged
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: long-squids-warn.md -->
 ## 2026-03-17
 
