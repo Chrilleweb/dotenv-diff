@@ -10,6 +10,16 @@ Running `dotenv-diff` before each commit helps catch missing, unused, and misuse
 
 A common setup is Husky + lint-staged, where `dotenv-diff` runs automatically on commit.
 
+### Example lint-staged config
+
+```json
+{
+  "*.{js,ts,tsx,svelte}": [
+    "dotenv-diff --example .env.example"
+  ]
+}
+```
+
 ## Running dotenv-diff in GitHub Actions
 
 Use `dotenv-diff` in CI to validate environment variable consistency on pull requests.
