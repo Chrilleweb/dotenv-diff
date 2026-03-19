@@ -8,17 +8,7 @@ Instead, it is built to integrate cleanly with your existing tooling, such as Hu
 
 Running `dotenv-diff` before each commit helps catch missing, unused, and misused environment variables early.
 
-A common setup is Husky + lint-staged, where `dotenv-diff` runs automatically on commit.
-
-### Example lint-staged config
-
-```json
-{
-  "*.{js,ts,tsx,svelte}": [
-    "dotenv-diff --example .env.example"
-  ]
-}
-```
+A common setup is to use Husky to run `dotenv-diff`:
 
 ## Running dotenv-diff in GitHub Actions
 
