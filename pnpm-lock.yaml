@@ -20,6 +20,12 @@ importers:
       '@repo/vitest':
         specifier: workspace:*
         version: link:packages/@repo/vitest
+      '@types/node':
+        specifier: ^25.5.0
+        version: 25.5.0
+      '@types/prompts':
+        specifier: ^2.4.9
+        version: 2.4.9
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.57.0
         version: 8.57.0(@typescript-eslint/parser@8.57.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
@@ -78,16 +84,6 @@ importers:
       prompts:
         specifier: ^2.4.2
         version: 2.4.2
-    devDependencies:
-      '@types/node':
-        specifier: ^25.5.0
-        version: 25.5.0
-      '@types/prompts':
-        specifier: ^2.4.9
-        version: 2.4.9
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
 
 packages:
 
