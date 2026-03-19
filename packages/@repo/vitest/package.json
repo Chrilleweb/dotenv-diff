@@ -1,0 +1,14 @@
+{
+  "name": "@repo/vitest",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "types": "./vitest.config.d.ts",
+  "exports": {
+    "./vitest.config.js": {
+      "types": "./vitest.config.d.ts",
+      "default": "./vitest.config.js"
+    },
+    "./package.json": "./package.json"
+  }
+}
