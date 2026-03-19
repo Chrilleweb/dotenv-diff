@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.4
+
+### Patch Changes
+
+- bb633f2: Added support for lint-staged
+
 ## 2.7.3
 
 ### Patch Changes
