@@ -10,6 +10,18 @@ Running `dotenv-diff` before each commit helps catch missing, unused, and misuse
 
 A common setup is to use Husky to run `dotenv-diff`:
 
+![Husky + dotenv-diff Example](./assets/husky-dotenv-diff.png)
+
+```json
+{
+  "scripts": {
+    "dotenv-diff": "dotenv-diff --example .env.example"
+  }
+}
+```
+
+Best practice if to set the example file to `.env.example` (default is `.env`) to ensure you are validating against your reference file.
+
 ## Running dotenv-diff in GitHub Actions
 
 Use `dotenv-diff` in CI to validate environment variable consistency on pull requests.
