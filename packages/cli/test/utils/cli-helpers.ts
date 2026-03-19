@@ -16,8 +16,7 @@ let cliPath: string | null = null;
 export function buildOnce(): { distDir: string; cliPath: string } {
   if (distDir && cliPath) return { distDir, cliPath };
   distDir = fs.mkdtempSync(path.join(process.cwd(), 'dist-test-'));
-  const tsc = path.join(process.cwd(), 'node_modules', '.bin', 'tsc');
-  execSync(`${tsc} --outDir ${distDir}`, { stdio: 'inherit' });
+  execSync(`tsc --outDir ${distDir}`, { stdio: 'inherit' });
   cliPath = path.join(distDir, 'bin', 'dotenv-diff.js');
   return { distDir, cliPath };
 }
