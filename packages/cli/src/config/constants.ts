@@ -65,12 +65,15 @@ export const ALLOWED_CATEGORIES = [
   'gitignore',
 ] as const;
 
-/** * Threshold in days for showing expiration warnings for environment variables.
- * Variables expiring within this number of days or already expired will trigger a warning.
+/**
+ * Threshold in days for showing expiration warnings for environment variables.
+ * Expiration warnings are shown for variables with expiration dates within this threshold.
+ * Expiration warnings do not trigger an error exit by default, but can be promoted to errors with strict mode.
  */
 export const EXPIRE_THRESHOLD_DAYS = 20;
 
-/** Threshold in days for showing urgent expiration warnings.
- * Variables expiring within this number of days or already expired will trigger a high-severity warning.
+/**
+ * Threshold in days for urgent expiration checks.
+ * Expiration warnings at or below this value trigger an error exit even without strict mode.
  */
 export const URGENT_EXPIRE_DAYS = 7;
