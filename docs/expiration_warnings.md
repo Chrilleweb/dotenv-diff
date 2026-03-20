@@ -40,28 +40,22 @@ TOKEN_D=...
 - The annotation applies to the **next env key only**
 - If no key follows, no warning is created
 
-## Warning output
+## Behavior
 
-When expiration annotations are found, CLI output includes an `Expiration warnings` section.
+`dotenv-diff` uses two expiration thresholds:
 
-Severity is shown from `daysLeft`:
-
-- `< 0`: expired (`EXPIRED ... days ago`)
-- `0`: `EXPIRES TODAY`
-- `1`: `expires tomorrow`
-- `2-3`: urgent warning
-- `4-7`: warning
-- `> 7`: still shown as informational warning
+- `<= 7 days`: treated as error and returns exit code `1`
+- `<= 20 days`: treated as warning (error in strict mode)
 
 ## Strict mode
 
-In strict mode, expiration warnings are treated as blocking warnings and return exit code `1`.
+In strict mode, expiration warnings at `<= 20 days` are treated as blocking warnings and return exit code `1`.
 
 ```bash
 dotenv-diff --strict
 ```
 
-If expiration warnings exist, strict mode includes them in the strict error summary.
+If expiration warnings at `<= 20 days` exist, strict mode includes them in the strict error summary.
 
 ## Enable / disable
 
