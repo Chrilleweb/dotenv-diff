@@ -286,6 +286,6 @@ export function matchesGlobPattern(filePath: string, pattern: string): boolean {
     .replace(/___DOUBLESTAR___/g, '.*')
     .replace(/\?/g, '[^/]');
 
-  const re = new RegExp(`^${regexPattern}$`, 'i');
+  const re = new RegExp(`^${regexPattern}$`);
   return re.test(normalized);
 }

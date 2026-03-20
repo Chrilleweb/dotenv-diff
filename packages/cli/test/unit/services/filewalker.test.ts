@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { execSync } from 'child_process';
 import {
   findFiles,
   expandBraceSets,
@@ -184,9 +185,9 @@ describe('filewalker', () => {
       expect(result).toBe(false);
     });
 
-    it('handles case insensitive matching', () => {
+    it('is case sensitive for glob matching', () => {
       const result = matchesGlobPattern('src/App.JS', '**/*.js');
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
 
     it('handles patterns without separators', () => {
@@ -278,13 +279,12 @@ describe('filewalker', () => {
 
       try {
         // Try to create a FIFO (named pipe) - only works on Unix-like systems
-        const { execSync } = require('child_process');
         execSync(`mkfifo "${pipePath}"`);
 
         const result = getPatternBaseDir(tmpDir, 'testpipe');
         // FIFO is neither file nor directory
         expect(result).toBeNull();
-      } catch (err) {
+      } catch {
         // Skip on Windows or if mkfifo not available
         console.log('FIFO test skipped - not supported on this system');
         expect(true).toBe(true); // Dummy assertion so test doesn't fail
@@ -409,7 +409,6 @@ describe('filewalker', () => {
     });
 
     it('walks extra roots for patterns outside cwd', async () => {
-      const parentDir = path.dirname(tmpDir);
       const srcDir = path.join(tmpDir, 'src');
       fs.mkdirSync(srcDir);
       fs.writeFileSync(path.join(srcDir, 'app.js'), '');
