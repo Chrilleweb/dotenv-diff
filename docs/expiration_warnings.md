@@ -6,7 +6,6 @@ By annotating a key with an expiration date, `dotenv-diff` can:
 
 - warn when a key is expired
 - warn when a key is close to expiration
-- fail the process in `--strict` mode
 
 ## Syntax
 
@@ -54,8 +53,6 @@ In strict mode, expiration warnings at `<= 20 days` are treated as blocking warn
 ```bash
 dotenv-diff --strict
 ```
-
-If expiration warnings at `<= 20 days` exist, strict mode includes them in the strict error summary.
 
 ## Enable / disable
 
