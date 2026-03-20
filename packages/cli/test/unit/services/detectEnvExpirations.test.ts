@@ -125,4 +125,26 @@ describe('detectEnvExpirations', () => {
       { key: 'B', date: '2024-12-20', daysLeft: 19 },
     ]);
   });
+
+  it('is stable across time-of-day for the same calendar date', () => {
+    vi.setSystemTime(new Date('2024-12-01T23:59:59.000Z'));
+
+    fs.writeFileSync(
+      envPath,
+      `
+      # @expire 2024-12-31
+      API_KEY=123
+      `,
+    );
+
+    const result = detectEnvExpirations(envPath);
+
+    expect(result).toEqual([
+      {
+        key: 'API_KEY',
+        date: '2024-12-31',
+        daysLeft: 30,
+      },
+    ]);
+  });
 });

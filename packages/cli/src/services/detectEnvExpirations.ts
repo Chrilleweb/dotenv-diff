@@ -1,6 +1,9 @@
 import fs from 'fs';
 import type { ExpireWarning } from '../config/types.js';
 
+// Number of milliseconds in a day
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
 /**
  * Detects expiration warnings in a dotenv file.
  * fx:
@@ -27,7 +30,7 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
     const expireMatch = line.match(reg);
 
     if (expireMatch) {
-      pendingExpire = expireMatch[2]!; // capture dato
+      pendingExpire = expireMatch[2]!; // capture date
       continue;
     }
 
@@ -37,10 +40,12 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
       const key = line.split('=')[0];
 
       if (key && pendingExpire) {
-        const expireDate = new Date(pendingExpire);
-        const now = new Date();
-        const diffMs = expireDate.getTime() - now.getTime();
-        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        const diffDays = calculateDaysLeft(pendingExpire, new Date());
+
+        if (diffDays === null) {
+          pendingExpire = null;
+          continue;
+        }
 
         warnings.push({
           key,
@@ -54,4 +59,28 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
   }
 
   return warnings;
+}
+
+/**
+ * Calculates remaining days from today (UTC day) to a YYYY-MM-DD expiration date.
+ * Using UTC day boundaries avoids timezone and time-of-day drift.
+ * @param expireDateStr - Expiration date in YYYY-MM-DD format
+ * @param now - Current date
+ * @returns Number of days left until expiration, or null if invalid date
+ */
+function calculateDaysLeft(expireDateStr: string, now: Date): number | null {
+  const parts = expireDateStr.split('-').map(Number);
+  if (parts.length !== 3) return null;
+
+  const [year, month, day] = parts;
+  if (!year || !month || !day) return null;
+
+  const expireUtc = Date.UTC(year, month - 1, day);
+  const todayUtc = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+  );
+
+  return Math.ceil((expireUtc - todayUtc) / MS_PER_DAY);
 }
