@@ -17,6 +17,13 @@ export async function confirmYesNo(
 ): Promise<boolean> {
   if (isYesMode) return true;
   if (isCiMode) return false;
+
+  // Avoid hanging in non-interactive environments (e.g. hooks/scripts without TTY)
+  const hasInteractiveTty = Boolean(
+    process.stdin?.isTTY && process.stdout?.isTTY,
+  );
+  if (!hasInteractiveTty) return false;
+
   const res = await prompts({
     type: 'select',
     name: 'ok',
