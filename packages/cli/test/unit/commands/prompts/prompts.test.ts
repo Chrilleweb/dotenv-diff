@@ -6,6 +6,17 @@ vi.mock('prompts');
 
 const mockPrompts = prompts as unknown as ReturnType<typeof vi.fn>;
 
+function setTTY(stdinTTY: boolean, stdoutTTY: boolean): void {
+  Object.defineProperty(process.stdin, 'isTTY', {
+    value: stdinTTY,
+    configurable: true,
+  });
+  Object.defineProperty(process.stdout, 'isTTY', {
+    value: stdoutTTY,
+    configurable: true,
+  });
+}
+
 describe('confirmYesNo', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -32,6 +43,7 @@ describe('confirmYesNo', () => {
   });
 
   it('returns true when user selects Yes', async () => {
+    setTTY(true, true);
     mockPrompts.mockResolvedValue({ ok: true });
 
     const result = await confirmYesNo('Are you sure?', {
@@ -44,6 +56,7 @@ describe('confirmYesNo', () => {
   });
 
   it('returns false when user selects No', async () => {
+    setTTY(true, true);
     mockPrompts.mockResolvedValue({ ok: false });
 
     const result = await confirmYesNo('Are you sure?', {
@@ -56,6 +69,7 @@ describe('confirmYesNo', () => {
   });
 
   it('returns false when prompt returns undefined', async () => {
+    setTTY(true, true);
     mockPrompts.mockResolvedValue({});
 
     const result = await confirmYesNo('Are you sure?', {
@@ -64,5 +78,17 @@ describe('confirmYesNo', () => {
     });
 
     expect(result).toBe(false);
+  });
+
+  it('returns false when no TTY is available and does not prompt', async () => {
+    setTTY(false, false);
+
+    const result = await confirmYesNo('Are you sure?', {
+      isCiMode: false,
+      isYesMode: false,
+    });
+
+    expect(result).toBe(false);
+    expect(mockPrompts).not.toHaveBeenCalled();
   });
 });

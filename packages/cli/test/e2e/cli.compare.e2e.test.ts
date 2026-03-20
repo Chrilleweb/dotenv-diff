@@ -56,7 +56,7 @@ describe('added .env to gitignore with --compare and --fix', () => {
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
     fs.writeFileSync(
       path.join(cwd, 'src', 'index.ts'),
-      `const apiKey = process.env.API_KEY;`.trimStart(),
+      'const apiKey = process.env.API_KEY;'.trimStart(),
     );
 
     const res = runCli(cwd, ['--compare', '--fix']);
@@ -78,7 +78,7 @@ describe('added .env to gitignore with --compare and --fix', () => {
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
     fs.writeFileSync(
       path.join(cwd, 'src', 'index.ts'),
-      `const apiKey = process.env.API_KEY;`.trimStart(),
+      'const apiKey = process.env.API_KEY;'.trimStart(),
     );
 
     const res = runCli(cwd, ['--compare', '--json']);
@@ -89,7 +89,7 @@ describe('added .env to gitignore with --compare and --fix', () => {
     expect(json[0].gitignoreIssue?.reason).toBe('not-ignored');
   });
 
-  it('Will prompt .env.example file not found. and prompt if .env.local exists and .env.example is set to --example', async () => {
+  it('Will skip interactive prompt in non-TTY when .env.example is missing and --example is set', async () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env.local'), 'FOO=bar');
 
@@ -97,9 +97,7 @@ describe('added .env to gitignore with --compare and --fix', () => {
 
     expect(res.status).toBe(0);
     expect(res.stdout).toContain('▸ File not found');
-    expect(res.stdout).toContain(
-      'Do you want to create a .env.example file from .env.local?',
-    );
+    expect(res.stdout).toContain('▸ Skipping .env.example creation');
   });
 
   describe('Values mismatch checks', () => {
