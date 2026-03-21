@@ -2,6 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import chalk from 'chalk';
 import { printStats } from '../../../../src/ui/scan/printStats.js';
 import type { ScanStats } from '../../../../src/config/types.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  value,
+  accent,
+  divider,
+} from '../../../../src/ui/theme.js';
 
 describe('printStats (scan)', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
@@ -29,14 +36,6 @@ describe('printStats (scan)', () => {
 
   it('prints scan statistics when showStats is true', () => {
     printStats(stats, true);
-
-    const dim = chalk.hex('#555555');
-    const label = chalk.hex('#888888');
-    const value = chalk.hex('#e0e0e0').bold;
-    const accent = chalk.hex('#00d4aa');
-    const divider = dim('─'.repeat(50));
-
-    const UI_LABEL_WIDTH = 28;
 
     // Leading blank line
     expect(logSpy).toHaveBeenNthCalledWith(1);
