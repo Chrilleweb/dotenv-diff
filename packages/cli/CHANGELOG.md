@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.5
+
+### Patch Changes
+
+- 540565f: Case sensitive for glob pattern fix
+- c01b84c: removed extra space efter framework warnings
+- d278b99: fixed interactive prompt may run in non-TTY environments
+- 5725302: Fixed expire date calculation may be off by one day due to timezone parsing
+- c01b84c: added more label width
+
 ## 2.7.4
 
 ### Patch Changes
