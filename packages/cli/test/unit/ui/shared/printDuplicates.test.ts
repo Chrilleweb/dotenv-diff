@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { printDuplicates } from '../../../../src/ui/shared/printDuplicates.js';
 
 vi.mock('../../../../src/ui/theme.js', () => ({
+  UI_LABEL_WIDTH: 26,
   label: (text: string) => `L(${text})`,
   value: (text: string) => `V(${text})`,
   warning: (text: string) => `W(${text})`,

@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
 import { printAutoFix } from '../../../../src/ui/shared/printAutoFix.js';
 import type { FixContext } from '../../../../src/config/types.js';
 
@@ -66,8 +65,15 @@ describe('printAutoFix', () => {
 
     printAutoFix(context, '.env', false);
 
-    expect(logSpy).toHaveBeenCalledWith(
-      'Status                    no changes needed',
-    );
+    expect(
+      logSpy.mock.calls.some((call: [string]) => call[0] === '▸ Auto-fix'),
+    ).toBe(true);
+    expect(
+      logSpy.mock.calls.some(
+        (call: [string]) =>
+          String(call[0]).includes('Status') &&
+          String(call[0]).includes('no changes needed'),
+      ),
+    ).toBe(true);
   });
 });

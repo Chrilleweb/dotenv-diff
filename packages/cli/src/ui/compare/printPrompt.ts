@@ -1,5 +1,6 @@
 import path from 'path';
 import {
+  UI_LABEL_WIDTH,
   label,
   value,
   accent,
@@ -28,9 +29,11 @@ export const printPrompt = {
     console.log(`${warning('▸')} ${header('No env files found')}`);
     console.log(`${divider}`);
     console.log(
-      `${label('Status'.padEnd(26))}${warning('no .env* or .env.example found')}`,
+      `${label('Status'.padEnd(UI_LABEL_WIDTH))}${warning('no .env* or .env.example found')}`,
     );
-    console.log(`${label('Action'.padEnd(26))}${dim('skipping comparison')}`);
+    console.log(
+      `${label('Action'.padEnd(UI_LABEL_WIDTH))}${dim('skipping comparison')}`,
+    );
     console.log(`${divider}`);
   },
 
@@ -39,7 +42,7 @@ export const printPrompt = {
     console.log(`${warning('▸')} ${header('File not found')}`);
     console.log(`${divider}`);
     console.log(
-      `${label('File'.padEnd(26))}${warning(path.basename(envPath))}`,
+      `${label('File'.padEnd(UI_LABEL_WIDTH))}${warning(path.basename(envPath))}`,
     );
     console.log(`${divider}`);
   },
@@ -56,10 +59,10 @@ export const printPrompt = {
     console.log(`${accent('▸')} ${header('File created')}`);
     console.log(`${divider}`);
     console.log(
-      `${label('Created'.padEnd(26))}${value(path.basename(envPath))}`,
+      `${label('Created'.padEnd(UI_LABEL_WIDTH))}${value(path.basename(envPath))}`,
     );
     console.log(
-      `${label('From'.padEnd(26))}${dim(path.basename(examplePath))}`,
+      `${label('From'.padEnd(UI_LABEL_WIDTH))}${dim(path.basename(examplePath))}`,
     );
     console.log(`${divider}`);
   },
@@ -69,9 +72,11 @@ export const printPrompt = {
     console.log(`${accent('▸')} ${header('File created')}`);
     console.log(`${divider}`);
     console.log(
-      `${label('Created'.padEnd(26))}${value(path.basename(examplePath))}`,
+      `${label('Created'.padEnd(UI_LABEL_WIDTH))}${value(path.basename(examplePath))}`,
     );
-    console.log(`${label('From'.padEnd(26))}${dim(path.basename(envPath))}`);
+    console.log(
+      `${label('From'.padEnd(UI_LABEL_WIDTH))}${dim(path.basename(envPath))}`,
+    );
     console.log(`${divider}`);
   },
 };

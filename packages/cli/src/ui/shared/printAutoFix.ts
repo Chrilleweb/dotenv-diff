@@ -1,5 +1,13 @@
 import type { FixContext } from '../../config/types.js';
-import { label, value, accent, divider, header, wrapReason } from '../theme.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  value,
+  accent,
+  divider,
+  header,
+  wrapReason,
+} from '../theme.js';
 
 /**
  * Prints the result of the auto-fix operation.
@@ -20,21 +28,23 @@ export function printAutoFix(
   console.log(`${divider}`);
 
   if (!result.fixApplied) {
-    console.log(`${label('Status'.padEnd(26))}${value('no changes needed')}`);
+    console.log(
+      `${label('Status'.padEnd(UI_LABEL_WIDTH))}${value('no changes needed')}`,
+    );
   } else {
     if (result.removedDuplicates.length) {
       console.log(
-        `${label('Removed duplicates'.padEnd(26))}${value(wrapReason(result.removedDuplicates.join(', '), 26))}`,
+        `${label('Removed duplicates'.padEnd(UI_LABEL_WIDTH))}${value(wrapReason(result.removedDuplicates.join(', '), 26))}`,
       );
     }
     if (result.addedEnv.length) {
       console.log(
-        `${label('Added missing keys'.padEnd(26))}${value(wrapReason(result.addedEnv.join(', '), 26))}`,
+        `${label('Added missing keys'.padEnd(UI_LABEL_WIDTH))}${value(wrapReason(result.addedEnv.join(', '), 26))}`,
       );
     }
     if (result.gitignoreUpdated) {
       console.log(
-        `${label('Updated .gitignore'.padEnd(26))}${value(wrapReason(envName, 26))}`,
+        `${label('Updated .gitignore'.padEnd(UI_LABEL_WIDTH))}${value(wrapReason(envName, 26))}`,
       );
     }
   }

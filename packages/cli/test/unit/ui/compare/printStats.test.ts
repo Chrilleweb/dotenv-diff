@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { printStats } from '../../../../src/ui/compare/printStats.js';
-import { label, value, accent, header } from '../../../../src/ui/theme.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  value,
+  accent,
+  header,
+} from '../../../../src/ui/theme.js';
 
 describe('printStats', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
@@ -58,28 +64,28 @@ describe('printStats', () => {
       `${accent('▸')} ${header('Compare Statistics')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Keys in .env'.padEnd(26))}${value('5')}`,
+      `${label('Keys in .env'.padEnd(UI_LABEL_WIDTH))}${value('5')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Keys in .env.example'.padEnd(26))}${value('4')}`,
+      `${label('Keys in .env.example'.padEnd(UI_LABEL_WIDTH))}${value('4')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Shared keys'.padEnd(26))}${value('3')}`,
+      `${label('Shared keys'.padEnd(UI_LABEL_WIDTH))}${value('3')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Missing in .env'.padEnd(26))}${value('1')}`,
+      `${label('Missing in .env'.padEnd(UI_LABEL_WIDTH))}${value('1')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Extra (not in .env.example)'.padEnd(26))}${value('1')}`,
+      `${label('Extra (not in .env.example)'.padEnd(UI_LABEL_WIDTH))}${value('1')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Empty values'.padEnd(26))}${value('1')}`,
+      `${label('Empty values'.padEnd(UI_LABEL_WIDTH))}${value('1')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Duplicate keys'.padEnd(26))}${value('1')}`,
+      `${label('Duplicate keys'.padEnd(UI_LABEL_WIDTH))}${value('1')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Value mismatches'.padEnd(26))}${value('2')}`,
+      `${label('Value mismatches'.padEnd(UI_LABEL_WIDTH))}${value('2')}`,
     );
   });
 
@@ -95,10 +101,10 @@ describe('printStats', () => {
     );
 
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Missing in .env'.padEnd(26))}${value('0')}`,
+      `${label('Missing in .env'.padEnd(UI_LABEL_WIDTH))}${value('0')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Duplicate keys'.padEnd(26))}${value('1')}`,
+      `${label('Duplicate keys'.padEnd(UI_LABEL_WIDTH))}${value('1')}`,
     );
 
     expect(

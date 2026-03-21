@@ -1,6 +1,14 @@
 import type { SecretFinding } from '../../core/security/secretDetectors.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
-import { label, accent, warning, error, divider, header } from '../theme.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  accent,
+  warning,
+  error,
+  divider,
+  header,
+} from '../theme.js';
 
 /**
  * Get the color function for the severity level.
@@ -53,7 +61,7 @@ export function printSecrets(
     for (const f of findings) {
       const color = getSeverityColor(f.severity);
       console.log(
-        `${label(f.severity.toUpperCase().padEnd(26))}${color(`${normalizePath(f.file)}:${f.line}`)}`,
+        `${label(f.severity.toUpperCase().padEnd(UI_LABEL_WIDTH))}${color(`${normalizePath(f.file)}:${f.line}`)}`,
       );
     }
   }

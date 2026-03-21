@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { printSecrets } from '../../../../src/ui/scan/printSecrets.js';
-import type { SecretFinding } from '../../../../src/core/security/secretDetectors.js';
+import type {
+  SecretFinding,
+  SecretSeverity,
+} from '../../../../src/core/security/secretDetectors.js';
 
 // Mock normalizePath
 vi.mock('../../../../src/core/helpers/normalizePath.js', () => ({
@@ -8,6 +11,7 @@ vi.mock('../../../../src/core/helpers/normalizePath.js', () => ({
 }));
 
 vi.mock('../../../../src/ui/theme.js', () => ({
+  UI_LABEL_WIDTH: 26,
   label: (text: string) => `L(${text})`,
   accent: (text: string) => `A(${text})`,
   warning: (text: string) => `W(${text})`,
@@ -89,7 +93,7 @@ describe('printSecrets', () => {
         kind: 'pattern',
         message: 'Weird issue',
         snippet: 'weird snippet',
-        severity: 'strange' as any, // force default branch
+        severity: 'strange' as SecretSeverity, // force default branch
       },
     ];
 

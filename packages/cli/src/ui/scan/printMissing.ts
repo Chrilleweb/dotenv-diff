@@ -1,6 +1,6 @@
 import type { EnvUsage, VariableUsages } from '../../config/types.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
-import { label, value, error, divider } from '../theme.js';
+import { UI_LABEL_WIDTH, label, value, error, divider } from '../theme.js';
 
 /**
  * Print missing environment variables (used in code but not in env file).
@@ -45,7 +45,7 @@ export function printMissing(
   for (const [, items] of byFile) {
     for (const { variable, usage } of items) {
       console.log(
-        `${label(variable.padEnd(26))}${error(`${normalizePath(usage.file)}:${usage.line}`)}`,
+        `${label(variable.padEnd(UI_LABEL_WIDTH))}${error(`${normalizePath(usage.file)}:${usage.line}`)}`,
       );
     }
   }

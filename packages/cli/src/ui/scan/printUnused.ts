@@ -1,4 +1,11 @@
-import { label, warning, error, divider, header } from '../theme.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  warning,
+  error,
+  divider,
+  header,
+} from '../theme.js';
 
 /**
  * Print unused environment variables (defined in env but not used in code).
@@ -23,7 +30,9 @@ export function printUnused(
   console.log(`${divider}`);
 
   for (const variable of unused) {
-    console.log(`${label(variable.padEnd(26))}${textColor('Unused')}`);
+    console.log(
+      `${label(variable.padEnd(UI_LABEL_WIDTH))}${textColor('Unused')}`,
+    );
   }
 
   console.log(`${divider}`);

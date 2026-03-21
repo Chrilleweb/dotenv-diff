@@ -1,4 +1,11 @@
-import { accent, warning, error, divider, header } from '../theme.js';
+import {
+  UI_LABEL_WIDTH,
+  accent,
+  warning,
+  error,
+  divider,
+  header,
+} from '../theme.js';
 import chalk from 'chalk';
 
 /**
@@ -26,9 +33,11 @@ export function printHealthScore(
   console.log(`${indicator} ${header('Project Health Score')}`);
   console.log(`${divider}`);
   console.log(
-    `${chalk.hex('#888888')('Score'.padEnd(26))}${scoreColor(`${score}/100`)}`,
+    `${chalk.hex('#888888')('Score'.padEnd(UI_LABEL_WIDTH))}${scoreColor(`${score}/100`)}`,
   );
-  console.log(`${chalk.hex('#888888')('Status'.padEnd(26))}${scoreColor(lbl)}`);
+  console.log(
+    `${chalk.hex('#888888')('Status'.padEnd(UI_LABEL_WIDTH))}${scoreColor(lbl)}`,
+  );
   console.log(`${divider}`);
   console.log();
 

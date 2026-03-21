@@ -1,5 +1,13 @@
 import { basename } from 'path';
-import { label, value, accent, warning, divider, header } from '../theme.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  value,
+  accent,
+  warning,
+  divider,
+  header,
+} from '../theme.js';
 
 /**
  * Printed when the config file is successfully created
@@ -10,7 +18,9 @@ export function printInitSuccess(filePath: string): void {
   console.log();
   console.log(`${accent('▸')} ${header('Config created')}`);
   console.log(`${divider}`);
-  console.log(`${label('Path'.padEnd(26))}${value(basename(filePath))}`);
+  console.log(
+    `${label('Path'.padEnd(UI_LABEL_WIDTH))}${value(basename(filePath))}`,
+  );
   console.log(`${divider}`);
 }
 
@@ -23,6 +33,8 @@ export function printInitExists(filePath: string): void {
   console.log();
   console.log(`${warning('▸')} ${header('Config already exists')}`);
   console.log(`${divider}`);
-  console.log(`${label('Path'.padEnd(26))}${value(basename(filePath))}`);
+  console.log(
+    `${label('Path'.padEnd(UI_LABEL_WIDTH))}${value(basename(filePath))}`,
+  );
   console.log(`${divider}`);
 }

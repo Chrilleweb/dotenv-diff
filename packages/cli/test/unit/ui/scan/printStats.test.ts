@@ -2,6 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import chalk from 'chalk';
 import { printStats } from '../../../../src/ui/scan/printStats.js';
 import type { ScanStats } from '../../../../src/config/types.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  value,
+  accent,
+  divider,
+} from '../../../../src/ui/theme.js';
 
 describe('printStats (scan)', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
@@ -30,12 +37,6 @@ describe('printStats (scan)', () => {
   it('prints scan statistics when showStats is true', () => {
     printStats(stats, true);
 
-    const dim = chalk.hex('#555555');
-    const label = chalk.hex('#888888');
-    const value = chalk.hex('#e0e0e0').bold;
-    const accent = chalk.hex('#00d4aa');
-    const divider = dim('─'.repeat(50));
-
     // Leading blank line
     expect(logSpy).toHaveBeenNthCalledWith(1);
 
@@ -51,23 +52,23 @@ describe('printStats (scan)', () => {
     // Values
     expect(logSpy).toHaveBeenNthCalledWith(
       4,
-      `${label('Files scanned'.padEnd(26))}${value('10')}`,
+      `${label('Files scanned'.padEnd(UI_LABEL_WIDTH))}${value('10')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       5,
-      `${label('Variable references'.padEnd(26))}${value('50')}`,
+      `${label('Variable references'.padEnd(UI_LABEL_WIDTH))}${value('50')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       6,
-      `${label('Unique variables'.padEnd(26))}${value('8')}`,
+      `${label('Unique variables'.padEnd(UI_LABEL_WIDTH))}${value('8')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       7,
-      `${label('Warnings'.padEnd(26))}${value('3')}`,
+      `${label('Warnings'.padEnd(UI_LABEL_WIDTH))}${value('3')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       8,
-      `${label('Duration'.padEnd(26))}${value('1.23s')}`,
+      `${label('Duration'.padEnd(UI_LABEL_WIDTH))}${value('1.23s')}`,
     );
 
     // Closing divider + trailing blank line

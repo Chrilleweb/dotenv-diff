@@ -4,6 +4,7 @@ import {
   printInitSuccess,
   printInitExists,
 } from '../../../../src/ui/shared/printInitStatus.js';
+import { UI_LABEL_WIDTH, label, value } from '../../../../src/ui/theme.js';
 
 describe('printInitSuccess', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
@@ -30,7 +31,7 @@ describe('printInitSuccess', () => {
     // Path line
     expect(logSpy).toHaveBeenNthCalledWith(
       4,
-      'Path                      dotenv-diff.config.json',
+      `${label('Path'.padEnd(UI_LABEL_WIDTH))}${value('dotenv-diff.config.json')}`,
     );
   });
 });
@@ -63,7 +64,7 @@ describe('printInitExists', () => {
     // Path line
     expect(logSpy).toHaveBeenNthCalledWith(
       4,
-      chalk.dim('Path                      dotenv-diff.config.json'),
+      `${label('Path'.padEnd(UI_LABEL_WIDTH))}${value('dotenv-diff.config.json')}`,
     );
   });
 });
