@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { printErrorNotFound } from '../../../../src/ui/compare/printErrorNotFound.js';
-import { error, label, value, header } from '../../../../src/ui/theme.js';
+import {
+  UI_LABEL_WIDTH,
+  error,
+  label,
+  value,
+  header,
+} from '../../../../src/ui/theme.js';
 
 describe('printErrorNotFound', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
@@ -20,10 +26,10 @@ describe('printErrorNotFound', () => {
       `${error('▸')} ${header('File not found')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Missing env'.padEnd(26))}${error('.env')}`,
+      `${label('Missing env'.padEnd(UI_LABEL_WIDTH))}${error('.env')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Suggestion'.padEnd(26))}${value('ensure both files exist before comparing')}`,
+      `${label('Suggestion'.padEnd(UI_LABEL_WIDTH))}${value('ensure both files exist before comparing')}`,
     );
   });
 
@@ -34,10 +40,10 @@ describe('printErrorNotFound', () => {
       `${error('▸')} ${header('File not found')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Missing example'.padEnd(26))}${error('.env.example')}`,
+      `${label('Missing example'.padEnd(UI_LABEL_WIDTH))}${error('.env.example')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Suggestion'.padEnd(26))}${value('ensure both files exist before comparing')}`,
+      `${label('Suggestion'.padEnd(UI_LABEL_WIDTH))}${value('ensure both files exist before comparing')}`,
     );
   });
 
@@ -48,13 +54,13 @@ describe('printErrorNotFound', () => {
       `${error('▸')} ${header('File not found')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Missing env'.padEnd(26))}${error('.env')}`,
+      `${label('Missing env'.padEnd(UI_LABEL_WIDTH))}${error('.env')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Missing example'.padEnd(26))}${error('.env.example')}`,
+      `${label('Missing example'.padEnd(UI_LABEL_WIDTH))}${error('.env.example')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Suggestion'.padEnd(26))}${value('ensure both files exist before comparing')}`,
+      `${label('Suggestion'.padEnd(UI_LABEL_WIDTH))}${value('ensure both files exist before comparing')}`,
     );
   });
 

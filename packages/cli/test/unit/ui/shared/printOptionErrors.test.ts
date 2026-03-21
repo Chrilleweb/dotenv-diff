@@ -5,11 +5,11 @@ import {
   printCiYesWarning,
 } from '../../../../src/ui/shared/printOptionErrors.js';
 import {
+  UI_LABEL_WIDTH,
   error,
   warning,
   value,
   label,
-  divider,
   header,
 } from '../../../../src/ui/theme.js';
 
@@ -35,10 +35,10 @@ describe('printInvalidCategory', () => {
       `${error('▸')} ${header('Invalid flag')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Invalid values'.padEnd(26))}${error('bad1, bad2')}`,
+      `${label('Invalid values'.padEnd(UI_LABEL_WIDTH))}${error('bad1, bad2')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Allowed'.padEnd(26))}${value('allowed1, allowed2')}`,
+      `${label('Allowed'.padEnd(UI_LABEL_WIDTH))}${value('allowed1, allowed2')}`,
     );
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
@@ -66,7 +66,7 @@ describe('printInvalidRegex', () => {
       `${error('▸')} ${header('Invalid regex')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Pattern'.padEnd(26))}${error('[abc')}`,
+      `${label('Pattern'.padEnd(UI_LABEL_WIDTH))}${error('[abc')}`,
     );
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
@@ -90,7 +90,7 @@ describe('printCiYesWarning', () => {
       `${warning('▸')} ${header('Flag conflict')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Resolution'.padEnd(26))}${value('proceeding with --yes')}`,
+      `${label('Resolution'.padEnd(UI_LABEL_WIDTH))}${value('proceeding with --yes')}`,
     );
   });
 });

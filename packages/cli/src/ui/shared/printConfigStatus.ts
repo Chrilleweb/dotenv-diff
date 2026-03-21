@@ -1,5 +1,13 @@
 import path from 'path';
-import { label, value, accent, error, divider, header } from '../theme.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  value,
+  accent,
+  error,
+  divider,
+  header,
+} from '../theme.js';
 
 /**
  * Prints message when dotenv-diff.config.json is successfully loaded.
@@ -12,7 +20,7 @@ export function printConfigLoaded(filePath: string): void {
   console.log();
   console.log(`${accent('▸')} ${header('Config')}`);
   console.log(`${divider}`);
-  console.log(`${label('Loaded'.padEnd(26))}${value(fileName)}`);
+  console.log(`${label('Loaded'.padEnd(UI_LABEL_WIDTH))}${value(fileName)}`);
   console.log(`${divider}`);
 }
 
@@ -28,8 +36,8 @@ export function printConfigLoadError(err: unknown): void {
   console.log(`${error('▸')} ${header('Config Error')}`);
   console.log(`${divider}`);
   console.log(
-    `${label('Failed to parse'.padEnd(26))}${error('dotenv-diff.config.json')}`,
+    `${label('Failed to parse'.padEnd(UI_LABEL_WIDTH))}${error('dotenv-diff.config.json')}`,
   );
-  console.log(`${label('Reason'.padEnd(26))}${error(message)}`);
+  console.log(`${label('Reason'.padEnd(UI_LABEL_WIDTH))}${error(message)}`);
   console.log(`${divider}`);
 }

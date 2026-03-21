@@ -1,6 +1,14 @@
 import type { EnvUsage, VariableUsages } from '../../config/types.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
-import { label, warning, error, dim, divider, header } from '../theme.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  warning,
+  error,
+  dim,
+  divider,
+  header,
+} from '../theme.js';
 
 /**
  * Print environment variables that were logged using console.log / warn / error.
@@ -41,13 +49,13 @@ export function printConsolelogWarning(
     uniqueUsages.slice(0, maxShow).forEach((usage) => {
       const normalizedFile = normalizePath(usage.file);
       console.log(
-        `${label(variable.padEnd(26))}${textColor(`${normalizedFile}:${usage.line}`)}`,
+        `${label(variable.padEnd(UI_LABEL_WIDTH))}${textColor(`${normalizedFile}:${usage.line}`)}`,
       );
     });
 
     if (uniqueUsages.length > maxShow) {
       console.log(
-        `${label(''.padEnd(26))}${dim(`+${uniqueUsages.length - maxShow} more`)}`,
+        `${label(''.padEnd(UI_LABEL_WIDTH))}${dim(`+${uniqueUsages.length - maxShow} more`)}`,
       );
     }
   }

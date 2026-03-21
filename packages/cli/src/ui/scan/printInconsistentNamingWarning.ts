@@ -1,5 +1,6 @@
 import type { InconsistentNamingWarning } from '../../config/types.js';
 import {
+  UI_LABEL_WIDTH,
   label,
   warning,
   error,
@@ -30,7 +31,7 @@ export function printInconsistentNamingWarning(
   for (const { key1, key2, suggestion } of warnings) {
     const suggestionText = `Use only: ${suggestion}`;
     console.log(
-      `${label(`${key1} ↔ ${key2}`.padEnd(26))}${textColor(wrapReason(suggestionText, 26))}`,
+      `${label(`${key1} ↔ ${key2}`.padEnd(UI_LABEL_WIDTH))}${textColor(wrapReason(suggestionText, 26))}`,
     );
   }
 

@@ -36,6 +36,8 @@ describe('printStats (scan)', () => {
     const accent = chalk.hex('#00d4aa');
     const divider = dim('─'.repeat(50));
 
+    const UI_LABEL_WIDTH = 28;
+
     // Leading blank line
     expect(logSpy).toHaveBeenNthCalledWith(1);
 
@@ -51,23 +53,23 @@ describe('printStats (scan)', () => {
     // Values
     expect(logSpy).toHaveBeenNthCalledWith(
       4,
-      `${label('Files scanned'.padEnd(26))}${value('10')}`,
+      `${label('Files scanned'.padEnd(UI_LABEL_WIDTH))}${value('10')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       5,
-      `${label('Variable references'.padEnd(26))}${value('50')}`,
+      `${label('Variable references'.padEnd(UI_LABEL_WIDTH))}${value('50')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       6,
-      `${label('Unique variables'.padEnd(26))}${value('8')}`,
+      `${label('Unique variables'.padEnd(UI_LABEL_WIDTH))}${value('8')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       7,
-      `${label('Warnings'.padEnd(26))}${value('3')}`,
+      `${label('Warnings'.padEnd(UI_LABEL_WIDTH))}${value('3')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       8,
-      `${label('Duration'.padEnd(26))}${value('1.23s')}`,
+      `${label('Duration'.padEnd(UI_LABEL_WIDTH))}${value('1.23s')}`,
     );
 
     // Closing divider + trailing blank line

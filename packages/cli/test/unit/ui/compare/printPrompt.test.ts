@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { printPrompt } from '../../../../src/ui/compare/printPrompt.js';
 import {
+  UI_LABEL_WIDTH,
   accent,
   warning,
   dim,
@@ -27,10 +28,10 @@ describe('printPrompt', () => {
       `${warning('▸')} ${header('No env files found')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Status'.padEnd(26))}${warning('no .env* or .env.example found')}`,
+      `${label('Status'.padEnd(UI_LABEL_WIDTH))}${warning('no .env* or .env.example found')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Action'.padEnd(26))}${dim('skipping comparison')}`,
+      `${label('Action'.padEnd(UI_LABEL_WIDTH))}${dim('skipping comparison')}`,
     );
   });
 
@@ -41,7 +42,7 @@ describe('printPrompt', () => {
       `${warning('▸')} ${header('File not found')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('File'.padEnd(26))}${warning('.env.production')}`,
+      `${label('File'.padEnd(UI_LABEL_WIDTH))}${warning('.env.production')}`,
     );
   });
 
@@ -60,10 +61,10 @@ describe('printPrompt', () => {
       `${accent('▸')} ${header('File created')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Created'.padEnd(26))}${value('.env')}`,
+      `${label('Created'.padEnd(UI_LABEL_WIDTH))}${value('.env')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('From'.padEnd(26))}${dim('.env.example')}`,
+      `${label('From'.padEnd(UI_LABEL_WIDTH))}${dim('.env.example')}`,
     );
   });
 
@@ -74,10 +75,10 @@ describe('printPrompt', () => {
       `${accent('▸')} ${header('File created')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('Created'.padEnd(26))}${value('.env.example')}`,
+      `${label('Created'.padEnd(UI_LABEL_WIDTH))}${value('.env.example')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('From'.padEnd(26))}${dim('.env')}`,
+      `${label('From'.padEnd(UI_LABEL_WIDTH))}${dim('.env')}`,
     );
   });
 });

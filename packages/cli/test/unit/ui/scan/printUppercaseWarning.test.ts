@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { printUppercaseWarning } from '../../../../src/ui/scan/printUppercaseWarning.js';
 import {
+  UI_LABEL_WIDTH,
   accent,
   error,
   label,
@@ -41,7 +42,7 @@ describe('printUppercaseWarning', () => {
     expect(logSpy).toHaveBeenNthCalledWith(3, `${divider}`);
     expect(logSpy).toHaveBeenNthCalledWith(
       4,
-      `${label('apiKey'.padEnd(26))}${value('API_KEY')}`,
+      `${label('apiKey'.padEnd(UI_LABEL_WIDTH))}${value('API_KEY')}`,
     );
     expect(logSpy).toHaveBeenNthCalledWith(5, `${divider}`);
   });
@@ -68,10 +69,10 @@ describe('printUppercaseWarning', () => {
     printUppercaseWarning(warnings, '.env');
 
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('apiKey'.padEnd(26))}${value('API_KEY')}`,
+      `${label('apiKey'.padEnd(UI_LABEL_WIDTH))}${value('API_KEY')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('secretKey'.padEnd(26))}${value('SECRET_KEY')}`,
+      `${label('secretKey'.padEnd(UI_LABEL_WIDTH))}${value('SECRET_KEY')}`,
     );
   });
 });

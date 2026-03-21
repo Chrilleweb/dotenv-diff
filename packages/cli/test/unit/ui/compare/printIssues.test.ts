@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { printIssues } from '../../../../src/ui/compare/printIssues.js';
 import {
+  UI_LABEL_WIDTH,
   error,
   warning,
   label,
@@ -41,10 +42,10 @@ describe('printIssues', () => {
       `${error('▸')} ${header('Missing keys')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('A'.padEnd(26))}${error('missing')}`,
+      `${label('A'.padEnd(UI_LABEL_WIDTH))}${error('missing')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('B'.padEnd(26))}${error('missing')}`,
+      `${label('B'.padEnd(UI_LABEL_WIDTH))}${error('missing')}`,
     );
   });
 
@@ -65,7 +66,7 @@ describe('printIssues', () => {
       `${warning('▸')} ${header('Extra keys (not in example)')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('X'.padEnd(26))}${warning('extra')}`,
+      `${label('X'.padEnd(UI_LABEL_WIDTH))}${warning('extra')}`,
     );
   });
 
@@ -78,7 +79,7 @@ describe('printIssues', () => {
       `${warning('▸')} ${header('Empty values')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('EMPTY_KEY'.padEnd(26))}${warning('empty')}`,
+      `${label('EMPTY_KEY'.padEnd(UI_LABEL_WIDTH))}${warning('empty')}`,
     );
   });
 
@@ -94,7 +95,7 @@ describe('printIssues', () => {
       `${warning('▸')} ${header('Value mismatches')}`,
     );
     expect(logSpy).toHaveBeenCalledWith(
-      `${label('API_KEY'.padEnd(26))}${warning('expected: 123')}  ${dim('got: 456')}`,
+      `${label('API_KEY'.padEnd(UI_LABEL_WIDTH))}${warning('expected: 123')}  ${dim('got: 456')}`,
     );
   });
 

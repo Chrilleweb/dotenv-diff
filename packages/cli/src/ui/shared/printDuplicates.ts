@@ -1,4 +1,12 @@
-import { label, value, warning, error, divider, header } from '../theme.js';
+import {
+  UI_LABEL_WIDTH,
+  label,
+  value,
+  warning,
+  error,
+  divider,
+  header,
+} from '../theme.js';
 import type { Duplicate } from '../../config/types.js';
 
 /**
@@ -31,7 +39,9 @@ export function printDuplicates(
     console.log(`${divider}`);
 
     for (const { key, count } of dEnv) {
-      console.log(`${label(key.padEnd(26))}${value(`${count} occurrences`)}`);
+      console.log(
+        `${label(key.padEnd(UI_LABEL_WIDTH))}${value(`${count} occurrences`)}`,
+      );
     }
 
     console.log(`${divider}`);
@@ -43,7 +53,9 @@ export function printDuplicates(
     console.log(`${divider}`);
 
     for (const { key, count } of dEx) {
-      console.log(`${label(key.padEnd(26))}${value(`${count} occurrences`)}`);
+      console.log(
+        `${label(key.padEnd(UI_LABEL_WIDTH))}${value(`${count} occurrences`)}`,
+      );
     }
 
     console.log(`${divider}`);
