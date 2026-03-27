@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.7
+
+### Patch Changes
+
+- b4a31d7: fixed ui bug for framework warnings
+
 ## 2.7.6
 
 ### Patch Changes

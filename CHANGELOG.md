@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: tough-hornets-hammer.md -->
+## 2026-03-27
+
+### Highlights
+- fixed ui bug for framework warnings
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: slimy-jokes-know.md,smart-planes-wash.md -->
 ## 2026-03-27
 
