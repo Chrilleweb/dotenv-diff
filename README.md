@@ -63,8 +63,8 @@ Example warning:
 
 ```bash
 Framework issues (Sveltekit):
-  - PUBLIC_URL (src/routes/+page.ts:1)
-    → Variables accessed through import.meta.env must start with "VITE_"
+  - PUBLIC_API_URL (src/routes/+page.ts:1)
+    → $env/dynamic/private variables must not start with "PUBLIC_"
 ```
 
 → See [Framework Documentation](./docs/frameworks/index.md) for more details.
