@@ -24,7 +24,10 @@ const REASON_MAX = 24;
  * @param indent The number of spaces to indent wrapped lines (should align with the start of the reason text in the output)
  * @returns The wrapped reason text with newlines and indentation as needed
  */
-export function wrapReason(reason: string, indent: number): string {
+export function wrapReason(
+  reason: string,
+  indent: number = UI_LABEL_WIDTH,
+): string {
   if (reason.length <= REASON_MAX) return reason;
   const pad = ' '.repeat(indent);
   const words = reason.split(' ');

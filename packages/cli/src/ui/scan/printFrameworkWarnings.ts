@@ -58,7 +58,7 @@ export function printFrameworkWarnings(
 
   for (const { w, locations } of grouped.values()) {
     console.log(
-      `${label(w.variable.padEnd(UI_LABEL_WIDTH))}${textColor(wrapReason(w.reason, 26))}`,
+      `${label(w.variable.padEnd(UI_LABEL_WIDTH))}${textColor(wrapReason(w.reason))}`,
     );
     for (const loc of locations) {
       console.log(`${label(''.padEnd(UI_LABEL_WIDTH))}${dim(loc)}`);
