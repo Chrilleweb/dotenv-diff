@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('../../../../src/ui/theme.js', () => ({
-  UI_LABEL_WIDTH: 26,
+  UI_LABEL_WIDTH: 28,
   label: (text: string) => `L(${text})`,
   warning: (text: string) => `W(${text})`,
   error: (text: string) => `E(${text})`,

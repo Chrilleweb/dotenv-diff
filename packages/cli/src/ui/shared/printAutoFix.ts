@@ -34,17 +34,17 @@ export function printAutoFix(
   } else {
     if (result.removedDuplicates.length) {
       console.log(
-        `${label('Removed duplicates'.padEnd(UI_LABEL_WIDTH))}${value(wrapReason(result.removedDuplicates.join(', '), 26))}`,
+        `${label('Removed duplicates'.padEnd(UI_LABEL_WIDTH))}${value(wrapReason(result.removedDuplicates.join(', ')))}`,
       );
     }
     if (result.addedEnv.length) {
       console.log(
-        `${label('Added missing keys'.padEnd(UI_LABEL_WIDTH))}${value(wrapReason(result.addedEnv.join(', '), 26))}`,
+        `${label('Added missing keys'.padEnd(UI_LABEL_WIDTH))}${value(wrapReason(result.addedEnv.join(', ')))}`,
       );
     }
     if (result.gitignoreUpdated) {
       console.log(
-        `${label('Updated .gitignore'.padEnd(UI_LABEL_WIDTH))}${value(wrapReason(envName, 26))}`,
+        `${label('Updated .gitignore'.padEnd(UI_LABEL_WIDTH))}${value(wrapReason(envName))}`,
       );
     }
   }
