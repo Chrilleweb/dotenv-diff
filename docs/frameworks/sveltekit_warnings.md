@@ -23,12 +23,20 @@ import.meta.env.VITE_PUBLIC_URL
 ## 2 `process.env` should only be used in server files
 
 ```ts
-process.env.VITE_SECRET
+// Warning in client file
+const apiUrl = process.env.API_URL;
+
+// No warning in server file
+export async function load() {
+  const secret = process.env.DATABASE_PASSWORD;
+}
 ```
 
 Warning:
 
 `process.env should only be used in server files`
+
+**Note:** `process.env` is allowed in configuration files like `svelte.config.js` or `svelte.config.ts`, as these are Node.js files that run during build time.
 
 ## 3 `$env/dynamic/private` cannot be used in client-side code
 

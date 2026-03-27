@@ -94,6 +94,30 @@ export const ENV_PATTERNS: Pattern[] = [
     regex: /(?<![.\w])env\.([A-Z_][A-Z0-9_]*)/g,
   },
 
+  // SvelteKit object destructuring from env
+  // const { VAR1, VAR2 } = env; (destructured from $env/dynamic/* or $env/static/*)
+  {
+    name: 'sveltekit' as const,
+    regex: /\{([^}]*)\}\s*=\s*env\b/g,
+    processor: (match) => {
+      const content = match[1];
+      if (!content) return [];
+
+      return content
+        .split(',')
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .map((part) => {
+          // Handle aliases: VAR: alias
+          // Handle defaults: VAR = "value"
+          // We want the left-most identifier
+          const [key] = part.split(/[:=]/);
+          return key ? key.trim() : '';
+        })
+        .filter((key) => /^[A-Z_][A-Z0-9_]*$/.test(key));
+    },
+  },
+
   // named import from dynamic is invalid in SvelteKit
   // import { env } from '$env/dynamic/private';
   {

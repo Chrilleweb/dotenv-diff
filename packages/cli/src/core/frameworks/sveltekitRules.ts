@@ -18,6 +18,9 @@ export function applySvelteKitRules(
     return;
   }
 
+  // Config files are allowed to use process.env
+  const isConfigFile = /svelte\.config\.(ts|js)$/.test(normalizedFile);
+
   const isServerFile =
     // SvelteKit route server files
     normalizedFile.includes('/+server.') ||
@@ -50,7 +53,7 @@ export function applySvelteKitRules(
 
   // process.env
   if (u.pattern === 'process.env') {
-    if (!isServerFile) {
+    if (!isServerFile && !isConfigFile) {
       warnings.push({
         variable: u.variable,
         reason: 'process.env should only be used in server files',
