@@ -180,4 +180,81 @@ describe('scanFile - Pattern Detection', () => {
       });
     });
   });
+
+  describe('SvelteKit env Object Access', () => {
+    it('detects env.VARIABLE_NAME access', () => {
+      const code = 'const token = env.KEYCLOAK_SECRET;';
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'KEYCLOAK_SECRET',
+        pattern: 'sveltekit',
+      });
+    });
+
+    it('detects destructuring from env: const { VAR1, VAR2 } = env', () => {
+      const code = 'const { KEYCLOAK_URL, KEYCLOAK_REALM } = env;';
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(2);
+      const variables = result.map((u) => u.variable).sort();
+      expect(variables).toEqual(['KEYCLOAK_REALM', 'KEYCLOAK_URL']);
+    });
+
+    it('detects destructuring with aliasing: const { VAR: alias } = env', () => {
+      const code = 'const { KEYCLOAK_URL: url } = env;';
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'KEYCLOAK_URL',
+        pattern: 'sveltekit',
+      });
+    });
+
+    it('detects destructuring with default values: const { VAR = "default" } = env', () => {
+      const code = 'const { KEYCLOAK_URL = "http://localhost:8080" } = env;';
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'KEYCLOAK_URL',
+        pattern: 'sveltekit',
+      });
+    });
+
+    it('detects multiple mixed destructuring from env', () => {
+      const code =
+        'const { KEYCLOAK_URL, KEYCLOAK_REALM: realm, CLIENT_SECRET = "default" } = env;';
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(3);
+      const variables = result.map((u) => u.variable).sort();
+      expect(variables).toEqual([
+        'CLIENT_SECRET',
+        'KEYCLOAK_REALM',
+        'KEYCLOAK_URL',
+      ]);
+    });
+
+    it('detects multiline destructuring from env', () => {
+      const code = `
+        const { 
+          KEYCLOAK_URL,
+          KEYCLOAK_REALM,
+          CLIENT_ID
+        } = env;
+      `;
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(3);
+      const variables = result.map((u) => u.variable).sort();
+      expect(variables).toEqual([
+        'CLIENT_ID',
+        'KEYCLOAK_REALM',
+        'KEYCLOAK_URL',
+      ]);
+    });
+  });
 });

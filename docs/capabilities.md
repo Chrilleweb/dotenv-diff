@@ -25,6 +25,8 @@ import.meta.env['MY_KEY']
 import { env } from '$env/dynamic/private';
 import { env } from '$env/dynamic/public';
 env.MY_KEY
+const { MY_KEY } = env
+const { MY_KEY: alias, OTHER_KEY = "fallback" } = env
 
 // SvelteKit – static (named imports)
 import { MY_KEY } from '$env/static/private';

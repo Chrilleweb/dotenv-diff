@@ -66,6 +66,16 @@ describe('applySvelteKitRules', () => {
     expect(warnings).toHaveLength(0);
   });
 
+  it('allows process.env in svelte.config.js', () => {
+    applySvelteKitRules({ ...baseUsage, file: 'svelte.config.js' }, warnings);
+    expect(warnings).toHaveLength(0);
+  });
+
+  it('allows process.env in svelte.config.ts', () => {
+    applySvelteKitRules({ ...baseUsage, file: 'svelte.config.ts' }, warnings);
+    expect(warnings).toHaveLength(0);
+  });
+
   // dynamic private
   it('warns dynamic/private in svelte file', () => {
     applySvelteKitRules(
