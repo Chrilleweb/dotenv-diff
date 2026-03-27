@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- changesets: slimy-jokes-know.md,smart-planes-wash.md -->
+## 2026-03-27
+
+### Highlights
+- fixed false warning in sveltekit config files
+- sveltekit object destructering from env
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: forty-zoos-sell.md,icy-beers-eat.md,late-sides-wonder.md,salty-doors-think.md,smooth-cats-guess.md,tough-radios-obey.md -->
 ## 2026-03-22
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.7.6
+
+### Patch Changes
+
+- 495e282: fixed false warning in sveltekit config files
+- 495e282: sveltekit object destructering from env
+
 ## 2.7.5
 
 ### Patch Changes
