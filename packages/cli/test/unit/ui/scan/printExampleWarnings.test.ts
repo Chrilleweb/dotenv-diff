@@ -63,6 +63,20 @@ describe('printExampleWarnings', () => {
         String(call[0]).includes('TOKEN'),
       ),
     ).toBe(true);
+
+    expect(
+      logSpy.mock.calls.some((call: [string]) =>
+        String(call[0]).includes('Looks like a real API key'),
+      ),
+    ).toBe(true);
+
+    expect(
+      logSpy.mock.calls.some(
+        (call: [string]) =>
+          String(call[0]).includes('[high]') ||
+          String(call[0]).includes('[medium]'),
+      ),
+    ).toBe(false);
   });
 
   it('uses warning indicator when strict is false and no high severity exists', () => {

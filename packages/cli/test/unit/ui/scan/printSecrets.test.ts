@@ -102,7 +102,28 @@ describe('printSecrets', () => {
 
     expect(
       logSpy.mock.calls.some((call: [string]) =>
-        String(call[0]).includes('STRANGE'),
+        String(call[0]).includes('Weird issue'),
+      ),
+    ).toBe(true);
+  });
+
+  it('prints secret reason text as the label', () => {
+    const secrets: SecretFinding[] = [
+      {
+        file: '/reason.ts',
+        line: 11,
+        kind: 'pattern',
+        message: 'matches known provider key pattern',
+        snippet: 'const key = "..."',
+        severity: 'high',
+      },
+    ];
+
+    printSecrets(secrets);
+
+    expect(
+      logSpy.mock.calls.some((call: [string]) =>
+        String(call[0]).includes('matches known provider key pattern'),
       ),
     ).toBe(true);
   });

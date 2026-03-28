@@ -23,9 +23,7 @@ export function printExampleWarnings(
 
   for (const w of warnings) {
     const severityColor = w.severity === 'high' ? error : warning;
-    console.log(
-      `${label(padLabel(w.key))}${severityColor(`${w.reason} [${w.severity}]`)}`,
-    );
+    console.log(`${label(padLabel(w.key))}${severityColor(w.reason)}`);
   }
 
   console.log(`${divider}`);
