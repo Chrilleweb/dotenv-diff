@@ -12,6 +12,7 @@ vi.mock('../../../../src/core/helpers/normalizePath.js', () => ({
 
 vi.mock('../../../../src/ui/theme.js', () => ({
   UI_LABEL_WIDTH: 28,
+  padLabel: (text: string) => text,
   label: (text: string) => `L(${text})`,
   accent: (text: string) => `A(${text})`,
   warning: (text: string) => `W(${text})`,
