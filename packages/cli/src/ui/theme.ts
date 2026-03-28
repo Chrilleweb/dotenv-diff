@@ -44,3 +44,18 @@ export function wrapReason(
   if (current.trim()) lines.push(current.trimEnd());
   return lines.join(`\n${pad}`);
 }
+
+/** Minimum spaces between a label and its value when the label overflows. */
+const MIN_LABEL_GAP = 2;
+
+/**
+ * Pads a label string so the following value is always visually separated.
+ * When the label fits within UI_LABEL_WIDTH it aligns to that column;
+ * when it overflows it adds MIN_LABEL_GAP spaces instead of merging into the value.
+ * @param text The raw label text (e.g. an env-var name)
+ * @returns The padded/spaced string ready to pass to `label()`
+ */
+export function padLabel(text: string): string {
+  if (text.length >= UI_LABEL_WIDTH) return text + ' '.repeat(MIN_LABEL_GAP);
+  return text.padEnd(UI_LABEL_WIDTH);
+}

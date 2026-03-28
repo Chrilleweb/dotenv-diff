@@ -8,6 +8,7 @@ import {
   dim,
   divider,
   header,
+  padLabel,
 } from '../theme.js';
 
 /**
@@ -49,7 +50,7 @@ export function printConsolelogWarning(
     uniqueUsages.slice(0, maxShow).forEach((usage) => {
       const normalizedFile = normalizePath(usage.file);
       console.log(
-        `${label(variable.padEnd(UI_LABEL_WIDTH))}${textColor(`${normalizedFile}:${usage.line}`)}`,
+        `${label(padLabel(variable))}${textColor(`${normalizedFile}:${usage.line}`)}`,
       );
     });
 

@@ -11,6 +11,7 @@ import {
   divider,
   header,
   wrapReason,
+  padLabel,
 } from '../theme.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
 
@@ -58,7 +59,7 @@ export function printFrameworkWarnings(
 
   for (const { w, locations } of grouped.values()) {
     console.log(
-      `${label(w.variable.padEnd(UI_LABEL_WIDTH))}${textColor(wrapReason(w.reason))}`,
+      `${label(padLabel(w.variable))}${textColor(wrapReason(w.reason))}`,
     );
     for (const loc of locations) {
       console.log(`${label(''.padEnd(UI_LABEL_WIDTH))}${dim(loc)}`);
