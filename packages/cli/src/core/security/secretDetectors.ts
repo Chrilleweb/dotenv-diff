@@ -120,6 +120,48 @@ function ignoreUrlsMatch(url: string, ignoreUrls?: string[]): boolean {
 }
 
 /**
+ * Checks if a string looks like a character set / alphabet used for ID generation
+ * or similar utilities (e.g. customAlphabet, nanoid, uuid generation).
+ *
+ * A charset string is characterised by:
+ *   - Containing long runs of consecutive ASCII characters (a-z, A-Z, 0-9)
+ *   - Low uniqueness ratio: many repeated character classes, few truly unique chars
+ *     relative to string length
+ *
+ * Examples that should pass:
+ *   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' // dotenv-diff-ignore
+ *   '0123456789abcdef'
+ *   'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'   (base32 alphabet)
+ */
+function looksLikeCharset(s: string): boolean {
+  // Must be reasonably long to bother checking
+  if (s.length < 16) return false;
+
+  // Unique character ratio: a charset reuses few characters relative to its length,
+  // but more importantly its unique chars are a large fraction of the total charset
+  // space (26 lc + 26 uc + 10 digits = 62). If >50% of the possible alphanumeric
+  // chars appear, it's almost certainly a charset definition.
+  const unique = new Set(s.replace(/[^A-Za-z0-9]/g, '')).size;
+  if (unique >= 61) return true; // covers a-z (26), A-Z (26), 0-9 (10), or combos
+
+  // Fallback: detect sequential runs of 6+ consecutive ASCII codes
+  // e.g. 'abcdef', 'ABCDEF', '012345'
+  const sequentialRunThreshold = 6;
+  let maxRun = 1;
+  let currentRun = 1;
+  for (let i = 1; i < s.length; i++) {
+    if (s.charCodeAt(i) === s.charCodeAt(i - 1)! + 1) {
+      currentRun++;
+      if (currentRun > maxRun) maxRun = currentRun;
+    } else {
+      currentRun = 1;
+    }
+  }
+
+  return maxRun >= sequentialRunThreshold;
+}
+
+/**
  * Checks if a string looks like a harmless literal.
  * @param s - The string to check.
  * @returns True if the string looks harmless, false otherwise.
@@ -137,7 +179,8 @@ function looksHarmlessLiteral(s: string): boolean {
     ) || // env-like keys
     /^[MmZzLlHhVvCcSsQqTtAa][0-9eE+.\- ,MmZzLlHhVvCcSsQqTtAa]*$/.test(s) || // SVG path data
     /<svg[\s\S]*?>[\s\S]*?<\/svg>/i.test(s) || // SVG markup
-    HARMLESS_URLS.some((rx) => rx.test(s)) // Allowlisted URLs
+    HARMLESS_URLS.some((rx) => rx.test(s)) || // Allowlisted URLs
+    looksLikeCharset(s) // character sets / alphabets used for ID generation
   );
 }
 

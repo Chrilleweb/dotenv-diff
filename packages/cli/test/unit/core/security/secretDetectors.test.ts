@@ -456,5 +456,76 @@ const email = "user@example.com";
 
       expect(findings).toHaveLength(0);
     });
+
+    describe('charset and alphabet detection', () => {
+      it('should ignore full alphanumeric alphabet (customAlphabet pattern)', () => {
+        // The exact case from the bug report
+        const source = `const createBundleId = customAlphabet(
+  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+  8,
+)`;
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(0);
+      });
+
+      it('should ignore lowercase-only alphabet', () => {
+        const source = "const id = nanoid('abcdefghijklmnopqrstuvwxyz', 10);";
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(0);
+      });
+
+      it('should ignore uppercase-only alphabet', () => {
+        const source =
+          "const code = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);";
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(0);
+      });
+
+      it('should ignore hex charset', () => {
+        // 16 unique chars, has a sequential run of 10 digits + 6 letters
+        const source = "const hex = customAlphabet('0123456789abcdef', 32);";
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(0);
+      });
+
+      it('should ignore base32 alphabet', () => {
+        // RFC 4648 base32: A-Z + 2-7
+        const source =
+          "const encoded = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567', 16);";
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(0);
+      });
+
+      it('should ignore digits-only charset', () => {
+        const source = "const pin = customAlphabet('0123456789', 6);";
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(0);
+      });
+
+      it('should still detect a real high-entropy secret that is not a charset', () => {
+        // Looks like a real token — no sequential runs, no large unique set structure
+        const source =
+          'const token = "xK9mQwP2zLsR8tYu5nV7cJ4hFgD6eS1iO0pA3bC";';
+        const findings = detectSecretsInSource('test.ts', source);
+        // Should still be flagged as entropy finding
+        expect(findings.length).toBeGreaterThan(0);
+        expect(findings.some((f) => f.kind === 'entropy')).toBe(true);
+      });
+
+      it('should still detect AWS key even if it superficially resembles an alphabet', () => {
+        const source = 'const key = "AKIAIOSFODNN7EXAMPLE";';
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(1);
+        expect(findings[0].severity).toBe('high');
+      });
+
+      it('should ignore alphabet assigned to a variable without a function call', () => {
+        // Charset used as a plain constant, not inside a function
+        const source =
+          "const ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789';";
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(0);
+      });
+    });
   });
 });
