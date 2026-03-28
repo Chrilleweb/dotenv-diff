@@ -19,7 +19,7 @@ export type SecretFinding = {
 
 // Regular expressions for detecting suspicious keys and provider patterns
 export const SUSPICIOUS_KEYS =
-  /\b(pass(word)?|secret|token|apikey|api_key|key|auth|bearer|private|client_secret|access[_-]?token)\b/i;
+  /\b(pass(word)?|secret|token|apikey|api_key|client_secret|access[_-]?token)\b/i;
 
 // Regular expressions for detecting provider patterns
 export const PROVIDER_PATTERNS: RegExp[] = [
