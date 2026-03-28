@@ -130,7 +130,7 @@ describe('secretDetectors', () => {
 
     it('should detect high-entropy long strings', () => {
       const source =
-        'const value = "Xy9Pq2Wz8Rt4Lm6Ks0Hv3Jn7Bp1Df5Cg9Ea2Ub6Tx4Sy8Rw3Qu7Pv0Nz5My1Lx9Kw2Jv6Iu4Ht0Gs8Fr3Eq7Dp1Co5Bn9Am";';
+        'const value = "Xy9Pq2Wz8Rt4Lm6Ks0Hv3Jn7Bp1Df5Cg9Ea2Ub6Tx4Sy8Rw3Qu7Pv0Nz5My1Lx9Kw2Jv6Iu4Ht0Gs8Fr3Eq7Dp1Co5Bn9Am";'; // dotenv-diff-ignore
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings.length).toBeGreaterThan(0);
@@ -469,40 +469,43 @@ const email = "user@example.com";
       });
 
       it('should ignore lowercase-only alphabet', () => {
-        const source = 'const id = nanoid(\'abcdefghijklmnopqrstuvwxyz\', 10);';
+        const source = "const id = nanoid('abcdefghijklmnopqrstuvwxyz', 10);";
         const findings = detectSecretsInSource('test.ts', source);
         expect(findings).toHaveLength(0);
       });
 
       it('should ignore uppercase-only alphabet', () => {
-        const source = 'const code = customAlphabet(\'ABCDEFGHIJKLMNOPQRSTUVWXYZ\', 6);';
+        const source =
+          "const code = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);";
         const findings = detectSecretsInSource('test.ts', source);
         expect(findings).toHaveLength(0);
       });
 
       it('should ignore hex charset', () => {
         // 16 unique chars, has a sequential run of 10 digits + 6 letters
-        const source = 'const hex = customAlphabet(\'0123456789abcdef\', 32);';
+        const source = "const hex = customAlphabet('0123456789abcdef', 32);";
         const findings = detectSecretsInSource('test.ts', source);
         expect(findings).toHaveLength(0);
       });
 
       it('should ignore base32 alphabet', () => {
         // RFC 4648 base32: A-Z + 2-7
-        const source = 'const encoded = customAlphabet(\'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567\', 16);';
+        const source =
+          "const encoded = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567', 16);";
         const findings = detectSecretsInSource('test.ts', source);
         expect(findings).toHaveLength(0);
       });
 
       it('should ignore digits-only charset', () => {
-        const source = 'const pin = customAlphabet(\'0123456789\', 6);';
+        const source = "const pin = customAlphabet('0123456789', 6);";
         const findings = detectSecretsInSource('test.ts', source);
         expect(findings).toHaveLength(0);
       });
 
       it('should still detect a real high-entropy secret that is not a charset', () => {
         // Looks like a real token — no sequential runs, no large unique set structure
-        const source = 'const token = "xK9mQwP2zLsR8tYu5nV7cJ4hFgD6eS1iO0pA3bC";';
+        const source =
+          'const token = "xK9mQwP2zLsR8tYu5nV7cJ4hFgD6eS1iO0pA3bC";';
         const findings = detectSecretsInSource('test.ts', source);
         // Should still be flagged as entropy finding
         expect(findings.length).toBeGreaterThan(0);
@@ -518,7 +521,8 @@ const email = "user@example.com";
 
       it('should ignore alphabet assigned to a variable without a function call', () => {
         // Charset used as a plain constant, not inside a function
-        const source = 'const ALPHABET = \'abcdefghijklmnopqrstuvwxyz0123456789\';';
+        const source =
+          "const ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789';";
         const findings = detectSecretsInSource('test.ts', source);
         expect(findings).toHaveLength(0);
       });
