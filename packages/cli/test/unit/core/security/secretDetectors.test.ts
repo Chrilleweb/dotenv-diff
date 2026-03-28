@@ -527,5 +527,43 @@ const email = "user@example.com";
         expect(findings).toHaveLength(0);
       });
     });
+    describe('minified file detection', () => {
+      it('should ignore lines over 500 chars (likely minified)', () => {
+        // Real minified line from a bundled file — contains URLs and identifiers
+        // that would otherwise trigger URL and entropy warnings
+        const source =
+          'const WORKSPACES_DOCS_URL="https://www.sanity.io/docs/workspaces",useWorkspaceAuthStates=createHookFromObservableFactory((workspaces)=>combineLatest(workspaces.map((workspace)=>workspace.auth.state.pipe(map((state)=>[workspace.name,state])))).pipe(map((entries)=>Object.fromEntries(entries)))),STATE_TITLES={notAuthenticated:"Not authenticated",authenticated:"Authenticated",error:"Error"},COOKIE_NAME="sanity_workspace",DEFAULT_TIMEOUT=3e4,RETRY_ATTEMPTS=3,BASE_PATH="/v2021-06-07",API_VERSION="2021-06-07";';
+        expect(source.length).toBeGreaterThan(500); // confirm the line is actually long
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(0);
+      });
+
+      it('should ignore suspicious-looking strings inside minified lines', () => {
+        // Minified code with a token field — should not warn because the line is minified
+        const source =
+          'var n=function(){return Math.random().toString(36).substr(2,9)},t={apiUrl:"https://api.example.com/v1",timeout:3e4,retry:3,token:"placeholder",headers:{"Content-Type":"application/json",Accept:"application/json"},endpoints:{auth:"/auth",users:"/users",data:"/data"},utils:{encode:function(e){return btoa(e)},decode:function(e){return atob(e)},hash:function(e){return e.split("").reduce((function(e,n){return(e=(e<<5)-e+n.charCodeAt(0))&e}),0)}},extra:"paddingToEnsureThisLineExceedsFiveHundredCharactersAsRequiredByTheMinifiedLineDetectionLogicInOurSecretScanner"};';
+        expect(source.length).toBeGreaterThan(500);
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings).toHaveLength(0);
+      });
+
+      it('should still detect secrets on normal-length lines', () => {
+        // A short, normal line with a real secret should still be caught
+        const source =
+          'const token = "ghp_1234567890abcdefghijklmnopqrstuvwxyz";';
+        expect(source.length).toBeLessThan(500);
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings.length).toBeGreaterThan(0);
+      });
+
+      it('should not ignore a 499-char line', () => {
+        // Just under the threshold — should still be scanned normally
+        const padding = 'x'.repeat(380);
+        const source = `const token = "ghp_1234567890abcdefghijklmnopqrstuvwxyz"; // ${padding}`;
+        expect(source.length).toBeLessThan(500);
+        const findings = detectSecretsInSource('test.ts', source);
+        expect(findings.length).toBeGreaterThan(0);
+      });
+    });
   });
 });

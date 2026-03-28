@@ -61,7 +61,7 @@ export function printSecrets(
     for (const f of findings) {
       const color = getSeverityColor(f.severity);
       console.log(
-        `${label(padLabel(f.severity.toUpperCase()))}${color(`${normalizePath(f.file)}:${f.line}`)}`,
+        `${label(padLabel(f.message))}${color(`${normalizePath(f.file)}:${f.line}`)}`,
       );
     }
   }
