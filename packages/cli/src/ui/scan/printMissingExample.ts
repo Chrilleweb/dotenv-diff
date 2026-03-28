@@ -2,14 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { resolveFromCwd } from '../../core/helpers/resolveFromCwd.js';
 import type { ScanUsageOptions } from '../../config/types.js';
-import {
-  UI_LABEL_WIDTH,
-  label,
-  error,
-  warning,
-  divider,
-  header,
-} from '../theme.js';
+import { label, error, warning, divider, header, padLabel } from '../theme.js';
 
 /**
  * Print message if the specified example file is missing.
@@ -32,7 +25,7 @@ export function printMissingExample(opts: ScanUsageOptions): boolean {
   console.log(`${indicator} ${header('Missing example file')}`);
   console.log(`${divider}`);
   console.log(
-    `${label('File'.padEnd(UI_LABEL_WIDTH))}${(opts.isCiMode ? error : warning)(fileName)}`,
+    `${label(padLabel('File'))}${(opts.isCiMode ? error : warning)(fileName)}`,
   );
   console.log(`${divider}`);
 

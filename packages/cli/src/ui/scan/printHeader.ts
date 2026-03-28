@@ -1,11 +1,4 @@
-import {
-  UI_LABEL_WIDTH,
-  accent,
-  label,
-  value,
-  divider,
-  header,
-} from '../theme.js';
+import { accent, label, value, divider, header, padLabel } from '../theme.js';
 
 /**
  * Prints the header for the scanning output.
@@ -19,7 +12,7 @@ export function printHeader(comparedAgainst?: string): void {
   console.log(`${accent('▸')} ${header('dotenv-diff')}`);
   console.log(`${divider}`);
   console.log(
-    `${label('Comparing against'.padEnd(UI_LABEL_WIDTH))}${value(comparedAgainst)}`,
+    `${label(padLabel('Comparing against'))}${value(comparedAgainst)}`,
   );
   console.log(`${divider}`);
 }

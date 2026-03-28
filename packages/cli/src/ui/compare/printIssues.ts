@@ -1,12 +1,12 @@
 import type { Filtered } from '../../config/types.js';
 import {
-  UI_LABEL_WIDTH,
   label,
   warning,
   error,
   dim,
   divider,
   header,
+  padLabel,
 } from '../theme.js';
 
 /**
@@ -28,7 +28,7 @@ export function printIssues(
     console.log(`${error('▸')} ${header('Missing keys')}`);
     console.log(`${divider}`);
     for (const key of filtered.missing) {
-      console.log(`${label(key.padEnd(UI_LABEL_WIDTH))}${error('missing')}`);
+      console.log(`${label(padLabel(key))}${error('missing')}`);
     }
     console.log(`${divider}`);
   }
@@ -38,7 +38,7 @@ export function printIssues(
     console.log(`${warning('▸')} ${header('Extra keys (not in example)')}`);
     console.log(`${divider}`);
     for (const key of filtered.extra) {
-      console.log(`${label(key.padEnd(UI_LABEL_WIDTH))}${warning('extra')}`);
+      console.log(`${label(padLabel(key))}${warning('extra')}`);
     }
     console.log(`${divider}`);
   }
@@ -48,7 +48,7 @@ export function printIssues(
     console.log(`${warning('▸')} ${header('Empty values')}`);
     console.log(`${divider}`);
     for (const key of filtered.empty) {
-      console.log(`${label(key.padEnd(UI_LABEL_WIDTH))}${warning('empty')}`);
+      console.log(`${label(padLabel(key))}${warning('empty')}`);
     }
     console.log(`${divider}`);
   }
@@ -59,7 +59,7 @@ export function printIssues(
     console.log(`${divider}`);
     for (const { key, expected, actual } of filtered.mismatches) {
       console.log(
-        `${label(key.padEnd(UI_LABEL_WIDTH))}${warning(`expected: ${expected}`)}  ${dim(`got: ${actual}`)}`,
+        `${label(padLabel(key))}${warning(`expected: ${expected}`)}  ${dim(`got: ${actual}`)}`,
       );
     }
     console.log(`${divider}`);

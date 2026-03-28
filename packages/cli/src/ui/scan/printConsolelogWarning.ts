@@ -1,13 +1,13 @@
 import type { EnvUsage, VariableUsages } from '../../config/types.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
 import {
-  UI_LABEL_WIDTH,
   label,
   warning,
   error,
   dim,
   divider,
   header,
+  padLabel,
 } from '../theme.js';
 
 /**
@@ -49,13 +49,13 @@ export function printConsolelogWarning(
     uniqueUsages.slice(0, maxShow).forEach((usage) => {
       const normalizedFile = normalizePath(usage.file);
       console.log(
-        `${label(variable.padEnd(UI_LABEL_WIDTH))}${textColor(`${normalizedFile}:${usage.line}`)}`,
+        `${label(padLabel(variable))}${textColor(`${normalizedFile}:${usage.line}`)}`,
       );
     });
 
     if (uniqueUsages.length > maxShow) {
       console.log(
-        `${label(''.padEnd(UI_LABEL_WIDTH))}${dim(`+${uniqueUsages.length - maxShow} more`)}`,
+        `${label(padLabel(''))}${dim(`+${uniqueUsages.length - maxShow} more`)}`,
       );
     }
   }

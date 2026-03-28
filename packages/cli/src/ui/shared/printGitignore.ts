@@ -1,13 +1,13 @@
 import type { GitignoreIssue } from '../../config/types.js';
 import { GITIGNORE_ISSUES } from '../../config/constants.js';
 import {
-  UI_LABEL_WIDTH,
   label,
   value,
   warning,
   error,
   divider,
   header,
+  padLabel,
 } from '../theme.js';
 
 /**
@@ -42,14 +42,10 @@ export function printGitignoreWarning(options: GitignoreWarningOptions): void {
   log('');
   log(`${indicator} ${header('Gitignore warning')}`);
   log(`${divider}`);
+  log(`${label(padLabel('File'))}${(strict ? error : warning)(envFile)}`);
+  log(`${label(padLabel('Issue'))}${(strict ? error : warning)(issue)}`);
   log(
-    `${label('File'.padEnd(UI_LABEL_WIDTH))}${(strict ? error : warning)(envFile)}`,
-  );
-  log(
-    `${label('Issue'.padEnd(UI_LABEL_WIDTH))}${(strict ? error : warning)(issue)}`,
-  );
-  log(
-    `${label('Suggestion'.padEnd(UI_LABEL_WIDTH))}${value(`add ${envFile} to .gitignore`)}`,
+    `${label(padLabel('Suggestion'))}${value(`add ${envFile} to .gitignore`)}`,
   );
   log(`${divider}`);
 }

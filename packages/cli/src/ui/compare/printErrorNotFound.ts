@@ -1,12 +1,5 @@
 import path from 'path';
-import {
-  UI_LABEL_WIDTH,
-  label,
-  value,
-  error,
-  divider,
-  header,
-} from '../theme.js';
+import { label, value, error, divider, header, padLabel } from '../theme.js';
 
 /**
  * Prints error messages if env/example files are missing.
@@ -29,17 +22,17 @@ export function printErrorNotFound(
 
   if (!envExists) {
     console.log(
-      `${label('Missing env'.padEnd(UI_LABEL_WIDTH))}${error(path.basename(envFlag))}`,
+      `${label(padLabel('Missing env'))}${error(path.basename(envFlag))}`,
     );
   }
   if (!exExists) {
     console.log(
-      `${label('Missing example'.padEnd(UI_LABEL_WIDTH))}${error(path.basename(exampleFlag))}`,
+      `${label(padLabel('Missing example'))}${error(path.basename(exampleFlag))}`,
     );
   }
 
   console.log(
-    `${label('Suggestion'.padEnd(UI_LABEL_WIDTH))}${value('ensure both files exist before comparing')}`,
+    `${label(padLabel('Suggestion'))}${value('ensure both files exist before comparing')}`,
   );
   console.log(`${divider}`);
 }

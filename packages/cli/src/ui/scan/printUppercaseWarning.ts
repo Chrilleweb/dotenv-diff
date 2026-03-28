@@ -1,12 +1,5 @@
 import type { UppercaseWarning } from '../../config/types.js';
-import {
-  UI_LABEL_WIDTH,
-  label,
-  error,
-  divider,
-  header,
-  warning,
-} from '../theme.js';
+import { label, error, divider, header, warning, padLabel } from '../theme.js';
 
 /**
  * Print warnings for environment variable keys that are not uppercase.
@@ -33,9 +26,7 @@ export function printUppercaseWarning(
   console.log(`${divider}`);
 
   for (const w of warnings) {
-    console.log(
-      `${label(w.key.padEnd(UI_LABEL_WIDTH))}${textColor(w.suggestion)}`,
-    );
+    console.log(`${label(padLabel(w.key))}${textColor(w.suggestion)}`);
   }
 
   console.log(`${divider}`);
