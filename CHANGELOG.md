@@ -1,5 +1,25 @@
 # Changelog
 
+<!-- changesets: common-ways-stare.md,cyan-states-fall.md,empty-squids-try.md,olive-carrots-share.md,quiet-news-spend.md,sparkly-places-allow.md,sunny-jeans-wish.md -->
+## 2026-03-28
+
+### Highlights
+- added CI, GITHUB_ACTIONS and INIT_CWD to default ignore keys
+- added TZ to default exclude keys
+- fix false positive secret warnings on charset/alphabet strings
+- replaced severity with reason for secret detection output
+- made suspicious keys more loose
+- skip minified files in secret detection
+- fixed ui space issue if key is too long
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: tough-hornets-hammer.md -->
 ## 2026-03-27
 

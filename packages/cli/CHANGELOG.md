@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.7.8
+
+### Patch Changes
+
+- c4ed883: added CI, GITHUB_ACTIONS and INIT_CWD to default ignore keys
+- e664d23: added TZ to default exclude keys
+- 277c745: fix false positive secret warnings on charset/alphabet strings
+- e664d23: replaced severity with reason for secret detection output
+- 101fc04: made suspicious keys more loose
+- e664d23: skip minified files in secret detection
+- 1804a31: fixed ui space issue if key is too long
+
 ## 2.7.7
 
 ### Patch Changes
