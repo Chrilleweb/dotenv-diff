@@ -1,5 +1,5 @@
 type Pattern = {
-  name: 'process.env' | 'import.meta.env' | 'sveltekit';
+  name: 'process.env' | 'import.meta.env' | 'sveltekit' | 'env-wrapper';
   regex: RegExp;
   processor?: (match: RegExpExecArray) => string[];
 };
@@ -87,9 +87,13 @@ export const ENV_PATTERNS: Pattern[] = [
    *   readBoolEnv('FEATURE_FLAG')
    */
   {
-    name: 'process.env',
+    name: 'env-wrapper',
     regex:
       /\b(?:findEnv|readEnv|readBoolEnv)\(\s*['"]([A-Z_][A-Z0-9_]*)['"]\s*\)/g,
+    processor: (match) => {
+      const variable = match[1];
+      return variable ? [variable] : [];
+    },
   },
 
   // SvelteKit static named imports
