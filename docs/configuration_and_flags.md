@@ -158,6 +158,9 @@ Specify a comma-separated list of keys to ignore during the comparison other tha
 - `PROD`
 - `DEV`
 - `SSR`
+- `CI`
+- `GITHUB_ACTIONS`
+- `INIT_CWD`
 
 This is useful when you have certain environment variables that are expected to differ between environments and you want to exclude them from the comparison.
 

@@ -57,4 +57,10 @@ describe('filterIgnoredKeys', () => {
     expect(res).not.toContain('MODE');
     expect(res).not.toContain('PWD');
   });
+
+  it('Will ignore CI and GITHUB_ACTIONS by default', () => {
+    const keys = ['CI', 'GITHUB_ACTIONS', 'API_KEY'];
+    const res = filterIgnoredKeys(keys, [], []);
+    expect(res).toEqual(['API_KEY']);
+  });
 });

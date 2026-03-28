@@ -11,6 +11,9 @@ export const DEFAULT_EXCLUDE_KEYS = [
   'PROD',
   'DEV',
   'SSR',
+  'CI',
+  'GITHUB_ACTIONS',
+  'INIT_CWD',
 ];
 
 /**
