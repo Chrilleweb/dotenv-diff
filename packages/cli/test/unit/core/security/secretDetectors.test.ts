@@ -130,7 +130,7 @@ describe('secretDetectors', () => {
 
     it('should detect high-entropy long strings', () => {
       const source =
-        'const value = "Xy9Pq2Wz8Rt4Lm6Ks0Hv3Jn7Bp1Df5Cg9Ea2Ub6Tx4Sy8Rw3Qu7Pv0Nz5My1Lx9Kw2Jv6Iu4Ht0Gs8Fr3Eq7Dp1Co5Bn9Am";'; // dotenv-diff-ignore
+        'const value = "Xy9Pq2Wz8Rt4Lm6Ks0Hv3Jn7Bp1Df5Cg9Ea2Ub6Tx4Sy8Rw3Qu7Pv0Nz5My1Lx9Kw2Jv6Iu4Ht0Gs8Fr3Eq7Dp1Co5Bn9Am";';
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings.length).toBeGreaterThan(0);

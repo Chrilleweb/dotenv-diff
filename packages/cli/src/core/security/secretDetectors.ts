@@ -129,7 +129,7 @@ function ignoreUrlsMatch(url: string, ignoreUrls?: string[]): boolean {
  *     relative to string length
  *
  * Examples that should pass:
- *   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+ *   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' // dotenv-diff-ignore
  *   '0123456789abcdef'
  *   'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'   (base32 alphabet)
  */
