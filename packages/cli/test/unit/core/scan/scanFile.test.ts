@@ -54,6 +54,36 @@ const port = process.env.PORT;
     });
   });
 
+  it('detects env variable via findEnv wrapper', () => {
+    const content = "const apiKey = findEnv('API_KEY');";
+    const usages = scanFile('/test/project/src/app.ts', content, baseOpts);
+
+    expect(usages).toHaveLength(1);
+    expect(usages[0]).toMatchObject({
+      variable: 'API_KEY',
+      pattern: 'process.env',
+    });
+  });
+
+  it('detects env variables via readEnv and readBoolEnv wrappers', () => {
+    const content = `
+const apiUrl = readEnv("API_URL");
+const enabled = readBoolEnv('FEATURE_ENABLED');
+`;
+    const usages = scanFile('/test/project/src/app.ts', content, baseOpts);
+
+    expect(usages).toHaveLength(2);
+    expect(usages[0]?.variable).toBe('API_URL');
+    expect(usages[1]?.variable).toBe('FEATURE_ENABLED');
+  });
+
+  it('does not detect wrappers when argument is not a string literal', () => {
+    const content = 'const key = readEnv(envKey);';
+    const usages = scanFile('/test/project/src/app.ts', content, baseOpts);
+
+    expect(usages).toHaveLength(0);
+  });
+
   it('calculates correct line and column numbers', () => {
     const content = `const x = 1;
 const y = 2;

@@ -21,6 +21,11 @@ import.meta.env.MY_KEY
 import.meta.env["MY_KEY"]
 import.meta.env['MY_KEY']
 
+// Wrapper-based helpers
+findEnv('MY_KEY')
+readEnv('MY_KEY')
+readBoolEnv('FEATURE_FLAG')
+
 // SvelteKit – dynamic (env object)
 import { env } from '$env/dynamic/private';
 import { env } from '$env/dynamic/public';

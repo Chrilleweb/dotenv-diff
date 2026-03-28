@@ -78,6 +78,20 @@ export const ENV_PATTERNS: Pattern[] = [
     },
   },
 
+  /**
+   * Matches wrapper helper calls around env reads.
+   *
+   * Examples:
+   *   findEnv('MY_KEY')
+   *   readEnv("MY_KEY")
+   *   readBoolEnv('FEATURE_FLAG')
+   */
+  {
+    name: 'process.env',
+    regex:
+      /\b(?:findEnv|readEnv|readBoolEnv)\(\s*['"]([A-Z_][A-Z0-9_]*)['"]\s*\)/g,
+  },
+
   // SvelteKit static named imports
   // import { SECRET } from '$env/static/private';
   // import { PUBLIC_URL } from '$env/static/public';
