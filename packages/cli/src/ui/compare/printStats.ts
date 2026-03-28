@@ -1,12 +1,5 @@
 import type { Filtered } from '../../config/types.js';
-import {
-  UI_LABEL_WIDTH,
-  label,
-  value,
-  accent,
-  divider,
-  header,
-} from '../theme.js';
+import { label, value, accent, divider, header, padLabel } from '../theme.js';
 
 /**
  * Interface representing the comparison statistics between two environment files
@@ -46,7 +39,7 @@ export function printStats(
   if (json || !showStats) return;
 
   const row = (lbl: string, val: string | number) =>
-    console.log(`${label(lbl.padEnd(UI_LABEL_WIDTH))}${value(String(val))}`);
+    console.log(`${label(padLabel(lbl))}${value(String(val))}`);
 
   console.log();
   console.log(`${accent('▸')} ${header('Compare Statistics')}`);

@@ -1,12 +1,5 @@
 import type { ExpireWarning } from '../../config/types.js';
-import {
-  UI_LABEL_WIDTH,
-  label,
-  error,
-  warning,
-  divider,
-  header,
-} from '../theme.js';
+import { label, error, warning, divider, header, padLabel } from '../theme.js';
 import { EXPIRE_THRESHOLD_DAYS } from '../../config/constants.js';
 
 /**
@@ -43,9 +36,7 @@ export function printExpireWarnings(
 
     const rowColor = strict || warn.daysLeft <= 7 ? error : warning;
 
-    console.log(
-      `${label(warn.key.padEnd(UI_LABEL_WIDTH))}${rowColor(statusText)}`,
-    );
+    console.log(`${label(padLabel(warn.key))}${rowColor(statusText)}`);
   }
 
   console.log(`${divider}`);

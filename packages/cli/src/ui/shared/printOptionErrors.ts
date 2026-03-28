@@ -1,11 +1,11 @@
 import {
-  UI_LABEL_WIDTH,
   label,
   value,
   warning,
   error,
   divider,
   header,
+  padLabel,
 } from '../theme.js';
 
 /**
@@ -22,13 +22,9 @@ export function printInvalidCategory(
   console.log();
   console.log(`${error('▸')} ${header('Invalid flag')}`);
   console.log(`${divider}`);
-  console.log(`${label('Flag'.padEnd(UI_LABEL_WIDTH))}${error(flagName)}`);
-  console.log(
-    `${label('Invalid values'.padEnd(UI_LABEL_WIDTH))}${error(bad.join(', '))}`,
-  );
-  console.log(
-    `${label('Allowed'.padEnd(UI_LABEL_WIDTH))}${value(allowed.join(', '))}`,
-  );
+  console.log(`${label(padLabel('Flag'))}${error(flagName)}`);
+  console.log(`${label(padLabel('Invalid values'))}${error(bad.join(', '))}`);
+  console.log(`${label(padLabel('Allowed'))}${value(allowed.join(', '))}`);
   console.log(`${divider}`);
   process.exit(1);
 }
@@ -41,7 +37,7 @@ export function printInvalidRegex(pattern: string): never {
   console.log();
   console.log(`${error('▸')} ${header('Invalid regex')}`);
   console.log(`${divider}`);
-  console.log(`${label('Pattern'.padEnd(UI_LABEL_WIDTH))}${error(pattern)}`);
+  console.log(`${label(padLabel('Pattern'))}${error(pattern)}`);
   console.log(`${divider}`);
   process.exit(1);
 }
@@ -55,10 +51,10 @@ export function printCiYesWarning(): void {
   console.log(`${warning('▸')} ${header('Flag conflict')}`);
   console.log(`${divider}`);
   console.log(
-    `${label('Issue'.padEnd(UI_LABEL_WIDTH))}${warning('Both --ci and --yes provided')}`,
+    `${label(padLabel('Issue'))}${warning('Both --ci and --yes provided')}`,
   );
   console.log(
-    `${label('Resolution'.padEnd(UI_LABEL_WIDTH))}${value('proceeding with --yes')}`,
+    `${label(padLabel('Resolution'))}${value('proceeding with --yes')}`,
   );
   console.log(`${divider}`);
 }

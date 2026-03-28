@@ -1,7 +1,6 @@
 import type { EnvUsage, VariableUsages } from '../../config/types.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
 import {
-  UI_LABEL_WIDTH,
   label,
   warning,
   error,
@@ -56,7 +55,7 @@ export function printConsolelogWarning(
 
     if (uniqueUsages.length > maxShow) {
       console.log(
-        `${label(''.padEnd(UI_LABEL_WIDTH))}${dim(`+${uniqueUsages.length - maxShow} more`)}`,
+        `${label(padLabel(''))}${dim(`+${uniqueUsages.length - maxShow} more`)}`,
       );
     }
   }

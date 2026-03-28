@@ -1,13 +1,13 @@
 import type { SecretFinding } from '../../core/security/secretDetectors.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
 import {
-  UI_LABEL_WIDTH,
   label,
   accent,
   warning,
   error,
   divider,
   header,
+  padLabel,
 } from '../theme.js';
 
 /**
@@ -61,7 +61,7 @@ export function printSecrets(
     for (const f of findings) {
       const color = getSeverityColor(f.severity);
       console.log(
-        `${label(f.severity.toUpperCase().padEnd(UI_LABEL_WIDTH))}${color(`${normalizePath(f.file)}:${f.line}`)}`,
+        `${label(padLabel(f.severity.toUpperCase()))}${color(`${normalizePath(f.file)}:${f.line}`)}`,
       );
     }
   }

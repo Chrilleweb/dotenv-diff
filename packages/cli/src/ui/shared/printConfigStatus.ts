@@ -1,12 +1,12 @@
 import path from 'path';
 import {
-  UI_LABEL_WIDTH,
   label,
   value,
   accent,
   error,
   divider,
   header,
+  padLabel,
 } from '../theme.js';
 
 /**
@@ -20,7 +20,7 @@ export function printConfigLoaded(filePath: string): void {
   console.log();
   console.log(`${accent('▸')} ${header('Config')}`);
   console.log(`${divider}`);
-  console.log(`${label('Loaded'.padEnd(UI_LABEL_WIDTH))}${value(fileName)}`);
+  console.log(`${label(padLabel('Loaded'))}${value(fileName)}`);
   console.log(`${divider}`);
 }
 
@@ -36,8 +36,8 @@ export function printConfigLoadError(err: unknown): void {
   console.log(`${error('▸')} ${header('Config Error')}`);
   console.log(`${divider}`);
   console.log(
-    `${label('Failed to parse'.padEnd(UI_LABEL_WIDTH))}${error('dotenv-diff.config.json')}`,
+    `${label(padLabel('Failed to parse'))}${error('dotenv-diff.config.json')}`,
   );
-  console.log(`${label('Reason'.padEnd(UI_LABEL_WIDTH))}${error(message)}`);
+  console.log(`${label(padLabel('Reason'))}${error(message)}`);
   console.log(`${divider}`);
 }

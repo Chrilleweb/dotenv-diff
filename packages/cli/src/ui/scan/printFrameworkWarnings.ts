@@ -3,7 +3,6 @@ import type {
   DetectedFramework,
 } from '../../config/types.js';
 import {
-  UI_LABEL_WIDTH,
   label,
   warning,
   error,
@@ -62,7 +61,7 @@ export function printFrameworkWarnings(
       `${label(padLabel(w.variable))}${textColor(wrapReason(w.reason))}`,
     );
     for (const loc of locations) {
-      console.log(`${label(''.padEnd(UI_LABEL_WIDTH))}${dim(loc)}`);
+      console.log(`${label(padLabel(''))}${dim(loc)}`);
     }
   }
 
