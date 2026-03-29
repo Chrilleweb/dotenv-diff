@@ -41,7 +41,7 @@ export const PROVIDER_PATTERNS: RegExp[] = [
 const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
 
 // Regex for detecting HTTPS URLs
-const HTTPS_PATTERN = /["'`](https?:\/\/(?!localhost)[^"'`]*)["'`]/g;
+const HTTPS_PATTERN = /["'`](https:\/\/(?!localhost)[^"'`]*)["'`]/g;
 
 // List of harmless URL patterns to ignore
 const HARMLESS_URLS = [
@@ -296,15 +296,15 @@ export function detectSecretsInSource(
       const url = httpsMatch[1];
       if (url && !looksHarmlessLiteral(url)) {
         if (ignoreUrlsMatch(url, opts?.ignoreUrls)) continue;
-        const protocol = url.startsWith('https') ? 'HTTPS' : 'HTTP';
 
         findings.push({
           file,
           line: lineNo,
           kind: 'pattern',
-          message: `${protocol} URL detected – consider moving to an environment variable`,
+          message:
+            'HTTPS URL detected – consider moving to an environment variable',
           snippet: line.trim().slice(0, 180),
-          severity: protocol === 'HTTP' ? 'medium' : 'low',
+          severity: 'low',
         });
       }
     }
