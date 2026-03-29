@@ -9,6 +9,7 @@ import { DEFAULT_EXCLUDE_PATTERNS } from '../core/scan/patterns.js';
 import { scanFile } from '../core/scan/scanFile.js';
 import { findFiles } from './fileWalker.js';
 import { normalizePath } from '../core/helpers/normalizePath.js';
+import { isLikelyMinified } from '../core/helpers/isLikelyMinified.js';
 
 /**
  * Scans the codebase for environment variable usage based on the provided options.
@@ -30,6 +31,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   for (const filePath of files) {
     const content = await safeReadFile(filePath);
     if (!content) continue;
+    if (isLikelyMinified(content)) continue; // Skip likely minified files
 
     // Scan the file for environment variable usages
     const fileUsages = scanFile(filePath, content, opts);

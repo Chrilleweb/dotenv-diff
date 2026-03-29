@@ -3,6 +3,7 @@ import type { EnvUsage, ScanOptions } from '../../config/types.js';
 import { ENV_PATTERNS } from './patterns.js';
 import { hasIgnoreComment } from '../security/secretDetectors.js';
 import { normalizePath } from '../helpers/normalizePath.js';
+import { isLikelyMinified } from '../helpers/isLikelyMinified.js';
 
 /**
  * Scans a file for environment variable usage.
@@ -61,6 +62,9 @@ export function scanFile(
 
         // Get the context (the actual line)
         const contextLine = lines[lineNumber - 1]!;
+
+        // Ignore likely minified / bundled lines to avoid scan false positives
+        if (isLikelyMinified(contextLine)) continue;
 
         // Determine previous line for ignore detection
         const prevLine = lines[lineNumber - 2] ?? '';

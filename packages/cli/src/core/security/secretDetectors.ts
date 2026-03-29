@@ -1,4 +1,5 @@
 import { shannonEntropyNormalized } from './entropy.js';
+import { isLikelyMinified } from '../helpers/isLikelyMinified.js';
 
 /**
  * Severity levels for detected secrets
@@ -54,11 +55,6 @@ const HARMLESS_URLS = [
 // Known harmless attribute keys commonly used in UI / analytics
 const HARMLESS_ATTRIBUTE_KEYS =
   /\b(trackingId|trackingContext|data-testid|data-test|aria-label)\b/i;
-
-// Ignore minified files
-function isLikelyMinified(line: string): boolean {
-  return line.length > 500; // Extremely long line, likely minified
-}
 
 // Checks if a line is an HTML text node or tag
 function isHtmlTextNode(line: string): boolean {

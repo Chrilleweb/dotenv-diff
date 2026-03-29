@@ -38,6 +38,8 @@ Default scanned file types: .ts, .js, jsx, tsx, vue, .mjs, .mts, .cjs, .cts, .sv
 
 ## What It Checks For
 
+> **Note:** The scanner skips files containing any line over 500 characters, as these are likely minified or bundled — this avoids false positives across all checks below.
+
 ### 1 Missing Variables
 
 Variables that are **used in code** but **not defined** in the selected env comparison file.
