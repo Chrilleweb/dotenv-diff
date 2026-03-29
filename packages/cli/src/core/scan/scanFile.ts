@@ -62,6 +62,9 @@ export function scanFile(
         // Get the context (the actual line)
         const contextLine = lines[lineNumber - 1]!;
 
+        // Ignore likely minified / bundled lines to avoid scan false positives
+        if (contextLine.length > 500) continue;
+
         // Determine previous line for ignore detection
         const prevLine = lines[lineNumber - 2] ?? '';
 

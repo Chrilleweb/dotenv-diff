@@ -105,6 +105,20 @@ const key = process.env.SECRET_KEY;`;
     expect(usages[0]?.isLogged).toBe(true);
   });
 
+  it('ignores env usage on likely minified lines', () => {
+    const minifiedLine = `${'x'.repeat(520)}process.env.API_KEY`;
+    const usages = scanFile('/test/project/src/app.js', minifiedLine, baseOpts);
+
+    expect(usages).toHaveLength(0);
+  });
+
+  it('ignores console.log env usage on likely minified lines', () => {
+    const minifiedLine = `${'x'.repeat(520)}console.log(process.env.API_KEY)`;
+    const usages = scanFile('/test/project/src/app.js', minifiedLine, baseOpts);
+
+    expect(usages).toHaveLength(0);
+  });
+
   it('does not mark as logged when not in console statement', () => {
     const content = 'const key = process.env.API_KEY;';
     const usages = scanFile('/test/project/src/app.js', content, baseOpts);
