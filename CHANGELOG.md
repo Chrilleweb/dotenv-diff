@@ -1,5 +1,23 @@
 # Changelog
 
+<!-- changesets: chilly-lands-dance.md,fair-places-care.md,huge-kings-make.md,kind-onions-invent.md,sunny-eyes-admire.md -->
+## 2026-03-29
+
+### Highlights
+- added more patterns to DEFAULT_EXCLUDE_PATTERNS
+- ignore minified lines for env usage
+- removed warning on detecting http URLs
+- improved source secret detection for JSX props
+- added more default exclude keys
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: common-ways-stare.md,cyan-states-fall.md,empty-squids-try.md,olive-carrots-share.md,quiet-news-spend.md,sparkly-places-allow.md,sunny-jeans-wish.md -->
 ## 2026-03-28
 
