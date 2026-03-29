@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.9
+
+### Patch Changes
+
+- 13f4df6: added more patterns to DEFAULT_EXCLUDE_PATTERNS
+- c142351: ignore minified lines for env usage
+- 2869c10: removed warning on detecting http URLs
+- 3d47c38: improved source secret detection for JSX props
+- 2abfab8: added more default exclude keys
+
 ## 2.7.8
 
 ### Patch Changes
