@@ -163,8 +163,31 @@ export const DEFAULT_EXCLUDE_PATTERNS = [
   '.git',
   '.vscode',
   '.idea',
+
+  // Tests
   '.test.',
   '.spec.',
   '__tests__',
   '__mocks__',
+
+  // Common noisy paths
+  'test',
+  'tests',
+  'fixtures',
+  'fixture',
+  'examples',
+  'example',
+  'samples',
+  'sandbox',
+
+  // Generated / vendored / caches
+  '.turbo',
+  '.cache',
+  '.output',
+  '.vercel',
+  '.yarn',
+  '.pnpm-store',
+  '.parcel-cache',
+  '.rollup.cache',
+  '.DS_Store',
 ];
