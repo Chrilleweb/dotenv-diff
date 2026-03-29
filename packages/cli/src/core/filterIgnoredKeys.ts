@@ -15,6 +15,16 @@ export const DEFAULT_EXCLUDE_KEYS = [
   'GITHUB_ACTIONS',
   'INIT_CWD',
   'TZ',
+  'PORT',
+  'PATH',
+  'HOME',
+  'USER',
+  'SHELL',
+  'LANG',
+  'TMP',
+  'TEMP',
+  'TMPDIR',
+  'NODE_PATH',
 ];
 
 /**
