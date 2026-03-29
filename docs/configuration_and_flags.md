@@ -363,8 +363,7 @@ Usage in the configuration file:
 ### `--exclude-files <patterns>`
 
 Specify a comma-separated list of file patterns to exclude from scanning.
-These patterns are added to the default exclude patterns (like `node_modules`, `dist`, etc.).
-Useful when you want to skip specific files or directories that shouldn't be scanned.
+These patterns are added on top of the built-in default exclude patterns. This is useful when you want to skip additional files or directories that should not be scanned in your project.
 
 Example usage:
 
@@ -379,6 +378,50 @@ Usage in the configuration file:
   "excludeFiles": ["tests/**", "*.spec.ts"]
 }
 ```
+
+dotenv-diff already excludes the following paths by default:
+
+```bash
+[
+  'node_modules',
+  '.sveltekit',
+  '.svelte-kit',
+  '_actions',
+  'dist',
+  'build',
+  '.next',
+  '.nuxt',
+  'coverage',
+  '.git',
+  '.vscode',
+  '.idea',
+  '.test.',
+  '.spec.',
+  '__tests__',
+  '__mocks__',
+  'test',
+  'tests',
+  'fixtures',
+  'fixture',
+  'examples',
+  'example',
+  'samples',
+  'sandbox',
+  '.turbo',
+  '.cache',
+  '.output',
+  '.vercel',
+  '.yarn',
+  '.pnpm-store',
+  '.parcel-cache',
+  '.rollup.cache',
+  '.DS_Store'
+]
+```
+
+Your custom --exclude-files patterns are appended to that list.
+
+If you later want to scan files from one of the default excluded paths, use `--include-files` or `--files` to explicitly include them.
 
 ## Display Options
 

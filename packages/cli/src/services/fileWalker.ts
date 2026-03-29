@@ -40,6 +40,15 @@ export async function findFiles(
       ? [...defaultPatterns, ...opts.include]
       : defaultPatterns;
   const includePatterns = rawInclude.flatMap(expandBraceSets);
+  const explicitIncludePatterns = (opts.include ?? []).flatMap(expandBraceSets);
+  const explicitIncludeBases = explicitIncludePatterns
+    .map((pattern) => {
+      const normalized = pattern.replace(/\\/g, '/');
+      const idx = normalized.search(/[*?\[\]{}]/);
+      const base = idx === -1 ? normalized : normalized.slice(0, idx);
+      return base.replace(/\/$/, '');
+    })
+    .filter(Boolean);
 
   const files: string[] = [];
   const walked = new Set<string>();
@@ -76,9 +85,23 @@ export async function findFiles(
     for (const entry of entries) {
       const fullPath = path.join(startDir, entry.name);
       const relativeToRoot = path.relative(rootDir, fullPath);
+      const normalizedRelative = relativeToRoot.replace(/\\/g, '/');
+      const explicitlyIncluded =
+        explicitIncludePatterns.length > 0 &&
+        shouldInclude(entry.name, relativeToRoot, explicitIncludePatterns);
+      const includedDirectoryRoot =
+        entry.isDirectory() &&
+        explicitIncludeBases.some(
+          (base) =>
+            normalizedRelative === base ||
+            normalizedRelative.startsWith(`${base}/`) ||
+            base.startsWith(`${normalizedRelative}/`),
+        );
 
       // Exclude checks should use path relative to *rootDir* (keeps existing semantics)
       if (
+        !explicitlyIncluded &&
+        !includedDirectoryRoot &&
         shouldExclude(entry.name, relativeToRoot, [
           ...DEFAULT_EXCLUDE_PATTERNS,
           ...(opts.exclude ?? []),

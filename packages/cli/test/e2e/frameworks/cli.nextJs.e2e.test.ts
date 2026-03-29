@@ -57,7 +57,7 @@ describe('Next.js environment variable usage rules', () => {
       }`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_SERVER_KEY=ok`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_SERVER_KEY=ok');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -79,7 +79,7 @@ describe('Next.js environment variable usage rules', () => {
 console.log(process.env.NEXT_PUBLIC_IMAGE_BASE);`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `NEXT_PUBLIC_IMAGE_BASE=1`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'NEXT_PUBLIC_IMAGE_BASE=1');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -98,7 +98,7 @@ console.log(process.env.NEXT_PUBLIC_IMAGE_BASE);`,
 console.log(process.env.SECRET_TOKEN);`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_TOKEN=1`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_TOKEN=1');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -111,9 +111,9 @@ console.log(process.env.SECRET_TOKEN);`,
     const cwd = tmpDir();
     makeNextProject(cwd);
 
-    fs.mkdirSync(path.join(cwd, 'app/api/test'), { recursive: true });
+    fs.mkdirSync(path.join(cwd, 'app/api/code'), { recursive: true });
     fs.writeFileSync(
-      path.join(cwd, 'app/api/test/route.ts'),
+      path.join(cwd, 'app/api/code/route.ts'),
       `export async function GET() {
         process.env.NEXT_PUBLIC_SECRET_PASSWORD;
       }`,
@@ -121,7 +121,7 @@ console.log(process.env.SECRET_TOKEN);`,
 
     fs.writeFileSync(
       path.join(cwd, '.env'),
-      `NEXT_PUBLIC_SECRET_PASSWORD=secret123`,
+      'NEXT_PUBLIC_SECRET_PASSWORD=secret123',
     );
     const res = runCli(cwd, ['--scan-usage', '--json']);
 
@@ -141,7 +141,7 @@ console.log(process.env.SECRET_TOKEN);`,
     expect(warning.reason).toContain(
       'Potential sensitive environment variable exposed to the browser',
     );
-    expect(warning.file).toContain('app/api/test/route.ts');
+    expect(warning.file).toContain('app/api/code/route.ts');
     expect(warning.line).toBeGreaterThan(0);
   });
 
@@ -228,7 +228,7 @@ API_ENDPOINT=api`,
 }`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `DATABASE_URL=postgresql://...`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'DATABASE_URL=postgresql://...');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -249,7 +249,7 @@ API_ENDPOINT=api`,
     }`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `DATABASE_URL=db`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'DATABASE_URL=db');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -262,13 +262,13 @@ API_ENDPOINT=api`,
 
     fs.mkdirSync(path.join(cwd, 'pages/api'), { recursive: true });
     fs.writeFileSync(
-      path.join(cwd, 'pages/api/test.ts'),
+      path.join(cwd, 'pages/api/code.ts'),
       `export default function handler() {
       console.log(process.env.SECRET_KEY);
     }`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_KEY=ok`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=ok');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -288,7 +288,7 @@ API_ENDPOINT=api`,
     }`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_KEY=ok`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=ok');
 
     const res = runCli(cwd, ['--scan-usage']);
 

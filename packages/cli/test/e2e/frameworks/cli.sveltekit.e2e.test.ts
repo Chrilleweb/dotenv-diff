@@ -47,10 +47,10 @@ describe('SvelteKit environment variable usage rules', () => {
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+page.ts'),
-      `console.log(import.meta.env.PUBLIC_URL);`,
+      'console.log(import.meta.env.PUBLIC_URL);',
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `PUBLIC_URL=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'PUBLIC_URL=123');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -65,10 +65,10 @@ describe('SvelteKit environment variable usage rules', () => {
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+page.ts'),
-      `console.log(import.meta.env.VITE_PUBLIC_URL);`,
+      'console.log(import.meta.env.VITE_PUBLIC_URL);',
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `VITE_PUBLIC_URL=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'VITE_PUBLIC_URL=123');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -82,10 +82,10 @@ describe('SvelteKit environment variable usage rules', () => {
 
     fs.writeFileSync(
       path.join(cwd, 'src/index.ts'),
-      `console.log(process.env.VITE_SECRET);`,
+      'console.log(process.env.VITE_SECRET);',
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `VITE_SECRET=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'VITE_SECRET=123');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -99,7 +99,7 @@ describe('SvelteKit environment variable usage rules', () => {
 
     fs.writeFileSync(
       path.join(cwd, 'src/app.ts'),
-      `import { VITE_PUBLIC } from '$env/static/public';`,
+      'import { VITE_PUBLIC } from \'$env/static/public\';',
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'VITE_PUBLIC=123');
@@ -135,7 +135,7 @@ describe('SvelteKit environment variable usage rules', () => {
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+page.svelte'),
-      `import { SECRET_KEY } from '$env/static/private';`,
+      'import { SECRET_KEY } from \'$env/static/private\';',
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=123');
@@ -174,8 +174,8 @@ describe('SvelteKit environment variable usage rules', () => {
     makeSvelteKitProject(cwd);
 
     fs.writeFileSync(
-      path.join(cwd, 'src/test.ts'),
-      `import { PUBLIC_TOKEN } from '$env/static/private';`,
+      path.join(cwd, 'src/svelteFile.ts'),
+      'import { PUBLIC_TOKEN } from \'$env/static/private\';',
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'PUBLIC_TOKEN=123');
@@ -197,7 +197,7 @@ const url2 = import.meta.env.PUBLIC_URL;
 const url3 = import.meta.env.PUBLIC_URL;`,
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `PUBLIC_URL=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'PUBLIC_URL=123');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -212,10 +212,10 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+page.ts'),
-      `console.log(import.meta.env.PUBLIC_URL);`,
+      'console.log(import.meta.env.PUBLIC_URL);',
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `PUBLIC_URL=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'PUBLIC_URL=123');
 
     const res = runCli(cwd, ['--scan-usage', '--strict']);
 
@@ -230,10 +230,10 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+page.server.ts'),
-      `console.log(import.meta.env.SECRET_KEY);`,
+      'console.log(import.meta.env.SECRET_KEY);',
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_KEY=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=123');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -247,10 +247,10 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+server.ts'),
-      `console.log(import.meta.env.API_KEY);`,
+      'console.log(import.meta.env.API_KEY);',
     );
 
-    fs.writeFileSync(path.join(cwd, '.env'), `API_KEY=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=123');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -302,7 +302,7 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/routes/+page.svelte'),
-      `import SECRET_KEY from '$env/static/private';`,
+      'import SECRET_KEY from \'$env/static/private\';',
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=123');
@@ -516,9 +516,9 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/+server.ts'),
-      `console.log(process.env.SECRET_KEY);`,
+      'console.log(process.env.SECRET_KEY);',
     );
-    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_KEY=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=123');
 
     const res = runCli(cwd, ['--scan-usage']);
 
@@ -534,9 +534,9 @@ const url3 = import.meta.env.PUBLIC_URL;`,
 
     fs.writeFileSync(
       path.join(cwd, 'src/hooks.server.ts'),
-      `console.log(process.env.SECRET_KEY);`,
+      'console.log(process.env.SECRET_KEY);',
     );
-    fs.writeFileSync(path.join(cwd, '.env'), `SECRET_KEY=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=123');
 
     const res = runCli(cwd, ['--scan-usage']);
 

@@ -335,6 +335,34 @@ describe('filewalker', () => {
     });
   });
 
+  describe('fileWalker - default exclude patterns', () => {
+    it('excludes files inside .vercel by default', () => {
+      const result = shouldExclude('config.js', '.vercel/output/config.js', [
+        '.vercel',
+      ]);
+
+      expect(result).toBe(true);
+    });
+
+    it('excludes files inside examples by default', () => {
+      const result = shouldExclude('demo.ts', 'examples/demo/demo.ts', [
+        'examples',
+      ]);
+
+      expect(result).toBe(true);
+    });
+
+    it('does not exclude a normal source file when no exclude pattern matches', () => {
+      const result = shouldExclude('config.ts', 'src/config.ts', [
+        '.vercel',
+        'examples',
+        'fixtures',
+      ]);
+
+      expect(result).toBe(false);
+    });
+  });
+
   describe('findFiles', () => {
     it('finds files with default patterns', async () => {
       const srcDir = path.join(tmpDir, 'src');
@@ -458,6 +486,48 @@ describe('filewalker', () => {
 
       expect(result).not.toContain(nodeModulesFile);
       expect(result).toContain(srcFile);
+    });
+
+    it('allows include patterns to scan inside node_modules and .vercel', async () => {
+      const nodeModulesDir = path.join(tmpDir, 'node_modules', 'lib');
+      const vercelDir = path.join(tmpDir, '.vercel', 'output');
+
+      fs.mkdirSync(nodeModulesDir, { recursive: true });
+      fs.mkdirSync(vercelDir, { recursive: true });
+
+      const nmFile = path.join(nodeModulesDir, 'package.js');
+      const vercelFile = path.join(vercelDir, 'config.js');
+
+      fs.writeFileSync(nmFile, '');
+      fs.writeFileSync(vercelFile, '');
+
+      const result = await findFiles(tmpDir, {
+        include: ['node_modules/**/*.js', '.vercel/**/*.js'],
+      });
+
+      expect(result).toContain(nmFile);
+      expect(result).toContain(vercelFile);
+    });
+
+    it('allows --files patterns to scan inside node_modules and .vercel', async () => {
+      const nodeModulesDir = path.join(tmpDir, 'node_modules', 'lib');
+      const vercelDir = path.join(tmpDir, '.vercel', 'output');
+
+      fs.mkdirSync(nodeModulesDir, { recursive: true });
+      fs.mkdirSync(vercelDir, { recursive: true });
+
+      const nmFile = path.join(nodeModulesDir, 'package.js');
+      const vercelFile = path.join(vercelDir, 'config.js');
+
+      fs.writeFileSync(nmFile, '');
+      fs.writeFileSync(vercelFile, '');
+
+      const result = await findFiles(tmpDir, {
+        files: ['node_modules/**/*.js', '.vercel/**/*.js'],
+      });
+
+      expect(result).toContain(nmFile);
+      expect(result).toContain(vercelFile);
     });
   });
 });
