@@ -223,9 +223,9 @@ BAZ=
   it('handles special characters in values', () => {
     fs.writeFileSync(
       envPath,
-      'URL=https://example.com?foo=bar&baz=qux\nPATH=/usr/local/bin\n',
+      'URL=https://example.com?foo=bar&baz=qux\nDB_PATH=/usr/local/bin\n',
     );
-    fs.writeFileSync(examplePath, 'URL=\nPATH=\n');
+    fs.writeFileSync(examplePath, 'URL=\nDB_PATH=\n');
 
     const opts: ComparisonOptions = {
       checkValues: false,
@@ -237,7 +237,7 @@ BAZ=
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
     expect(result.current.URL).toContain('https://');
-    expect(result.current.PATH).toBe('/usr/local/bin');
+    expect(result.current.DB_PATH).toBe('/usr/local/bin');
   });
 
   it('handles keys with dots and hyphens', () => {
