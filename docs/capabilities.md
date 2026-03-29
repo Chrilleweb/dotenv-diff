@@ -34,11 +34,11 @@ import { MY_KEY } from '$env/static/public';
 MY_KEY
 ```
 
-Default scanned file types: .ts, .js, jsx, tsx, vue, .mjs, .mts, .cjs, .cts, .svelte
-
 ## What It Checks For
 
 > **Note:** The scanner skips files containing any line over 500 characters, as these are likely minified or bundled — this avoids false positives across all checks below.
+
+Which files are scanned is determined by the file scanning configuration (see [configuration and flags](./configuration_and_flags.md#file-scanning-flags)).
 
 ### 1 Missing Variables
 

@@ -330,6 +330,8 @@ Usage in the configuration file:
 
 ## File Scanning Flags
 
+> **Note:** Default file patterns: .ts, .js, jsx, tsx, vue, .mjs, .mts, .cjs, .cts, .svelte
+
 ### `--files <patterns>`
 
 Specify a comma-separated list of file patterns to scan for environment variable usage.
