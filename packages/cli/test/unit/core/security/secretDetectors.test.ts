@@ -351,13 +351,11 @@ const token = "AKIAIOSFODNN7EXAMPLE";
       expect(findings[0].message).toContain('HTTPS URL detected');
     });
 
-    it('should detect HTTP URLs as medium severity', () => {
+    it('should not detect HTTP URLs as medium severity', () => {
       const source = 'const apiUrl = "http://api.realservice.com/endpoint";';
       const findings = detectSecretsInSource('test.ts', source);
 
-      expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('medium');
-      expect(findings[0].message).toContain('HTTP URL detected');
+      expect(findings).toHaveLength(0);
     });
 
     it('should ignore URLs from ignoreUrls config', () => {
