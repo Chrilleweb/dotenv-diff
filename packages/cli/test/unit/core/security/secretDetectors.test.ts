@@ -457,6 +457,38 @@ const email = "user@example.com";
       expect(findings).toHaveLength(0);
     });
 
+    it('does not flag JSX label props containing password text', () => {
+      const source = '<Password label="Current password" />';
+      expect(detectSecretsInSource('Component.tsx', source)).toEqual([]);
+    });
+
+    it('does not flag JSX placeholder props containing password text', () => {
+      const source = '<Input placeholder="Re-enter password" />';
+      expect(detectSecretsInSource('Component.tsx', source)).toEqual([]);
+    });
+
+    it('does not flag JSX name props like currentPassword', () => {
+      const source = '<Password name="currentPassword" />';
+      expect(detectSecretsInSource('Component.tsx', source)).toEqual([]);
+    });
+
+    it('does not flag JSX expression props without string literals', () => {
+      const source = '<Password passwordError={currentPasswordError} />';
+      expect(detectSecretsInSource('Component.tsx', source)).toEqual([]);
+    });
+
+    it('still flags hardcoded secret in JSX prop string literal', () => {
+      const source = '<SecretField value="sk_live_abcdefghijklmnopqrstuvwxyz123456" />';
+      const findings = detectSecretsInSource('Component.tsx', source);
+      expect(findings.length).toBeGreaterThan(0);
+    });
+
+    it('still flags hardcoded token in JSX prop expression string', () => {
+      const source = '<TokenField token={"ghp_abcdefghijklmnopqrstuvwxyz1234567890"} />';
+      const findings = detectSecretsInSource('Component.tsx', source);
+      expect(findings.length).toBeGreaterThan(0);
+    });
+
     describe('charset and alphabet detection', () => {
       it('should ignore full alphanumeric alphabet (customAlphabet pattern)', () => {
         // The exact case from the bug report

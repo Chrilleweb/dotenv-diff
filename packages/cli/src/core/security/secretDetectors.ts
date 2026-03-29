@@ -52,6 +52,19 @@ const HARMLESS_URLS = [
   /xmlns=["']http:\/\/www\.w3\.org\/2000\/svg["']/i, // SVG namespace
 ];
 
+// Known harmless attribute keys commonly used in UI components
+const HARMLESS_UI_ATTRIBUTE_NAMES =
+  /^(name|label|placeholder|title|alt|caption|helperText|description|text|htmlFor|id|data-testid|data-test|aria-label)$/i;
+
+/**
+ * Checks if a string looks like a UI label or attribute value, which are often false positives in secret detection.
+ * @param s - The string to check.
+ * @returns True if the string looks like a UI label, false otherwise.
+ */
+function looksLikeUiLabel(s: string): boolean {
+  return /\s/.test(s);
+}
+
 // Known harmless attribute keys commonly used in UI / analytics
 const HARMLESS_ATTRIBUTE_KEYS =
   /\b(trackingId|trackingContext|data-testid|data-test|aria-label)\b/i;
@@ -318,15 +331,26 @@ export function detectSecretsInSource(
       // Ignore if inside HTML tag content
       if (/<[^>]*>.*<\/[^>]*>/.test(line.trim())) continue;
 
-      const m = line.match(/=\s*["'`](.+?)["'`]/);
+      const attrMatch = line.match(
+        /([:@A-Za-z0-9_-]+)\s*=\s*(?:\{\s*["'`](.+?)["'`]\s*\}|["'`](.+?)["'`])/,
+      );
+
+      if (!attrMatch) continue;
+
+      const attrName = attrMatch[1];
+      const literal = attrMatch[2] ?? attrMatch[3];
+
+      // Skip common UI props like label, placeholder, name, etc.
+      if (HARMLESS_UI_ATTRIBUTE_NAMES.test(attrName!)) continue;
+
       if (
-        m &&
-        m[1] &&
-        !looksHarmlessLiteral(m[1]) &&
+        literal &&
+        !looksHarmlessLiteral(literal) &&
+        !looksLikeUiLabel(literal) &&
         !looksLikeUrlConstruction(line) &&
-        m[1].length >= 12 &&
+        literal.length >= 12 &&
         !isEnvAccessor(line) &&
-        !isPureInterpolationTemplate(m[1])
+        !isPureInterpolationTemplate(literal)
       ) {
         findings.push({
           file,
