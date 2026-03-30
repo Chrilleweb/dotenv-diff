@@ -5,6 +5,7 @@ import type {
 } from '../../../src/config/types.js';
 import { type SecretFinding } from '../../../src/core/security/secretDetectors.js';
 import { promptNoEnvScenario } from '../../../src/commands/prompts/promptNoEnvScenario.js';
+import { ProcessComparisonResult } from '../../../src/services/processComparisonFile.js';
 
 vi.mock('../../../src/services/scanCodebase.js', () => ({
   scanCodebase: vi.fn(),
@@ -129,7 +130,7 @@ describe('scanUsage', () => {
 
     vi.mocked(processComparisonFile).mockReturnValue({
       error: { message: 'err', shouldExit: true },
-    } as any);
+    } as ProcessComparisonResult);
 
     vi.mocked(printComparisonError).mockReturnValue({ exit: true });
 
@@ -171,7 +172,7 @@ describe('scanUsage', () => {
           severity: 'medium',
         },
       ],
-    } as any);
+    } as ScanResult);
 
     const result = await scanUsage({ ...baseOpts, json: true, strict: false });
 
@@ -230,13 +231,17 @@ describe('scanUsage', () => {
     vi.mocked(processComparisonFile).mockReturnValue({
       scanResult: { ...baseScanResult },
       comparedAgainst: '.env',
+      envVariables: {},
+      duplicatesFound: false,
+      dupsEnv: [],
+      dupsEx: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
         addedEnv: [],
         gitignoreUpdated: false,
       },
-    } as any);
+    } as ProcessComparisonResult);
 
     await scanUsage({ ...baseOpts, isCiMode: false, json: false });
 
@@ -279,7 +284,7 @@ describe('scanUsage', () => {
     });
     vi.mocked(processComparisonFile).mockReturnValue({
       error: { message: 'soft error', shouldExit: false },
-    } as any);
+    } as ProcessComparisonResult);
     vi.mocked(printComparisonError).mockReturnValue({ exit: false });
 
     const result = await scanUsage(baseOpts);
@@ -295,6 +300,10 @@ describe('scanUsage', () => {
     vi.mocked(processComparisonFile).mockReturnValue({
       scanResult: { ...baseScanResult },
       comparedAgainst: '.env',
+      envVariables: {},
+      duplicatesFound: false,
+      dupsEnv: [],
+      dupsEx: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -304,7 +313,7 @@ describe('scanUsage', () => {
       uppercaseWarnings: [{ key: 'myKey', suggestion: 'MY_KEY' }],
       expireWarnings: [{ key: 'OLD_KEY', date: '2024-01-01', daysLeft: -10 }],
       inconsistentNamingWarnings: [{ key1: 'A', key2: 'B', suggestion: 'A_B' }],
-    } as any);
+    } as ProcessComparisonResult);
 
     await scanUsage(baseOpts);
 
@@ -337,6 +346,10 @@ describe('scanUsage', () => {
     vi.mocked(processComparisonFile).mockReturnValue({
       scanResult: { ...baseScanResult },
       comparedAgainst: DEFAULT_EXAMPLE_FILE,
+      envVariables: {},
+      duplicatesFound: false,
+      dupsEnv: [],
+      dupsEx: [],
       exampleFull: { SECRET: 'abc123' },
       fix: {
         fixApplied: false,
@@ -344,7 +357,7 @@ describe('scanUsage', () => {
         addedEnv: [],
         gitignoreUpdated: false,
       },
-    } as any);
+    } as ProcessComparisonResult);
 
     await scanUsage(baseOpts);
 
@@ -361,6 +374,10 @@ describe('scanUsage', () => {
     vi.mocked(processComparisonFile).mockReturnValue({
       scanResult: { ...baseScanResult },
       comparedAgainst: '.env',
+      envVariables: {},
+      duplicatesFound: false,
+      dupsEnv: [],
+      dupsEx: [],
       exampleFull: { SECRET: 'abc123' },
       fix: {
         fixApplied: false,
@@ -368,7 +385,7 @@ describe('scanUsage', () => {
         addedEnv: [],
         gitignoreUpdated: false,
       },
-    } as any);
+    } as ProcessComparisonResult);
 
     await scanUsage(baseOpts);
 
@@ -524,5 +541,93 @@ describe('scanUsage', () => {
 
       expect(result.exitWithError).toBe(true);
     }
+  });
+
+  it('filters out usages on HTML comment closing lines (-->)', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      used: [
+        {
+          variable: 'A',
+          file: 'f.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: '--> process.env.A',
+        },
+      ],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    await scanUsage({ ...baseOpts, isCiMode: true });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({ used: [] }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('filters out the dotenv-diff-ignore-end line itself', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      used: [
+        {
+          variable: 'END_LINE',
+          file: 'f.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: '<!-- dotenv-diff-ignore-end -->',
+        },
+      ],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    await scanUsage({ ...baseOpts, isCiMode: true });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({ used: [] }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('filters out the dotenv-diff-ignore-start line itself but not subsequent usages', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      used: [
+        {
+          variable: 'START_LINE',
+          file: 'f.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: '<!-- dotenv-diff-ignore-start -->',
+        },
+        {
+          variable: 'KEPT',
+          file: 'f.ts',
+          line: 2,
+          column: 0,
+          pattern: 'process.env',
+          context: 'process.env.KEPT',
+        },
+      ],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    await scanUsage({ ...baseOpts, isCiMode: true });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({
+        used: [expect.objectContaining({ variable: 'KEPT' })],
+      }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
   });
 });
