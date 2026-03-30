@@ -42,6 +42,8 @@
   "keywords": [
     "dotenv",
     "env",
+    "environment",
+    "variables",
     "dotenv-diff",
     "env-check",
     "env-validate",

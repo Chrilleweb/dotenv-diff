@@ -147,4 +147,32 @@ describe('detectEnvExpirations', () => {
       },
     ]);
   });
+
+  it('skips env key when expire date has invalid month or day (e.g. 00)', () => {
+    fs.writeFileSync(
+      envPath,
+      `
+    # @expire 2024-00-01
+    API_KEY=123
+    `,
+    );
+
+    const result = detectEnvExpirations(envPath);
+
+    expect(result).toEqual([]);
+  });
+
+  it('skips env key when expire date has zero day', () => {
+    fs.writeFileSync(
+      envPath,
+      `
+    # @expire 2024-12-00
+    API_KEY=123
+    `,
+    );
+
+    const result = detectEnvExpirations(envPath);
+
+    expect(result).toEqual([]);
+  });
 });

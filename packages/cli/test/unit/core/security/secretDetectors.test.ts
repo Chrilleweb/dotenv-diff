@@ -367,6 +367,28 @@ const token = "AKIAIOSFODNN7EXAMPLE";
       expect(findings).toHaveLength(0);
     });
 
+    it('upgrades severity from medium to high when same line matches both suspicious key and provider pattern', () => {
+      // "secret" triggers SUSPICIOUS_KEYS (medium), "ghp_..." triggers PROVIDER_PATTERNS (high)
+      // Both are kind: 'pattern' on same line → dedup should keep the high severity one
+      const source =
+        'const secret = "ghp_1234567890abcdefghijklmnopqrstuvwxyz";';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(findings).toHaveLength(1);
+      expect(findings[0].severity).toBe('high');
+      expect(findings[0].message).toContain('known provider key pattern');
+    });
+
+    it('does not downgrade severity when a lower severity finding appears after a higher one', () => {
+      // If somehow high came first and medium second, high should be kept
+      // provider pattern (high) + suspicious key (medium) on same line → stays high
+      const source = 'const apikey = "AKIAIOSFODNN7EXAMPLE";';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(findings).toHaveLength(1);
+      expect(findings[0].severity).toBe('high');
+    });
+
     it('should use higher threshold for test files', () => {
       const source =
         'const key = "aB3dE5fG7hI9jK0lM2nO4pQ6rS8tU1vW3xY5zA7bC9dE1fG3hI5jK7lM9nO0pQ2";';
@@ -476,13 +498,15 @@ const email = "user@example.com";
     });
 
     it('still flags hardcoded secret in JSX prop string literal', () => {
-      const source = '<SecretField value="sk_live_abcdefghijklmnopqrstuvwxyz123456" />';
+      const source =
+        '<SecretField value="sk_live_abcdefghijklmnopqrstuvwxyz123456" />';
       const findings = detectSecretsInSource('Component.tsx', source);
       expect(findings.length).toBeGreaterThan(0);
     });
 
     it('still flags hardcoded token in JSX prop expression string', () => {
-      const source = '<TokenField token={"ghp_abcdefghijklmnopqrstuvwxyz1234567890"} />';
+      const source =
+        '<TokenField token={"ghp_abcdefghijklmnopqrstuvwxyz1234567890"} />';
       const findings = detectSecretsInSource('Component.tsx', source);
       expect(findings.length).toBeGreaterThan(0);
     });

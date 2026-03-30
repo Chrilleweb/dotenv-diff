@@ -23,7 +23,7 @@ import type {
 /**
  * Result of processing comparison file
  */
-interface ProcessComparisonResult {
+export interface ProcessComparisonResult {
   scanResult: ScanResult;
   envVariables: Record<string, string | undefined>;
   comparedAgainst: string;
