@@ -137,6 +137,8 @@ export interface Options {
   inconsistentNamingWarnings: boolean;
 }
 
+export type EnvPatternName = 'process.env' | 'import.meta.env' | 'sveltekit';
+
 /**
  * Represents a single usage of an environment variable in the codebase.
  */
@@ -150,7 +152,7 @@ export interface EnvUsage {
   /** The column number where the usage was detected */
   column: number;
   /** The pattern used to access the environment variable */
-  pattern: 'process.env' | 'import.meta.env' | 'sveltekit';
+  pattern: EnvPatternName;
   /** List of imported env modules (for sveltekit) */
   imports?: string[];
   /** The actual line content where the usage was detected */

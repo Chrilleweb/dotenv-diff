@@ -24,36 +24,31 @@ export function scanFile(
   const relativePath = normalizePath(path.relative(opts.cwd, filePath));
 
   // Collect all $env imports used in this file
-  const envImports: string[] = [];
-
   const importRegex =
     /import\s+(?:\{[^}]*\}|\w+)\s+from\s+['"](\$env\/(?:static|dynamic)\/(?:private|public))['"]/g;
 
-  let importMatch: RegExpExecArray | null;
-
-  while ((importMatch = importRegex.exec(content)) !== null) {
-    envImports.push(importMatch[1]!);
-  }
+  const envImports = [...content.matchAll(importRegex)]
+    .map((m) => m[1])
+    .filter((m): m is string => m != null);
 
   for (const pattern of ENV_PATTERNS) {
-    let match: RegExpExecArray | null;
     const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
 
-    while ((match = regex.exec(content)) !== null) {
+    for (const match of content.matchAll(regex)) {
       const variables = pattern.processor
         ? pattern.processor(match)
-        : [match[1]!];
+        : [match[1] ?? ''];
 
       for (const variable of variables) {
         if (!variable) continue;
 
-        const matchIndex = match.index;
+        const matchIndex = match.index!;
 
         // Find line and column
         // Note: For destructured variables, this points to the start of the destructuring block
         // not the specific variable location. Ideally we'd search within the match.
         const beforeMatch = content.substring(0, matchIndex);
-        const lineNumber = beforeMatch.split('\n').length;
+        const lineNumber = (beforeMatch.match(/\n/g)?.length ?? 0) + 1;
         const lastNewlineIndex = beforeMatch.lastIndexOf('\n');
         const column =
           lastNewlineIndex === -1
@@ -61,7 +56,7 @@ export function scanFile(
             : matchIndex - lastNewlineIndex;
 
         // Get the context (the actual line)
-        const contextLine = lines[lineNumber - 1]!;
+        const contextLine = lines[lineNumber - 1] ?? '';
 
         // Ignore likely minified / bundled lines to avoid scan false positives
         if (isLikelyMinified(contextLine)) continue;
