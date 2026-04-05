@@ -1,5 +1,7 @@
+import type { EnvPatternName } from '../../config/types.js';
+
 type Pattern = {
-  name: 'process.env' | 'import.meta.env' | 'sveltekit';
+  name: EnvPatternName;
   regex: RegExp;
   processor?: (match: RegExpExecArray) => string[];
 };
@@ -19,7 +21,7 @@ export const ENV_PATTERNS: Pattern[] = [
    *   process.env['MY_KEY']
    */
   {
-    name: 'process.env',
+    name: 'process.env' as const,
     regex:
       /process\.env\.([A-Z_][A-Z0-9_]*)|process\.env\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
     processor: (match) => {
@@ -38,7 +40,7 @@ export const ENV_PATTERNS: Pattern[] = [
    *   const { MY_KEY, OTHER_KEY: alias, THIRD_KEY = "fallback" } = process.env
    */
   {
-    name: 'process.env',
+    name: 'process.env' as const,
     regex: /\{([^}]*)\}\s*=\s*process\.env\b/g,
     processor: (match) => {
       const content = match[1];
@@ -69,7 +71,7 @@ export const ENV_PATTERNS: Pattern[] = [
    *   import.meta.env['MY_KEY']
    */
   {
-    name: 'import.meta.env',
+    name: 'import.meta.env' as const,
     regex:
       /import\.meta\.env\.([A-Z_][A-Z0-9_]*)|import\.meta\.env\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
     processor: (match) => {
