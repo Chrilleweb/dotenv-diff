@@ -3,7 +3,7 @@ import type { EnvPatternName } from '../../config/types.js';
 type Pattern = {
   name: EnvPatternName;
   regex: RegExp;
-  processor?: (match: RegExpMatchArray) => string[];
+  processor?: (match: RegExpExecArray) => string[];
 };
 
 /**
