@@ -21,7 +21,7 @@ export const ENV_PATTERNS: Pattern[] = [
    *   process.env['MY_KEY']
    */
   {
-    name: 'process.env',
+    name: 'process.env' as const,
     regex:
       /process\.env\.([A-Z_][A-Z0-9_]*)|process\.env\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
     processor: (match) => {
@@ -40,7 +40,7 @@ export const ENV_PATTERNS: Pattern[] = [
    *   const { MY_KEY, OTHER_KEY: alias, THIRD_KEY = "fallback" } = process.env
    */
   {
-    name: 'process.env',
+    name: 'process.env' as const,
     regex: /\{([^}]*)\}\s*=\s*process\.env\b/g,
     processor: (match) => {
       const content = match[1];
@@ -71,7 +71,7 @@ export const ENV_PATTERNS: Pattern[] = [
    *   import.meta.env['MY_KEY']
    */
   {
-    name: 'import.meta.env',
+    name: 'import.meta.env' as const,
     regex:
       /import\.meta\.env\.([A-Z_][A-Z0-9_]*)|import\.meta\.env\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
     processor: (match) => {
@@ -84,7 +84,7 @@ export const ENV_PATTERNS: Pattern[] = [
   // import { SECRET } from '$env/static/private';
   // import { PUBLIC_URL } from '$env/static/public';
   {
-    name: 'sveltekit',
+    name: 'sveltekit' as const,
     regex:
       /import\s*\{\s*([A-Z_][A-Z0-9_]*)\s*\}\s*from\s*['"]\$env\/static\/(?:private|public)['"]/g,
   },
@@ -92,14 +92,14 @@ export const ENV_PATTERNS: Pattern[] = [
   // SvelteKit dynamic env object
   // env.SECRET (Only matches .env variables accessed via env.VAR syntax)
   {
-    name: 'sveltekit',
+    name: 'sveltekit' as const,
     regex: /(?<![.\w])env\.([A-Z_][A-Z0-9_]*)/g,
   },
 
   // SvelteKit object destructuring from env
   // const { VAR1, VAR2 } = env; (destructured from $env/dynamic/* or $env/static/*)
   {
-    name: 'sveltekit',
+    name: 'sveltekit' as const,
     regex: /\{([^}]*)\}\s*=\s*env\b/g,
     processor: (match) => {
       const content = match[1];
@@ -123,7 +123,7 @@ export const ENV_PATTERNS: Pattern[] = [
   // named import from dynamic is invalid in SvelteKit
   // import { env } from '$env/dynamic/private';
   {
-    name: 'sveltekit',
+    name: 'sveltekit' as const,
     regex:
       /import\s*\{\s*([A-Z_][A-Z0-9_]*)\s*\}\s*from\s*['"]\$env\/dynamic\/(?:private|public)['"]/g,
   },
@@ -131,7 +131,7 @@ export const ENV_PATTERNS: Pattern[] = [
   // default import from any $env module is invalid in SvelteKit
   // import SECRET from '$env/...';
   {
-    name: 'sveltekit',
+    name: 'sveltekit' as const,
     regex:
       /import\s+([A-Z_][A-Z0-9_]*)\s+from\s+['"]\$env\/(?:static|dynamic)\/(?:private|public)['"]/g,
   },
