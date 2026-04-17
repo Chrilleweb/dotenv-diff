@@ -48,15 +48,16 @@ describe('discoverEnvFiles', () => {
     fs.writeFileSync(path.join(cwd, '.env.prod'), '');
     fs.writeFileSync(path.join(cwd, '.env.example.prod'), '');
 
+    const envPath = path.join(cwd, '.env.prod');
     const result = discoverEnvFiles({
       cwd,
-      envFlag: path.join(cwd, '.env.prod'),
+      envFlag: envPath,
       exampleFlag: null,
     });
 
-    expect(result.primaryEnv).toBe('.env.prod');
+    expect(result.primaryEnv).toBe(envPath);
     expect(result.primaryExample).toBe('.env.example.prod');
-    expect(result.envFiles[0]).toBe('.env.prod');
+    expect(result.envFiles[0]).toBe(envPath);
   });
 
   it('handles --example flag and finds matching env via suffix', () => {
@@ -123,13 +124,14 @@ describe('discoverEnvFiles', () => {
   it('adds --env file to envFiles when it exists on disk', () => {
     fs.writeFileSync(path.join(cwd, '.env.custom'), '');
 
+    const envPath = path.join(cwd, '.env.custom');
     const result = discoverEnvFiles({
       cwd,
-      envFlag: path.join(cwd, '.env.custom'),
+      envFlag: envPath,
       exampleFlag: null,
     });
 
-    expect(result.envFiles[0]).toBe('.env.custom');
+    expect(result.envFiles[0]).toBe(envPath);
   });
 
   it('handles --env .env without suffix', () => {
@@ -159,14 +161,15 @@ describe('discoverEnvFiles', () => {
   });
 
   it('handles --env flag when the env file does not exist', () => {
+    const envPath = path.join(cwd, '.env.missing');
     const result = discoverEnvFiles({
       cwd,
-      envFlag: path.join(cwd, '.env.missing'),
+      envFlag: envPath,
       exampleFlag: null,
     });
 
-    expect(result.primaryEnv).toBe('.env.missing');
-    expect(result.envFiles.includes('.env.missing')).toBe(false);
+    expect(result.primaryEnv).toBe(envPath);
+    expect(result.envFiles.includes(envPath)).toBe(false);
   });
 
   it('handles non-standard example file that does not start with .env.example', () => {
@@ -197,5 +200,21 @@ describe('discoverEnvFiles', () => {
     });
 
     expect(result.envFiles[0]).toBe('.env');
+  });
+
+  it('preserves full path when --env points to a nested subdirectory', () => {
+    const subDir = path.join(cwd, 'config');
+    fs.mkdirSync(subDir);
+    const envPath = path.join(subDir, '.env.prod');
+    fs.writeFileSync(envPath, '');
+
+    const result = discoverEnvFiles({
+      cwd,
+      envFlag: envPath,
+      exampleFlag: null,
+    });
+
+    expect(result.primaryEnv).toBe(envPath);
+    expect(result.envFiles[0]).toBe(envPath);
   });
 });

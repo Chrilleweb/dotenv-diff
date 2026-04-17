@@ -44,21 +44,21 @@ export function discoverEnvFiles({
 
   // --env (without --example): force primaryEnv and try to find a matching example name via suffix
   if (envFlag && !exampleFlag) {
-    const envNameFromFlag = path.basename(envFlag);
-    primaryEnv = envNameFromFlag;
+    const envBaseName = path.basename(envFlag);
+    primaryEnv = envFlag;
 
     // If the specified --env actually exists, make sure it's in the list (first) without duplicates
     if (fs.existsSync(envFlag)) {
-      const set = new Set([envNameFromFlag, ...envFiles]);
+      const set = new Set([envFlag, ...envFiles]);
       envFiles.length = 0;
       envFiles.push(...Array.from(set));
     }
 
-    // try to find a matching example name based on the suffix
+    // try to find a matching example name based on the suffix (basename only for suffix derivation)
     const suffix =
-      envNameFromFlag === DEFAULT_ENV_FILE
+      envBaseName === DEFAULT_ENV_FILE
         ? ''
-        : envNameFromFlag.replace(DEFAULT_ENV_FILE, '');
+        : envBaseName.replace(DEFAULT_ENV_FILE, '');
     const potentialExample = suffix
       ? `${DEFAULT_EXAMPLE_FILE}${suffix}`
       : DEFAULT_EXAMPLE_FILE;
