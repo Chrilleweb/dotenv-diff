@@ -50,7 +50,9 @@ export function applyFixes(options: ApplyFixesOptions): {
   if (duplicateKeys.length) {
     const duplicateSet = new Set(duplicateKeys);
 
-    const lines = fs.readFileSync(envPath, 'utf-8').split('\n');
+    const raw = fs.readFileSync(envPath, 'utf-8');
+    const eol = raw.includes('\r\n') ? '\r\n' : '\n';
+    const lines = raw.split(eol);
     const seen = new Set<string>();
     const newLines: string[] = [];
 
@@ -69,18 +71,19 @@ export function applyFixes(options: ApplyFixesOptions): {
       newLines.unshift(line);
     }
 
-    fs.writeFileSync(envPath, newLines.join('\n'));
+    fs.writeFileSync(envPath, newLines.join(eol));
     result.removedDuplicates = duplicateKeys;
   }
 
   // --- Add missing keys to .env ---
   if (missingKeys.length) {
     const content = fs.readFileSync(envPath, 'utf-8');
+    const eol = content.includes('\r\n') ? '\r\n' : '\n';
     const newContent =
       content +
-      (content.endsWith('\n') ? '' : '\n') +
-      missingKeys.map((k) => `${k}=`).join('\n') +
-      '\n';
+      (content.endsWith('\n') ? '' : eol) +
+      missingKeys.map((k) => `${k}=`).join(eol) +
+      eol;
     fs.writeFileSync(envPath, newContent);
     result.addedEnv = missingKeys;
   }

@@ -62,7 +62,7 @@ describe('applyFixes', () => {
 
   it('does not duplicate keys in .env.example if already present', () => {
     fs.writeFileSync(examplePath, 'A=\nB=\n');
-    const { changed, result } = applyFixes({
+    const {} = applyFixes({
       envPath,
       missingKeys: ['B'],
       duplicateKeys: [],
@@ -150,7 +150,7 @@ B=2
     });
 
     const env = fs.readFileSync(envPath, 'utf-8');
-    expect(env).toBe(`A=2\nC=1\nB=2\n`);
+    expect(env).toBe('A=2\nC=1\nB=2\n');
   });
 
   it('handles ensureGitignore=true without throwing (best-effort)', () => {
@@ -162,6 +162,53 @@ B=2
     });
 
     expect(changed).toBe(false);
+  });
+
+  describe('line ending preservation', () => {
+    it('preserves CRLF when removing duplicate keys', () => {
+      fs.writeFileSync(envPath, 'A=1\r\nB=2\r\nA=3\r\n');
+
+      applyFixes({ envPath, missingKeys: [], duplicateKeys: ['A'] });
+
+      const finalContent = fs.readFileSync(envPath, 'utf-8');
+      expect(finalContent).toBe('B=2\r\nA=3\r\n');
+    });
+
+    it('preserves LF when removing duplicate keys', () => {
+      fs.writeFileSync(envPath, 'A=1\nB=2\nA=3\n');
+
+      applyFixes({ envPath, missingKeys: [], duplicateKeys: ['A'] });
+
+      const finalContent = fs.readFileSync(envPath, 'utf-8');
+      expect(finalContent).toBe('B=2\nA=3\n');
+    });
+
+    it('preserves CRLF when adding missing keys', () => {
+      fs.writeFileSync(envPath, 'A=1\r\n');
+
+      applyFixes({ envPath, missingKeys: ['B', 'C'], duplicateKeys: [] });
+
+      const finalContent = fs.readFileSync(envPath, 'utf-8');
+      expect(finalContent).toBe('A=1\r\nB=\r\nC=\r\n');
+    });
+
+    it('preserves LF when adding missing keys', () => {
+      fs.writeFileSync(envPath, 'A=1\n');
+
+      applyFixes({ envPath, missingKeys: ['B', 'C'], duplicateKeys: [] });
+
+      const finalContent = fs.readFileSync(envPath, 'utf-8');
+      expect(finalContent).toBe('A=1\nB=\nC=\n');
+    });
+
+    it('uses CRLF separator when file has no trailing newline and CRLF style', () => {
+      fs.writeFileSync(envPath, 'A=1\r\nB=2'); // no trailing newline
+
+      applyFixes({ envPath, missingKeys: ['C'], duplicateKeys: [] });
+
+      const finalContent = fs.readFileSync(envPath, 'utf-8');
+      expect(finalContent).toBe('A=1\r\nB=2\r\nC=\r\n');
+    });
   });
 
   describe('ensureGitignore functionality', () => {
@@ -230,7 +277,7 @@ B=2
       const gitignorePath = path.join(tmpDir, '.gitignore');
       fs.writeFileSync(gitignorePath, '.env\n.env.*\n');
 
-      const { changed, result } = applyFixes({
+      const { result } = applyFixes({
         envPath,
         missingKeys: [],
         duplicateKeys: [],
