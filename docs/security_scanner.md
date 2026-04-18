@@ -7,7 +7,6 @@
 - [Provider Pattern Matching](#1-provider-pattern-matching-high-severity)
 - [Suspicious Key Name Detection](#2-suspicious-key-name-detection-medium-severity)
 - [High-Entropy String Detection](#3-high-entropy-string-detection-medium--high-severity)
-- [Hardcoded HTTPS URLs](#4-hardcoded-https-urls-low-severity)
 - [Example File Scanning](#example-file-scanning)
 - [False Positive Protections](#false-positive-protections)
 - [Suppressing False Positives](#suppressing-false-positives)
@@ -62,20 +61,6 @@ Uses [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory
 | 48+ chars | ≥ 0.85 (normalized) | high |
 
 > In test files (`*.spec.ts`, `*.test.ts`, `__tests__/`, `fixtures/`, etc.) the threshold is raised to **0.95** to reduce false positives.
-
----
-
-## 4. Hardcoded HTTPS URLs (low severity)
-
-Flags HTTPS URLs embedded as string literals, suggesting they should be moved to an environment variable.
-
-The following are **ignored automatically**:
-
-- `example.com`, `placeholder.com`
-- `127.0.0.1`
-- SVG namespace URIs (`http://www.w3.org/2000/svg`)
-
-Additional URLs can be ignored via the `--ignore-urls` flag — see [Configuration and Flags](./configuration_and_flags.md).
 
 ---
 
