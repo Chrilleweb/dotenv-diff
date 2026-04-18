@@ -6,5 +6,5 @@
     "declarationDir": "dist",
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "bin/**/*.ts", "types/**/*.d.ts"]
+  "include": ["src/**/*.ts", "bin/**/*.ts", "types/**/*.d.ts", "test/**/*.ts"]
 }

@@ -235,7 +235,7 @@ describe('applySvelteKitRules', () => {
     );
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].reason).toMatch(/must not start with "PUBLIC_"/);
+    expect(warnings[0]!.reason).toMatch(/must not start with "PUBLIC_"/);
   });
 
   it('warns for sensitive PUBLIC_ variable exposed to browser', () => {
@@ -250,6 +250,6 @@ describe('applySvelteKitRules', () => {
     );
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].reason).toMatch(/Potential sensitive/);
+    expect(warnings[0]!.reason).toMatch(/Potential sensitive/);
   });
 });

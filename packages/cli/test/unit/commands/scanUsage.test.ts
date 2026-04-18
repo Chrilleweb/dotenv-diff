@@ -5,7 +5,7 @@ import type {
 } from '../../../src/config/types.js';
 import { type SecretFinding } from '../../../src/core/security/secretDetectors.js';
 import { promptNoEnvScenario } from '../../../src/commands/prompts/promptNoEnvScenario.js';
-import { ProcessComparisonResult } from '../../../src/services/processComparisonFile.js';
+import type { ProcessComparisonResult } from '../../../src/services/processComparisonFile.js';
 
 vi.mock('../../../src/services/scanCodebase.js', () => ({
   scanCodebase: vi.fn(),

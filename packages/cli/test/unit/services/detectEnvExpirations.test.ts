@@ -53,8 +53,8 @@ describe('detectEnvExpirations', () => {
 
     const result = detectEnvExpirations(envPath);
 
-    expect(result[0].key).toBe('TOKEN');
-    expect(result[0].daysLeft).toBe(9);
+    expect(result[0]!.key).toBe('TOKEN');
+    expect(result[0]!.daysLeft).toBe(9);
   });
 
   it('supports // expire comments', () => {
@@ -103,7 +103,7 @@ describe('detectEnvExpirations', () => {
     const result = detectEnvExpirations(envPath);
 
     expect(result).toHaveLength(1);
-    expect(result[0].key).toBe('A');
+    expect(result[0]!.key).toBe('A');
   });
 
   it('handles multiple expiration blocks', () => {

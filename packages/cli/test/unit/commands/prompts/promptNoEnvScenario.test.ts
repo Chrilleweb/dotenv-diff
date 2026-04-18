@@ -135,11 +135,7 @@ describe('promptNoEnvScenario', () => {
   it('defaults isCiMode and isYesMode to false when undefined in prompt call', async () => {
     mockConfirmYesNo.mockResolvedValue(true);
 
-    const opts: ScanUsageOptions = {
-      ...baseOpts,
-      isCiMode: undefined,
-      isYesMode: undefined,
-    };
+    const opts: ScanUsageOptions = { ...baseOpts };
 
     await promptNoEnvScenario(opts);
 

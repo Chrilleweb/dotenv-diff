@@ -202,7 +202,7 @@ ANOTHER=test`,
 
     const result = parseEnvFile(envPath);
     expect(result.LONG).toBe(longValue);
-    expect(result.LONG.length).toBe(10000);
+    expect(result.LONG!.length).toBe(10000);
   });
 
   it('handles Unicode characters', () => {

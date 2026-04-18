@@ -54,8 +54,8 @@ describe('detectInconsistentNaming', () => {
     const warnings = detectInconsistentNaming(keys);
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].key1).toBe('API_KEY');
-    expect(warnings[0].key2).toBe('api_key');
+    expect(warnings[0]!.key1).toBe('API_KEY');
+    expect(warnings[0]!.key2).toBe('api_key');
   });
 
   it('does not create duplicate warnings for same pair', () => {
@@ -66,12 +66,15 @@ describe('detectInconsistentNaming', () => {
   });
 
   it('skips undefined keys in the array', () => {
-    const keys = ['API_KEY', undefined, 'APIKEY', undefined] as any[];
-    const warnings = detectInconsistentNaming(keys);
+    const keys = ['API_KEY', undefined, 'APIKEY', undefined] as (
+      | string
+      | undefined
+    )[];
+    const warnings = detectInconsistentNaming(keys as string[]);
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].key1).toBe('API_KEY');
-    expect(warnings[0].key2).toBe('APIKEY');
+    expect(warnings[0]!.key1).toBe('API_KEY');
+    expect(warnings[0]!.key2).toBe('APIKEY');
   });
 
   it('suggests snake_case key when key1 has underscores', () => {
@@ -79,7 +82,7 @@ describe('detectInconsistentNaming', () => {
     const warnings = detectInconsistentNaming(keys);
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].suggestion).toContain('API_KEY');
+    expect(warnings[0]!.suggestion).toContain('API_KEY');
   });
 
   it('suggests snake_case key when key2 has underscores', () => {
@@ -87,7 +90,7 @@ describe('detectInconsistentNaming', () => {
     const warnings = detectInconsistentNaming(keys);
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].suggestion).toContain('API_KEY');
+    expect(warnings[0]!.suggestion).toContain('API_KEY');
   });
 
   it('avoids duplicate warnings when same key appears multiple times', () => {
@@ -95,7 +98,7 @@ describe('detectInconsistentNaming', () => {
     const warnings = detectInconsistentNaming(keys);
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].key1).toBe('API_KEY');
-    expect(warnings[0].key2).toBe('APIKEY');
+    expect(warnings[0]!.key1).toBe('API_KEY');
+    expect(warnings[0]!.key2).toBe('APIKEY');
   });
 });
