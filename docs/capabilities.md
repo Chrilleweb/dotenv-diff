@@ -54,15 +54,15 @@ Duplicate variable definitions inside env files (both main env and example env, 
 
 ### 4 Secret Detection
 
-Potential secrets and sensitive values, including high-risk patterns.
+Potential secrets and sensitive values, including high-risk patterns. See [Security Scanner](./security_scanner.md) for a full description of detection techniques and false positive protections.
 
 ### 5 Example File Secret Warnings
 
-Potential secrets found in `.env.example` content.
+Potential secrets found in `.env.example` content. See the [Example File Scanning](./security_scanner.md#example-file-scanning) section of the Security Scanner docs.
 
 ### 6 Framework-Specific Misuse
 
-Framework-aware warnings (for supported frameworks) around unsafe or incorrect env usage patterns.
+Framework-aware warnings (for supported frameworks) around unsafe or incorrect env usage patterns. See [Framework Warnings](./frameworks/index.md).
 
 ### 7 Uppercase Naming Warnings
 
@@ -78,7 +78,7 @@ Cases where environment-related values are logged with `console.log`.
 
 ### 10 Expiration Warnings
 
-Warnings for environment values that look like expiring tokens/credentials or contain expiration metadata.
+Warnings for environment values that look like expiring tokens/credentials or contain expiration metadata. See [Expiration Warnings](./expiration_warnings.md).
 
 ### 11 Gitignore Safety Check
 
