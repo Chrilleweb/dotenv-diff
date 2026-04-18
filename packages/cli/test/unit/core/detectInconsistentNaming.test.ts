@@ -70,7 +70,7 @@ describe('detectInconsistentNaming', () => {
       | string
       | undefined
     )[];
-    const warnings = detectInconsistentNaming(keys);
+    const warnings = detectInconsistentNaming(keys as string[]);
 
     expect(warnings).toHaveLength(1);
     expect(warnings[0]!.key1).toBe('API_KEY');
