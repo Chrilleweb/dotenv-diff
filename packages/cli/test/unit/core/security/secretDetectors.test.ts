@@ -43,9 +43,9 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].kind).toBe('pattern');
-      expect(findings[0].severity).toBe('high');
-      expect(findings[0].message).toContain('known provider key pattern');
+      expect(findings[0]!.kind).toBe('pattern');
+      expect(findings[0]!.severity).toBe('high');
+      expect(findings[0]!.message).toContain('known provider key pattern');
     });
 
     it('should detect AWS temp key pattern', () => {
@@ -53,7 +53,7 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('high');
+      expect(findings[0]!.severity).toBe('high');
     });
 
     it('should detect GitHub token pattern', () => {
@@ -62,7 +62,7 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('high');
+      expect(findings[0]!.severity).toBe('high');
     });
 
     it('should keep high severity when provider pattern and suspicious key overlap on same line', () => {
@@ -71,8 +71,8 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('high');
-      expect(findings[0].message).toContain('known provider key pattern');
+      expect(findings[0]!.severity).toBe('high');
+      expect(findings[0]!.message).toContain('known provider key pattern');
     });
 
     it('should detect Stripe live key pattern', () => {
@@ -81,7 +81,7 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('high');
+      expect(findings[0]!.severity).toBe('high');
     });
 
     it('should detect Stripe test key pattern', () => {
@@ -90,7 +90,7 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('high');
+      expect(findings[0]!.severity).toBe('high');
     });
 
     it('should detect Google API key pattern', () => {
@@ -98,7 +98,7 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('high');
+      expect(findings[0]!.severity).toBe('high');
     });
 
     it('should detect JWT token pattern', () => {
@@ -107,7 +107,7 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('high');
+      expect(findings[0]!.severity).toBe('high');
     });
 
     it('should detect suspicious password assignment', () => {
@@ -115,9 +115,9 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].kind).toBe('pattern');
-      expect(findings[0].severity).toBe('medium');
-      expect(findings[0].message).toContain('password/secret/token-like');
+      expect(findings[0]!.kind).toBe('pattern');
+      expect(findings[0]!.severity).toBe('medium');
+      expect(findings[0]!.message).toContain('password/secret/token-like');
     });
 
     it('should detect suspicious secret assignment', () => {
@@ -125,7 +125,7 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('medium');
+      expect(findings[0]!.severity).toBe('medium');
     });
 
     it('should detect high-entropy long strings', () => {
@@ -347,8 +347,8 @@ const token = "AKIAIOSFODNN7EXAMPLE";
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('low');
-      expect(findings[0].message).toContain('HTTPS URL detected');
+      expect(findings[0]!.severity).toBe('low');
+      expect(findings[0]!.message).toContain('HTTPS URL detected');
     });
 
     it('should not detect HTTP URLs as medium severity', () => {
@@ -375,8 +375,8 @@ const token = "AKIAIOSFODNN7EXAMPLE";
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('high');
-      expect(findings[0].message).toContain('known provider key pattern');
+      expect(findings[0]!.severity).toBe('high');
+      expect(findings[0]!.message).toContain('known provider key pattern');
     });
 
     it('does not downgrade severity when a lower severity finding appears after a higher one', () => {
@@ -386,7 +386,7 @@ const token = "AKIAIOSFODNN7EXAMPLE";
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0].severity).toBe('high');
+      expect(findings[0]!.severity).toBe('high');
     });
 
     it('should use higher threshold for test files', () => {
@@ -570,7 +570,7 @@ const email = "user@example.com";
         const source = 'const key = "AKIAIOSFODNN7EXAMPLE";';
         const findings = detectSecretsInSource('test.ts', source);
         expect(findings).toHaveLength(1);
-        expect(findings[0].severity).toBe('high');
+        expect(findings[0]!.severity).toBe('high');
       });
 
       it('should ignore alphabet assigned to a variable without a function call', () => {

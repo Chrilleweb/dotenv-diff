@@ -42,13 +42,13 @@ describe('applyNextJsRules', () => {
 
   it('detects client component via "use client" directive', () => {
     const map = new Map<string, string>();
-    map.set(baseUsage.file, `"use client"\nconsole.log('test')`);
+    map.set(baseUsage.file, '"use client"\nconsole.log(\'test\')');
 
     applyNextJsRules(baseUsage, warnings, map);
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].framework).toBe('nextjs');
-    expect(warnings[0].reason).toMatch(/Server-only variable/);
+    expect(warnings[0]!.framework).toBe('nextjs');
+    expect(warnings[0]!.reason).toMatch(/Server-only variable/);
   });
 
   it('detects pages router client file', () => {
@@ -65,7 +65,7 @@ describe('applyNextJsRules', () => {
 
   it('detects client component via bare use client directive', () => {
     const map = new Map<string, string>();
-    map.set(baseUsage.file, `use client;\nconst x = 1;`);
+    map.set(baseUsage.file, 'use client;\nconst x = 1;');
 
     applyNextJsRules(baseUsage, warnings, map);
 
@@ -84,7 +84,7 @@ describe('applyNextJsRules', () => {
     applyNextJsRules({ ...baseUsage, pattern: 'import.meta.env' }, warnings);
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].reason).toMatch(/process\.env/);
+    expect(warnings[0]!.reason).toMatch(/process\.env/);
   });
 
   it('warns about sensitive NEXT_PUBLIC variable', () => {
@@ -97,12 +97,12 @@ describe('applyNextJsRules', () => {
     );
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].reason).toMatch(/sensitive/);
+    expect(warnings[0]!.reason).toMatch(/sensitive/);
   });
 
   it('does not warn for valid NEXT_PUBLIC usage in client component', () => {
     const map = new Map<string, string>();
-    map.set(baseUsage.file, `'use client'`);
+    map.set(baseUsage.file, '\'use client\'');
 
     applyNextJsRules(
       {
@@ -131,7 +131,7 @@ describe('applyNextJsRules', () => {
 
   it('stops processing after first matching rule (early return)', () => {
     const map = new Map<string, string>();
-    map.set(baseUsage.file, `'use client'`);
+    map.set(baseUsage.file, '\'use client\'');
 
     applyNextJsRules(
       {

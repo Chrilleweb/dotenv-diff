@@ -425,7 +425,7 @@ describe('run', () => {
         envFlag: 'a.env',
         exampleFlag: 'b.env',
         only: undefined,
-      } as Partial<Options>),
+      } as unknown as Partial<Options>),
     );
 
     const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);

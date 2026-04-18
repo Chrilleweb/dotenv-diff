@@ -39,8 +39,8 @@ describe('detectSecretsInExample', () => {
     const warnings = detectSecretsInExample(env);
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].severity).toBe('medium');
-    expect(warnings[0].reason).toContain('Entropy');
+    expect(warnings[0]!.severity).toBe('medium');
+    expect(warnings[0]!.reason).toContain('Entropy');
   });
 
   it('detects very high entropy values as high severity', () => {
@@ -52,8 +52,8 @@ describe('detectSecretsInExample', () => {
     const warnings = detectSecretsInExample(env);
 
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].severity).toBe('high');
-    expect(warnings[0].reason).toContain('Entropy');
+    expect(warnings[0]!.severity).toBe('high');
+    expect(warnings[0]!.reason).toContain('Entropy');
   });
 
   it('returns no warnings when nothing matches', () => {

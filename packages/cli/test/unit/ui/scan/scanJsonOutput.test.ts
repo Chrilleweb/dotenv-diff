@@ -61,7 +61,7 @@ describe('scanJsonOutput', () => {
 
     const result = scanJsonOutput(scanResult, '');
 
-    expect(result.secrets?.[0].file).toBe('src/file.ts');
+    expect(result.secrets?.[0]?.file).toBe('src/file.ts');
   });
 
   it('includes missing variables with their usages', () => {
@@ -98,11 +98,11 @@ describe('scanJsonOutput', () => {
     const result = scanJsonOutput(scanResult, '');
 
     expect(result.missing).toHaveLength(2);
-    expect(result.missing?.[0].variable).toBe('API_KEY');
-    expect(result.missing?.[0].usages).toHaveLength(2);
-    expect(result.missing?.[0].usages[0].file).toBe('src/api.ts');
-    expect(result.missing?.[1].variable).toBe('DB_URL');
-    expect(result.missing?.[1].usages).toHaveLength(1);
+    expect(result.missing?.[0]?.variable).toBe('API_KEY');
+    expect(result.missing?.[0]?.usages).toHaveLength(2);
+    expect(result.missing?.[0]?.usages[0]?.file).toBe('src/api.ts');
+    expect(result.missing?.[1]?.variable).toBe('DB_URL');
+    expect(result.missing?.[1]?.usages).toHaveLength(1);
   });
 
   it('handles missing variables without usages and filters non-missing usages', () => {
@@ -131,10 +131,10 @@ describe('scanJsonOutput', () => {
     const result = scanJsonOutput(scanResult, '');
 
     expect(result.missing).toHaveLength(2);
-    expect(result.missing?.[0].variable).toBe('MISSING_KEY');
-    expect(result.missing?.[0].usages).toHaveLength(1);
-    expect(result.missing?.[1].variable).toBe('UNUSED_MISSING');
-    expect(result.missing?.[1].usages).toHaveLength(0);
+    expect(result.missing?.[0]?.variable).toBe('MISSING_KEY');
+    expect(result.missing?.[0]?.usages).toHaveLength(1);
+    expect(result.missing?.[1]?.variable).toBe('UNUSED_MISSING');
+    expect(result.missing?.[1]?.usages).toHaveLength(0);
   });
 
   it('includes unused variables', () => {
@@ -201,8 +201,8 @@ describe('scanJsonOutput', () => {
     const result = scanJsonOutput(scanResult, '');
 
     expect(result.frameworkWarnings).toHaveLength(1);
-    expect(result.frameworkWarnings?.[0].file).toBe('src/config.ts');
-    expect(result.frameworkWarnings?.[0].framework).toBe('sveltekit');
+    expect(result.frameworkWarnings?.[0]?.file).toBe('src/config.ts');
+    expect(result.frameworkWarnings?.[0]?.framework).toBe('sveltekit');
   });
 
   it('includes duplicates when present', () => {
@@ -247,8 +247,8 @@ describe('scanJsonOutput', () => {
     const result = scanJsonOutput(scanResult, '');
 
     expect(result.logged).toHaveLength(1);
-    expect(result.logged?.[0].file).toBe('src/logger.ts');
-    expect(result.logged?.[0].variable).toBe('SECRET_KEY');
+    expect(result.logged?.[0]?.file).toBe('src/logger.ts');
+    expect(result.logged?.[0]?.variable).toBe('SECRET_KEY');
   });
 
   it('includes example warnings', () => {

@@ -73,7 +73,7 @@ describe('scanCodebase', () => {
       const result = await scanCodebase(defaultOpts);
 
       expect(result.used).toHaveLength(1);
-      expect(result.used[0].variable).toBe('API_KEY');
+      expect(result.used[0]!.variable).toBe('API_KEY');
       expect(result.stats.filesScanned).toBe(1);
       expect(result.stats.totalUsages).toBe(1);
       expect(result.stats.uniqueVariables).toBe(1);
@@ -276,7 +276,7 @@ describe('scanCodebase', () => {
       });
 
       expect(result.used).toHaveLength(1);
-      expect(result.used[0].variable).toBe('API_KEY');
+      expect(result.used[0]!.variable).toBe('API_KEY');
     });
   });
 
@@ -328,7 +328,7 @@ describe('scanCodebase', () => {
       });
 
       expect(result.secrets).toHaveLength(1);
-      expect(result.secrets[0].severity).toBe('high');
+      expect(result.secrets[0]!.severity).toBe('high');
     });
 
     it('handles secret detection errors gracefully', async () => {
@@ -371,8 +371,8 @@ describe('scanCodebase', () => {
       const result = await scanCodebase(defaultOpts);
 
       expect(result.logged).toHaveLength(1);
-      expect(result.logged[0].variable).toBe('API_KEY');
-      expect(result.logged[0].isLogged).toBe(true);
+      expect(result.logged[0]!.variable).toBe('API_KEY');
+      expect(result.logged[0]!.isLogged).toBe(true);
     });
 
     it('does not track non-logged variables', async () => {
@@ -490,10 +490,8 @@ describe('scanCodebase', () => {
     it('does not pass files option when undefined', async () => {
       vi.mocked(findFiles).mockResolvedValue([]);
 
-      await scanCodebase({
-        ...defaultOpts,
-        files: undefined,
-      });
+      const { files: _files, ...optsWithoutFiles } = defaultOpts;
+      await scanCodebase(optsWithoutFiles);
 
       expect(findFiles).toHaveBeenCalledWith(
         tmpDir,
