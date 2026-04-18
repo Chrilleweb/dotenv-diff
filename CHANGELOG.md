@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- changesets: eighty-hornets-shop.md,spotty-owls-cheat.md -->
+## 2026-04-18
+
+### Highlights
+- fix env handle windows styled line endings
+- fixed nested env path
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: chilly-lands-dance.md,fair-places-care.md,huge-kings-make.md,kind-onions-invent.md,sunny-eyes-admire.md -->
 ## 2026-03-29
 

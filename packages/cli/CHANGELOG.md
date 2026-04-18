@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.7.10
+
+### Patch Changes
+
+- aa5daed: fix env handle windows styled line endings
+- 68b66fc: fixed nested env path
+
 ## 2.7.9
 
 ### Patch Changes
