@@ -1,20 +1,20 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { scanFile } from '../../../../src/core/scan/scanFile.js';
 import type { ScanOptions } from '../../../../src/config/types.js';
 
-describe('scanFile', () => {
-  const baseOpts: ScanOptions = {
-    cwd: '/test/project',
-    include: [],
-    exclude: [],
-    ignore: [],
-    ignoreRegex: [],
-    files: [],
-    secrets: false,
-    ignoreUrls: [],
-    json: false,
-  };
+const baseOpts: ScanOptions = {
+  cwd: '/test/project',
+  include: [],
+  exclude: [],
+  ignore: [],
+  ignoreRegex: [],
+  files: [],
+  secrets: false,
+  ignoreUrls: [],
+  json: false,
+};
 
+describe('scanFile', () => {
   it('detects process.env.VAR usage', () => {
     const content = 'const apiKey = process.env.API_KEY;';
     const usages = scanFile('/test/project/src/app.js', content, baseOpts);
@@ -251,5 +251,40 @@ import.meta.env.VAR2;
     const usages = scanFile('/test/project/src/app.js', content, baseOpts);
 
     expect(usages[0]?.context).toBeTruthy();
+  });
+});
+
+describe('scanFile – line 48 false variable guard', () => {
+  // All real processors in patterns.ts filter out falsy values before returning,
+  // so the `if (!variable) continue` guard is dead code with real patterns.
+  // We must use a mocked ENV_PATTERNS that returns an empty-string variable
+  // to exercise the true branch of the guard.
+  it('skips falsy (empty-string) variable emitted by a processor (line 48 true branch)', async () => {
+    vi.resetModules();
+    vi.doMock('../../../../src/core/scan/patterns.js', () => ({
+      ENV_PATTERNS: [
+        {
+          name: 'process.env',
+          // Regex matches process.env.KEY and captures group 1
+          regex: /process\.env\.([A-Z_][A-Z0-9_]*)/g,
+          // Returns ['', 'API_KEY']: empty string is falsy → line 48 skips it,
+          // 'API_KEY' is truthy → pushed to usages.
+          processor: (match: RegExpExecArray) => ['' as string, match[1]!],
+        },
+      ],
+    }));
+
+    const { scanFile: scanFileFresh } =
+      await import('../../../../src/core/scan/scanFile.js');
+
+    const content = 'const key = process.env.API_KEY;';
+    const usages = scanFileFresh('/test/project/src/app.js', content, baseOpts);
+
+    // Empty-string variable was skipped (line 48), only API_KEY remains
+    expect(usages).toHaveLength(1);
+    expect(usages[0]?.variable).toBe('API_KEY');
+
+    vi.doUnmock('../../../../src/core/scan/patterns.js');
+    vi.resetModules();
   });
 });
