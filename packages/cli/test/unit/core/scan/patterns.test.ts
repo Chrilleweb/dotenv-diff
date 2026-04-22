@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { scanFile } from '../../../../src/core/scan/scanFile';
-import { DEFAULT_INCLUDE_EXTENSIONS } from '../../../../src/core/scan/patterns';
+import {
+  DEFAULT_INCLUDE_EXTENSIONS,
+  DEFAULT_EXCLUDE_PATTERNS,
+  ENV_PATTERNS,
+} from '../../../../src/core/scan/patterns';
 import type { ScanOptions } from '../../../../src/config/types';
 
 describe('scanFile - Pattern Detection', () => {
@@ -169,6 +173,23 @@ describe('scanFile - Pattern Detection', () => {
       expect(DEFAULT_INCLUDE_EXTENSIONS).toContain('.cts');
     });
 
+    it('includes all expected extensions', () => {
+      expect(DEFAULT_INCLUDE_EXTENSIONS).toEqual(
+        expect.arrayContaining([
+          '.js',
+          '.ts',
+          '.jsx',
+          '.tsx',
+          '.vue',
+          '.svelte',
+          '.mjs',
+          '.mts',
+          '.cjs',
+          '.cts',
+        ]),
+      );
+    });
+
     it('will detect patterns in .mts files', () => {
       const code = 'const val = process.env.MY_KEY;';
       const result = scanFile('test.mts', code, baseOpts);
@@ -177,6 +198,259 @@ describe('scanFile - Pattern Detection', () => {
       expect(result[0]).toMatchObject({
         variable: 'MY_KEY',
         pattern: 'process.env',
+      });
+    });
+
+    it('will detect patterns in .vue files', () => {
+      const code = 'const val = import.meta.env.VITE_KEY;';
+      const result = scanFile('component.vue', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({ variable: 'VITE_KEY' });
+    });
+
+    it('will detect patterns in .svelte files', () => {
+      const code = "import { MY_VAR } from '$env/static/private';";
+      const result = scanFile('page.svelte', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({ variable: 'MY_VAR' });
+    });
+  });
+
+  describe('Default exclude patterns', () => {
+    it('excludes node_modules', () => {
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('node_modules');
+    });
+
+    it('excludes dist', () => {
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('dist');
+    });
+
+    it('excludes build', () => {
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('build');
+    });
+
+    it('excludes test files by extension', () => {
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('.test.');
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('.spec.');
+    });
+
+    it('excludes __tests__ and __mocks__ directories', () => {
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('__tests__');
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('__mocks__');
+    });
+
+    it('excludes framework build dirs', () => {
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('.next');
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('.nuxt');
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('.sveltekit');
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('.svelte-kit');
+    });
+
+    it('excludes common fixture/sample paths', () => {
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('fixtures');
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('examples');
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('samples');
+      expect(DEFAULT_EXCLUDE_PATTERNS).toContain('sandbox');
+    });
+  });
+
+  describe('ENV_PATTERNS export', () => {
+    it('exports an array', () => {
+      expect(Array.isArray(ENV_PATTERNS)).toBe(true);
+    });
+
+    it('contains patterns for all three pattern names', () => {
+      const names = ENV_PATTERNS.map((p) => p.name);
+      expect(names).toContain('process.env');
+      expect(names).toContain('import.meta.env');
+      expect(names).toContain('sveltekit');
+    });
+
+    it('every pattern has a regex', () => {
+      for (const p of ENV_PATTERNS) {
+        expect(p.regex).toBeInstanceOf(RegExp);
+      }
+    });
+  });
+
+  describe('Processor branch coverage', () => {
+    // Helper to build a minimal RegExpExecArray
+    function makeMatch(
+      fullMatch: string,
+      ...groups: (string | undefined)[]
+    ): RegExpExecArray {
+      return Object.assign([fullMatch, ...groups], {
+        index: 0,
+        input: fullMatch,
+      }) as unknown as RegExpExecArray;
+    }
+
+    it('process.env processor returns [] when both capture groups are undefined (line 31)', () => {
+      const processor = ENV_PATTERNS.find(
+        (p) => p.name === 'process.env' && p.regex.source.includes('\\['),
+      )?.processor;
+      expect(
+        processor?.(makeMatch('process.env.', undefined, undefined)),
+      ).toEqual([]);
+    });
+
+    it('process.env destructuring processor returns empty string for part starting with : (line 58)', () => {
+      // `:ALIAS` splits to key='' which is falsy → returns '' → filtered out by uppercase check
+      const code = 'const { :ALIAS } = process.env;';
+      const result = scanFile('test.js', code, baseOpts);
+      expect(result).toHaveLength(0);
+    });
+
+    it('import.meta.env processor returns [] when both capture groups are undefined (line 79)', () => {
+      const processor = ENV_PATTERNS.find(
+        (p) => p.name === 'import.meta.env',
+      )?.processor;
+      expect(
+        processor?.(makeMatch('import.meta.env.', undefined, undefined)),
+      ).toEqual([]);
+    });
+
+    it('env destructuring processor returns [] for empty braces: const {} = env (line 106)', () => {
+      const code = 'const {} = env;';
+      const result = scanFile('test.ts', code, baseOpts);
+      expect(result).toHaveLength(0);
+    });
+
+    it('env destructuring processor returns empty string for part starting with : (line 117)', () => {
+      // `:ALIAS` splits to key='' which is falsy → returns '' → filtered out by uppercase check
+      const code = 'const { :ALIAS } = env;';
+      const result = scanFile('test.ts', code, baseOpts);
+      expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('Pattern edge cases', () => {
+    it('does not detect lowercase process.env keys', () => {
+      const code = 'const val = process.env.myKey;';
+      const result = scanFile('test.js', code, baseOpts);
+      expect(result).toHaveLength(0);
+    });
+
+    it('does not detect lowercase import.meta.env keys', () => {
+      const code = 'const val = import.meta.env.myKey;';
+      const result = scanFile('test.js', code, baseOpts);
+      expect(result).toHaveLength(0);
+    });
+
+    it('does not match env.lowercase (sveltekit pattern requires uppercase)', () => {
+      const code = 'const val = env.myKey;';
+      const result = scanFile('test.ts', code, baseOpts);
+      expect(result).toHaveLength(0);
+    });
+
+    it('detects keys with numbers: MY_KEY_123', () => {
+      const code = 'const val = process.env.MY_KEY_123;';
+      const result = scanFile('test.js', code, baseOpts);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({ variable: 'MY_KEY_123' });
+    });
+
+    it('detects multiple keys on different lines', () => {
+      const code = [
+        'const a = process.env.KEY_ONE;',
+        'const b = process.env.KEY_TWO;',
+      ].join('\n');
+      const result = scanFile('test.js', code, baseOpts);
+      expect(result).toHaveLength(2);
+      const variables = result.map((r) => r.variable).sort();
+      expect(variables).toEqual(['KEY_ONE', 'KEY_TWO']);
+    });
+  });
+
+  describe('SvelteKit Static Named Imports', () => {
+    it('detects import from $env/static/private', () => {
+      const code = "import { SECRET_KEY } from '$env/static/private';";
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'SECRET_KEY',
+        pattern: 'sveltekit',
+      });
+    });
+
+    it('detects import from $env/static/public', () => {
+      const code = "import { PUBLIC_API_URL } from '$env/static/public';";
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'PUBLIC_API_URL',
+        pattern: 'sveltekit',
+      });
+    });
+
+    it('detects import with double quotes', () => {
+      const code = 'import { SECRET_KEY } from "$env/static/private";';
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({ variable: 'SECRET_KEY' });
+    });
+  });
+
+  describe('SvelteKit Invalid Dynamic Named Imports', () => {
+    it('detects invalid named import from $env/dynamic/private', () => {
+      const code = "import { SECRET_KEY } from '$env/dynamic/private';";
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'SECRET_KEY',
+        pattern: 'sveltekit',
+      });
+    });
+
+    it('detects invalid named import from $env/dynamic/public', () => {
+      const code = "import { PUBLIC_KEY } from '$env/dynamic/public';";
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'PUBLIC_KEY',
+        pattern: 'sveltekit',
+      });
+    });
+  });
+
+  describe('SvelteKit Invalid Default Imports', () => {
+    it('detects invalid default import from $env/static/private', () => {
+      const code = "import SECRET_KEY from '$env/static/private';";
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'SECRET_KEY',
+        pattern: 'sveltekit',
+      });
+    });
+
+    it('detects invalid default import from $env/static/public', () => {
+      const code = "import PUBLIC_URL from '$env/static/public';";
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'PUBLIC_URL',
+        pattern: 'sveltekit',
+      });
+    });
+
+    it('detects invalid default import from $env/dynamic/private', () => {
+      const code = "import SECRET_KEY from '$env/dynamic/private';";
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'SECRET_KEY',
+        pattern: 'sveltekit',
       });
     });
   });
