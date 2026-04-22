@@ -368,11 +368,12 @@ const token = "AKIAIOSFODNN7EXAMPLE";
     });
 
     it('upgrades severity from medium to high when same line matches both suspicious key and provider pattern', () => {
-      // "secret" triggers SUSPICIOUS_KEYS (medium), "ghp_..." triggers PROVIDER_PATTERNS (high)
-      // Both are kind: 'pattern' on same line → dedup should keep the high severity one
+      // "token" triggers SUSPICIOUS_KEYS (medium) first, JWT value triggers PROVIDER_PATTERNS (high) second.
+      // JWT is not caught by looksHarmlessLiteral (contains dots, too long for short-base64, no sequential runs).
+      // Both produce kind:'pattern' with the same snippet → dedup upgrade path (lines 418-419) is exercised.
       const source =
-        'const secret = "ghp_1234567890abcdefghijklmnopqrstuvwxyz";';
-      const findings = detectSecretsInSource('test.ts', source);
+        'const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";';
+      const findings = detectSecretsInSource('src/auth.ts', source);
 
       expect(findings).toHaveLength(1);
       expect(findings[0]!.severity).toBe('high');
@@ -380,13 +381,32 @@ const token = "AKIAIOSFODNN7EXAMPLE";
     });
 
     it('does not downgrade severity when a lower severity finding appears after a higher one', () => {
-      // If somehow high came first and medium second, high should be kept
       // provider pattern (high) + suspicious key (medium) on same line → stays high
       const source = 'const apikey = "AKIAIOSFODNN7EXAMPLE";';
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
       expect(findings[0]!.severity).toBe('high');
+    });
+
+    it('does not upgrade when two provider patterns fire on the same line (equal severity, line 418 false branch)', () => {
+      // Two PROVIDER_PATTERNS both produce kind:'pattern', severity:'high' on the same line.
+      // Dedup key is identical for both → second finding: severityRank[high] > severityRank[high] = false → no upgrade.
+      const source =
+        "const x = 'AKIAJLDFBMHXJKQYRSLP', y = 'ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZabcde';";
+      const findings = detectSecretsInSource('src/config.ts', source);
+
+      expect(findings).toHaveLength(1);
+      expect(findings[0]!.severity).toBe('high');
+    });
+
+    it('skips finding when attribute name is a harmless UI prop like "name" or "label" (line 344)', () => {
+      // SUSPICIOUS_KEYS fires because the value contains "secret", but attrName is "name"
+      // which matches HARMLESS_UI_ATTRIBUTE_NAMES → continue, no finding emitted.
+      const source = 'name = "my-secret-token-value-longerthan12chars"';
+      const findings = detectSecretsInSource('src/form.ts', source);
+
+      expect(findings).toHaveLength(0);
     });
 
     it('should use higher threshold for test files', () => {
