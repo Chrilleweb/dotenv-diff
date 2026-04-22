@@ -94,14 +94,17 @@ export async function promptEnsureFiles(
       return { didCreate: false, shouldExit: true, exitCode: 0 };
     }
     printPrompt.missingEnv(examplePath);
-    const createExample = isYesMode
-      ? true
-      : isCiMode
-        ? false
-        : await confirmYesNo(
-            `Do you want to create a ${path.basename(examplePath)} file from ${path.basename(envPath)}?`,
-            { isCiMode, isYesMode },
-          );
+    let createExample: boolean;
+    if (isYesMode) {
+      createExample = true;
+    } else if (isCiMode) {
+      createExample = false;
+    } else {
+      createExample = await confirmYesNo(
+        `Do you want to create a ${path.basename(examplePath)} file from ${path.basename(envPath)}?`,
+        { isCiMode, isYesMode },
+      );
+    }
 
     if (!createExample) {
       printPrompt.skipCreation(path.basename(examplePath));
