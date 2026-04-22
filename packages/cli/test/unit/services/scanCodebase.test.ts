@@ -471,6 +471,21 @@ describe('scanCodebase', () => {
     });
   });
 
+  describe('minified file detection', () => {
+    it('skips files detected as likely minified (line 34)', async () => {
+      const testFile = path.join(tmpDir, 'bundle.min.js');
+      // A single line > 500 chars triggers isLikelyMinified
+      fsSync.writeFileSync(testFile, 'x'.repeat(520) + 'process.env.API_KEY');
+
+      vi.mocked(findFiles).mockResolvedValue([testFile]);
+
+      const result = await scanCodebase(defaultOpts);
+
+      expect(scanFile).not.toHaveBeenCalled();
+      expect(result.stats.filesScanned).toBe(0);
+    });
+  });
+
   describe('files option', () => {
     it('passes files option to findFiles when provided', async () => {
       vi.mocked(findFiles).mockResolvedValue([]);
