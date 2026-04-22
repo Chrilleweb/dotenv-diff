@@ -851,4 +851,140 @@ describe('compareMany', () => {
       false,
     );
   });
+
+  it('falls back ?? false when json and fix are undefined (lines 103, 123-124, 266, 280-281)', async () => {
+    // opts.json and opts.fix are undefined → opts.json ?? false and opts.fix ?? false
+    // take the right-hand fallback branch for each ?? operator.
+    const opts = {
+      ...createOptions(),
+      json: undefined as unknown as boolean,
+      fix: undefined as unknown as boolean,
+    };
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+
+    const result = await compareMany(pairs, opts);
+
+    expect(result.exitWithError).toBe(false);
+    // printHeader receives false from opts.json ?? false (line 103)
+    expect(mockPrintHeader).toHaveBeenCalledWith('.env', '.env.example', false);
+    // printDuplicates receives false for both ?? args (lines 123-124)
+    expect(mockPrintDuplicates).toHaveBeenCalledWith(
+      '.env',
+      '.env.example',
+      [],
+      [],
+      false,
+      false,
+    );
+    // printIssues receives false for both ?? args (line 266)
+    expect(mockPrintIssues).toHaveBeenCalledWith(
+      expect.any(Object),
+      false,
+      false,
+    );
+    // printFixTips receives false for both ?? args (lines 280-281)
+    expect(mockPrintFixTips).toHaveBeenCalledWith(
+      expect.any(Object),
+      false,
+      false,
+      false,
+    );
+  });
+
+  it('falls back ?? false/false in printStats when showStats=true and json/checkValues are undefined (lines 244, 246)', async () => {
+    // opts.json=undefined → opts.json ?? false = false (line 244 right branch)
+    // opts.checkValues=undefined → opts.checkValues ?? false = false (line 246 right branch)
+    // opts.showStats=true (defined) → opts.showStats ?? true takes left branch (right is dead code)
+    const opts = {
+      ...createOptions({ showStats: true }),
+      json: undefined as unknown as boolean,
+      checkValues: undefined as unknown as boolean,
+    };
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+
+    await compareMany(pairs, opts);
+
+    expect(mockPrintStats).toHaveBeenCalledWith(
+      '.env',
+      '.env.example',
+      expect.any(Object),
+      expect.any(Object),
+      false, // opts.json ?? false → false (right branch)
+      true, // opts.showStats → true (left branch, defined)
+      false, // opts.checkValues ?? false → false (right branch)
+    );
+  });
+
+  it('falls back json ?? false in printAutoFix when fix=true and json is undefined (line 298)', async () => {
+    // opts.fix=true → reaches applyFixes + printAutoFix
+    // opts.json=undefined → opts.json ?? false takes the right branch (line 298)
+    mockApplyFixes.mockReturnValue({
+      changed: true,
+      result: {
+        removedDuplicates: [],
+        addedEnv: ['NEW_KEY'],
+        gitignoreUpdated: false,
+      },
+    });
+    mockDiffEnv.mockReturnValue({
+      missing: ['NEW_KEY'],
+      extra: [],
+      valueMismatches: [],
+    });
+
+    const opts = {
+      ...createOptions({ fix: true }),
+      json: undefined as unknown as boolean,
+    };
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+
+    await compareMany(pairs, opts);
+
+    // printAutoFix called with false from opts.json ?? false
+    expect(mockPrintAutoFix).toHaveBeenCalledWith(
+      expect.any(Object),
+      '.env',
+      false,
+    );
+  });
+
+  it('treats undefined env values as empty via v ?? "" fallback (line 191)', async () => {
+    // parseEnvFile returns KEY1: undefined → (v ?? "").trim() === "" takes ?? right branch
+    mockParseEnvFile.mockImplementationOnce(() => ({
+      KEY1: undefined as unknown as string,
+      KEY2: 'value2',
+    }));
+    // second parseEnvFile call (example file) falls through to the beforeEach default
+
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+
+    await compareMany(pairs, createOptions());
+
+    // KEY1 has undefined value → treated as empty
+    expect(mockPrintIssues).toHaveBeenCalledWith(
+      expect.objectContaining({ empty: ['KEY1'] }),
+      false,
+      false,
+    );
+  });
+
+  it('excludes missing from filtered when only filter does not include missing (line 201 false branch)', async () => {
+    // only: ['extra'] → run('missing') returns false → line 201 takes the [] branch
+    mockDiffEnv.mockReturnValue({
+      missing: ['MISSING_KEY'],
+      extra: ['EXTRA_KEY'],
+      valueMismatches: [],
+    });
+
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+    const opts = createOptions({ only: ['extra'] });
+
+    await compareMany(pairs, opts);
+
+    expect(mockPrintIssues).toHaveBeenCalledWith(
+      expect.objectContaining({ missing: [], extra: ['EXTRA_KEY'] }),
+      false,
+      false,
+    );
+  });
 });

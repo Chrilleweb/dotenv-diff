@@ -207,12 +207,6 @@ function skipCommentedUsages(usages: readonly EnvUsage[]): EnvUsage[] {
     if (!u.context) return true;
     const line = u.context.trim();
 
-    if (line.includes('<!--')) insideHtmlComment = true;
-    if (line.includes('-->')) {
-      insideHtmlComment = false;
-      return false;
-    }
-
     if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*start\s*-->/i.test(line)) {
       insideIgnoreBlock = true;
       return false;
@@ -220,6 +214,12 @@ function skipCommentedUsages(usages: readonly EnvUsage[]): EnvUsage[] {
 
     if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*end\s*-->/i.test(line)) {
       insideIgnoreBlock = false;
+      return false;
+    }
+
+    if (line.includes('<!--')) insideHtmlComment = true;
+    if (line.includes('-->')) {
+      insideHtmlComment = false;
       return false;
     }
 
@@ -246,13 +246,13 @@ function calculateStats(scanResult: ScanResult): ScanResult {
   const warningsCount =
     (scanResult.frameworkWarnings?.length ?? 0) +
     (scanResult.exampleWarnings?.length ?? 0) +
-    (scanResult.logged?.length ?? 0) +
+    scanResult.logged?.length +
     (scanResult.uppercaseWarnings?.length ?? 0) +
     (scanResult.expireWarnings?.length ?? 0) +
     (scanResult.inconsistentNamingWarnings?.length ?? 0) +
     (scanResult.secrets?.length ?? 0) +
-    (scanResult.missing.length ?? 0) +
-    (scanResult.unused.length ?? 0) +
+    scanResult.missing.length +
+    scanResult.unused.length +
     (scanResult.duplicates?.env?.length ?? 0) +
     (scanResult.duplicates?.example?.length ?? 0);
 

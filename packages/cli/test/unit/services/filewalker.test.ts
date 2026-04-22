@@ -509,6 +509,17 @@ describe('filewalker', () => {
       expect(result).toContain(vercelFile);
     });
 
+    it('uses full pattern as base when include pattern has no glob characters (line 48 idx===-1 branch)', async () => {
+      const srcDir = path.join(tmpDir, 'src');
+      fs.mkdirSync(srcDir);
+      fs.writeFileSync(path.join(srcDir, 'app.js'), '');
+
+      // A plain path with no glob chars (*?[]{}): idx is -1 → base = normalized (whole string)
+      const result = await findFiles(tmpDir, { include: ['src'] });
+
+      expect(result.some((f) => f.includes('app.js'))).toBe(true);
+    });
+
     it('allows --files patterns to scan inside node_modules and .vercel', async () => {
       const nodeModulesDir = path.join(tmpDir, 'node_modules', 'lib');
       const vercelDir = path.join(tmpDir, '.vercel', 'output');

@@ -242,7 +242,7 @@ function maybePrintStats(
     stats,
     filtered,
     opts.json ?? false,
-    opts.showStats ?? true,
+    opts.showStats,
     opts.checkValues ?? false,
   );
 }

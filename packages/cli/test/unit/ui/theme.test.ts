@@ -9,6 +9,8 @@ import {
   divider,
   header,
   wrapReason,
+  padLabel,
+  UI_LABEL_WIDTH,
 } from '../../../src/ui/theme.js';
 
 describe('theme exports', () => {
@@ -71,5 +73,20 @@ describe('wrapReason', () => {
 
     expect(result).toBe('123456789012345678901234');
     expect(result.endsWith('\n')).toBe(false);
+  });
+});
+
+describe('padLabel', () => {
+  it('pads short labels to UI_LABEL_WIDTH (line 60)', () => {
+    const result = padLabel('SHORT');
+    expect(result).toBe('SHORT'.padEnd(UI_LABEL_WIDTH));
+    expect(result.length).toBe(UI_LABEL_WIDTH);
+  });
+
+  it('adds MIN_LABEL_GAP spaces when label is at or exceeds UI_LABEL_WIDTH (line 59)', () => {
+    const longLabel = 'A'.repeat(UI_LABEL_WIDTH); // exactly at threshold
+    const result = padLabel(longLabel);
+    expect(result).toBe(longLabel + '  ');
+    expect(result.startsWith(longLabel)).toBe(true);
   });
 });

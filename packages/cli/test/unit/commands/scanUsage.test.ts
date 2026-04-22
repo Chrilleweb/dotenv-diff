@@ -65,6 +65,7 @@ import { printScanResult } from '../../../src/services/printScanResult.js';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { printMissingExample } from '../../../src/ui/scan/printMissingExample.js';
 import { printComparisonError } from '../../../src/ui/scan/printComparisonError.js';
+import { frameworkValidator } from '../../../src/core/frameworks/frameworkValidator.js';
 
 describe('scanUsage', () => {
   const dummySecret: SecretFinding = {
@@ -112,6 +113,7 @@ describe('scanUsage', () => {
     vi.mocked(promptNoEnvScenario).mockResolvedValue({
       compareFile: undefined,
     });
+    vi.mocked(frameworkValidator).mockReturnValue([]);
   });
 
   it('returns early when example missing in CI mode', async () => {
@@ -511,14 +513,15 @@ describe('scanUsage', () => {
         ],
       },
       {
-        logged: [
+        used: [
           {
             variable: 'A',
             file: 'f.ts',
             line: 1,
             column: 0,
             pattern: 'process.env',
-            context: '',
+            context: 'console.log(process.env.A)',
+            isLogged: true,
           },
         ],
       },
@@ -595,7 +598,7 @@ describe('scanUsage', () => {
     );
   });
 
-  it('filters out the dotenv-diff-ignore-start line itself but not subsequent usages', async () => {
+  it('filters out the dotenv-diff-ignore-start line itself and subsequent usages inside block (line 217-218)', async () => {
     vi.mocked(scanCodebase).mockResolvedValue({
       ...baseScanResult,
       used: [
@@ -608,12 +611,88 @@ describe('scanUsage', () => {
           context: '<!-- dotenv-diff-ignore-start -->',
         },
         {
-          variable: 'KEPT',
+          variable: 'INSIDE_BLOCK',
           file: 'f.ts',
           line: 2,
           column: 0,
           pattern: 'process.env',
-          context: 'process.env.KEPT',
+          context: 'process.env.INSIDE_BLOCK',
+        },
+      ],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    await scanUsage({ ...baseOpts, isCiMode: true });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({ used: [] }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('passes false to printComparisonError when json is not set (line 105)', async () => {
+    vi.mocked(determineComparisonFile).mockResolvedValue({
+      type: 'found',
+      file: { path: '/env/.env', name: '.env' },
+    });
+    vi.mocked(processComparisonFile).mockReturnValue({
+      error: { message: 'err', shouldExit: false },
+    } as ProcessComparisonResult);
+    vi.mocked(printComparisonError).mockReturnValue({ exit: false });
+
+    const { json: _omit, ...optsWithoutJson } = baseOpts;
+    await scanUsage(optsWithoutJson as ScanUsageOptions);
+
+    expect(printComparisonError).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(Boolean),
+      false,
+    );
+  });
+
+  it('handles undefined secrets gracefully in JSON mode (line 143)', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      secrets: undefined as unknown as SecretFinding[],
+    });
+
+    const result = await scanUsage({ ...baseOpts, json: true });
+
+    expect(result.exitWithError).toBe(false);
+  });
+
+  it('returns false in strict JSON mode when there are no violations (lines 163-175)', async () => {
+    const result = await scanUsage({ ...baseOpts, json: true, strict: true });
+
+    expect(result.exitWithError).toBe(false);
+  });
+
+  it('exits in strict JSON mode when exampleWarnings exist (line 175)', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      exampleWarnings: [
+        { key: 'SECRET', value: 'abc', reason: 'Entropy', severity: 'low' },
+      ],
+    } as ScanResult);
+
+    const result = await scanUsage({ ...baseOpts, json: true, strict: true });
+
+    expect(result.exitWithError).toBe(true);
+  });
+
+  it('keeps usage with no context (line 207)', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      used: [
+        {
+          variable: 'NO_CONTEXT_KEY',
+          file: 'f.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: undefined as unknown as string,
         },
       ],
     });
@@ -623,7 +702,108 @@ describe('scanUsage', () => {
 
     expect(printScanResult).toHaveBeenCalledWith(
       expect.objectContaining({
-        used: [expect.objectContaining({ variable: 'KEPT' })],
+        used: [expect.objectContaining({ variable: 'NO_CONTEXT_KEY' })],
+      }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('filters usage inside unclosed HTML comment block (line 220)', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      used: [
+        {
+          variable: 'INSIDE_HTML_COMMENT',
+          file: 'f.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: '<!-- unclosed comment process.env.INSIDE_HTML_COMMENT',
+        },
+        {
+          variable: 'AFTER_OPEN',
+          file: 'f.ts',
+          line: 2,
+          column: 0,
+          pattern: 'process.env',
+          context: 'process.env.AFTER_OPEN',
+        },
+      ],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    await scanUsage({ ...baseOpts, isCiMode: true });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({ used: [] }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('handles undefined logged and secrets in calculateStats (lines 249, 253)', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      logged: undefined as unknown as ScanResult['logged'],
+      secrets: undefined as unknown as ScanResult['secrets'],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    // Should not throw even when logged/secrets are undefined
+    await expect(
+      scanUsage({ ...baseOpts, isCiMode: true }),
+    ).resolves.not.toThrow();
+    expect(printScanResult).toHaveBeenCalled();
+  });
+
+  it('resumes keeping usages after dotenv-diff-ignore-end (line 222-223)', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      used: [
+        {
+          variable: 'START_LINE',
+          file: 'f.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: '<!-- dotenv-diff-ignore-start -->',
+        },
+        {
+          variable: 'INSIDE_BLOCK',
+          file: 'f.ts',
+          line: 2,
+          column: 0,
+          pattern: 'process.env',
+          context: 'process.env.INSIDE_BLOCK',
+        },
+        {
+          variable: 'END_MARKER',
+          file: 'f.ts',
+          line: 3,
+          column: 0,
+          pattern: 'process.env',
+          context: '<!-- dotenv-diff-ignore-end -->',
+        },
+        {
+          variable: 'AFTER_BLOCK',
+          file: 'f.ts',
+          line: 4,
+          column: 0,
+          pattern: 'process.env',
+          context: 'process.env.AFTER_BLOCK',
+        },
+      ],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    await scanUsage({ ...baseOpts, isCiMode: true });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({
+        used: [expect.objectContaining({ variable: 'AFTER_BLOCK' })],
       }),
       expect.anything(),
       expect.anything(),

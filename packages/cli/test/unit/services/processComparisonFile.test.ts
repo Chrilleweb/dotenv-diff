@@ -56,9 +56,12 @@ vi.mock('../../../src/core/detectInconsistentNaming.js', () => ({
   ]),
 }));
 
+import fs from 'fs';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { applyFixes } from '../../../src/core/fixEnv.js';
 import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
+import { findDuplicateKeys } from '../../../src/core/duplicates.js';
+import { resolveFromCwd } from '../../../src/core/helpers/resolveFromCwd.js';
 
 describe('processComparisonFile', () => {
   const baseScanResult: ScanResult = {
@@ -95,6 +98,7 @@ describe('processComparisonFile', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(resolveFromCwd).mockImplementation((_, p) => p);
   });
 
   it('processes normally without fix', () => {
@@ -253,10 +257,66 @@ describe('processComparisonFile', () => {
     expect(result.scanResult.duplicates?.env).toBeDefined();
   });
 
+  it('does not set exampleFull when example file does not exist on disk (line 74)', () => {
+    vi.mocked(fs.existsSync).mockReturnValueOnce(false);
+
+    const result = processComparisonFile(baseScanResult, compareFile, baseOpts);
+
+    expect(result.exampleFull).toBeUndefined();
+    expect(result.error).toBeUndefined();
+  });
+
+  it('skips duplicate check when allowDuplicates is true (lines 105-109)', () => {
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      allowDuplicates: true,
+    });
+
+    expect(result.dupsEnv).toHaveLength(0);
+    expect(result.dupsEx).toHaveLength(0);
+    expect(result.duplicatesFound).toBe(false);
+  });
+
+  it('sets duplicatesFound via dupsEx when only example file has duplicates (lines 109, 154)', () => {
+    // First call: env file → no duplicates. Second call: example file → has duplicate.
+    vi.mocked(findDuplicateKeys)
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([{ key: 'EX_KEY', count: 2 }]);
+
+    // Use a fresh duplicates object to avoid mutation from previous tests
+    const result = processComparisonFile(
+      { ...baseScanResult, duplicates: {} },
+      compareFile,
+      { ...baseOpts, allowDuplicates: false },
+    );
+
+    expect(result.duplicatesFound).toBe(true);
+    expect(result.dupsEnv).toHaveLength(0);
+    expect(result.dupsEx).toHaveLength(1);
+    // dupsEnv is empty → scanResult.duplicates.env NOT set (line 154 false branch)
+    expect(result.scanResult.duplicates?.env).toBeUndefined();
+    // dupsEx has items → scanResult.duplicates.example IS set
+    expect(result.scanResult.duplicates?.example).toBeDefined();
+  });
+
+  it('uses empty exampleKeysList when exampleFull is undefined in inconsistent naming check (line 119)', () => {
+    // existsSync returns false → exampleFull never set → exampleKeysList = []
+    vi.mocked(fs.existsSync).mockReturnValueOnce(false);
+
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      inconsistentNamingWarnings: true,
+    });
+
+    expect(result.exampleFull).toBeUndefined();
+    expect(result.inconsistentNamingWarnings?.length).toBeGreaterThan(0);
+    expect(result.error).toBeUndefined();
+  });
+
   it('initialises scanResult.duplicates if it was undefined before writing', () => {
     const scanWithNoDuplicates: ScanResult = {
       ...baseScanResult,
-      duplicates: undefined as any,
+      duplicates: undefined as unknown as ScanResult['duplicates'],
     };
 
     const result = processComparisonFile(scanWithNoDuplicates, compareFile, {
