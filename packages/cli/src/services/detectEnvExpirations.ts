@@ -70,8 +70,6 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
  */
 function calculateDaysLeft(expireDateStr: string, now: Date): number | null {
   const parts = expireDateStr.split('-').map(Number);
-  if (parts.length !== 3) return null;
-
   const [year, month, day] = parts;
   if (!year || !month || !day) return null;
 
