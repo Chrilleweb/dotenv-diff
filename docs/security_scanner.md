@@ -45,7 +45,7 @@ Only triggers when all of the following are true:
 
 - The value is **12+ characters** long
 - The value does **not** contain spaces (space → likely a human-readable label, not a secret)
-- The attribute name is **not** a known harmless UI prop (`label`, `placeholder`, `name`, `title`, `aria-label`, etc.)
+- The attribute name is **not** a known harmless UI prop (`label`, `placeholder`, `name`, `title`, `aria-label`, `type`, `autocomplete`, `inputmode`, `role`, `method`, `enctype`, etc.)
 - The line does **not** read from an env accessor (`process.env`, `import.meta.env`, SvelteKit `$env/*`)
 - The value is **not** a pure interpolation template (e.g. `` `${a}:${b}` ``)
 
