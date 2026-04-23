@@ -38,7 +38,7 @@ jobs:
       - name: Fix lcov paths
         run: |
           if [ -f "coverage/lcov.info" ]; then
-            sed -i "s|^SF:|SF:|g" coverage/lcov.info
+            sed -i "s|^SF:|SF:packages/cli/|g" coverage/lcov.info
           fi
 
       - name: Run diff-cover analysis
