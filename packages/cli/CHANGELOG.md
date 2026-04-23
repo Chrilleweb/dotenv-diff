@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.7.10
+
+### Patch Changes
+
+- aa5daed: fix env handle windows styled line endings
+- e8b6ed8: fixed false warning an type=password
+- 68b66fc: fixed nested env path
+- d0eca1f: fixed warning on unsued dynamic sveltekit variables
+
 ## 2.7.9
 
 ### Patch Changes
