@@ -1,6 +1,6 @@
 import type { EnvPatternName } from '../../config/types.js';
 
-export type Pattern = {
+type Pattern = {
   name: EnvPatternName;
   regex: RegExp;
   processor?: (match: RegExpExecArray) => string[];
