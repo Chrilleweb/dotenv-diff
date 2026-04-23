@@ -7,6 +7,38 @@ type Pattern = {
 };
 
 /**
+ * Builds SvelteKit env patterns for an aliased import.
+ * Handles: import { env as aliasName } from '$env/dynamic/private'
+ * @param alias - The local alias used for the env object (e.g. "privateEnv")
+ * @returns Patterns matching aliasName.VAR and { VAR } = aliasName
+ */
+export function buildSveltekitAliasPatterns(alias: string): Pattern[] {
+  return [
+    {
+      name: 'sveltekit' as const,
+      regex: new RegExp(`(?<![.\\w])${alias}\\.([A-Z_][A-Z0-9_]*)`, 'g'),
+    },
+    {
+      name: 'sveltekit' as const,
+      regex: new RegExp(`\\{([^}]*)\\}\\s*=\\s*${alias}\\b`, 'g'),
+      processor: (match) => {
+        const content = match[1];
+        if (!content) return [];
+        return content
+          .split(',')
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .map((part) => {
+            const [key] = part.split(/[:=]/);
+            return key ? key.trim() : '';
+          })
+          .filter((key) => /^[A-Z_][A-Z0-9_]*$/.test(key));
+      },
+    },
+  ];
+}
+
+/**
  * Framework-specific regex patterns for detecting environment variable usage
  * across different runtimes and frameworks.
  */

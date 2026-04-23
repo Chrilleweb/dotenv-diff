@@ -4,6 +4,7 @@ import {
   DEFAULT_INCLUDE_EXTENSIONS,
   DEFAULT_EXCLUDE_PATTERNS,
   ENV_PATTERNS,
+  buildSveltekitAliasPatterns,
 } from '../../../../src/core/scan/patterns';
 import type { ScanOptions } from '../../../../src/config/types';
 
@@ -452,6 +453,70 @@ describe('scanFile - Pattern Detection', () => {
         variable: 'SECRET_KEY',
         pattern: 'sveltekit',
       });
+    });
+  });
+
+  describe('buildSveltekitAliasPatterns', () => {
+    function makeMatch(
+      fullMatch: string,
+      ...groups: (string | undefined)[]
+    ): RegExpExecArray {
+      return Object.assign([fullMatch, ...groups], {
+        index: 0,
+        input: fullMatch,
+      }) as unknown as RegExpExecArray;
+    }
+
+    it('returns two patterns for a given alias', () => {
+      const patterns = buildSveltekitAliasPatterns('privateEnv');
+      expect(patterns).toHaveLength(2);
+      expect(patterns[0]?.regex).toBeInstanceOf(RegExp);
+      expect(patterns[1]?.regex).toBeInstanceOf(RegExp);
+      expect(patterns.every((p) => p.name === 'sveltekit')).toBe(true);
+    });
+
+    it('dot notation pattern matches alias.VAR', () => {
+      const [dotPattern] = buildSveltekitAliasPatterns('privateEnv');
+      expect(dotPattern!.regex.test('privateEnv.MY_SECRET')).toBe(true);
+      expect(dotPattern!.regex.test('env.MY_SECRET')).toBe(false);
+    });
+
+    it('destructuring processor returns [] for empty content (if !content branch)', () => {
+      const [, destructurePattern] = buildSveltekitAliasPatterns('privateEnv');
+      const result = destructurePattern!.processor!(makeMatch('{}', ''));
+      expect(result).toEqual([]);
+    });
+
+    it('destructuring processor returns [] when content is undefined', () => {
+      const [, destructurePattern] = buildSveltekitAliasPatterns('privateEnv');
+      const result = destructurePattern!.processor!(makeMatch('{}', undefined));
+      expect(result).toEqual([]);
+    });
+
+    it('destructuring processor returns empty string for part starting with : (key falsy branch)', () => {
+      // ':ALIAS' splits to key='' which is falsy → '' → filtered by uppercase check
+      const code = `import { env as privateEnv } from '$env/dynamic/private';
+const { :ALIAS } = privateEnv;`;
+      const result = scanFile('test.ts', code, baseOpts);
+      expect(result).toHaveLength(0);
+    });
+
+    it('destructuring processor extracts multiple vars from aliased import', () => {
+      const code = `import { env as privateEnv } from '$env/dynamic/private';
+const { SECRET_KEY, API_TOKEN } = privateEnv;`;
+      const result = scanFile('test.ts', code, baseOpts);
+      expect(result.map((u) => u.variable).sort()).toEqual([
+        'API_TOKEN',
+        'SECRET_KEY',
+      ]);
+    });
+
+    it('destructuring processor handles aliased keys: { VAR: alias } = privateEnv', () => {
+      const code = `import { env as privateEnv } from '$env/dynamic/private';
+const { SECRET_KEY: secret } = privateEnv;`;
+      const result = scanFile('test.ts', code, baseOpts);
+      expect(result).toHaveLength(1);
+      expect(result[0]?.variable).toBe('SECRET_KEY');
     });
   });
 

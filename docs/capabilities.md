@@ -28,6 +28,12 @@ env.MY_KEY
 const { MY_KEY } = env
 const { MY_KEY: alias, OTHER_KEY = "fallback" } = env
 
+// SvelteKit – dynamic with aliased import
+import { env as privateEnv } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
+privateEnv.MY_KEY
+const { MY_KEY } = privateEnv
+
 // SvelteKit – static (named imports)
 import { MY_KEY } from '$env/static/private';
 import { MY_KEY } from '$env/static/public';
