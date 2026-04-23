@@ -1,5 +1,22 @@
 # Changelog
 
+<!-- changesets: eighty-hornets-shop.md,fresh-eels-follow.md,spotty-owls-cheat.md,twelve-clouds-add.md -->
+## 2026-04-23
+
+### Highlights
+- fix env handle windows styled line endings
+- fixed false warning an type=password
+- fixed nested env path
+- fixed warning on unsued dynamic sveltekit variables
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: chilly-lands-dance.md,fair-places-care.md,huge-kings-make.md,kind-onions-invent.md,sunny-eyes-admire.md -->
 ## 2026-03-29
 
