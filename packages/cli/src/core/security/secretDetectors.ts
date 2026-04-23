@@ -54,7 +54,7 @@ const HARMLESS_URLS = [
 
 // Known harmless attribute keys commonly used in UI components
 const HARMLESS_UI_ATTRIBUTE_NAMES =
-  /^(name|label|placeholder|title|alt|caption|helperText|description|text|htmlFor|id|data-testid|data-test|aria-label)$/i;
+  /^(name|label|placeholder|title|alt|caption|helperText|description|text|htmlFor|id|data-testid|data-test|aria-label|type|autocomplete|inputmode|role|method|enctype)$/i;
 
 /**
  * Checks if a string looks like a UI label or attribute value, which are often false positives in secret detection.

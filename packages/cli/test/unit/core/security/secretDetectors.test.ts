@@ -307,6 +307,20 @@ const token = "AKIAIOSFODNN7EXAMPLE";
       expect(findings).toHaveLength(0);
     });
 
+    it('does not flag autocomplete="new-password" as a secret', () => {
+      const source = 'autocomplete="new-password"';
+      const findings = detectSecretsInSource('src/routes/+page.svelte', source);
+
+      expect(findings).toHaveLength(0);
+    });
+
+    it('does not flag type="password" as a secret', () => {
+      const source = 'type="password"';
+      const findings = detectSecretsInSource('src/routes/+page.svelte', source);
+
+      expect(findings).toHaveLength(0);
+    });
+
     it('should ignore lines with HTML tags containing secrets', () => {
       const source = '<div>secret="MySecretValue123"</div>';
       const findings = detectSecretsInSource('test.ts', source);
