@@ -155,6 +155,64 @@ import * as env from '$env/dynamic/private';`;
     expect(usages.length).toBeGreaterThanOrEqual(0);
   });
 
+  it('detects env variable accessed via aliased $env import (dot notation)', () => {
+    const content = `import { env as privateEnv } from '$env/dynamic/private';
+const key = privateEnv.SUPABASE_SERVICE_ROLE_KEY;`;
+    const usages = scanFile(
+      '/test/project/src/lib/supabase.ts',
+      content,
+      baseOpts,
+    );
+
+    expect(usages).toHaveLength(1);
+    expect(usages[0]?.variable).toBe('SUPABASE_SERVICE_ROLE_KEY');
+    expect(usages[0]?.pattern).toBe('sveltekit');
+  });
+
+  it('detects env variable accessed via aliased $env/dynamic/public import', () => {
+    const content = `import { env as publicEnv } from '$env/dynamic/public';
+const url = publicEnv.PUBLIC_SUPABASE_URL;`;
+    const usages = scanFile(
+      '/test/project/src/lib/supabase.ts',
+      content,
+      baseOpts,
+    );
+
+    expect(usages).toHaveLength(1);
+    expect(usages[0]?.variable).toBe('PUBLIC_SUPABASE_URL');
+  });
+
+  it('detects multiple env variables via multiple aliased imports', () => {
+    const content = `import { env as publicEnv } from '$env/dynamic/public';
+import { env as privateEnv } from '$env/dynamic/private';
+const url = publicEnv.PUBLIC_SUPABASE_URL;
+const key = privateEnv.SUPABASE_SERVICE_ROLE_KEY;`;
+    const usages = scanFile(
+      '/test/project/src/lib/supabase.ts',
+      content,
+      baseOpts,
+    );
+
+    expect(usages).toHaveLength(2);
+    expect(usages.map((u) => u.variable)).toContain('PUBLIC_SUPABASE_URL');
+    expect(usages.map((u) => u.variable)).toContain(
+      'SUPABASE_SERVICE_ROLE_KEY',
+    );
+  });
+
+  it('detects env variables via destructuring from aliased import', () => {
+    const content = `import { env as privateEnv } from '$env/dynamic/private';
+const { SECRET_KEY, API_TOKEN } = privateEnv;`;
+    const usages = scanFile(
+      '/test/project/src/lib/server.ts',
+      content,
+      baseOpts,
+    );
+
+    expect(usages.map((u) => u.variable)).toContain('SECRET_KEY');
+    expect(usages.map((u) => u.variable)).toContain('API_TOKEN');
+  });
+
   it('returns empty array when no env variables found', () => {
     const content = 'const x = 1;\nconst y = 2;';
     const usages = scanFile('/test/project/src/app.js', content, baseOpts);

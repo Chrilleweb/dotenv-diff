@@ -1,6 +1,6 @@
 import path from 'path';
 import type { EnvUsage, ScanOptions } from '../../config/types.js';
-import { ENV_PATTERNS } from './patterns.js';
+import { ENV_PATTERNS, buildSveltekitAliasPatterns } from './patterns.js';
 import { hasIgnoreComment } from '../security/secretDetectors.js';
 import { normalizePath } from '../helpers/normalizePath.js';
 import { isLikelyMinified } from '../helpers/isLikelyMinified.js';
@@ -35,7 +35,18 @@ export function scanFile(
     envImports.push(importMatch[1]!);
   }
 
-  for (const pattern of ENV_PATTERNS) {
+  // Detect aliased $env imports: import { env as aliasName } from '$env/dynamic/private'
+  const aliasImportRegex =
+    /import\s*\{\s*env\s+as\s+(\w+)\s*\}\s*from\s*['"]\$env\/(?:static|dynamic)\/(?:private|public)['"]/g;
+
+  const allPatterns = [...ENV_PATTERNS];
+  let aliasImportMatch: RegExpExecArray | null;
+
+  while ((aliasImportMatch = aliasImportRegex.exec(content)) !== null) {
+    allPatterns.push(...buildSveltekitAliasPatterns(aliasImportMatch[1]!));
+  }
+
+  for (const pattern of allPatterns) {
     let match: RegExpExecArray | null;
     const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
 
