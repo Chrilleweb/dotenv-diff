@@ -200,6 +200,28 @@ const key = privateEnv.SUPABASE_SERVICE_ROLE_KEY;`;
     );
   });
 
+  it('sets imports to only the specific module for each aliased usage (prevents false framework warnings)', () => {
+    const content = `import { env as publicEnv } from '$env/dynamic/public';
+import { env as privateEnv } from '$env/dynamic/private';
+const url = publicEnv.PUBLIC_SUPABASE_URL;
+const key = privateEnv.SUPABASE_SERVICE_ROLE_KEY;`;
+    const usages = scanFile(
+      '/test/project/src/lib/supabase.ts',
+      content,
+      baseOpts,
+    );
+
+    const publicUsage = usages.find(
+      (u) => u.variable === 'PUBLIC_SUPABASE_URL',
+    );
+    const privateUsage = usages.find(
+      (u) => u.variable === 'SUPABASE_SERVICE_ROLE_KEY',
+    );
+
+    expect(publicUsage?.imports).toEqual(['$env/dynamic/public']);
+    expect(privateUsage?.imports).toEqual(['$env/dynamic/private']);
+  });
+
   it('detects env variables via destructuring from aliased import', () => {
     const content = `import { env as privateEnv } from '$env/dynamic/private';
 const { SECRET_KEY, API_TOKEN } = privateEnv;`;
