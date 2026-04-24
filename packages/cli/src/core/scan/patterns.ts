@@ -4,23 +4,31 @@ type Pattern = {
   name: EnvPatternName;
   regex: RegExp;
   processor?: (match: RegExpExecArray) => string[];
+  /** When set, overrides the file-level imports list for usages from this pattern */
+  sourceModule?: string;
 };
 
 /**
  * Builds SvelteKit env patterns for an aliased import.
  * Handles: import { env as aliasName } from '$env/dynamic/private'
  * @param alias - The local alias used for the env object (e.g. "privateEnv")
+ * @param sourceModule - The specific $env module the alias was imported from
  * @returns Patterns matching aliasName.VAR and { VAR } = aliasName
  */
-export function buildSveltekitAliasPatterns(alias: string): Pattern[] {
+export function buildSveltekitAliasPatterns(
+  alias: string,
+  sourceModule: string,
+): Pattern[] {
   return [
     {
       name: 'sveltekit' as const,
       regex: new RegExp(`(?<![.\\w])${alias}\\.([A-Z_][A-Z0-9_]*)`, 'g'),
+      sourceModule,
     },
     {
       name: 'sveltekit' as const,
       regex: new RegExp(`\\{([^}]*)\\}\\s*=\\s*${alias}\\b`, 'g'),
+      sourceModule,
       processor: (match) => {
         const content = match[1];
         if (!content) return [];

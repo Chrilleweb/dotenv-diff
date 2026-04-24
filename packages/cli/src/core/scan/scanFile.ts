@@ -36,14 +36,20 @@ export function scanFile(
   }
 
   // Detect aliased $env imports: import { env as aliasName } from '$env/dynamic/private'
+  // Capture both the alias name (group 1) and the source module (group 2)
   const aliasImportRegex =
-    /import\s*\{\s*env\s+as\s+(\w+)\s*\}\s*from\s*['"]\$env\/(?:static|dynamic)\/(?:private|public)['"]/g;
+    /import\s*\{\s*env\s+as\s+(\w+)\s*\}\s*from\s*['"](\$env\/(?:static|dynamic)\/(?:private|public))['"]/g;
 
   const allPatterns = [...ENV_PATTERNS];
   let aliasImportMatch: RegExpExecArray | null;
 
   while ((aliasImportMatch = aliasImportRegex.exec(content)) !== null) {
-    allPatterns.push(...buildSveltekitAliasPatterns(aliasImportMatch[1]!));
+    allPatterns.push(
+      ...buildSveltekitAliasPatterns(
+        aliasImportMatch[1]!,
+        aliasImportMatch[2]!,
+      ),
+    );
   }
 
   for (const pattern of allPatterns) {
@@ -97,7 +103,7 @@ export function scanFile(
           line: lineNumber,
           column,
           pattern: pattern.name,
-          imports: envImports,
+          imports: pattern.sourceModule ? [pattern.sourceModule] : envImports,
           context: contextLine,
           isLogged,
         });

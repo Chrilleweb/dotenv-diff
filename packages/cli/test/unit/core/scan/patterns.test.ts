@@ -468,27 +468,48 @@ describe('scanFile - Pattern Detection', () => {
     }
 
     it('returns two patterns for a given alias', () => {
-      const patterns = buildSveltekitAliasPatterns('privateEnv');
+      const patterns = buildSveltekitAliasPatterns(
+        'privateEnv',
+        '$env/dynamic/private',
+      );
       expect(patterns).toHaveLength(2);
       expect(patterns[0]?.regex).toBeInstanceOf(RegExp);
       expect(patterns[1]?.regex).toBeInstanceOf(RegExp);
       expect(patterns.every((p) => p.name === 'sveltekit')).toBe(true);
     });
 
+    it('sets sourceModule on both returned patterns', () => {
+      const patterns = buildSveltekitAliasPatterns(
+        'privateEnv',
+        '$env/dynamic/private',
+      );
+      expect(patterns[0]?.sourceModule).toBe('$env/dynamic/private');
+      expect(patterns[1]?.sourceModule).toBe('$env/dynamic/private');
+    });
+
     it('dot notation pattern matches alias.VAR', () => {
-      const [dotPattern] = buildSveltekitAliasPatterns('privateEnv');
+      const [dotPattern] = buildSveltekitAliasPatterns(
+        'privateEnv',
+        '$env/dynamic/private',
+      );
       expect(dotPattern!.regex.test('privateEnv.MY_SECRET')).toBe(true);
       expect(dotPattern!.regex.test('env.MY_SECRET')).toBe(false);
     });
 
     it('destructuring processor returns [] for empty content (if !content branch)', () => {
-      const [, destructurePattern] = buildSveltekitAliasPatterns('privateEnv');
+      const [, destructurePattern] = buildSveltekitAliasPatterns(
+        'privateEnv',
+        '$env/dynamic/private',
+      );
       const result = destructurePattern!.processor!(makeMatch('{}', ''));
       expect(result).toEqual([]);
     });
 
     it('destructuring processor returns [] when content is undefined', () => {
-      const [, destructurePattern] = buildSveltekitAliasPatterns('privateEnv');
+      const [, destructurePattern] = buildSveltekitAliasPatterns(
+        'privateEnv',
+        '$env/dynamic/private',
+      );
       const result = destructurePattern!.processor!(makeMatch('{}', undefined));
       expect(result).toEqual([]);
     });
