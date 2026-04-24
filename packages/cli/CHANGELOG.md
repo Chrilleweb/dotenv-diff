@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.11
+
+### Patch Changes
+
+- 2e4bab3: fixed false warning in sveltekit alias
+
 ## 2.7.10
 
 ### Patch Changes
