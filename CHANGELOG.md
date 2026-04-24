@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: three-tools-attack.md -->
+## 2026-04-24
+
+### Highlights
+- fixed false warning in sveltekit alias
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: eighty-hornets-shop.md,fresh-eels-follow.md,spotty-owls-cheat.md,twelve-clouds-add.md -->
 ## 2026-04-23
 
