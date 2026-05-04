@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.8.0
+
+### Minor Changes
+
+- 962c90d: added --list-all flag to view all environment variables found in codebase
+
 ## 2.7.11
 
 ### Patch Changes
