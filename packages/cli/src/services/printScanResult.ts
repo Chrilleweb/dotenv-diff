@@ -49,7 +49,6 @@ export function printScanResult(
 
   if (opts.listAll) {
     printListAll(scanResult.used);
-    return { exitWithError: false };
   }
 
   printHeader(comparedAgainst);
@@ -108,7 +107,7 @@ export function printScanResult(
     printSecrets(scanResult.secrets, opts.strict);
   }
   // Console log usage warning
-  if (scanResult.logged) {
+  if (scanResult.logged?.length) {
     printConsolelogWarning(scanResult.logged, opts.strict);
   }
 

@@ -440,9 +440,9 @@ If you later want to scan files from one of the default excluded paths, use `--i
 
 ### `--list-all`
 
-Scans the codebase and prints all unique environment variable names found — without comparing them against any `.env` file.
+Scans the codebase and prints all unique environment variable names found.
 
-This is useful when you want a quick overview of every environment variable your project references, for example when bootstrapping a new environment or auditing env usage.
+This is useful when you want a quick overview of every environment variable your project references.
 
 The list is sorted alphabetically and deduplicated across all usages.
 
@@ -452,41 +452,13 @@ Example usage:
 dotenv-diff --list-all
 ```
 
-Example output:
-
-```
-Environment variables found in codebase
-──────────────────────────────────────────────────────────────────────
-  API_BASE_URL
-  DATABASE_URL
-  NEXT_PUBLIC_ANALYTICS_ID
-  STRIPE_SECRET_KEY
-──────────────────────────────────────────────────────────────────────
-  4 unique variable(s)
-```
-
-Combine with `--json` for machine-readable output:
-
-```bash
-dotenv-diff --list-all --json
-```
+Usage in the configuration file:
 
 ```json
-[
-  "API_BASE_URL",
-  "DATABASE_URL",
-  "NEXT_PUBLIC_ANALYTICS_ID",
-  "STRIPE_SECRET_KEY"
-]
+{
+  "listAll": true
+}
 ```
-
-You can also scope the scan using the standard file scanning flags:
-
-```bash
-dotenv-diff --list-all --include-files "src/**"
-```
-
-> **Note:** `--list-all` exits immediately after printing the list and does not perform any comparison or validation.
 
 ---
 

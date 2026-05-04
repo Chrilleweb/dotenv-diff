@@ -431,6 +431,33 @@ describe('printScanResult', () => {
     expect(printConsolelogWarning).not.toHaveBeenCalled();
   });
 
+  it('calls printConsolelogWarning when logged has items', () => {
+    const loggedUsages = [
+      {
+        variable: 'SECRET_KEY',
+        file: 'src/logger.ts',
+        line: 42,
+        column: 5,
+        pattern: 'process.env' as const,
+        context: 'console.log(process.env.SECRET_KEY)',
+      },
+    ];
+
+    printScanResult(
+      {
+        ...baseScanResult,
+        logged: loggedUsages,
+      },
+      baseOpts,
+      '.env',
+    );
+
+    expect(printConsolelogWarning).toHaveBeenCalledWith(
+      loggedUsages,
+      undefined,
+    );
+  });
+
   it('keeps exitWithError false when secrets is undefined and no strict violations', () => {
     const result = printScanResult(
       {

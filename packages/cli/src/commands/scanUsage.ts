@@ -136,7 +136,11 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
 
   // JSON output
   if (opts.json) {
-    const jsonOutput = scanJsonOutput(scanResult, comparedAgainst);
+    const jsonOutput = scanJsonOutput(
+      scanResult,
+      comparedAgainst,
+      opts.listAll ?? false,
+    );
     console.log(JSON.stringify(jsonOutput, null, 2));
 
     // Check for high severity secrets

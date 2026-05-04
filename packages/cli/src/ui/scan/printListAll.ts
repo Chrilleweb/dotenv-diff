@@ -13,13 +13,15 @@ export function printListAll(usages: EnvUsage[]): void {
     return;
   }
 
-  console.log(`\n${header('Environment variables found in codebase')}`);
-  console.log(divider);
+  console.log(
+    `\n${accent('▸')} ${header('Environment variables found in codebase')}`,
+  );
+  console.log(`${divider}`);
 
   for (const key of uniqueVars) {
-    console.log(`  ${accent(key)}`);
+    console.log(`${accent(key)}`);
   }
 
-  console.log(divider);
-  console.log(dim(`  ${uniqueVars.length} unique variable(s)\n`));
+  console.log(`${divider}`);
+  console.log(dim(`${uniqueVars.length} unique variable(s)\n`));
 }
