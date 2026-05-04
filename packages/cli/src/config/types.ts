@@ -93,6 +93,7 @@ export interface RawOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+  listAll?: boolean;
 }
 
 /**
@@ -135,6 +136,7 @@ export interface Options {
   uppercaseKeys: boolean;
   expireWarnings: boolean;
   inconsistentNamingWarnings: boolean;
+  listAll: boolean;
 }
 
 export type EnvPatternName = 'process.env' | 'import.meta.env' | 'sveltekit';
@@ -228,6 +230,7 @@ export interface ScanUsageOptions extends ScanOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+  listAll?: boolean;
 }
 
 /**

@@ -68,6 +68,10 @@ vi.mock('../../../src/ui/scan/printInconsistentNamingWarning.js', () => ({
   printInconsistentNamingWarning: vi.fn(),
 }));
 
+vi.mock('../../../src/ui/scan/printListAll.js', () => ({
+  printListAll: vi.fn(),
+}));
+
 vi.mock('../../../src/core/scan/computeHealthScore.js', () => ({
   computeHealthScore: vi.fn(() => 100),
 }));
@@ -95,10 +99,20 @@ import { printUnused } from '../../../src/ui/scan/printUnused.js';
 import { printFrameworkWarnings } from '../../../src/ui/scan/printFrameworkWarnings.js';
 import { printUppercaseWarning } from '../../../src/ui/scan/printUppercaseWarning.js';
 import { printInconsistentNamingWarning } from '../../../src/ui/scan/printInconsistentNamingWarning.js';
+import { printListAll } from '../../../src/ui/scan/printListAll.js';
 import { printExampleWarnings } from '../../../src/ui/scan/printExampleWarnings.js';
 import { printSecrets } from '../../../src/ui/scan/printSecrets.js';
 import { printExpireWarnings } from '../../../src/ui/scan/printExpireWarnings.js';
 import { printConsolelogWarning } from '../../../src/ui/scan/printConsolelogWarning.js';
+import type { SecretFinding } from '../../../src/core/security/secretDetectors.js';
+import type {
+  FrameworkWarning,
+  UppercaseWarning,
+  InconsistentNamingWarning,
+  ExampleSecretWarning,
+  ExpireWarning,
+} from '../../../src/config/types.js';
+import { GITIGNORE_ISSUES } from '../../../src/config/constants.js';
 
 describe('printScanResult', () => {
   const baseScanResult: ScanResult = {
@@ -142,10 +156,18 @@ describe('printScanResult', () => {
   });
 
   it('returns exitWithError true when high severity secret exists', () => {
+    const secret: SecretFinding = {
+      file: 'test.ts',
+      line: 1,
+      kind: 'pattern',
+      message: 'test',
+      snippet: 'test',
+      severity: 'high',
+    };
     const result = printScanResult(
       {
         ...baseScanResult,
-        secrets: [{ severity: 'high' } as any],
+        secrets: [secret],
       },
       baseOpts,
       '.env',
@@ -186,8 +208,8 @@ describe('printScanResult', () => {
 
   it('prints gitignore warning when env file is not ignored', () => {
     vi.mocked(checkGitignoreStatus).mockReturnValue({
-      reason: 'not-ignored',
-    } as any);
+      reason: GITIGNORE_ISSUES.NOT_IGNORED,
+    });
 
     printScanResult(baseScanResult, baseOpts, '.env');
 
@@ -198,8 +220,8 @@ describe('printScanResult', () => {
 
   it('returns exitWithError true in strict mode when gitignore issue exists', () => {
     vi.mocked(checkGitignoreStatus).mockReturnValue({
-      reason: 'not-ignored',
-    } as any);
+      reason: GITIGNORE_ISSUES.NOT_IGNORED,
+    });
 
     const result = printScanResult(
       baseScanResult,
@@ -211,10 +233,17 @@ describe('printScanResult', () => {
   });
 
   it('prints framework warnings when present', () => {
+    const warning: FrameworkWarning = {
+      variable: 'API_KEY',
+      reason: 'exposed',
+      file: 'app.ts',
+      line: 1,
+      framework: 'nextjs',
+    };
     printScanResult(
       {
         ...baseScanResult,
-        frameworkWarnings: [{ type: 'nextjs', message: 'warn' } as any],
+        frameworkWarnings: [warning],
       },
       baseOpts,
       '.env',
@@ -224,10 +253,14 @@ describe('printScanResult', () => {
   });
 
   it('prints uppercase warnings when present', () => {
+    const warning: UppercaseWarning = {
+      key: 'Api_Key',
+      suggestion: 'API_KEY',
+    };
     printScanResult(
       {
         ...baseScanResult,
-        uppercaseWarnings: [{ key: 'Api_Key', expected: 'API_KEY' } as any],
+        uppercaseWarnings: [warning],
       },
       baseOpts,
       '.env',
@@ -237,10 +270,15 @@ describe('printScanResult', () => {
   });
 
   it('prints inconsistent naming warnings when present', () => {
+    const warning: InconsistentNamingWarning = {
+      key1: 'API_KEY',
+      key2: 'APIKEY',
+      suggestion: 'API_KEY',
+    };
     printScanResult(
       {
         ...baseScanResult,
-        inconsistentNamingWarnings: [{ key: 'MY-KEY' } as any],
+        inconsistentNamingWarnings: [warning],
       },
       baseOpts,
       '.env',
@@ -250,10 +288,16 @@ describe('printScanResult', () => {
   });
 
   it('prints example warnings when present', () => {
+    const warning: ExampleSecretWarning = {
+      key: 'SECRET_VAR',
+      value: 'suspicious_value',
+      reason: 'Entropy',
+      severity: 'low',
+    };
     printScanResult(
       {
         ...baseScanResult,
-        exampleWarnings: [{ severity: 'low' } as any],
+        exampleWarnings: [warning],
       },
       baseOpts,
       '.env',
@@ -263,10 +307,18 @@ describe('printScanResult', () => {
   });
 
   it('prints secrets when secrets flag is enabled', () => {
+    const secret: SecretFinding = {
+      file: 'test.ts',
+      line: 1,
+      kind: 'pattern',
+      message: 'test',
+      snippet: 'test',
+      severity: 'low',
+    };
     printScanResult(
       {
         ...baseScanResult,
-        secrets: [{ severity: 'low' } as any],
+        secrets: [secret],
       },
       { ...baseOpts, secrets: true },
       '.env',
@@ -276,10 +328,15 @@ describe('printScanResult', () => {
   });
 
   it('prints expiration warnings when present', () => {
+    const warning: ExpireWarning = {
+      key: 'TOKEN',
+      date: '2026-12-31',
+      daysLeft: 5,
+    };
     printScanResult(
       {
         ...baseScanResult,
-        expireWarnings: [{ key: 'TOKEN', daysLeft: 5 } as any],
+        expireWarnings: [warning],
       },
       baseOpts,
       '.env',
@@ -289,10 +346,16 @@ describe('printScanResult', () => {
   });
 
   it('returns exitWithError true when high severity example warning exists', () => {
+    const warning: ExampleSecretWarning = {
+      key: 'DB_PASSWORD',
+      value: 'password123',
+      reason: 'Pattern',
+      severity: 'high',
+    };
     const result = printScanResult(
       {
         ...baseScanResult,
-        exampleWarnings: [{ severity: 'high' } as any],
+        exampleWarnings: [warning],
       },
       baseOpts,
       '.env',
@@ -302,10 +365,15 @@ describe('printScanResult', () => {
   });
 
   it('returns exitWithError true when expiration warning is urgent (<=7 days)', () => {
+    const warning: ExpireWarning = {
+      key: 'TOKEN',
+      date: '2026-03-10',
+      daysLeft: 7,
+    };
     const result = printScanResult(
       {
         ...baseScanResult,
-        expireWarnings: [{ key: 'TOKEN', daysLeft: 7 } as any],
+        expireWarnings: [warning],
       },
       baseOpts,
       '.env',
@@ -333,7 +401,7 @@ describe('printScanResult', () => {
     printScanResult(
       {
         ...baseScanResult,
-        duplicates: undefined as any,
+        duplicates: {},
       },
       baseOpts,
       '',
@@ -354,7 +422,7 @@ describe('printScanResult', () => {
     printScanResult(
       {
         ...baseScanResult,
-        logged: undefined as any,
+        logged: [],
       },
       baseOpts,
       '.env',
@@ -367,7 +435,7 @@ describe('printScanResult', () => {
     const result = printScanResult(
       {
         ...baseScanResult,
-        secrets: undefined as any,
+        secrets: [],
       },
       baseOpts,
       '.env',
@@ -429,5 +497,27 @@ describe('printScanResult', () => {
       '.env',
       false,
     );
+  });
+
+  it('calls printListAll and returns early when listAll is true', () => {
+    const usages = [
+      {
+        variable: 'API_KEY',
+        file: 'src/index.ts',
+        line: 1,
+        column: 1,
+        pattern: 'process.env' as const,
+        context: 'process.env.API_KEY',
+      },
+    ];
+
+    const result = printScanResult(
+      { ...baseScanResult, used: usages },
+      { ...baseOpts, listAll: true },
+      '.env',
+    );
+
+    expect(printListAll).toHaveBeenCalledWith(usages);
+    expect(result.exitWithError).toBe(false);
   });
 });

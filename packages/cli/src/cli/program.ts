@@ -92,5 +92,9 @@ export function createProgram() {
         'Disable inconsistent naming pattern warnings',
       )
       .option('--init', 'Create a sample dotenv-diff.config.json file')
+      .option(
+        '--list-all',
+        'List all unique environment variable keys found in codebase',
+      )
   );
 }
