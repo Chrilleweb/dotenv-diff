@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: gentle-sheep-feel.md -->
+## 2026-05-04
+
+### Highlights
+- added --list-all flag to view all environment variables found in codebase
+
+### Package Releases
+- dotenv-diff: minor
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | minor
+
 <!-- changesets: three-tools-attack.md -->
 ## 2026-04-24
 
