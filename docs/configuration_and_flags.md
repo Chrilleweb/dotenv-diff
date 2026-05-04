@@ -28,6 +28,7 @@ CLI flags always take precedence over configuration file values.
 
 ### Display Options
 
+- [--list-all](#--list-all)
 - [--show-unused](#--show-unused)
 - [--no-show-unused](#--no-show-unused)
 - [--show-stats](#--show-stats)
@@ -436,6 +437,30 @@ Your custom --exclude-files patterns are appended to that list.
 If you later want to scan files from one of the default excluded paths, use `--include-files` or `--files` to explicitly include them.
 
 ## Display Options
+
+### `--list-all`
+
+Scans the codebase and prints all unique environment variable names found.
+
+This is useful when you want a quick overview of every environment variable your project references.
+
+The list is sorted alphabetically and deduplicated across all usages.
+
+Example usage:
+
+```bash
+dotenv-diff --list-all
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "listAll": true
+}
+```
+
+---
 
 ### `--show-unused`
 

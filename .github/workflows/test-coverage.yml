@@ -33,13 +33,38 @@ jobs:
         run: pip install diff-cover
 
       - name: Run coverage
-        run: pnpm run coverage
+        run: pnpm --filter dotenv-diff run coverage
 
-      - name: Fix lcov paths
+      - name: Locate and normalize coverage files
+        id: coverage_files
         run: |
-          if [ -f "coverage/lcov.info" ]; then
-            sed -i "s|^SF:|SF:|g" coverage/lcov.info
+          LCOV_FILE="coverage/lcov.info"
+          SUMMARY_FILE="coverage/coverage-summary.json"
+
+          if [ -f "packages/cli/coverage/lcov.info" ]; then
+            LCOV_FILE="packages/cli/coverage/lcov.info"
           fi
+
+          if [ -f "packages/cli/coverage/coverage-summary.json" ]; then
+            SUMMARY_FILE="packages/cli/coverage/coverage-summary.json"
+          fi
+
+          if [ ! -f "$LCOV_FILE" ]; then
+            echo "Missing lcov file at $LCOV_FILE"
+            exit 1
+          fi
+
+          if [ ! -f "$SUMMARY_FILE" ]; then
+            echo "Missing coverage summary at $SUMMARY_FILE"
+            exit 1
+          fi
+
+          # Normalize source-file paths for monolith layout so diff-cover can
+          # map coverage entries to changed files under packages/cli.
+          sed -i -E 's|^SF:src/|SF:packages/cli/src/|; s|^SF:src\\|SF:packages/cli/src/|; s|^SF:packages\\cli\\src\\|SF:packages/cli/src/|' "$LCOV_FILE"
+
+          echo "lcov_file=$LCOV_FILE" >> $GITHUB_OUTPUT
+          echo "summary_file=$SUMMARY_FILE" >> $GITHUB_OUTPUT
 
       - name: Run diff-cover analysis
         id: diff_cover
@@ -51,11 +76,11 @@ jobs:
           all_passed=true
 
           overall_coverage="N/A"
-          if [ -f "coverage/coverage-summary.json" ]; then
-            overall_coverage=$(jq -r '.total.lines.pct' "coverage/coverage-summary.json")
+          if [ -f "${{ steps.coverage_files.outputs.summary_file }}" ]; then
+            overall_coverage=$(jq -r '.total.lines.pct' "${{ steps.coverage_files.outputs.summary_file }}")
           fi
 
-          diff-cover coverage/lcov.info \
+          diff-cover "${{ steps.coverage_files.outputs.lcov_file }}" \
             --compare-branch=origin/${{ github.event.pull_request.base.ref }} \
             --diff-range-notation=... \
             --json-report diff-coverage.json \

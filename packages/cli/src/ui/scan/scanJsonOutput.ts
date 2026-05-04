@@ -17,6 +17,7 @@ import { normalizePath } from '../../core/helpers/normalizePath.js';
  */
 interface ScanJsonOutput {
   stats?: ScanStats;
+  listAll?: string[];
   missing?: Array<{
     variable: string;
     usages: Array<{
@@ -64,8 +65,15 @@ interface ScanJsonOutput {
 export function scanJsonOutput(
   scanResult: ScanResult,
   comparedAgainst: string,
+  listAll: boolean = false,
 ): ScanJsonOutput {
   const output: ScanJsonOutput = {};
+
+  if (listAll) {
+    output.listAll = [
+      ...new Set(scanResult.used.map((usage) => usage.variable)),
+    ].sort();
+  }
 
   // Add comparison info if we compared against a file
   if (comparedAgainst) {

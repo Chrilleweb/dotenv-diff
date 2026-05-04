@@ -27,6 +27,7 @@ import { computeHealthScore } from '../core/scan/computeHealthScore.js';
 import { printHealthScore } from '../ui/scan/printHealthScore.js';
 import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
 import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
+import { printListAll } from '../ui/scan/printListAll.js';
 
 /**
  * Prints the scan result to the console.
@@ -45,6 +46,10 @@ export function printScanResult(
 
   // Determine if output should be in JSON format
   const isJson = opts.json;
+
+  if (opts.listAll) {
+    printListAll(scanResult.used);
+  }
 
   printHeader(comparedAgainst);
 
@@ -102,7 +107,7 @@ export function printScanResult(
     printSecrets(scanResult.secrets, opts.strict);
   }
   // Console log usage warning
-  if (scanResult.logged) {
+  if (scanResult.logged?.length) {
     printConsolelogWarning(scanResult.logged, opts.strict);
   }
 

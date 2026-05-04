@@ -313,4 +313,58 @@ describe('scanJsonOutput', () => {
     expect(result.healthScore).toBeDefined();
     expect(typeof result.healthScore).toBe('number');
   });
+
+  it('includes listAllVariables when listAll is true', () => {
+    const scanResult = makeScanResult({
+      used: [
+        {
+          variable: 'Z_VAR',
+          file: 'src\\a.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: 'process.env.Z_VAR',
+        },
+        {
+          variable: 'A_VAR',
+          file: 'src\\b.ts',
+          line: 2,
+          column: 0,
+          pattern: 'process.env',
+          context: 'process.env.A_VAR',
+        },
+        {
+          variable: 'A_VAR',
+          file: 'src\\c.ts',
+          line: 3,
+          column: 0,
+          pattern: 'process.env',
+          context: 'process.env.A_VAR',
+        },
+      ],
+    });
+
+    const result = scanJsonOutput(scanResult, '', true);
+
+    expect(result.listAll).toEqual(['A_VAR', 'Z_VAR']);
+  });
+
+  it('omits listAllVariables when listAll is false', () => {
+    const scanResult = makeScanResult({
+      used: [
+        {
+          variable: 'ONLY_VAR',
+          file: 'src\\a.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: 'process.env.ONLY_VAR',
+        },
+      ],
+    });
+
+    const result = scanJsonOutput(scanResult, '', false);
+
+    expect(result.listAll).toBeUndefined();
+  });
 });

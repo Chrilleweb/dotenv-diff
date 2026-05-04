@@ -57,3 +57,4 @@ jobs:
           title: 'chore(release): publish to npm'
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          NPM_CONFIG_PROVENANCE: true

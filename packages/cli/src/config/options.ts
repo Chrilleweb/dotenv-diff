@@ -56,6 +56,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const uppercaseKeys = raw.uppercaseKeys !== false;
   const expireWarnings = raw.expireWarnings !== false;
   const inconsistentNamingWarnings = raw.inconsistentNamingWarnings !== false;
+  const listAll = toBool(raw.listAll);
 
   const cwd = process.cwd();
   const envFlag =
@@ -96,6 +97,7 @@ export function normalizeOptions(raw: RawOptions): Options {
     uppercaseKeys,
     expireWarnings,
     inconsistentNamingWarnings,
+    listAll,
   };
 }
 

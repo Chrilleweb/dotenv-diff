@@ -87,6 +87,7 @@ async function runScanMode(opts: Options): Promise<boolean> {
     uppercaseKeys: opts.uppercaseKeys,
     expireWarnings: opts.expireWarnings,
     inconsistentNamingWarnings: opts.inconsistentNamingWarnings,
+    listAll: opts.listAll,
   });
 
   return exitWithError;
