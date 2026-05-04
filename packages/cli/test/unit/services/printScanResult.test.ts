@@ -462,7 +462,7 @@ describe('printScanResult', () => {
     const result = printScanResult(
       {
         ...baseScanResult,
-        secrets: [],
+        secrets: undefined as unknown as [],
       },
       baseOpts,
       '.env',
