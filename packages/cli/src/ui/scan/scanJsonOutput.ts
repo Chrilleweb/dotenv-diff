@@ -109,7 +109,7 @@ export function scanJsonOutput(
         file: normalizePath(u.file),
         line: u.line,
         pattern: u.pattern,
-        context: u.context,
+        context: u.context.trim(),
       })),
     }));
   }
@@ -160,7 +160,7 @@ export function scanJsonOutput(
       line: l.line,
       column: l.column,
       pattern: l.pattern,
-      context: l.context,
+      context: l.context.trim(),
     }));
   }
 
