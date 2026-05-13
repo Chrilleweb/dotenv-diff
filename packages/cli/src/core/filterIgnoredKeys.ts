@@ -12,6 +12,7 @@ export const DEFAULT_EXCLUDE_KEYS = [
   'DEV',
   'SSR',
   'CI',
+  'SLOW_MO',
   'GITHUB_ACTIONS',
   'INIT_CWD',
   'TZ',
