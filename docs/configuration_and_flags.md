@@ -160,6 +160,7 @@ Specify a comma-separated list of keys to ignore during the comparison other tha
 - `DEV`
 - `SSR`
 - `CI`
+- `SLOW_MO`
 - `GITHUB_ACTIONS`
 - `INIT_CWD`
 - `PORT`
