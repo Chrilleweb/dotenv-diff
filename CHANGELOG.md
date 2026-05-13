@@ -1,5 +1,21 @@
 # Changelog
 
+<!-- changesets: fine-facts-dress.md,slow-buttons-grab.md,solid-frogs-sing.md -->
+## 2026-05-13
+
+### Highlights
+- does not include default excludes keys to list-all flag
+- trimmed context for json output
+- added SLOW_MO to default exclude list
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: gentle-sheep-feel.md -->
 ## 2026-05-04
 

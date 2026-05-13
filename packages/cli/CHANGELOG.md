@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.8.1
+
+### Patch Changes
+
+- 209a7bd: does not include default excludes keys to list-all flag
+- cfa00e5: trimmed context for json output
+- 32bb3d5: added SLOW_MO to default exclude list
+
 ## 2.8.0
 
 ### Minor Changes
