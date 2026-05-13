@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs';
+import fsSync from 'fs';
 import path from 'path';
 import os from 'os';
 import { execSync } from 'child_process';
@@ -272,6 +273,20 @@ describe('filewalker', () => {
       // Now try to get pattern base for 'app.js/something'
       const result = getPatternBaseDir(tmpDir, path.join('app.js', 'fake'));
       expect(result).toBeNull();
+    });
+
+    it('covers st.isFile() false branch - path exists but is neither file nor directory', () => {
+      // Mock statSync to return a stat where isDirectory and isFile both return false
+      const fakeStat = {
+        isDirectory: () => false,
+        isFile: () => false,
+      } as ReturnType<typeof fsSync.statSync>;
+      const spy = vi.spyOn(fsSync, 'statSync').mockReturnValueOnce(fakeStat);
+
+      const result = getPatternBaseDir(tmpDir, 'anything');
+      expect(result).toBeNull();
+
+      spy.mockRestore();
     });
 
     it('covers st.isFile() false branch using FIFO/pipe if available', () => {
