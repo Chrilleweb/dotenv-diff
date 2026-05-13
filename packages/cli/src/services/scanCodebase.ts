@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import type { EnvUsage, ScanOptions, ScanResult } from '../config/types.js';
+import { DEFAULT_EXCLUDE_KEYS } from '../core/filterIgnoredKeys.js';
 import {
   detectSecretsInSource,
   type SecretFinding,
@@ -52,6 +53,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   // Filter out ignored variables
   const filteredUsages = allUsages.filter(
     (usage) =>
+      !DEFAULT_EXCLUDE_KEYS.includes(usage.variable) &&
       !opts.ignore.includes(usage.variable) &&
       !opts.ignoreRegex.some((regex) => regex.test(usage.variable)),
   );

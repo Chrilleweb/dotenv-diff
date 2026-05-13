@@ -205,6 +205,29 @@ describe('scanCodebase', () => {
   });
 
   describe('ignored variables', () => {
+    it('filters out default excluded variables like CI', async () => {
+      const testFile = path.join(tmpDir, 'app.js');
+      fsSync.writeFileSync(testFile, 'if (process.env.CI) {}');
+
+      vi.mocked(findFiles).mockResolvedValue([testFile]);
+      vi.mocked(scanFile).mockReturnValue([
+        {
+          variable: 'CI',
+          file: testFile,
+          line: 1,
+          column: 5,
+          pattern: 'process.env',
+          context: 'if (process.env.CI) {}',
+        },
+      ]);
+
+      const result = await scanCodebase(defaultOpts);
+
+      expect(result.used).toHaveLength(0);
+      expect(result.stats.totalUsages).toBe(0);
+      expect(result.stats.uniqueVariables).toBe(0);
+    });
+
     it('filters out ignored variables', async () => {
       const testFile = path.join(tmpDir, 'app.js');
       fsSync.writeFileSync(testFile, 'const x = process.env.API_KEY;');
