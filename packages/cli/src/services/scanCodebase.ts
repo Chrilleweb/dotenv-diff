@@ -21,7 +21,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const files = await findFiles(opts.cwd, {
     include: opts.include,
     exclude: [...DEFAULT_EXCLUDE_PATTERNS, ...opts.exclude],
-    ...(opts.files && opts.files.length > 0 && { files: opts.files }),
+    ...(opts.files?.length && { files: opts.files }),
   });
 
   const allUsages: EnvUsage[] = [];
@@ -31,8 +31,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
 
   for (const filePath of files) {
     const content = await safeReadFile(filePath);
-    if (!content) continue;
-    if (isLikelyMinified(content)) continue; // Skip likely minified files
+    if (!content || isLikelyMinified(content)) continue; // Skip likely minified files
 
     // Scan the file for environment variable usages
     const fileUsages = scanFile(filePath, content, opts);
