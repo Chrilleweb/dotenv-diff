@@ -37,8 +37,8 @@ export const PROVIDER_PATTERNS: RegExp[] = [
   /\bAC[0-9a-fA-F]{32}\b/, // Twilio Account SID
 ];
 
-// Regex for detecting long literals
-const LONG_LITERAL = /["'`]{1}([A-Za-z0-9+/_\-]{24,})["'`]{1}/g;
+// Regex for detecting long literals — only 32+ chars are worth scrutinizing,
+const LONG_LITERAL = /["'`]([A-Za-z0-9+/_\-]{32,})["'`]/g;
 
 // Regex for detecting HTTPS URLs
 const HTTPS_PATTERN = /["'`](https:\/\/(?!localhost)[^"'`]*)["'`]/g;
@@ -383,7 +383,6 @@ export function detectSecretsInSource(
     while ((lm = LONG_LITERAL.exec(line))) {
       const literal = lm[1]!;
       if (looksHarmlessLiteral(literal)) continue;
-      if (literal.length < 32) continue;
       const ent = shannonEntropyNormalized(literal);
       if (ent >= threshold) {
         const message = `found high-entropy string (len ${literal.length}, H≈${ent.toFixed(2)})`;
