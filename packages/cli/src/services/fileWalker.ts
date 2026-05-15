@@ -289,6 +289,36 @@ export function shouldExclude(
 }
 
 /**
+ * Cache for compiled glob regexes.
+ * Patterns are stable across many file checks, so compiling once per pattern
+ * (instead of per file × pattern) dramatically reduces work on large trees.
+ */
+const globRegexCache = new Map<string, RegExp>();
+
+/**
+ * Compiles a glob pattern into a RegExp, caching the result so subsequent
+ * lookups for the same pattern are O(1).
+ * @param pattern The glob pattern to compile.
+ * @returns The compiled RegExp.
+ */
+function compileGlob(pattern: string): RegExp {
+  const cached = globRegexCache.get(pattern);
+  if (cached) return cached;
+
+  const normalized = pattern.replace(/\\/g, '/');
+  const regexBody = normalized
+    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    .replace(/\*\*/g, '___DS___')
+    .replace(/\*/g, '[^/]*')
+    .replace(/___DS___/g, '.*')
+    .replace(/\?/g, '[^/]');
+
+  const re = new RegExp(`^${regexBody}$`);
+  globRegexCache.set(pattern, re);
+  return re;
+}
+
+/**
  * Checks if a file path matches a glob pattern.
  * A glob pattern is a string that may contain special characters like '*', '**', and '?' to represent wildcards and variable parts of the path.
  * @param filePath The path of the file to check.
@@ -296,19 +326,7 @@ export function shouldExclude(
  * @returns True if the file path matches the pattern, false otherwise.
  */
 export function matchesGlobPattern(filePath: string, pattern: string): boolean {
-  const hasSep = /[\/\\]/.test(pattern);
+  const hasSep = /[/\\]/.test(pattern);
   const subject = hasSep ? filePath : path.basename(filePath);
-
-  const normalized = subject.replace(/\\/g, '/');
-  let normalizedPattern = pattern.replace(/\\/g, '/');
-
-  let regexPattern = normalizedPattern
-    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-    .replace(/\*\*/g, '___DOUBLESTAR___')
-    .replace(/\*/g, '[^/]*')
-    .replace(/___DOUBLESTAR___/g, '.*')
-    .replace(/\?/g, '[^/]');
-
-  const re = new RegExp(`^${regexPattern}$`);
-  return re.test(normalized);
+  return compileGlob(pattern).test(subject.replace(/\\/g, '/'));
 }
