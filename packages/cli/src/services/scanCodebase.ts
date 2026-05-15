@@ -8,9 +8,12 @@ import {
 } from '../core/security/secretDetectors.js';
 import { DEFAULT_EXCLUDE_PATTERNS } from '../core/scan/patterns.js';
 import { scanFile } from '../core/scan/scanFile.js';
+import { createConcurrencyLimit } from '../core/helpers/concurrencyLimit.js';
 import { findFiles } from './fileWalker.js';
 import { normalizePath } from '../core/helpers/normalizePath.js';
 import { isLikelyMinified } from '../core/helpers/isLikelyMinified.js';
+
+const FILE_CONCURRENCY = 50;
 
 /**
  * Scans the codebase for environment variable usage based on the provided options.
@@ -21,32 +24,37 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const files = await findFiles(opts.cwd, {
     include: opts.include,
     exclude: [...DEFAULT_EXCLUDE_PATTERNS, ...opts.exclude],
-    ...(opts.files && opts.files.length > 0 && { files: opts.files }),
+    ...(opts.files?.length && { files: opts.files }),
   });
 
+  const limit = createConcurrencyLimit(FILE_CONCURRENCY);
+
+  const processFile = async (filePath: string) => {
+    const content = await safeReadFile(filePath);
+    if (!content || isLikelyMinified(content)) return;
+
+    const relativePath = normalizePath(path.relative(opts.cwd, filePath));
+    const fileUsages = scanFile(filePath, content, opts);
+    const secrets = safeDetectSecrets(relativePath, content, opts);
+
+    return { fileUsages, relativePath, content, secrets };
+  };
+
+  const results = await Promise.all(
+    files.map((f) => limit(() => processFile(f))),
+  );
+
   const allUsages: EnvUsage[] = [];
-  let filesScanned = 0;
   const allSecrets: SecretFinding[] = [];
   const fileContentMap = new Map<string, string>();
+  let filesScanned = 0;
 
-  for (const filePath of files) {
-    const content = await safeReadFile(filePath);
-    if (!content) continue;
-    if (isLikelyMinified(content)) continue; // Skip likely minified files
-
-    // Scan the file for environment variable usages
-    const fileUsages = scanFile(filePath, content, opts);
+  for (const result of results) {
+    if (!result) continue;
+    const { fileUsages, relativePath, content, secrets } = result;
     allUsages.push(...fileUsages);
-
-    // Store file content for later use (e.g., framework validation 'use client')
-    const relativePath = normalizePath(path.relative(opts.cwd, filePath));
     fileContentMap.set(relativePath, content);
-
-    // Detect secrets in the file content
-    const secrets = safeDetectSecrets(relativePath, content, opts);
     if (secrets.length) allSecrets.push(...secrets);
-
-    // Count successfully scanned files
     filesScanned++;
   }
 
@@ -58,8 +66,6 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       !opts.ignoreRegex.some((regex) => regex.test(usage.variable)),
   );
 
-  const uniqueVariables = [...new Set(filteredUsages.map((u) => u.variable))];
-
   const loggedVariables = filteredUsages.filter((u) => u.isLogged);
 
   return {
@@ -70,7 +76,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     stats: {
       filesScanned,
       totalUsages: filteredUsages.length,
-      uniqueVariables: uniqueVariables.length,
+      uniqueVariables: new Set(filteredUsages.map((u) => u.variable)).size,
       warningsCount: 0,
       duration: 0,
     },

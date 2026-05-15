@@ -240,9 +240,9 @@ function skipCommentedUsages(usages: readonly EnvUsage[]): EnvUsage[] {
 /**
  * Recalculates statistics for a scan result after filtering usages.
  * @param scanResult The current scan result
- * @returns Updated scanResult with recalculated stats
+ * @returns void (modifies scanResult in place)
  */
-function calculateStats(scanResult: ScanResult): ScanResult {
+function calculateStats(scanResult: ScanResult): void {
   const uniqueVariables = new Set(
     scanResult.used.map((u: EnvUsage) => u.variable),
   ).size;
@@ -264,9 +264,7 @@ function calculateStats(scanResult: ScanResult): ScanResult {
     filesScanned: scanResult.stats.filesScanned,
     totalUsages: scanResult.used.length,
     uniqueVariables,
-    warningsCount: warningsCount,
+    warningsCount,
     duration: scanResult.stats.duration,
   };
-
-  return scanResult;
 }
