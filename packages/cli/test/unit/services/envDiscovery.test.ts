@@ -44,6 +44,19 @@ describe('discoverEnvFiles', () => {
     expect(result.primaryEnv).toBe('.env.local');
   });
 
+  it('uses .env.development when it is the only available env file', () => {
+    fs.writeFileSync(path.join(cwd, '.env.development'), '');
+
+    const result = discoverEnvFiles({
+      cwd,
+      envFlag: null,
+      exampleFlag: null,
+    });
+
+    expect(result.envFiles).toEqual(['.env.development']);
+    expect(result.primaryEnv).toBe('.env.development');
+  });
+
   it('handles --env flag and finds matching example via suffix', () => {
     fs.writeFileSync(path.join(cwd, '.env.prod'), '');
     fs.writeFileSync(path.join(cwd, '.env.example.prod'), '');

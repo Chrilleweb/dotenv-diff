@@ -39,12 +39,14 @@ export const GITIGNORE_ISSUES = {
  * - `.env.example` - Template file (should be committed)
  * - `.env.local` - Local overrides (should be git-ignored)
  * - `.env.production` - Production-specific values (should be git-ignored)
+ * - `.env.development` - Development-specific values (depends on workflow, so we don't warn)
  */
 export const DEFAULT_ENV_CANDIDATES = [
   DEFAULT_ENV_FILE,
   DEFAULT_EXAMPLE_FILE,
   '.env.local',
   '.env.production',
+  '.env.development',
 ] as const;
 
 /**
