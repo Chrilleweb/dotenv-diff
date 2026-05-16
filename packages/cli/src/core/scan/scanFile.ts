@@ -20,6 +20,16 @@ export function scanFile(
   const usages: EnvUsage[] = [];
   const lines = content.split('\n');
 
+  // Precompute the absolute start offset of every line once. This lets each
+  // match's line/column be found with a binary search instead of re-scanning
+  // the file from the start for every match (which is O(matches × file size)).
+  const lineStarts: number[] = new Array(lines.length);
+  let lineOffset = 0;
+  for (let i = 0; i < lines.length; i++) {
+    lineStarts[i] = lineOffset;
+    lineOffset += lines[i]!.length + 1; // +1 for the '\n' stripped by split
+  }
+
   // Get relative path from cwd cross-platform compatible
   const relativePath = normalizePath(path.relative(opts.cwd, filePath));
 
@@ -74,16 +84,13 @@ export function scanFile(
 
         const matchIndex = match.index;
 
-        // Find line and column
+        // Find line and column via binary search over precomputed line offsets.
         // Note: For destructured variables, this points to the start of the destructuring block
         // not the specific variable location. Ideally we'd search within the match.
-        const beforeMatch = content.substring(0, matchIndex);
-        const lineNumber = beforeMatch.split('\n').length;
-        const lastNewlineIndex = beforeMatch.lastIndexOf('\n');
-        const column =
-          lastNewlineIndex === -1
-            ? matchIndex + 1
-            : matchIndex - lastNewlineIndex;
+        const { line: lineNumber, column } = offsetToLineCol(
+          lineStarts,
+          matchIndex,
+        );
 
         // Get the context (the actual line)
         const contextLine = lines[lineNumber - 1]!;
@@ -120,4 +127,29 @@ export function scanFile(
   }
 
   return usages;
+}
+
+/**
+ * Maps an absolute character offset to a 1-indexed line and column, using a
+ * precomputed array of line start offsets. Runs in O(log n) per lookup.
+ * @param lineStarts Absolute offset of the first character of each line.
+ * @param offset The absolute character offset to locate.
+ * @returns The 1-indexed line and column of the offset.
+ */
+function offsetToLineCol(
+  lineStarts: number[],
+  offset: number,
+): { line: number; column: number } {
+  // Binary search for the largest lineStart that is <= offset.
+  let lo = 0;
+  let hi = lineStarts.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (lineStarts[mid]! <= offset) {
+      lo = mid;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return { line: lo + 1, column: offset - lineStarts[lo]! + 1 };
 }
