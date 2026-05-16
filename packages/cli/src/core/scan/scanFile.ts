@@ -53,8 +53,16 @@ export function scanFile(
   }
 
   for (const pattern of allPatterns) {
+    // Reuse the pattern's own compiled regex instead of recompiling it via
+    // `new RegExp(source, flags)` for every file. Resetting lastIndex is safe
+    // because scanFile is fully synchronous — it runs to completion without
+    // yielding, so no other scanFile invocation can interleave and clobber the
+    // shared regex state.
+    // NOTE: if scanFile ever becomes async, this must be revisited.
+    const regex = pattern.regex;
+    regex.lastIndex = 0;
+
     let match: RegExpExecArray | null;
-    const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
 
     while ((match = regex.exec(content)) !== null) {
       const variables = pattern.processor
