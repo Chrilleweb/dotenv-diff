@@ -49,6 +49,8 @@ Which files are scanned is determined by the file scanning configuration (see [c
 ### 1 Missing Variables
 
 Variables that are **used in code** but **not defined** in the selected env comparison file.
+In the standard text output, each missing variable is shown once with the first matching usage location.
+Use `--json` if you need the full list of usages for the same variable.
 
 ### 2 Unused Variables
 

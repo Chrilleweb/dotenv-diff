@@ -321,6 +321,16 @@ const token = "AKIAIOSFODNN7EXAMPLE";
       expect(findings).toHaveLength(0);
     });
 
+    it('does not flag form="kc-reset-password-form" as a secret', () => {
+      const source = 'form="kc-reset-password-form"';
+      const findings = detectSecretsInSource(
+        'external-end-users/src/lib/ForgotPasswordPage.svelte',
+        source,
+      );
+
+      expect(findings).toHaveLength(0);
+    });
+
     it('should ignore lines with HTML tags containing secrets', () => {
       const source = '<div>secret="MySecretValue123"</div>';
       const findings = detectSecretsInSource('test.ts', source);

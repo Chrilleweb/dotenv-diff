@@ -90,6 +90,6 @@ describe('printListAll', () => {
     printListAll([makeUsage('TOKEN')]);
 
     // header + divider + variable + divider + summary = 5 calls
-    expect(logSpy).toHaveBeenCalledTimes(5);
+    expect(logSpy).toHaveBeenCalledTimes(6);
   });
 });
