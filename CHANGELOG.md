@@ -1,5 +1,23 @@
 # Changelog
 
+<!-- changesets: bold-stamps-fall.md,olive-rabbits-design.md,sparkly-wombats-rush.md,sweet-kings-tease.md,thin-points-pump.md -->
+## 2026-05-18
+
+### Highlights
+- added bench and .history to default exclude patterns
+- added .env.development to common environment files
+- added form as an harmless attribute for secret detectors
+- fixed ui bug for --list-all flag
+- missing warning will now only warn first issue instead of all usages
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: fine-facts-dress.md,slow-buttons-grab.md,solid-frogs-sing.md -->
 ## 2026-05-13
 

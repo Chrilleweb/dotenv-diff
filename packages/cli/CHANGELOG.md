@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.8.2
+
+### Patch Changes
+
+- 9b315f1: added bench and .history to default exclude patterns
+- 9e78a12: added .env.development to common environment files
+- 9b315f1: added form as an harmless attribute for secret detectors
+- 9b315f1: fixed ui bug for --list-all flag
+- 9b315f1: missing warning will now only warn first issue instead of all usages
+
 ## 2.8.1
 
 ### Patch Changes
