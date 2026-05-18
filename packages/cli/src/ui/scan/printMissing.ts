@@ -1,4 +1,4 @@
-import type { EnvUsage, VariableUsages } from '../../config/types.js';
+import type { EnvUsage } from '../../config/types.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
 import { label, value, error, divider, padLabel } from '../theme.js';
 
@@ -23,31 +23,22 @@ export function printMissing(
   console.log(`${error('▸')} ${value.bold(`Missing in ${fileType}`)}`);
   console.log(`${divider}`);
 
-  const grouped = missing.reduce((acc: VariableUsages, variable: string) => {
-    const usages = used.filter((u: EnvUsage) => u.variable === variable);
-    acc[variable] = usages;
-    return acc;
-  }, {});
+  const firstUsageByVariable = new Map<string, EnvUsage>();
 
-  const byFile = new Map<
-    string,
-    Array<{ variable: string; usage: EnvUsage }>
-  >();
-
-  for (const [variable, usages] of Object.entries(grouped)) {
-    for (const usage of usages) {
-      const file = normalizePath(usage.file);
-      if (!byFile.has(file)) byFile.set(file, []);
-      byFile.get(file)!.push({ variable, usage });
+  for (const usage of used) {
+    if (!missing.includes(usage.variable)) continue;
+    if (!firstUsageByVariable.has(usage.variable)) {
+      firstUsageByVariable.set(usage.variable, usage);
     }
   }
 
-  for (const [, items] of byFile) {
-    for (const { variable, usage } of items) {
-      console.log(
-        `${label(padLabel(variable))}${error(`${normalizePath(usage.file)}:${usage.line}`)}`,
-      );
-    }
+  for (const variable of missing) {
+    const usage = firstUsageByVariable.get(variable);
+    if (!usage) continue;
+
+    console.log(
+      `${label(padLabel(variable))}${error(`${normalizePath(usage.file)}:${usage.line}`)}`,
+    );
   }
 
   console.log(`${divider}`);

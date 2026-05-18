@@ -205,12 +205,14 @@ export const DEFAULT_EXCLUDE_PATTERNS = [
   '.git',
   '.vscode',
   '.idea',
+  '.history', // VS Code Local History
 
   // Tests
   '.test.',
   '.spec.',
   '__tests__',
   '__mocks__',
+  'bench',
 
   // Common noisy paths
   'test',

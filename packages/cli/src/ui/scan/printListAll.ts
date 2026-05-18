@@ -23,5 +23,6 @@ export function printListAll(usages: EnvUsage[]): void {
   }
 
   console.log(`${divider}`);
-  console.log(dim(`${uniqueVars.length} unique variable(s)\n`));
+  console.log(dim(`${uniqueVars.length} unique variable(s)`));
+  console.log(`${divider}`);
 }

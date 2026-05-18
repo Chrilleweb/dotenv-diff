@@ -38,7 +38,7 @@ describe('printMissing', () => {
     );
   });
 
-  it('prints grouped missing usages and falls back to environment file label', () => {
+  it('prints one line per missing variable and falls back to environment file label', () => {
     const used: EnvUsage[] = [
       {
         variable: 'API_KEY',
@@ -77,7 +77,7 @@ describe('printMissing', () => {
     const result = printMissing(['API_KEY', 'JWT_SECRET'], used, '');
 
     expect(result).toBe(true);
-    expect(logSpy).toHaveBeenCalledTimes(7);
+    expect(logSpy).toHaveBeenCalledTimes(6);
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       expect.stringContaining('Missing in environment file'),
@@ -88,10 +88,6 @@ describe('printMissing', () => {
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       5,
-      expect.stringContaining('normalized:src/a.ts:12'),
-    );
-    expect(logSpy).toHaveBeenNthCalledWith(
-      6,
       expect.stringContaining('normalized:src/b.ts:7'),
     );
   });
