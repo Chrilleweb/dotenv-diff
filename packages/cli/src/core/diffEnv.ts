@@ -30,7 +30,7 @@ export type DiffResult = {
 export function diffEnv(
   current: Record<string, string>,
   example: Record<string, string>,
-  checkValues = false,
+  checkValues: boolean = false,
 ): DiffResult {
   const currentKeys = Object.keys(current);
   const exampleKeys = Object.keys(example);
