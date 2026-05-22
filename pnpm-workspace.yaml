@@ -3,7 +3,7 @@ packages:
   - packages/cli
 
 # The minimum age of a release before it can be automatically updated by pnpm.
-minimumReleaseAge: 4320
+minimumReleaseAge: 1440 # 1 day in minutes
 
 # The policy to apply when a package is being updated to a version that is lower than the currently installed version.
 trustPolicy: no-downgrade
