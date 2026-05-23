@@ -96,5 +96,9 @@ export function createProgram() {
         '--list-all',
         'List all unique environment variable keys found in codebase',
       )
+      .option(
+        '--explain <key>',
+        'Show where a specific key is defined, used, and its status',
+      )
   );
 }

@@ -29,6 +29,7 @@ CLI flags always take precedence over configuration file values.
 ### Display Options
 
 - [--list-all](#--list-all)
+- [--explain](#--explain-key)
 - [--show-unused](#--show-unused)
 - [--no-show-unused](#--no-show-unused)
 - [--show-stats](#--show-stats)
@@ -460,6 +461,44 @@ Usage in the configuration file:
 ```json
 {
   "listAll": true
+}
+```
+
+---
+
+### `--explain <key>`
+
+Shows a detailed breakdown of a single environment variable: where it is defined in env files, where it is used in the codebase, and its overall status.
+
+This is useful for debugging a specific variable — for example when you want to confirm it is defined, find all usage sites, or understand why it is flagged as missing, unused, or ignored.
+
+Example usage:
+
+```bash
+dotenv-diff --explain DATABASE_URL
+```
+
+The output shows:
+
+- **Key** — the variable name
+- **Status** — one of: `ok`, `missing`, `unused`, `ignored`, or `duplicated`
+- **Defined in** — which env files the key appears in (e.g. `.env`, `.env.example`)
+- **Used in** — file paths and line numbers where the key is referenced in the codebase
+- **Checks** — a checklist of whether the key is defined, used, duplicated, and/or ignored
+
+Use `--json` together with `--explain` to get the result as structured JSON:
+
+```bash
+dotenv-diff --explain DATABASE_URL --json
+```
+
+The JSON output includes the full list of usage locations.
+
+Usage in the configuration file:
+
+```json
+{
+  "explain": "DATABASE_URL"
 }
 ```
 

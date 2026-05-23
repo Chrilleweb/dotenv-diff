@@ -57,6 +57,8 @@ export function normalizeOptions(raw: RawOptions): Options {
   const expireWarnings = raw.expireWarnings !== false;
   const inconsistentNamingWarnings = raw.inconsistentNamingWarnings !== false;
   const listAll = toBool(raw.listAll);
+  const explain =
+    typeof raw.explain === 'string' ? raw.explain.trim() : undefined;
 
   const cwd = process.cwd();
   const envFlag =
@@ -98,6 +100,7 @@ export function normalizeOptions(raw: RawOptions): Options {
     expireWarnings,
     inconsistentNamingWarnings,
     listAll,
+    explain,
   };
 }
 
