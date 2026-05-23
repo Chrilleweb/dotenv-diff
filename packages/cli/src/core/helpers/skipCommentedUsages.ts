@@ -1,5 +1,6 @@
 import type { EnvUsage } from '../../config/types.js';
 import { hasIgnoreComment } from '../../core/security/secretDetectors.js';
+
 /**
  * Filters out commented usages from the list.
  * Skipping comments:
