@@ -1,6 +1,6 @@
 import fs from 'fs';
-import path from 'path';
 import type { RawOptions } from './types.js';
+import { findConfigFile } from '../core/helpers/findConfigFile.js';
 import {
   printConfigLoaded,
   printConfigLoadError,
@@ -17,17 +17,7 @@ import {
 export function loadConfig(cliOptions: Partial<RawOptions>): RawOptions {
   const cwd = process.cwd();
 
-  // Recursive search upwards for dotenv-diff.config.json
-  function findConfigFile(dir: string): string | null {
-    const configPath = path.resolve(dir, 'dotenv-diff.config.json');
-    if (fs.existsSync(configPath)) return configPath;
-
-    const parent = path.dirname(dir);
-    if (parent !== dir) return findConfigFile(parent);
-    return null;
-  }
-
-  const foundPath = findConfigFile(cwd);
+  const foundPath = findConfigFile(cwd, 'dotenv-diff.config.json');
 
   let fileConfig: Partial<RawOptions> = {};
 
