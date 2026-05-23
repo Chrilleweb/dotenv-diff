@@ -8,6 +8,8 @@ First-class support for SvelteKit and Next.js. Also works well in modern JavaScr
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 
+> **✨ Featured in [awesome-cli-apps](https://github.com/agarrharr/awesome-cli-apps#development)** - A curated list of awesome CLI applications
+
 ---
 
 ### Warnings & errors detection
