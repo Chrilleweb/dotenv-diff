@@ -12,7 +12,7 @@ import { scanJsonOutput } from '../ui/scan/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../services/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
-import { hasIgnoreComment } from '../core/security/secretDetectors.js';
+import { skipCommentedUsages } from '../core/helpers/skipCommentedUsages.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
 import {
@@ -190,51 +190,6 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   });
 
   return { exitWithError: result.exitWithError };
-}
-
-/**
- * Filters out commented usages from the list.
- * Skipping comments:
- *   // process.env.API_URL
- *   # process.env.API_URL
- *   /* process.env.API_URL
- *   * process.env.API_URL
- *   <!-- process.env.API_URL -->
- * @param usages - List of environment variable usages
- * @returns Filtered list of environment variable usages
- */
-function skipCommentedUsages(usages: readonly EnvUsage[]): EnvUsage[] {
-  let insideHtmlComment = false;
-  let insideIgnoreBlock = false;
-
-  return usages.filter((u) => {
-    if (!u.context) return true;
-    const line = u.context.trim();
-
-    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*start\s*-->/i.test(line)) {
-      insideIgnoreBlock = true;
-      return false;
-    }
-
-    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*end\s*-->/i.test(line)) {
-      insideIgnoreBlock = false;
-      return false;
-    }
-
-    if (line.includes('<!--')) insideHtmlComment = true;
-    if (line.includes('-->')) {
-      insideHtmlComment = false;
-      return false;
-    }
-
-    if (insideIgnoreBlock) return false;
-
-    return (
-      !insideHtmlComment &&
-      !/^\s*(\/\/|#|\/\*|\*|<!--|-->)/.test(line) &&
-      !hasIgnoreComment(line)
-    );
-  });
 }
 
 /**
