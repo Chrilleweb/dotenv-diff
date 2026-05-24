@@ -61,6 +61,7 @@ export async function run(program: Command): Promise<void> {
       ignoreRegex: opts.ignoreRegex,
       files: opts.files,
       secrets: opts.secrets,
+      ignoreUrls: opts.ignoreUrls,
       json: opts.json,
     });
     process.exit(0);
