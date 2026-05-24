@@ -13,15 +13,22 @@ import {
 } from '../theme.js';
 
 export interface ExplainResult {
+  /** The environment variable key being explained */
   key: string;
+  /** List of env files where the key is defined */
   definedIn: string[];
+  /** List of usages for the environment variable */
   usages: EnvUsage[];
+  /** Indicates if the key is duplicated */
   isDuplicated: boolean;
+  /** Indicates if the key is ignored */
   isIgnored: boolean;
 }
 
 /**
  * Prints a detailed explanation for a single environment variable key.
+ * @param result The explain result to print
+ * @returns void
  */
 export function printExplain(result: ExplainResult): void {
   const { key, definedIn, usages, isDuplicated, isIgnored } = result;
@@ -53,6 +60,9 @@ export function printExplain(result: ExplainResult): void {
 
 /**
  * Prints a standard two-column row.
+ * @param name The label for the row
+ * @param content The content for the row
+ * @returns void
  */
 function printRow(name: string, content: string): void {
   console.log(`${label(padLabel(name))}${content}`);
@@ -60,6 +70,8 @@ function printRow(name: string, content: string): void {
 
 /**
  * Prints a continuation row aligned with the value column.
+ * @param content The content for the continuation row
+ * @returns void
  */
 function printContinuation(content: string): void {
   console.log(`${label(padLabel(''))}${content}`);
@@ -67,6 +79,9 @@ function printContinuation(content: string): void {
 
 /**
  * Prints env files where the key is defined.
+ * @param title The title for the file list
+ * @param files The list of files
+ * @returns void
  */
 function printFileList(title: string, files: string[]): void {
   if (files.length === 0) {
@@ -88,6 +103,8 @@ function printFileList(title: string, files: string[]): void {
 
 /**
  * Prints source usages for the key.
+ * @param usages The list of usages for the environment variable
+ * @returns void
  */
 function printUsageList(usages: EnvUsage[]): void {
   if (usages.length === 0) {
@@ -109,6 +126,8 @@ function printUsageList(usages: EnvUsage[]): void {
 
 /**
  * Prints one usage location with pattern and short code context.
+ * @param usage The usage information to print
+ * @returns void
  */
 function printUsage(usage: EnvUsage): void {
   const location = `${normalizePath(usage.file)}:${usage.line}`;
@@ -124,6 +143,8 @@ function printUsage(usage: EnvUsage): void {
 
 /**
  * Prints status checks for the key.
+ * @param checks The status of various checks for the key
+ * @returns void
  */
 function printChecks(checks: {
   isDefined: boolean;
@@ -144,6 +165,10 @@ function printChecks(checks: {
 
 /**
  * Formats a status check row.
+ * @param text The text for the check
+ * @param ok Whether the check passed
+ * @param failSeverity The severity of the failure ('error' or 'warning')
+ * @returns The formatted check string
  */
 function formatCheck(
   text: string,
@@ -160,6 +185,8 @@ function formatCheck(
 
 /**
  * Returns the overall visual status for the explain result.
+ * @param result The explain result to summarize
+ * @returns An object containing the indicator and text for the summary
  */
 function getSummary(result: ExplainResult): {
   indicator: string;
