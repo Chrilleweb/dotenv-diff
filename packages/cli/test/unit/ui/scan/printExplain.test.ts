@@ -249,7 +249,7 @@ describe('printExplain', () => {
     expect(allOutput.join('\n')).toContain('✘');
   });
 
-  it('shows ✘ Not ignored when isIgnored is true', () => {
+  it('shows ⚠ warning when isIgnored is true', () => {
     printExplain(
       baseResult({
         definedIn: ['.env'],
@@ -258,9 +258,9 @@ describe('printExplain', () => {
       }),
     );
 
-    expect(allOutput.join('\n')).toContain('✘');
+    expect(allOutput.join('\n')).toContain('⚠ Key is ignored');
+    expect(allOutput.join('\n')).not.toContain('Not ignored');
   });
-
   // ── structural output ────────────────────────────────────────────────────
 
   it('prints the key name in the header', () => {

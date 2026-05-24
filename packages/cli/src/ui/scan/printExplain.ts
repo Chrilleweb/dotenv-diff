@@ -136,7 +136,10 @@ function printChecks(checks: {
   printContinuation(
     formatCheck('Not duplicated', !checks.isDuplicated, 'warning'),
   );
-  printContinuation(formatCheck('Not ignored', !checks.isIgnored, 'warning'));
+
+  if (checks.isIgnored) {
+    printContinuation(warning('⚠ Key is ignored'));
+  }
 }
 
 /**
