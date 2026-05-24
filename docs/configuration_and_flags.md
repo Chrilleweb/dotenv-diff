@@ -492,8 +492,6 @@ Use `--json` together with `--explain` to get the result as structured JSON:
 dotenv-diff --explain DATABASE_URL --json
 ```
 
-The JSON output includes the full list of usage locations.
-
 Usage in the configuration file:
 
 ```json
