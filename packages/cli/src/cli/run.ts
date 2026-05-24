@@ -50,7 +50,7 @@ export async function run(program: Command): Promise<void> {
 
   setupGlobalConfig(opts);
 
-  // Route to --explain mode
+  // Handle --explain flag
   if (opts.explain) {
     await explainKey({
       key: opts.explain,
