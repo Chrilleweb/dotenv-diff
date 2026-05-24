@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.9.0
+
+### Minor Changes
+
+- 32b1876: feat: --explain <key> to show a detailed breakdown of a single environment varaible
+
 ## 2.8.2
 
 ### Patch Changes

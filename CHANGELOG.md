@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: odd-vans-glow.md -->
+## 2026-05-24
+
+### Highlights
+- feat: --explain <key> to show a detailed breakdown of a single environment varaible
+
+### Package Releases
+- dotenv-diff: minor
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | minor
+
 <!-- changesets: bold-stamps-fall.md,olive-rabbits-design.md,sparkly-wombats-rush.md,sweet-kings-tease.md,thin-points-pump.md -->
 ## 2026-05-18
 
