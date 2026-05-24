@@ -14,6 +14,7 @@ import type {
   ExitResult,
 } from '../config/types.js';
 import { scanUsage } from '../commands/scanUsage.js';
+import { explainKey } from '../commands/explain.js';
 import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';
 import { loadConfig } from '../config/loadConfig.js';
@@ -48,6 +49,23 @@ export async function run(program: Command): Promise<void> {
   const opts = normalizeOptions(mergedRawOptions);
 
   setupGlobalConfig(opts);
+
+  // Handle --explain flag
+  if (opts.explain) {
+    await explainKey({
+      key: opts.explain,
+      cwd: opts.cwd,
+      include: opts.includeFiles,
+      exclude: opts.excludeFiles,
+      ignore: opts.ignore,
+      ignoreRegex: opts.ignoreRegex,
+      files: opts.files,
+      secrets: opts.secrets,
+      ignoreUrls: opts.ignoreUrls,
+      json: opts.json,
+    });
+    process.exit(0);
+  }
 
   // Route to appropriate command and handle exit
   const exitWithError = opts.compare

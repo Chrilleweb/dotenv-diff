@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import path from 'path';
 import { normalizeOptions } from '../../../src/config/options.js';
 
@@ -92,5 +92,16 @@ describe('normalizeOptions', () => {
     expect(
       normalizeOptions({ scanUsage: 'false' as unknown as boolean }).scanUsage,
     ).toBe(false);
+  });
+
+  it('parses explain as trimmed string when provided', () => {
+    expect(normalizeOptions({ explain: '  MY_KEY  ' }).explain).toBe('MY_KEY');
+  });
+
+  it('returns undefined for explain when not a string', () => {
+    expect(normalizeOptions({}).explain).toBeUndefined();
+    expect(
+      normalizeOptions({ explain: true as unknown as string }).explain,
+    ).toBeUndefined();
   });
 });

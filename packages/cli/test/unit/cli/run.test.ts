@@ -47,6 +47,10 @@ vi.mock('../../../src/commands/init.js', () => ({
   runInit: vi.fn(),
 }));
 
+vi.mock('../../../src/commands/explain.js', () => ({
+  explainKey: vi.fn(),
+}));
+
 import { run } from '../../../src/cli/run.js';
 import { normalizeOptions } from '../../../src/config/options.js';
 import { discoverEnvFiles } from '../../../src/services/envDiscovery.js';
@@ -57,6 +61,7 @@ import { scanUsage } from '../../../src/commands/scanUsage.js';
 import { setupGlobalConfig } from '../../../src/ui/shared/setupGlobalConfig.js';
 import { loadConfig } from '../../../src/config/loadConfig.js';
 import { runInit } from '../../../src/commands/init.js';
+import { explainKey } from '../../../src/commands/explain.js';
 
 function createBaseOptions(overrides: Partial<Options> = {}): Options {
   return {
@@ -87,6 +92,7 @@ function createBaseOptions(overrides: Partial<Options> = {}): Options {
     expireWarnings: true,
     inconsistentNamingWarnings: true,
     listAll: false,
+    explain: undefined,
     ...overrides,
   };
 }
@@ -101,6 +107,7 @@ describe('run', () => {
   const mockSetupGlobalConfig = setupGlobalConfig as ReturnType<typeof vi.fn>;
   const mockLoadConfig = loadConfig as ReturnType<typeof vi.fn>;
   const mockRunInit = runInit as ReturnType<typeof vi.fn>;
+  const mockExplainKey = explainKey as ReturnType<typeof vi.fn>;
 
   let exitSpy: ReturnType<typeof vi.spyOn>;
 
@@ -439,5 +446,48 @@ describe('run', () => {
     expect('only' in compareOptions).toBe(false);
 
     existsSpy.mockRestore();
+  });
+
+  it('routes to explainKey when opts.explain is set and exits with 0', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ explain: 'MY_KEY' })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(
+      createBaseOptions({ explain: 'MY_KEY' }),
+    );
+    mockExplainKey.mockResolvedValue(undefined);
+    // process.exit is mocked (doesn't really exit), so scanUsage is reached too
+    mockScanUsage.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    expect(mockExplainKey).toHaveBeenCalledOnce();
+    expect(mockExplainKey).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 'MY_KEY' }),
+    );
+    // First exit(0) is from the explain path
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('passes json flag to explainKey', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ explain: 'DB_URL' })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(
+      createBaseOptions({ explain: 'DB_URL', json: true }),
+    );
+    mockExplainKey.mockResolvedValue(undefined);
+    mockScanUsage.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    expect(mockExplainKey).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 'DB_URL', json: true }),
+    );
+    expect(exitSpy).toHaveBeenCalledWith(0);
   });
 });

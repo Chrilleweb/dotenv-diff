@@ -98,6 +98,18 @@ API_TOKEN=
 
 ---
 
+## Explain a variable (`--explain`)
+
+Inspect a specific environment variable to see where it is defined, where it is used in the codebase, and its overall status:
+
+```bash
+dotenv-diff --explain DATABASE_URL
+```
+
+→ See [--explain Documentation](./docs/configuration_and_flags.md#--explain-key) for more details.
+
+---
+
 ## Monorepo support
 
 In monorepos with multiple apps and packages, you can include shared folders:

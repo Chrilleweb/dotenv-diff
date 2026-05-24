@@ -94,6 +94,7 @@ export interface RawOptions {
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
   listAll?: boolean;
+  explain?: string;
 }
 
 /**
@@ -137,6 +138,7 @@ export interface Options {
   expireWarnings: boolean;
   inconsistentNamingWarnings: boolean;
   listAll: boolean;
+  explain: string | undefined;
 }
 
 export type EnvPatternName = 'process.env' | 'import.meta.env' | 'sveltekit';
