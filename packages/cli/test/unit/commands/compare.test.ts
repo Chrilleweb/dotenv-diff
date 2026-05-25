@@ -34,7 +34,7 @@ vi.mock('../../../src/core/compare/updateTotals.js', () => ({
   updateTotals: vi.fn(() => false),
 }));
 
-vi.mock('../../../src/core/fixEnv.js', () => ({
+vi.mock('../../../src/services/fixEnv.js', () => ({
   applyFixes: vi.fn(),
 }));
 
@@ -84,7 +84,7 @@ import { checkGitignoreStatus } from '../../../src/services/git.js';
 import { findDuplicateKeys } from '../../../src/core/duplicates.js';
 import { filterIgnoredKeys } from '../../../src/core/helpers/filterIgnoredKeys.js';
 import { updateTotals } from '../../../src/core/compare/updateTotals.js';
-import { applyFixes } from '../../../src/core/fixEnv.js';
+import { applyFixes } from '../../../src/services/fixEnv.js';
 import { printFixTips } from '../../../src/ui/shared/printFixTips.js';
 import { printStats } from '../../../src/ui/compare/printStats.js';
 import { printDuplicates } from '../../../src/ui/shared/printDuplicates.js';

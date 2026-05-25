@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { isEnvIgnoredByGit, isGitRepo, findGitRoot } from '../services/git.js';
+import { isEnvIgnoredByGit, isGitRepo, findGitRoot } from './git.js';
 import { DEFAULT_GITIGNORE_ENV_PATTERNS } from '../config/constants.js';
 import type { FixResult } from '../config/types.js';
 

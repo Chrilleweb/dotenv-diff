@@ -27,7 +27,7 @@ vi.mock('../../../src/core/duplicates.js', () => ({
   findDuplicateKeys: vi.fn(() => [{ key: 'A', count: 2 }]),
 }));
 
-vi.mock('../../../src/core/fixEnv.js', () => ({
+vi.mock('../../../src/services/fixEnv.js', () => ({
   applyFixes: vi.fn(() => ({
     changed: true,
     result: {
@@ -58,7 +58,7 @@ vi.mock('../../../src/core/detectInconsistentNaming.js', () => ({
 
 import fs from 'fs';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
-import { applyFixes } from '../../../src/core/fixEnv.js';
+import { applyFixes } from '../../../src/services/fixEnv.js';
 import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
 import { findDuplicateKeys } from '../../../src/core/duplicates.js';
 import { resolveFromCwd } from '../../../src/core/helpers/resolveFromCwd.js';

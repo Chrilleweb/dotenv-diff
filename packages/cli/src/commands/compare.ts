@@ -13,7 +13,7 @@ import type {
 } from '../config/types.js';
 import { parseAndFilterEnv } from '../core/compare/parseAndFilterEnv.js';
 import { updateTotals } from '../core/compare/updateTotals.js';
-import { applyFixes } from '../core/fixEnv.js';
+import { applyFixes } from '../services/fixEnv.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printStats } from '../ui/compare/printStats.js';
 import { printDuplicates } from '../ui/shared/printDuplicates.js';
