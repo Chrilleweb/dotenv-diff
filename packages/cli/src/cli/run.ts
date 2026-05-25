@@ -48,6 +48,7 @@ export async function run(program: Command): Promise<void> {
   // Normalize merged options
   const opts = normalizeOptions(mergedRawOptions);
 
+  // set up global config (e.g. chalk for noColor)
   setupGlobalConfig(opts);
 
   // Handle --explain flag
