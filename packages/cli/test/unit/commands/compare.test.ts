@@ -26,7 +26,7 @@ vi.mock('../../../src/core/duplicates.js', () => ({
   findDuplicateKeys: vi.fn(),
 }));
 
-vi.mock('../../../src/core/filterIgnoredKeys.js', () => ({
+vi.mock('../../../src/core/helpers/filterIgnoredKeys.js', () => ({
   filterIgnoredKeys: vi.fn((keys) => keys),
 }));
 

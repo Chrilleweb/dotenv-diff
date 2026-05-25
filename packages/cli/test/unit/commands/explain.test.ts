@@ -16,7 +16,7 @@ vi.mock('../../../src/core/duplicates.js', () => ({
   findDuplicateKeys: vi.fn(),
 }));
 
-vi.mock('../../../src/core/helpers/skipCommentedUsages.js', () => ({
+vi.mock('../../../src/core/scan/skipCommentedUsages.js', () => ({
   skipCommentedUsages: vi.fn((usages) => usages),
 }));
 
