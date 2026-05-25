@@ -12,7 +12,7 @@ import { scanJsonOutput } from '../ui/scan/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../services/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
-import { skipCommentedUsages } from '../core/helpers/skipCommentedUsages.js';
+import { skipCommentedUsages } from '../core/scan/skipCommentedUsages.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
 import {

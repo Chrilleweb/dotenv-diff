@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import type { EnvUsage, ScanOptions, ScanResult } from '../config/types.js';
-import { DEFAULT_EXCLUDE_KEYS } from '../core/filterIgnoredKeys.js';
+import { DEFAULT_EXCLUDE_KEYS } from '../core/helpers/filterIgnoredKeys.js';
 import {
   detectSecretsInSource,
   type SecretFinding,
