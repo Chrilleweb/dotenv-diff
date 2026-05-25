@@ -6,7 +6,7 @@ import { findDuplicateKeys } from '../core/duplicates.js';
 import type { ScanOptions } from '../config/types.js';
 import { DEFAULT_ENV_FILE, DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import { printExplain, type ExplainResult } from '../ui/scan/printExplain.js';
-import { skipCommentedUsages } from '../core/helpers/skipCommentedUsages.js';
+import { skipCommentedUsages } from '../core/scan/skipCommentedUsages.js';
 
 /**
  * Options forwarded from the CLI for the --explain command.
