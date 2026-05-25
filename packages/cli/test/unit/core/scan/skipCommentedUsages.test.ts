@@ -2,10 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { skipCommentedUsages } from '../../../../src/core/scan/skipCommentedUsages.js';
 import type { EnvUsage } from '../../../../src/config/types.js';
 
-const usage = (variable: string, context?: string): EnvUsage => ({
-  variable,
-  context,
-});
+const usage = (variable: string, context?: string): EnvUsage =>
+  ({ variable, context }) as EnvUsage;
 
 describe('skipCommentedUsages', () => {
   it('keeps usages without context', () => {
