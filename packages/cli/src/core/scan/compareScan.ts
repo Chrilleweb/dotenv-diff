@@ -1,5 +1,5 @@
 import type { ScanResult } from '../../config/types.js';
-import { filterIgnoredKeys } from '../filterIgnoredKeys.js';
+import { filterIgnoredKeys } from '../helpers/filterIgnoredKeys.js';
 
 /**
  * Compares the scan result with the environment variables.

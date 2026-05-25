@@ -82,7 +82,7 @@ import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
 import { diffEnv } from '../../../src/core/diffEnv.js';
 import { checkGitignoreStatus } from '../../../src/services/git.js';
 import { findDuplicateKeys } from '../../../src/core/duplicates.js';
-import { filterIgnoredKeys } from '../../../src/core/filterIgnoredKeys.js';
+import { filterIgnoredKeys } from '../../../src/core/helpers/filterIgnoredKeys.js';
 import { updateTotals } from '../../../src/core/compare/updateTotals.js';
 import { applyFixes } from '../../../src/core/fixEnv.js';
 import { printFixTips } from '../../../src/ui/shared/printFixTips.js';

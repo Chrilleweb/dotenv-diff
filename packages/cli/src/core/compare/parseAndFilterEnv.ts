@@ -1,5 +1,5 @@
 import { parseEnvFile } from '../../services/parseEnvFile.js';
-import { filterIgnoredKeys } from '../filterIgnoredKeys.js';
+import { filterIgnoredKeys } from '../helpers/filterIgnoredKeys.js';
 import type { ComparisonOptions } from '../../config/types.js';
 
 /**
