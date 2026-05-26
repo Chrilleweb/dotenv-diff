@@ -117,6 +117,19 @@ describe('applyFixes', () => {
     expect(env).toContain('B=');
   });
 
+  it('starts on first line when adding missing keys to an empty file', () => {
+    fs.writeFileSync(envPath, '');
+
+    applyFixes({
+      envPath,
+      missingKeys: ['A', 'B'],
+      duplicateKeys: [],
+    });
+
+    const env = fs.readFileSync(envPath, 'utf-8');
+    expect(env).toBe('A=\nB=\n');
+  });
+
   it('handles duplicateKeys list even if no duplicates exist in file', () => {
     fs.writeFileSync(envPath, 'A=1\nB=2\n');
 
