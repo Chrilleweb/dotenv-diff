@@ -1,5 +1,21 @@
 # Changelog
 
+<!-- changesets: bright-parrots-start.md,little-dolls-walk.md,polite-pants-cheer.md -->
+## 2026-05-26
+
+### Highlights
+- adjustet --explain ui
+- detects dot notation when line break appears after process.env
+- prevent extra blank line when adding missing keys to empty .env files
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: odd-vans-glow.md -->
 ## 2026-05-24
 

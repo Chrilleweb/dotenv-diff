@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.9.1
+
+### Patch Changes
+
+- fdfe46a: adjustet --explain ui
+- fdfe46a: detects dot notation when line break appears after process.env
+- fdfe46a: prevent extra blank line when adding missing keys to empty .env files
+
 ## 2.9.0
 
 ### Minor Changes
