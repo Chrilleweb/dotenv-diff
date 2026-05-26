@@ -154,9 +154,10 @@ function printChecks(checks: {
 }): void {
   printRow('Checks', formatCheck('Defined', checks.isDefined, 'error'));
   printContinuation(formatCheck('Used', checks.isUsed, 'warning'));
-  printContinuation(
-    formatCheck('Not duplicated', !checks.isDuplicated, 'warning'),
-  );
+
+  if (checks.isDuplicated) {
+    printContinuation(warning('⚠ Key is duplicated'));
+  }
 
   if (checks.isIgnored) {
     printContinuation(warning('⚠ Key is ignored'));

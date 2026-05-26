@@ -53,7 +53,8 @@ export function buildSveltekitAliasPatterns(
 export const ENV_PATTERNS: Pattern[] = [
   /**
    * Matches process.env.KEY references in source code.
-   * Supports both dot notation and bracket notation.
+   * Supports both dot notation and bracket notation, including whitespace
+   * and line breaks between `env` and the accessor.
    *
    * Examples:
    *   process.env.MY_KEY
@@ -63,7 +64,7 @@ export const ENV_PATTERNS: Pattern[] = [
   {
     name: 'process.env' as const,
     regex:
-      /process\.env\.([A-Z_][A-Z0-9_]*)|process\.env\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
+      /process\.env\s*\.([A-Z_][A-Z0-9_]*)|process\.env\s*\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
     processor: (match) => {
       // match[1] covers dot notation: process.env.KEY
       // match[2] covers bracket notation: process.env['KEY']
@@ -103,7 +104,8 @@ export const ENV_PATTERNS: Pattern[] = [
 
   /**
    * Matches import.meta.env.KEY references in source code.
-   * Supports both dot notation and bracket notation.
+   * Supports both dot notation and bracket notation, including whitespace
+   * and line breaks between `env` and the accessor.
    *
    * Examples:
    *   import.meta.env.MY_KEY
@@ -113,7 +115,7 @@ export const ENV_PATTERNS: Pattern[] = [
   {
     name: 'import.meta.env' as const,
     regex:
-      /import\.meta\.env\.([A-Z_][A-Z0-9_]*)|import\.meta\.env\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
+      /import\.meta\.env\s*\.([A-Z_][A-Z0-9_]*)|import\.meta\.env\s*\[['"]([A-Z_][A-Z0-9_]*)['"]]/g,
     processor: (match) => {
       const variable = match[1] || match[2];
       return variable ? [variable] : [];

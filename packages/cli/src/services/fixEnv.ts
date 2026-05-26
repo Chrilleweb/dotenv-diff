@@ -79,11 +79,9 @@ export function applyFixes(options: ApplyFixesOptions): {
   if (missingKeys.length) {
     const content = fs.readFileSync(envPath, 'utf-8');
     const eol = content.includes('\r\n') ? '\r\n' : '\n';
+    const separator = content.length > 0 && !content.endsWith('\n') ? eol : '';
     const newContent =
-      content +
-      (content.endsWith('\n') ? '' : eol) +
-      missingKeys.map((k) => `${k}=`).join(eol) +
-      eol;
+      content + separator + missingKeys.map((k) => `${k}=`).join(eol) + eol;
     fs.writeFileSync(envPath, newContent);
     result.addedEnv = missingKeys;
   }

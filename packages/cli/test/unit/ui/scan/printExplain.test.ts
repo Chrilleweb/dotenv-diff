@@ -246,7 +246,8 @@ describe('printExplain', () => {
       }),
     );
 
-    expect(allOutput.join('\n')).toContain('✘');
+    expect(allOutput.join('\n')).toContain('⚠ Key is duplicated');
+    expect(allOutput.join('\n')).not.toContain('Not duplicated');
   });
 
   it('shows ⚠ warning when isIgnored is true', () => {
