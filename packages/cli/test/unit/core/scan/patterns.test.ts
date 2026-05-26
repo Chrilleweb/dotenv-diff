@@ -54,6 +54,34 @@ describe('scanFile - Pattern Detection', () => {
         pattern: 'process.env',
       });
     });
+
+    it('detects dot notation when line break appears after process.env', () => {
+      const code = `
+        const connectionString = process.env
+          .EXPO_PUBLIC_AZURE_METRICS_CONNECTION_STRING as string;
+      `;
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'EXPO_PUBLIC_AZURE_METRICS_CONNECTION_STRING',
+        pattern: 'process.env',
+      });
+    });
+
+    it('detects bracket notation when line break appears after process.env', () => {
+      const code = `
+        const val = process.env
+          ["MY_KEY"];
+      `;
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'MY_KEY',
+        pattern: 'process.env',
+      });
+    });
   });
 
   describe('Node.js Destructuring', () => {

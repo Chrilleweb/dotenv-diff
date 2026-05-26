@@ -62,6 +62,7 @@ import { setupGlobalConfig } from '../../../src/ui/shared/setupGlobalConfig.js';
 import { loadConfig } from '../../../src/config/loadConfig.js';
 import { runInit } from '../../../src/commands/init.js';
 import { explainKey } from '../../../src/commands/explain.js';
+import { DEFAULT_ENV_FILE } from '../../../src/config/constants.js';
 
 function createBaseOptions(overrides: Partial<Options> = {}): Options {
   return {
@@ -383,6 +384,24 @@ describe('run', () => {
 
     expect(mockScanUsage).toHaveBeenCalledWith(
       expect.objectContaining({ envPath: undefined }),
+    );
+    existsSpy.mockRestore();
+  });
+
+  it('uses DEFAULT_ENV_FILE envPath when no env flag and default env file exists', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ compare: false })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(createBaseOptions({ compare: false }));
+    const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
+    mockScanUsage.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    expect(mockScanUsage).toHaveBeenCalledWith(
+      expect.objectContaining({ envPath: DEFAULT_ENV_FILE }),
     );
     existsSpy.mockRestore();
   });
