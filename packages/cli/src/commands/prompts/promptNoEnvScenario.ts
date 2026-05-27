@@ -3,11 +3,12 @@ import path from 'path';
 import { confirmYesNo } from './prompts.js';
 import { DEFAULT_ENV_FILE } from '../../config/constants.js';
 import type { ScanUsageOptions, ComparisonFile } from '../../config/types.js';
+import { normalizePath } from '../../core/helpers/normalizePath.js';
 
 /**
- * Prompts the user to create a .env file if none are found in scan usage
+ * Prompts the user to create a comparison file if none are found in scan usage
  * @param opts - Scan configuration options
- * @returns The path and name of the created .env file, or undefined if none created
+ * @returns The path and name of the created file, or undefined if none created
  */
 export async function promptNoEnvScenario(
   opts: ScanUsageOptions,
@@ -15,11 +16,17 @@ export async function promptNoEnvScenario(
   if (opts.isCiMode) {
     return { compareFile: undefined };
   }
+
   console.log();
+
+  // Determine target file name for prompt based on provided options or default
+  const targetFile = opts.examplePath ?? opts.envPath ?? DEFAULT_ENV_FILE;
+  const fileName = path.basename(normalizePath(targetFile));
+
   const shouldCreate = opts.isYesMode
     ? true
     : await confirmYesNo(
-        "You don't have any .env files. Do you want to create a .env?",
+        `You don't have any .env files. Do you want to create a ${fileName}?`,
         {
           isCiMode: opts.isCiMode ?? false,
           isYesMode: opts.isYesMode ?? false,
@@ -30,14 +37,14 @@ export async function promptNoEnvScenario(
     return { compareFile: undefined };
   }
 
-  const envPath = path.resolve(opts.cwd, DEFAULT_ENV_FILE);
+  const filePath = path.resolve(opts.cwd, fileName);
 
-  fs.writeFileSync(envPath, '');
+  fs.writeFileSync(filePath, '');
 
   return {
     compareFile: {
-      path: envPath,
-      name: DEFAULT_ENV_FILE,
+      path: filePath,
+      name: fileName,
     },
   };
 }
