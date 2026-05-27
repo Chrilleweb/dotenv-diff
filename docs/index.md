@@ -30,6 +30,11 @@ Run:
 npx dotenv-diff
 ```
 
+If no `.env` files are found, `dotenv-diff` will prompt you to create one (interactive mode only).
+Use `--yes` to auto-accept prompts, or `--ci` to disable prompts and run read-only.
+If you choose not to create a file, `dotenv-diff` will still scan your codebase for environment variable usage, but it will not compare results against an `.env` file.
+
+
 ---
 
 ## Table of Contents
