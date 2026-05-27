@@ -144,4 +144,82 @@ describe('promptNoEnvScenario', () => {
       { isCiMode: false, isYesMode: false },
     );
   });
+
+  it('uses examplePath as target file when creating missing comparison file', async () => {
+    const opts: ScanUsageOptions = {
+      ...baseOpts,
+      examplePath: '.env.example',
+      isYesMode: true,
+    };
+
+    const result = await promptNoEnvScenario(opts);
+
+    const expectedPath = path.resolve('/project', '.env.example');
+
+    expect(result).toEqual({
+      compareFile: {
+        path: expectedPath,
+        name: '.env.example',
+      },
+    });
+    expect(mockWriteFileSync).toHaveBeenCalledWith(expectedPath, '');
+  });
+
+  it('uses examplePath in prompt text when prompting user', async () => {
+    mockConfirmYesNo.mockResolvedValue(false);
+
+    const opts: ScanUsageOptions = {
+      ...baseOpts,
+      examplePath: '.env.local',
+      isCiMode: false,
+      isYesMode: false,
+    };
+
+    await promptNoEnvScenario(opts);
+
+    expect(mockConfirmYesNo).toHaveBeenCalledWith(
+      "You don't have any .env files. Do you want to create a .env.local?",
+      { isCiMode: false, isYesMode: false },
+    );
+  });
+
+  it('prioritizes examplePath over envPath when both are provided', async () => {
+    const opts: ScanUsageOptions = {
+      ...baseOpts,
+      examplePath: '.env.example',
+      envPath: '.env',
+      isYesMode: true,
+    };
+
+    const result = await promptNoEnvScenario(opts);
+
+    const expectedPath = path.resolve('/project', '.env.example');
+
+    expect(result).toEqual({
+      compareFile: {
+        path: expectedPath,
+        name: '.env.example',
+      },
+    });
+    expect(mockWriteFileSync).toHaveBeenCalledWith(expectedPath, '');
+  });
+
+  it('falls back to .env when neither examplePath nor envPath is provided', async () => {
+    const opts: ScanUsageOptions = {
+      ...baseOpts,
+      isYesMode: true,
+    };
+
+    const result = await promptNoEnvScenario(opts);
+
+    const expectedPath = path.resolve('/project', '.env');
+
+    expect(result).toEqual({
+      compareFile: {
+        path: expectedPath,
+        name: '.env',
+      },
+    });
+    expect(mockWriteFileSync).toHaveBeenCalledWith(expectedPath, '');
+  });
 });

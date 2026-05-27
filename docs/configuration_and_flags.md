@@ -792,6 +792,10 @@ dotenv-diff --compare
 
 This flag is useful when you want to ensure that your runtime environment file matches the structure of your example file.
 
+- If one of the compare files is missing (for example `.env` or `.env.example`), `dotenv-diff` prompts you to create it from the other file in interactive mode.
+- With `--yes`, the missing file is created automatically without prompting.
+- With `--ci`, prompts are disabled and files are never created, which will cause the process to exit with an error if the required files are missing.
+
 Usage in the configuration file:
 
 ```json
