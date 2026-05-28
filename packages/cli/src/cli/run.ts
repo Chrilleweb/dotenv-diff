@@ -107,6 +107,7 @@ async function runScanMode(opts: Options): Promise<boolean> {
     expireWarnings: opts.expireWarnings,
     inconsistentNamingWarnings: opts.inconsistentNamingWarnings,
     listAll: opts.listAll,
+    baseline: opts.baseline,
   });
 
   return exitWithError;

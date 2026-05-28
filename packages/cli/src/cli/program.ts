@@ -100,5 +100,9 @@ export function createProgram() {
         '--explain <key>',
         'Show where a specific key is defined, used, and its status',
       )
+      .option(
+        '--baseline',
+        'Set current codebase state as baseline for future comparisons',
+      )
   );
 }
