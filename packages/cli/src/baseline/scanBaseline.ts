@@ -13,6 +13,8 @@ const BASELINE_VERSION = 1;
 /**
  * Loads the baseline file from disk. Returns null if the file does not exist
  * or cannot be parsed into a valid shape.
+ * @param cwd - Current working directory to resolve the baseline file from
+ * @returns The parsed baseline file or null if not found/invalid
  */
 export function loadBaselineFile(cwd: string): BaselineFile | null {
   const filePath = resolveFromCwd(cwd, BASELINE_FILE);
@@ -36,6 +38,10 @@ export function loadBaselineFile(cwd: string): BaselineFile | null {
 
 /**
  * Writes a baseline file to disk and returns the absolute path it was written to.
+ * @param cwd - Current working directory to resolve the baseline file from
+ * @param entries - List of baseline entries to write
+ * @returns Absolute file path of the written baseline file
+ * @throws If writing the file fails (e.g. due to permissions or disk issues)
  */
 export async function writeBaselineFile(
   cwd: string,
@@ -62,6 +68,8 @@ export async function writeBaselineFile(
  * numbers and snippet text are excluded. Secrets are stored as a fingerprint
  * (SHA-256 truncated to 12 hex chars) of `file:snippet` so no secret value is
  * ever written to the baseline file.
+ * @param scanResult The full scan result to convert into baseline entries
+ * @returns A sorted list of baseline entries representing the scan result
  */
 export function collectBaselineEntries(
   scanResult: ScanResult,
@@ -135,6 +143,9 @@ export function collectBaselineEntries(
  * entry removed. The matching logic is the mirror image of
  * {@link collectBaselineEntries} so every entry written suppresses the
  * correct warning.
+ * @param scanResult The full scan result to apply baseline filtering to
+ * @param entries The list of baseline entries to apply
+ * @returns A new ScanResult with baseline-covered warnings removed
  */
 export function applyBaselineEntries(
   scanResult: ScanResult,
@@ -200,6 +211,8 @@ export function applyBaselineEntries(
 /**
  * SHA-256 fingerprint truncated to 12 hex chars. Stable across runs; used for
  * secrets so no secret value is ever committed to the baseline file.
+ * @param input The string to fingerprint (e.g. `file:snippet` for a secret)
+ * @returns A 12-character hex string representing the fingerprint
  */
 function fingerprint(input: string): string {
   return crypto.createHash('sha256').update(input).digest('hex').slice(0, 12);
