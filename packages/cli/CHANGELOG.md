@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.10.0
+
+### Minor Changes
+
+- ec888a7: add --baseline flag to suppress known issues
+
+### Patch Changes
+
+- b1c6768: fix no-env prompt file selection and filename display
+
 ## 2.9.1
 
 ### Patch Changes
