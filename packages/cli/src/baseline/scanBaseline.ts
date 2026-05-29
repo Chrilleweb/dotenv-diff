@@ -195,10 +195,6 @@ export function applyBaselineEntries(
   };
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 /**
  * SHA-256 fingerprint truncated to 12 hex chars. Stable across runs; used for
  * secrets so no secret value is ever committed to the baseline file.
