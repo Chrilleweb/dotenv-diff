@@ -433,10 +433,6 @@ export interface InconsistentNamingWarning {
   suggestion: string;
 }
 
-// ---------------------------------------------------------------------------
-// Baseline types
-// ---------------------------------------------------------------------------
-
 /**
  * All warning categories that can be suppressed in a baseline file.
  */
@@ -459,8 +455,11 @@ export type BaselineRule =
  * `file` is only set for warnings that are tied to a specific source file.
  */
 export interface BaselineEntry {
+  /** The category of the warning being suppressed (e.g. 'missing', 'secret', etc.) */
   rule: BaselineRule;
+  /** A stable identifier for the warning (e.g. variable name, fingerprint, or sorted pair) */
   key: string;
+  /** The file associated with the warning, if applicable */
   file?: string;
 }
 
@@ -468,7 +467,10 @@ export interface BaselineEntry {
  * Shape of `dotenv-diff.baseline.json` as written to disk.
  */
 export interface BaselineFile {
+  /** The version of the baseline file format */
   version: number;
+  /** The timestamp when the baseline file was created */
   createdAt: string;
+  /** The list of baseline entries */
   entries: BaselineEntry[];
 }
