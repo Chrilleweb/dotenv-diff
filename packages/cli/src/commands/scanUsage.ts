@@ -22,7 +22,10 @@ import {
 } from '../config/constants.js';
 import { promptNoEnvScenario } from './prompts/promptNoEnvScenario.js';
 import {
-  BASELINE_FILE,
+  printBaselineWritten,
+  printBaselineError,
+} from '../ui/scan/printBaseline.js';
+import {
   collectBaselineEntries,
   writeBaselineFile,
   loadBaselineFile,
@@ -229,7 +232,7 @@ async function writeBaseline(
     if (asJson) {
       console.log(JSON.stringify({ ok: false, error: message }, null, 2));
     } else {
-      console.error(`Failed to write baseline: ${message}`);
+      printBaselineError(message);
     }
     return { exitWithError: true };
   }
@@ -243,10 +246,7 @@ async function writeBaseline(
       ),
     );
   } else {
-    console.log(`Saved ${entries.length} warning(s) to ${BASELINE_FILE}`);
-    console.log(
-      'Future runs will suppress these issues. Delete the file or remove entries to re-surface them.',
-    );
+    printBaselineWritten(entries.length, filePath);
   }
   return { exitWithError: false };
 }
