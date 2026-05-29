@@ -26,6 +26,7 @@ import {
   printBaselineError,
 } from '../ui/scan/printBaseline.js';
 import {
+  BASELINE_FILE,
   collectBaselineEntries,
   writeBaselineFile,
   loadBaselineFile,
@@ -240,7 +241,7 @@ async function writeBaseline(
   if (asJson) {
     console.log(
       JSON.stringify(
-        { ok: true, filePath, entryCount: entries.length },
+        { file: BASELINE_FILE, warningsStored: entries.length },
         null,
         2,
       ),
