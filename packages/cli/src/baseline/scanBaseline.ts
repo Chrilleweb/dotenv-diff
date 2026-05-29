@@ -83,6 +83,14 @@ export function collectBaselineEntries(
     entries.push({ rule: 'unused', key });
   }
 
+  for (const usage of scanResult.logged) {
+    entries.push({
+      rule: 'logged',
+      key: usage.variable,
+      file: usage.file,
+    });
+  }
+
   for (const secret of scanResult.secrets) {
     entries.push({
       rule: 'secret',
@@ -149,6 +157,7 @@ export function applyBaselineEntries(
     ...scanResult,
     missing: scanResult.missing.filter((k) => !has('missing', k)),
     unused: scanResult.unused.filter((k) => !has('unused', k)),
+    logged: scanResult.logged.filter((u) => !has('logged', u.variable, u.file)),
     secrets: scanResult.secrets.filter(
       (s) => !has('secret', fingerprint(`${s.file}:${s.snippet}`)),
     ),

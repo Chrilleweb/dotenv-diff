@@ -443,6 +443,7 @@ export interface InconsistentNamingWarning {
 export type BaselineRule =
   | 'missing'
   | 'unused'
+  | 'logged'
   | 'secret'
   | 'example-secret'
   | 'duplicate-env'

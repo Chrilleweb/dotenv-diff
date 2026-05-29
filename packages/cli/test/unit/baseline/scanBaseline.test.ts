@@ -176,6 +176,29 @@ describe('collectBaselineEntries', () => {
     expect(result).toContainEqual({ rule: 'unused', key: 'X' });
   });
 
+  it('collects logged warnings by variable + file', () => {
+    const result = collectBaselineEntries({
+      ...emptyScanResult,
+      logged: [
+        {
+          variable: 'API_KEY',
+          file: 'src/index.ts',
+          line: 10,
+          column: 0,
+          pattern: 'process.env',
+          context: 'console.log(process.env.API_KEY)',
+          isLogged: true,
+        },
+      ],
+    });
+
+    expect(result).toContainEqual({
+      rule: 'logged',
+      key: 'API_KEY',
+      file: 'src/index.ts',
+    });
+  });
+
   it('collects secrets as fingerprints (no raw value)', () => {
     const secret = makeSecret('src/app.ts', 'TOKEN=abc123');
     const result = collectBaselineEntries({
@@ -369,6 +392,50 @@ describe('applyBaselineEntries', () => {
     expect(after.unused).toEqual(['KEEP']);
   });
 
+  it('suppresses logged warning by variable + file', () => {
+    const result: ScanResult = {
+      ...emptyScanResult,
+      logged: [
+        {
+          variable: 'API_KEY',
+          file: 'src/index.ts',
+          line: 11,
+          column: 0,
+          pattern: 'process.env',
+          context: 'console.log(process.env.API_KEY)',
+          isLogged: true,
+        },
+      ],
+    };
+    const entries: BaselineEntry[] = [
+      { rule: 'logged', key: 'API_KEY', file: 'src/index.ts' },
+    ];
+    const after = applyBaselineEntries(result, entries);
+    expect(after.logged).toHaveLength(0);
+  });
+
+  it('keeps logged warning when file does not match', () => {
+    const result: ScanResult = {
+      ...emptyScanResult,
+      logged: [
+        {
+          variable: 'API_KEY',
+          file: 'src/index.ts',
+          line: 11,
+          column: 0,
+          pattern: 'process.env',
+          context: 'console.log(process.env.API_KEY)',
+          isLogged: true,
+        },
+      ],
+    };
+    const entries: BaselineEntry[] = [
+      { rule: 'logged', key: 'API_KEY', file: 'src/other.ts' },
+    ];
+    const after = applyBaselineEntries(result, entries);
+    expect(after.logged).toHaveLength(1);
+  });
+
   it('suppresses secret by fingerprint', () => {
     const secret = makeSecret('src/index.ts', 'TOKEN=secret');
     const result: ScanResult = { ...emptyScanResult, secrets: [secret] };
@@ -555,6 +622,17 @@ describe('applyBaselineEntries', () => {
       ...emptyScanResult,
       missing: ['A'],
       unused: ['B'],
+      logged: [
+        {
+          variable: 'LOG_KEY',
+          file: 'f.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: 'console.log(process.env.LOG_KEY)',
+          isLogged: true,
+        },
+      ],
       secrets: [makeSecret('f.ts', 'S=x')],
       exampleWarnings: [
         { key: 'K', value: 'v', reason: 'r', severity: 'medium' },
@@ -584,6 +662,7 @@ describe('applyBaselineEntries', () => {
 
     expect(after.missing).toHaveLength(0);
     expect(after.unused).toHaveLength(0);
+    expect(after.logged).toHaveLength(0);
     expect(after.secrets).toHaveLength(0);
     expect(after.exampleWarnings).toHaveLength(0);
     expect(after.duplicates.env).toHaveLength(0);
