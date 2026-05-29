@@ -218,6 +218,10 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
 /**
  * Writes the current scan state as a baseline file and reports the outcome.
  * Returns exitWithError: false so the caller exits cleanly.
+ * @param scanResult The full scan result to convert into baseline entries and write to disk
+ * @param cwd The current working directory to resolve the baseline file from
+ * @param asJson Whether to output results in JSON format (true) or console format (false)
+ * @returns An object indicating whether to exit with an error code (always false for this function)
  */
 async function writeBaseline(
   scanResult: ScanResult,
