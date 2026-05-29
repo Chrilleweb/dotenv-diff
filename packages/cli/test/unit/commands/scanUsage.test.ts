@@ -35,6 +35,11 @@ vi.mock('../../../src/ui/scan/printComparisonError.js', () => ({
   printComparisonError: vi.fn(() => ({ exit: false })),
 }));
 
+vi.mock('../../../src/ui/scan/printBaseline.js', () => ({
+  printBaselineWritten: vi.fn(),
+  printBaselineError: vi.fn(),
+}));
+
 vi.mock('../../../src/core/security/secretDetectors.js', () => ({
   hasIgnoreComment: vi.fn(() => false),
 }));
@@ -73,6 +78,10 @@ import { printScanResult } from '../../../src/services/printScanResult.js';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { printMissingExample } from '../../../src/ui/scan/printMissingExample.js';
 import { printComparisonError } from '../../../src/ui/scan/printComparisonError.js';
+import {
+  printBaselineWritten,
+  printBaselineError,
+} from '../../../src/ui/scan/printBaseline.js';
 import { frameworkValidator } from '../../../src/core/frameworks/frameworkValidator.js';
 import {
   collectBaselineEntries,
@@ -834,8 +843,6 @@ describe('scanUsage', () => {
   });
 
   it('writes baseline and exits cleanly in console mode', async () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
     const result = await scanUsage({
       ...baseOpts,
       baseline: true,
@@ -844,12 +851,11 @@ describe('scanUsage', () => {
 
     expect(collectBaselineEntries).toHaveBeenCalled();
     expect(writeBaselineFile).toHaveBeenCalledWith('/root', []);
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Saved 0 warning(s) to'),
+    expect(printBaselineWritten).toHaveBeenCalledWith(
+      0,
+      '/root/.dotenv-diff-baseline.json',
     );
     expect(result.exitWithError).toBe(false);
-
-    logSpy.mockRestore();
   });
 
   it('writes baseline when json option is omitted', async () => {
@@ -904,7 +910,6 @@ describe('scanUsage', () => {
   });
 
   it('returns baseline write failure and logs to stderr in console mode', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(writeBaselineFile).mockRejectedValue(
       new Error('permission denied'),
     );
@@ -915,12 +920,8 @@ describe('scanUsage', () => {
       json: false,
     });
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Failed to write baseline: permission denied'),
-    );
+    expect(printBaselineError).toHaveBeenCalledWith('permission denied');
     expect(result.exitWithError).toBe(true);
-
-    errorSpy.mockRestore();
   });
 
   it('applies baseline entries and recalculates stats before console output', async () => {
