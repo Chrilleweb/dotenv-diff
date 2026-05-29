@@ -94,6 +94,7 @@ function createBaseOptions(overrides: Partial<Options> = {}): Options {
     inconsistentNamingWarnings: true,
     listAll: false,
     explain: undefined,
+    baseline: false,
     ...overrides,
   };
 }

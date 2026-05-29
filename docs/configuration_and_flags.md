@@ -15,6 +15,7 @@ CLI flags always take precedence over configuration file values.
 - [--ignore-regex](#--ignore-regex-patterns)
 - [--fix](#--fix)
 - [--json](#--json)
+- [--baseline](#--baseline)
 - [--color](#--color)
 - [--no-color](#--no-color)
 - [--ci](#--ci)
@@ -254,6 +255,37 @@ Usage in the configuration file:
   "json": true
 }
 ```
+
+### `--baseline`
+
+Save the current warning state as a baseline file and exit cleanly.
+
+When this flag is used, dotenv-diff scans as usual, then writes a `dotenv-diff.baseline.json` file in the current working directory.
+Future runs automatically load this file and suppress matching existing warnings, so new issues become easier to spot.
+
+`--baseline` is useful when introducing dotenv-diff to an existing codebase with many known warnings.
+
+Example usage:
+
+```bash
+dotenv-diff --baseline
+```
+
+Use with JSON output:
+
+```bash
+dotenv-diff --baseline --json
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "baseline": true
+}
+```
+
+See [Baseline Workflow](./baseline.md) for recommendations on when to create, refresh, and review baseline entries.
 
 ### `--color`
 

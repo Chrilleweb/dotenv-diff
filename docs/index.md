@@ -43,6 +43,7 @@ If you choose not to create a file, `dotenv-diff` will still scan your codebase 
 |---|---|
 | [Capabilities](./capabilities.md) | What the scanner checks for and how it works |and rules |
 | [Configuration and Flags](./configuration_and_flags.md) | Full CLI/config reference for options and behavior |
+| [Baseline Workflow](./baseline.md) | Set a warning baseline and suppress already-known findings safely |
 | [Comparing Files](./compare.md) | How to compare two `.env` files to detect differences |
 | [Expiration Warnings](./expiration_warnings.md) | How `@expire` annotations work and strict mode integration |
 | [Ignore Comments](./ignore_comments.md) | Suppress false positives with inline/block ignore markers |

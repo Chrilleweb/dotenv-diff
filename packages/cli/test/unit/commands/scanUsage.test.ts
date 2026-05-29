@@ -35,6 +35,11 @@ vi.mock('../../../src/ui/scan/printComparisonError.js', () => ({
   printComparisonError: vi.fn(() => ({ exit: false })),
 }));
 
+vi.mock('../../../src/ui/scan/printBaseline.js', () => ({
+  printBaselineWritten: vi.fn(),
+  printBaselineError: vi.fn(),
+}));
+
 vi.mock('../../../src/core/security/secretDetectors.js', () => ({
   hasIgnoreComment: vi.fn(() => false),
 }));
@@ -58,6 +63,14 @@ vi.mock('../../../src/commands/prompts/promptNoEnvScenario.js', () => ({
   promptNoEnvScenario: vi.fn(),
 }));
 
+vi.mock('../../../src/baseline/scanBaseline.js', () => ({
+  BASELINE_FILE: '.dotenv-diff-baseline.json',
+  collectBaselineEntries: vi.fn(() => []),
+  writeBaselineFile: vi.fn(),
+  loadBaselineFile: vi.fn(() => null),
+  applyBaselineEntries: vi.fn((scanResult) => scanResult),
+}));
+
 import { scanUsage } from '../../../src/commands/scanUsage.js';
 import { scanCodebase } from '../../../src/services/scanCodebase.js';
 import { determineComparisonFile } from '../../../src/core/scan/determineComparisonFile.js';
@@ -65,7 +78,17 @@ import { printScanResult } from '../../../src/services/printScanResult.js';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { printMissingExample } from '../../../src/ui/scan/printMissingExample.js';
 import { printComparisonError } from '../../../src/ui/scan/printComparisonError.js';
+import {
+  printBaselineWritten,
+  printBaselineError,
+} from '../../../src/ui/scan/printBaseline.js';
 import { frameworkValidator } from '../../../src/core/frameworks/frameworkValidator.js';
+import {
+  collectBaselineEntries,
+  writeBaselineFile,
+  loadBaselineFile,
+  applyBaselineEntries,
+} from '../../../src/baseline/scanBaseline.js';
 
 describe('scanUsage', () => {
   const dummySecret: SecretFinding = {
@@ -114,6 +137,14 @@ describe('scanUsage', () => {
       compareFile: undefined,
     });
     vi.mocked(frameworkValidator).mockReturnValue([]);
+    vi.mocked(collectBaselineEntries).mockReturnValue([]);
+    vi.mocked(writeBaselineFile).mockResolvedValue(
+      '/root/.dotenv-diff-baseline.json',
+    );
+    vi.mocked(loadBaselineFile).mockReturnValue(null);
+    vi.mocked(applyBaselineEntries).mockImplementation(
+      (scanResult) => scanResult,
+    );
   });
 
   it('returns early when example missing in CI mode', async () => {
@@ -804,6 +835,123 @@ describe('scanUsage', () => {
     expect(printScanResult).toHaveBeenCalledWith(
       expect.objectContaining({
         used: [expect.objectContaining({ variable: 'AFTER_BLOCK' })],
+      }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('writes baseline and exits cleanly in console mode', async () => {
+    const result = await scanUsage({
+      ...baseOpts,
+      baseline: true,
+      json: false,
+    });
+
+    expect(collectBaselineEntries).toHaveBeenCalled();
+    expect(writeBaselineFile).toHaveBeenCalledWith('/root', []);
+    expect(printBaselineWritten).toHaveBeenCalledWith(
+      0,
+      '/root/.dotenv-diff-baseline.json',
+    );
+    expect(result.exitWithError).toBe(false);
+  });
+
+  it('writes baseline when json option is omitted', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { json: _omit, ...optsWithoutJson } = baseOpts;
+
+    const result = await scanUsage({
+      ...(optsWithoutJson as ScanUsageOptions),
+      baseline: true,
+    });
+
+    expect(writeBaselineFile).toHaveBeenCalled();
+    expect(result.exitWithError).toBe(false);
+
+    logSpy.mockRestore();
+  });
+
+  it('writes baseline and returns JSON success payload in json mode', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.mocked(collectBaselineEntries).mockReturnValue([
+      {
+        kind: 'missing',
+        fingerprint: 'missing:API_KEY',
+      },
+    ] as unknown as ReturnType<typeof collectBaselineEntries>);
+    vi.mocked(writeBaselineFile).mockResolvedValue(
+      '/root/.dotenv-diff-baseline.json',
+    );
+
+    const result = await scanUsage({ ...baseOpts, baseline: true, json: true });
+
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('"warningsStored": 1'),
+    );
+    expect(result.exitWithError).toBe(false);
+
+    logSpy.mockRestore();
+  });
+
+  it('returns baseline write failure when writeBaselineFile throws in json mode', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.mocked(writeBaselineFile).mockRejectedValue('disk full');
+
+    const result = await scanUsage({ ...baseOpts, baseline: true, json: true });
+
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('disk full'));
+    expect(result.exitWithError).toBe(true);
+
+    logSpy.mockRestore();
+  });
+
+  it('returns baseline write failure and logs to stderr in console mode', async () => {
+    vi.mocked(writeBaselineFile).mockRejectedValue(
+      new Error('permission denied'),
+    );
+
+    const result = await scanUsage({
+      ...baseOpts,
+      baseline: true,
+      json: false,
+    });
+
+    expect(printBaselineError).toHaveBeenCalledWith('permission denied');
+    expect(result.exitWithError).toBe(true);
+  });
+
+  it('applies baseline entries and recalculates stats before console output', async () => {
+    vi.mocked(loadBaselineFile).mockReturnValue({
+      entries: [{ kind: 'missing', fingerprint: 'missing:OLD_KEY' }],
+      meta: { version: 1 },
+    } as unknown as ReturnType<typeof loadBaselineFile>);
+    vi.mocked(applyBaselineEntries).mockImplementation((scanResult) => ({
+      ...scanResult,
+      used: [
+        {
+          variable: 'LIVE_KEY',
+          file: 'src/a.ts',
+          line: 1,
+          column: 0,
+          pattern: 'process.env',
+          context: 'process.env.LIVE_KEY',
+        },
+      ],
+      logged: [],
+      missing: [],
+      unused: [],
+      duplicates: {},
+      secrets: [],
+    }));
+
+    await scanUsage({ ...baseOpts, json: false, baseline: false });
+
+    expect(applyBaselineEntries).toHaveBeenCalled();
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({
+        stats: expect.objectContaining({ totalUsages: 1, uniqueVariables: 1 }),
       }),
       expect.anything(),
       expect.anything(),

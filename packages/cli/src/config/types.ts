@@ -67,6 +67,7 @@ export type Category = (typeof ALLOWED_CATEGORIES)[number];
  * normalization step that produces {@link Options}.
  */
 export interface RawOptions {
+  baseline?: boolean;
   checkValues?: boolean;
   ci?: boolean;
   yes?: boolean;
@@ -111,6 +112,7 @@ export interface RawOptions {
  * normalization logic.
  */
 export interface Options {
+  baseline: boolean;
   checkValues: boolean;
   isCiMode: boolean;
   isYesMode: boolean;
@@ -233,6 +235,7 @@ export interface ScanUsageOptions extends ScanOptions {
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
   listAll?: boolean;
+  baseline?: boolean;
 }
 
 /**
@@ -428,4 +431,46 @@ export interface InconsistentNamingWarning {
   key2: string;
   /** Suggested consistent naming for the keys */
   suggestion: string;
+}
+
+/**
+ * All warning categories that can be suppressed in a baseline file.
+ */
+export type BaselineRule =
+  | 'missing'
+  | 'unused'
+  | 'logged'
+  | 'secret'
+  | 'example-secret'
+  | 'duplicate-env'
+  | 'duplicate-example'
+  | 'framework'
+  | 'uppercase'
+  | 'expire'
+  | 'inconsistent-naming';
+
+/**
+ * A single suppressed warning in the baseline file.
+ * `key` is a stable identifier (variable name, fingerprint, or sorted pair).
+ * `file` is only set for warnings that are tied to a specific source file.
+ */
+export interface BaselineEntry {
+  /** The category of the warning being suppressed (e.g. 'missing', 'secret', etc.) */
+  rule: BaselineRule;
+  /** A stable identifier for the warning (e.g. variable name, fingerprint, or sorted pair) */
+  key: string;
+  /** The file associated with the warning, if applicable */
+  file?: string;
+}
+
+/**
+ * Shape of `dotenv-diff.baseline.json` as written to disk.
+ */
+export interface BaselineFile {
+  /** The version of the baseline file format */
+  version: number;
+  /** The timestamp when the baseline file was created */
+  createdAt: string;
+  /** The list of baseline entries */
+  entries: BaselineEntry[];
 }

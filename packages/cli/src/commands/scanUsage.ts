@@ -21,6 +21,17 @@ import {
   EXPIRE_THRESHOLD_DAYS,
 } from '../config/constants.js';
 import { promptNoEnvScenario } from './prompts/promptNoEnvScenario.js';
+import {
+  printBaselineWritten,
+  printBaselineError,
+} from '../ui/scan/printBaseline.js';
+import {
+  BASELINE_FILE,
+  collectBaselineEntries,
+  writeBaselineFile,
+  loadBaselineFile,
+  applyBaselineEntries,
+} from '../baseline/scanBaseline.js';
 
 /**
  * Scans the codebase for environment variable usage and compares it with
@@ -134,6 +145,18 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   // Recalculate stats after filtering
   calculateStats(scanResult);
 
+  // --baseline: write current warnings as the new baseline and exit cleanly
+  if (opts.baseline) {
+    return writeBaseline(scanResult, opts.cwd, opts.json ?? false);
+  }
+
+  // Apply existing baseline suppressions (if any) before output
+  const baselineFile = loadBaselineFile(opts.cwd);
+  if (baselineFile) {
+    scanResult = applyBaselineEntries(scanResult, baselineFile.entries);
+    calculateStats(scanResult);
+  }
+
   // JSON output
   if (opts.json) {
     const jsonOutput = scanJsonOutput(
@@ -190,6 +213,47 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   });
 
   return { exitWithError: result.exitWithError };
+}
+
+/**
+ * Writes the current scan state as a baseline file and reports the outcome.
+ * Returns exitWithError: false so the caller exits cleanly.
+ * @param scanResult The full scan result to convert into baseline entries and write to disk
+ * @param cwd The current working directory to resolve the baseline file from
+ * @param asJson Whether to output results in JSON format (true) or console format (false)
+ * @returns An object indicating whether to exit with an error code (always false for this function)
+ */
+async function writeBaseline(
+  scanResult: ScanResult,
+  cwd: string,
+  asJson: boolean,
+): Promise<ExitResult> {
+  const entries = collectBaselineEntries(scanResult);
+  let filePath: string;
+  try {
+    filePath = await writeBaselineFile(cwd, entries);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (asJson) {
+      console.log(JSON.stringify({ ok: false, error: message }, null, 2));
+    } else {
+      printBaselineError(message);
+    }
+    return { exitWithError: true };
+  }
+
+  if (asJson) {
+    console.log(
+      JSON.stringify(
+        { file: BASELINE_FILE, warningsStored: entries.length },
+        null,
+        2,
+      ),
+    );
+  } else {
+    printBaselineWritten(entries.length, filePath);
+  }
+  return { exitWithError: false };
 }
 
 /**

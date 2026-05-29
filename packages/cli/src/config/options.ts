@@ -30,6 +30,7 @@ import {
  * // Returns: { isCiMode: true, ignore: ['TEST_', 'DEBUG_'], only: ['unused', 'duplicates'], ... }
  */
 export function normalizeOptions(raw: RawOptions): Options {
+  const baseline = toBool(raw.baseline);
   const checkValues = toBool(raw.checkValues);
   const isCiMode = toBool(raw.ci);
   const isYesMode = toBool(raw.yes);
@@ -73,6 +74,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   }
 
   return {
+    baseline,
     checkValues,
     isCiMode,
     isYesMode,
