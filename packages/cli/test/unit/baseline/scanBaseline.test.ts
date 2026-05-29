@@ -5,7 +5,6 @@ import os from 'os';
 import crypto from 'crypto';
 import {
   BASELINE_FILE,
-  getBaselinePath,
   loadBaselineFile,
   writeBaselineFile,
   collectBaselineEntries,
@@ -61,17 +60,6 @@ beforeEach(() => {
 
 afterEach(() => {
   fs.rmSync(tmpDir, { recursive: true, force: true });
-});
-
-// ---------------------------------------------------------------------------
-// getBaselinePath
-// ---------------------------------------------------------------------------
-
-describe('getBaselinePath', () => {
-  it('returns absolute path to baseline file inside cwd', () => {
-    const result = getBaselinePath('/some/dir');
-    expect(result).toBe(path.resolve('/some/dir', BASELINE_FILE));
-  });
 });
 
 // ---------------------------------------------------------------------------

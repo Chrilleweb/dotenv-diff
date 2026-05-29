@@ -1,28 +1,21 @@
 import crypto from 'crypto';
 import fs from 'fs';
-import path from 'path';
 import type {
   BaselineEntry,
   BaselineFile,
   ScanResult,
 } from '../config/types.js';
+import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 
 export const BASELINE_FILE = 'dotenv-diff.baseline.json';
 const BASELINE_VERSION = 1;
-
-/**
- * Returns the absolute path to the baseline file for a given working directory.
- */
-export function getBaselinePath(cwd: string): string {
-  return path.resolve(cwd, BASELINE_FILE);
-}
 
 /**
  * Loads the baseline file from disk. Returns null if the file does not exist
  * or cannot be parsed into a valid shape.
  */
 export function loadBaselineFile(cwd: string): BaselineFile | null {
-  const filePath = getBaselinePath(cwd);
+  const filePath = resolveFromCwd(cwd, BASELINE_FILE);
   if (!fs.existsSync(filePath)) return null;
   try {
     const raw = fs.readFileSync(filePath, 'utf8');
@@ -48,7 +41,7 @@ export async function writeBaselineFile(
   cwd: string,
   entries: BaselineEntry[],
 ): Promise<string> {
-  const filePath = getBaselinePath(cwd);
+  const filePath = resolveFromCwd(cwd, BASELINE_FILE);
   const payload: BaselineFile = {
     version: BASELINE_VERSION,
     createdAt: new Date().toISOString(),

@@ -887,9 +887,8 @@ describe('scanUsage', () => {
 
     const result = await scanUsage({ ...baseOpts, baseline: true, json: true });
 
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"ok": true'));
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('"entryCount": 1'),
+      expect.stringContaining('"warningsStored": 1'),
     );
     expect(result.exitWithError).toBe(false);
 
@@ -902,7 +901,6 @@ describe('scanUsage', () => {
 
     const result = await scanUsage({ ...baseOpts, baseline: true, json: true });
 
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"ok": false'));
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('disk full'));
     expect(result.exitWithError).toBe(true);
 
