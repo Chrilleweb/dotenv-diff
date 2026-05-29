@@ -56,11 +56,10 @@ dotenv-diff --baseline --json
 
 Success output includes:
 
-- `ok: true`
-- `filePath`
-- `entryCount`
+- `file`
+- `warningsStored`
 
-If writing fails, JSON output returns `ok: false` with an error message.
+If writing fails, the process will exit with an exit code of `1`.
 
 ## Recommended workflow
 
