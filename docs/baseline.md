@@ -44,6 +44,7 @@ Baseline suppression supports the same categories produced by scan usage checks,
 - expiration warnings
 - secret findings (stored as fingerprints)
 - `.env.example` secret warnings
+- logged variable usages (`console.log` of env variables)
 
 ## JSON mode
 
