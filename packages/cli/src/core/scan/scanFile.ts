@@ -1,6 +1,11 @@
 import path from 'path';
 import type { EnvUsage, ScanOptions } from '../../config/types.js';
-import { ENV_PATTERNS, buildSveltekitAliasPatterns } from './patterns.js';
+import {
+  ENV_PATTERNS,
+  buildSveltekitAliasPatterns,
+  SVELTEKIT_IMPORT_REGEX,
+  SVELTEKIT_ALIAS_IMPORT_REGEX,
+} from './patterns.js';
 import { hasIgnoreComment } from '../security/secretDetectors.js';
 import { normalizePath } from '../helpers/normalizePath.js';
 import { isLikelyMinified } from '../helpers/isLikelyMinified.js';
@@ -36,24 +41,20 @@ export function scanFile(
   // Collect all $env imports used in this file
   const envImports: string[] = [];
 
-  const importRegex =
-    /import\s+(?:\{[^}]*\}|\w+)\s+from\s+['"](\$env\/(?:static|dynamic)\/(?:private|public))['"]/g;
-
+  SVELTEKIT_IMPORT_REGEX.lastIndex = 0;
   let importMatch: RegExpExecArray | null;
-
-  while ((importMatch = importRegex.exec(content)) !== null) {
+  while ((importMatch = SVELTEKIT_IMPORT_REGEX.exec(content)) !== null) {
     envImports.push(importMatch[1]!);
   }
 
-  // Detect aliased $env imports: import { env as aliasName } from '$env/dynamic/private'
-  // Capture both the alias name (group 1) and the source module (group 2)
-  const aliasImportRegex =
-    /import\s*\{\s*env\s+as\s+(\w+)\s*\}\s*from\s*['"](\$env\/(?:static|dynamic)\/(?:private|public))['"]/g;
-
+  // Detect aliased $env imports and build dynamic patterns for them
   const allPatterns = [...ENV_PATTERNS];
-  let aliasImportMatch: RegExpExecArray | null;
 
-  while ((aliasImportMatch = aliasImportRegex.exec(content)) !== null) {
+  SVELTEKIT_ALIAS_IMPORT_REGEX.lastIndex = 0;
+  let aliasImportMatch: RegExpExecArray | null;
+  while (
+    (aliasImportMatch = SVELTEKIT_ALIAS_IMPORT_REGEX.exec(content)) !== null
+  ) {
     allPatterns.push(
       ...buildSveltekitAliasPatterns(
         aliasImportMatch[1]!,

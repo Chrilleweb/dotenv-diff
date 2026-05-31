@@ -9,6 +9,21 @@ type Pattern = {
 };
 
 /**
+ * Matches SvelteKit $env imports to collect import sources per file.
+ * Example: import { env } from '$env/dynamic/private'
+ * Example: import { PUBLIC_URL } from '$env/static/public'
+ */
+export const SVELTEKIT_IMPORT_REGEX =
+  /import\s+(?:\{[^}]*\}|\w+)\s+from\s+['"](?<module>\$env\/(?:static|dynamic)\/(?:private|public))['"]/g;
+
+/**
+ * Matches aliased SvelteKit env imports.
+ * Example: import { env as privateEnv } from '$env/dynamic/private'
+ */
+export const SVELTEKIT_ALIAS_IMPORT_REGEX =
+  /import\s*\{\s*env\s+as\s+(?<alias>\w+)\s*\}\s*from\s+['"](?<source>\$env\/(?:static|dynamic)\/(?:private|public))['"]/g;
+
+/**
  * Builds SvelteKit env patterns for an aliased import.
  * Handles: import { env as aliasName } from '$env/dynamic/private'
  * @param alias - The local alias used for the env object (e.g. "privateEnv")
