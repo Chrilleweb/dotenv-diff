@@ -12,13 +12,7 @@ First-class support for SvelteKit and Next.js. Also works well in modern JavaScr
 
 ---
 
-### Warnings & errors detection
-
 ![Demo](https://raw.githubusercontent.com/Chrilleweb/dotenv-diff/main/docs/assets/demo.gif)
-
-### Clean / successful scan
-
-![Successful Scan](https://raw.githubusercontent.com/Chrilleweb/dotenv-diff/main/docs/assets/success.png)
 
 ---
 
@@ -97,6 +91,18 @@ API_TOKEN=
 → See [Expiration Documentation](https://github.com/Chrilleweb/dotenv-diff/blob/main/docs/expiration_warnings.md) for more details.
 
 ---
+
+---
+
+## Suppress existing warnings (`--baseline`)
+
+Adopt dotenv-diff in projects that already have known warnings by recording the current state into a baseline file. Future runs will only report newly introduced issues:
+
+```bash
+dotenv-diff --baseline
+```
+
+→ See [Baseline Documentation](https://github.com/Chrilleweb/dotenv-diff/blob/main/docs/baseline.md) for more details.
 
 ## Explain a variable (`--explain`)
 
