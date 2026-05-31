@@ -5,6 +5,8 @@ import {
   DEFAULT_EXCLUDE_PATTERNS,
   ENV_PATTERNS,
   buildSveltekitAliasPatterns,
+  SVELTEKIT_IMPORT_REGEX,
+  SVELTEKIT_ALIAS_IMPORT_REGEX,
 } from '../../../../src/core/scan/patterns';
 import type { ScanOptions } from '../../../../src/config/types';
 
@@ -566,6 +568,105 @@ const { SECRET_KEY: secret } = privateEnv;`;
       const result = scanFile('test.ts', code, baseOpts);
       expect(result).toHaveLength(1);
       expect(result[0]?.variable).toBe('SECRET_KEY');
+    });
+  });
+
+  describe('SVELTEKIT_IMPORT_REGEX', () => {
+    function exec(content: string) {
+      const re = new RegExp(
+        SVELTEKIT_IMPORT_REGEX.source,
+        SVELTEKIT_IMPORT_REGEX.flags,
+      );
+      return re.exec(content);
+    }
+
+    it('matches import from $env/static/private', () => {
+      const match = exec("import { env } from '$env/static/private';");
+      expect(match).not.toBeNull();
+      expect(match![1]).toBe('$env/static/private');
+    });
+
+    it('matches import from $env/dynamic/public', () => {
+      const match = exec("import { PUBLIC_URL } from '$env/dynamic/public';");
+      expect(match).not.toBeNull();
+      expect(match![1]).toBe('$env/dynamic/public');
+    });
+
+    it('captures the module path in named group', () => {
+      const match = exec("import { env } from '$env/dynamic/private';");
+      expect(match?.groups?.['module']).toBe('$env/dynamic/private');
+    });
+
+    it('does not match regular (non-$env) imports', () => {
+      const match = exec("import { something } from 'some-package';");
+      expect(match).toBeNull();
+    });
+
+    it('collects multiple $env imports', () => {
+      const content = `import { KEY1 } from '$env/static/private';
+import { KEY2 } from '$env/dynamic/public';`;
+      const re = new RegExp(
+        SVELTEKIT_IMPORT_REGEX.source,
+        SVELTEKIT_IMPORT_REGEX.flags,
+      );
+      const modules: string[] = [];
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(content)) !== null) modules.push(m[1]!);
+      expect(modules).toEqual(['$env/static/private', '$env/dynamic/public']);
+    });
+  });
+
+  describe('SVELTEKIT_ALIAS_IMPORT_REGEX', () => {
+    function exec(content: string) {
+      const re = new RegExp(
+        SVELTEKIT_ALIAS_IMPORT_REGEX.source,
+        SVELTEKIT_ALIAS_IMPORT_REGEX.flags,
+      );
+      return re.exec(content);
+    }
+
+    it('matches aliased import and captures alias and source', () => {
+      const match = exec(
+        "import { env as privateEnv } from '$env/dynamic/private';",
+      );
+      expect(match).not.toBeNull();
+      expect(match![1]).toBe('privateEnv');
+      expect(match![2]).toBe('$env/dynamic/private');
+    });
+
+    it('captures alias and source via named groups', () => {
+      const match = exec(
+        "import { env as publicEnv } from '$env/dynamic/public';",
+      );
+      expect(match?.groups?.['alias']).toBe('publicEnv');
+      expect(match?.groups?.['source']).toBe('$env/dynamic/public');
+    });
+
+    it('does not match non-aliased env import', () => {
+      const match = exec("import { env } from '$env/dynamic/private';");
+      expect(match).toBeNull();
+    });
+
+    it('does not match regular imports', () => {
+      const match = exec("import { something as alias } from 'some-package';");
+      expect(match).toBeNull();
+    });
+
+    it('collects multiple aliased imports', () => {
+      const content = `import { env as publicEnv } from '$env/dynamic/public';
+import { env as privateEnv } from '$env/dynamic/private';`;
+      const re = new RegExp(
+        SVELTEKIT_ALIAS_IMPORT_REGEX.source,
+        SVELTEKIT_ALIAS_IMPORT_REGEX.flags,
+      );
+      const found: Array<{ alias: string; source: string }> = [];
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(content)) !== null)
+        found.push({ alias: m[1]!, source: m[2]! });
+      expect(found).toEqual([
+        { alias: 'publicEnv', source: '$env/dynamic/public' },
+        { alias: 'privateEnv', source: '$env/dynamic/private' },
+      ]);
     });
   });
 

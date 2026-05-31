@@ -341,18 +341,24 @@ describe('scanFile – line 48 false variable guard', () => {
   // to exercise the true branch of the guard.
   it('skips falsy (empty-string) variable emitted by a processor (line 48 true branch)', async () => {
     vi.resetModules();
-    vi.doMock('../../../../src/core/scan/patterns.js', () => ({
-      ENV_PATTERNS: [
-        {
-          name: 'process.env',
-          // Regex matches process.env.KEY and captures group 1
-          regex: /process\.env\.([A-Z_][A-Z0-9_]*)/g,
-          // Returns ['', 'API_KEY']: empty string is falsy → line 48 skips it,
-          // 'API_KEY' is truthy → pushed to usages.
-          processor: (match: RegExpExecArray) => ['' as string, match[1]!],
-        },
-      ],
-    }));
+    vi.doMock('../../../../src/core/scan/patterns.js', async () => {
+      const actual = await vi.importActual<
+        typeof import('../../../../src/core/scan/patterns.js')
+      >('../../../../src/core/scan/patterns.js');
+      return {
+        ...actual,
+        ENV_PATTERNS: [
+          {
+            name: 'process.env',
+            // Regex matches process.env.KEY and captures group 1
+            regex: /process\.env\.([A-Z_][A-Z0-9_]*)/g,
+            // Returns ['', 'API_KEY']: empty string is falsy → line 48 skips it,
+            // 'API_KEY' is truthy → pushed to usages.
+            processor: (match: RegExpExecArray) => ['' as string, match[1]!],
+          },
+        ],
+      };
+    });
 
     const { scanFile: scanFileFresh } =
       await import('../../../../src/core/scan/scanFile.js');
