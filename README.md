@@ -12,13 +12,7 @@ First-class support for SvelteKit and Next.js. Also works well in modern JavaScr
 
 ---
 
-### Warnings & errors detection
-
 ![Demo](./docs/assets/demo.gif)
-
-### Clean / successful scan
-
-![Successful Scan](./docs/assets/success.png)
 
 ---
 
@@ -95,6 +89,18 @@ API_TOKEN=
 ```
 
 → See [Expiration Documentation](./docs/expiration_warnings.md) for more details.
+
+---
+
+## Suppress existing warnings (`--baseline`)
+
+Adopt dotenv-diff in projects that already have known warnings by recording the current state into a baseline file. Future runs will only report newly introduced issues:
+
+```bash
+dotenv-diff --baseline
+```
+
+→ See [Baseline Documentation](./docs/baseline.md) for more details.
 
 ---
 
