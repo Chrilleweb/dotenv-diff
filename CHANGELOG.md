@@ -1,5 +1,22 @@
 # Changelog
 
+<!-- changesets: cyan-plants-stand.md,metal-houses-pull.md -->
+## 2026-05-29
+
+### Highlights
+- fix no-env prompt file selection and filename display
+- add --baseline flag to suppress known issues
+
+### Package Releases
+- dotenv-diff: patch
+- dotenv-diff: minor
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+dotenv-diff | minor
+
 <!-- changesets: bright-parrots-start.md,little-dolls-walk.md,polite-pants-cheer.md -->
 ## 2026-05-26
 
