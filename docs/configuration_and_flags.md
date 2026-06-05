@@ -165,6 +165,7 @@ Specify a comma-separated list of keys to ignore during the comparison other tha
 - `SLOW_MO`
 - `GITHUB_ACTIONS`
 - `INIT_CWD`
+- `TZ`
 - `PORT`
 - `PATH`
 - `HOME`
