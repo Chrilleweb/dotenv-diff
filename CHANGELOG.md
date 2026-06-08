@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: floppy-carrots-cough.md -->
+## 2026-06-08
+
+### Highlights
+- updated commander dependency
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: cyan-plants-stand.md,metal-houses-pull.md -->
 ## 2026-05-29
 
