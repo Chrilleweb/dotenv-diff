@@ -47,6 +47,7 @@ export const DEFAULT_ENV_CANDIDATES = [
   '.env.local',
   '.env.production',
   '.env.development',
+  '.env.schema',
 ] as const;
 
 /**
