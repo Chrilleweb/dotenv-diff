@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.10.1
+
+### Patch Changes
+
+- 1d5e9d6: updated commander dependency
+
 ## 2.10.0
 
 ### Minor Changes
