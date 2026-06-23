@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: spicy-experts-own.md -->
+## 2026-06-23
+
+### Highlights
+- add .env.schema to default env candidates
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: floppy-carrots-cough.md -->
 ## 2026-06-08
 
