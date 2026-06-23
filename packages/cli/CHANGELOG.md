@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.10.2
+
+### Patch Changes
+
+- 9e73368: add .env.schema to default env candidates
+
 ## 2.10.1
 
 ### Patch Changes
