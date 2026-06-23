@@ -73,6 +73,19 @@ This creates a `dotenv-diff.config.json` file in the project root with an exampl
 
 Path to a specific `.env` file (default: `.env`).
 
+When `--env` is not specified, dotenv-diff automatically scans for the first matching file from the following list of default candidates (in order):
+
+| File | Purpose |
+|---|---|
+| `.env` | Primary environment file |
+| `.env.example` | Template / reference file |
+| `.env.local` | Local overrides (not committed) |
+| `.env.production` | Production-specific values |
+| `.env.development` | Development-specific values |
+| `.env.schema` | Schema / type definitions for env vars |
+
+If none of these files exist, dotenv-diff will still scan your codebase for environment variable usage but will not compare results against an env file. In interactive mode you will be prompted to create one.
+
 Example usage:
 
 ```bash
