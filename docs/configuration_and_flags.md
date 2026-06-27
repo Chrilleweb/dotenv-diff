@@ -54,6 +54,7 @@ CLI flags always take precedence over configuration file values.
 - [--compare](#--compare)
 - [--check-values](#--check-values)
 - [--only](#--only-list)
+- [--matrix](#--matrix-files)
 
 ## Configuration file
 
@@ -897,3 +898,28 @@ Usage in the configuration file:
   "only": ["missing", "duplicate"]
 }
 ```
+
+### `--matrix [files...]`
+
+Compares 2+ env files side-by-side as a key-presence matrix, instead of a 1:1 `--env`/`--example` comparison.
+Unlike `--compare`, there is no reference file — every file is an equal column, which makes it useful for spotting drift between environments (e.g. `.env.production` vs `.env.staging` vs `.env.example`).
+
+With no file names, it auto-discovers every `.env*` file in the current directory:
+
+```bash
+dotenv-diff --matrix
+```
+
+With explicit file names, only those files are compared (replaces auto-discovery):
+
+```bash
+dotenv-diff --matrix .env.production .env.staging .env.example
+```
+
+Combine with `--check-values` to also flag keys whose value differs between files, and with `--ignore`/`--ignore-regex` to exclude expected per-environment keys.
+
+`--matrix` is a standalone mode (like `--explain`): it does not require `--compare` and ignores `--only`, `--fix`, and gitignore checks, since those are specific to the 1:1 env/example comparison.
+
+Exits with code `1` if any key is missing from at least one file (or mismatched with `--check-values`), and `0` when every file matches exactly.
+
+See [Matrix Comparison](./matrix.md) for full output examples and JSON shape.

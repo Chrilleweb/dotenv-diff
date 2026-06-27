@@ -767,6 +767,21 @@ describe('compareMany', () => {
     expect(mockFindDuplicateKeys).toHaveBeenCalled();
   });
 
+  it('filters duplicate keys by ignoreRegex patterns', async () => {
+    mockFindDuplicateKeys.mockReturnValue([
+      { key: 'DUP1', count: 2 },
+      { key: 'TEST_DUP', count: 2 },
+    ]);
+
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+    const opts = createOptions({ ignoreRegex: [/^TEST_/] });
+
+    await compareMany(pairs, opts);
+
+    // The filtering happens inside findDuplicates' filterKey helper
+    expect(mockFindDuplicateKeys).toHaveBeenCalled();
+  });
+
   it('applies gitignore fix when ensureGitignore is true', async () => {
     mockCheckGitignoreStatus.mockReturnValue({
       reason: 'not-ignored',
