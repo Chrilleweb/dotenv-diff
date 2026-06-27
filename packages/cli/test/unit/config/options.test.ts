@@ -104,4 +104,27 @@ describe('normalizeOptions', () => {
       normalizeOptions({ explain: true as unknown as string }).explain,
     ).toBeUndefined();
   });
+
+  it('enables matrix mode with no files when --matrix is given without values', () => {
+    const opts = normalizeOptions({ matrix: true });
+
+    expect(opts.matrix).toBe(true);
+    expect(opts.matrixFiles).toEqual([]);
+  });
+
+  it('enables matrix mode with explicit files when --matrix is given values', () => {
+    const opts = normalizeOptions({
+      matrix: ['.env.production', '.env.staging'],
+    });
+
+    expect(opts.matrix).toBe(true);
+    expect(opts.matrixFiles).toEqual(['.env.production', '.env.staging']);
+  });
+
+  it('disables matrix mode when --matrix is not provided', () => {
+    const opts = normalizeOptions({});
+
+    expect(opts.matrix).toBe(false);
+    expect(opts.matrixFiles).toEqual([]);
+  });
 });

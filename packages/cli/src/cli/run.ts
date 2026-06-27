@@ -15,6 +15,7 @@ import type {
 } from '../config/types.js';
 import { scanUsage } from '../commands/scanUsage.js';
 import { explainKey } from '../commands/explain.js';
+import { runMatrix } from '../commands/matrix.js';
 import { printErrorNotFound } from '../ui/compare/printErrorNotFound.js';
 import { setupGlobalConfig } from '../ui/shared/setupGlobalConfig.js';
 import { loadConfig } from '../config/loadConfig.js';
@@ -66,6 +67,20 @@ export async function run(program: Command): Promise<void> {
       json: opts.json,
     });
     process.exit(0);
+  }
+
+  // Handle --matrix flag
+  if (opts.matrix) {
+    const { exitWithError } = await runMatrix({
+      cwd: opts.cwd,
+      files: opts.matrixFiles,
+      ignore: opts.ignore,
+      ignoreRegex: opts.ignoreRegex,
+      checkValues: opts.checkValues,
+      json: opts.json,
+      showStats: opts.showStats,
+    });
+    process.exit(exitWithError ? 1 : 0);
   }
 
   // Route to appropriate command and handle exit

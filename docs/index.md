@@ -45,6 +45,7 @@ If you choose not to create a file, `dotenv-diff` will still scan your codebase 
 | [Configuration and Flags](./configuration_and_flags.md) | Full CLI/config reference for options and behavior |
 | [Baseline Workflow](./baseline.md) | Set a warning baseline and suppress already-known findings safely |
 | [Comparing Files](./compare.md) | How to compare two `.env` files to detect differences |
+| [Matrix Comparison](./matrix.md) | Compare 3+ env files side-by-side to spot drift between environments |
 | [Expiration Warnings](./expiration_warnings.md) | How `@expire` annotations work and strict mode integration |
 | [Ignore Comments](./ignore_comments.md) | Suppress false positives with inline/block ignore markers |
 | [Monorepo Support](./monorepo_support.md) | Scan shared packages and cross-folder usage in monorepos |

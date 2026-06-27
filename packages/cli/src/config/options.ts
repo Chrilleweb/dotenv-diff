@@ -61,6 +61,9 @@ export function normalizeOptions(raw: RawOptions): Options {
   const explain =
     typeof raw.explain === 'string' ? raw.explain.trim() : undefined;
 
+  const matrixFiles = Array.isArray(raw.matrix) ? raw.matrix : [];
+  const matrix = raw.matrix === true || matrixFiles.length > 0;
+
   const cwd = process.cwd();
   const envFlag =
     typeof raw.env === 'string' ? path.resolve(cwd, raw.env) : undefined;
@@ -103,6 +106,8 @@ export function normalizeOptions(raw: RawOptions): Options {
     inconsistentNamingWarnings,
     listAll,
     explain,
+    matrix,
+    matrixFiles,
   };
 }
 

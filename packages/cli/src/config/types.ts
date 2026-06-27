@@ -96,6 +96,7 @@ export interface RawOptions {
   inconsistentNamingWarnings?: boolean;
   listAll?: boolean;
   explain?: string;
+  matrix?: boolean | string[];
 }
 
 /**
@@ -141,6 +142,8 @@ export interface Options {
   inconsistentNamingWarnings: boolean;
   listAll: boolean;
   explain: string | undefined;
+  matrix: boolean;
+  matrixFiles: string[];
 }
 
 export type EnvPatternName = 'process.env' | 'import.meta.env' | 'sveltekit';
@@ -473,4 +476,54 @@ export interface BaselineFile {
   createdAt: string;
   /** The list of baseline entries */
   entries: BaselineEntry[];
+}
+
+/**
+ * A single file column being compared in matrix mode (--matrix).
+ */
+export interface MatrixFileInput {
+  /** Display name of the file (e.g. ".env.production") */
+  name: string;
+  /** Parsed and ignore-filtered key-value pairs for this file */
+  values: Record<string, string>;
+}
+
+/**
+ * A single key's presence/value status across all files compared in matrix mode.
+ */
+export interface MatrixRow {
+  /** The environment variable key */
+  key: string;
+  /** Whether each file (aligned with MatrixResult.files) defines this key */
+  presence: boolean[];
+  /** The value of this key in each file (aligned with MatrixResult.files), undefined when absent */
+  values: (string | undefined)[];
+  /** True when the key is present in 2+ files with differing values (only computed when checkValues is enabled) */
+  hasMismatch: boolean;
+}
+
+/**
+ * Result of comparing 2+ env files as a key-presence matrix (--matrix).
+ */
+export interface MatrixResult {
+  /** Display names of the compared files, in column order */
+  files: string[];
+  /** One row per unique key found across all files, sorted alphabetically */
+  rows: MatrixRow[];
+  /** True when every file has every key, with matching values when checkValues is enabled */
+  allMatch: boolean;
+}
+
+/**
+ * Options for running matrix comparison (--matrix flag).
+ */
+export interface MatrixRunOptions {
+  cwd: string;
+  /** Explicit file names/paths to compare; empty means auto-discover all .env* files in cwd */
+  files: string[];
+  ignore: string[];
+  ignoreRegex: RegExp[];
+  checkValues: boolean;
+  json: boolean;
+  showStats: boolean;
 }

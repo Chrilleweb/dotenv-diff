@@ -266,6 +266,17 @@ describe('processComparisonFile', () => {
     expect(result.error).toBeUndefined();
   });
 
+  it('tests duplicate keys against ignoreRegex patterns', () => {
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      allowDuplicates: false,
+      ignoreRegex: [/^ZZZ_/],
+    });
+
+    // The duplicate key ('A') doesn't match the regex, so it's kept.
+    expect(result.dupsEnv.length).toBeGreaterThan(0);
+  });
+
   it('skips duplicate check when allowDuplicates is true (lines 105-109)', () => {
     const result = processComparisonFile(baseScanResult, compareFile, {
       ...baseOpts,

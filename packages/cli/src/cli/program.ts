@@ -39,6 +39,10 @@ export function createProgram() {
       .option('--scan-usage', 'Scan codebase for environment variable usage')
       .option('--compare', 'Compare .env and .env.example files')
       .option(
+        '--matrix [files...]',
+        'Compare 2+ env files as a key matrix (auto-discovers all .env* files if none given)',
+      )
+      .option(
         '--include-files <patterns>',
         'Comma-separated file patterns to ADD to default scan patterns (extends default)',
       )

@@ -51,6 +51,10 @@ vi.mock('../../../src/commands/explain.js', () => ({
   explainKey: vi.fn(),
 }));
 
+vi.mock('../../../src/commands/matrix.js', () => ({
+  runMatrix: vi.fn(),
+}));
+
 import { run } from '../../../src/cli/run.js';
 import { normalizeOptions } from '../../../src/config/options.js';
 import { discoverEnvFiles } from '../../../src/services/envDiscovery.js';
@@ -62,6 +66,7 @@ import { setupGlobalConfig } from '../../../src/ui/shared/setupGlobalConfig.js';
 import { loadConfig } from '../../../src/config/loadConfig.js';
 import { runInit } from '../../../src/commands/init.js';
 import { explainKey } from '../../../src/commands/explain.js';
+import { runMatrix } from '../../../src/commands/matrix.js';
 import { DEFAULT_ENV_FILE } from '../../../src/config/constants.js';
 
 function createBaseOptions(overrides: Partial<Options> = {}): Options {
@@ -95,6 +100,8 @@ function createBaseOptions(overrides: Partial<Options> = {}): Options {
     listAll: false,
     explain: undefined,
     baseline: false,
+    matrix: false,
+    matrixFiles: [],
     ...overrides,
   };
 }
@@ -108,6 +115,7 @@ describe('run', () => {
   const mockScanUsage = scanUsage as ReturnType<typeof vi.fn>;
   const mockSetupGlobalConfig = setupGlobalConfig as ReturnType<typeof vi.fn>;
   const mockLoadConfig = loadConfig as ReturnType<typeof vi.fn>;
+  const mockRunMatrix = runMatrix as ReturnType<typeof vi.fn>;
   const mockRunInit = runInit as ReturnType<typeof vi.fn>;
   const mockExplainKey = explainKey as ReturnType<typeof vi.fn>;
 
@@ -509,5 +517,49 @@ describe('run', () => {
       expect.objectContaining({ key: 'DB_URL', json: true }),
     );
     expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('routes to runMatrix when opts.matrix is set and exits with 0 on success', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ matrix: true })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(
+      createBaseOptions({ matrix: true, matrixFiles: [] }),
+    );
+    mockRunMatrix.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    expect(mockRunMatrix).toHaveBeenCalledOnce();
+    expect(mockRunMatrix).toHaveBeenCalledWith(
+      expect.objectContaining({ files: [] }),
+    );
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('routes to runMatrix with explicit files and exits with 1 on differences', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ matrix: ['.env.production', '.env.staging'] })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(
+      createBaseOptions({
+        matrix: true,
+        matrixFiles: ['.env.production', '.env.staging'],
+      }),
+    );
+    mockRunMatrix.mockResolvedValue({ exitWithError: true });
+
+    await run(program);
+
+    expect(mockRunMatrix).toHaveBeenCalledWith(
+      expect.objectContaining({
+        files: ['.env.production', '.env.staging'],
+      }),
+    );
+    expect(exitSpy).toHaveBeenCalledWith(1);
   });
 });
