@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- changesets: matrix-comparison.md,ripe-ducks-flash.md -->
+## 2026-06-28
+
+### Highlights
+- add --matrix flag to compare 3+ env files side-by-side as a key-presence matrix, auto-discovering all .env\* files when none are given
+- added first class support for nuxt
+
+### Package Releases
+- dotenv-diff: minor
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | minor
+
 <!-- changesets: spicy-experts-own.md -->
 ## 2026-06-23
 

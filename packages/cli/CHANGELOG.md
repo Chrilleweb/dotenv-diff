@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.11.0
+
+### Minor Changes
+
+- 353cacf: add --matrix flag to compare 3+ env files side-by-side as a key-presence matrix, auto-discovering all .env\* files when none are given
+- 7bae585: added first class support for nuxt
+
 ## 2.10.2
 
 ### Patch Changes
