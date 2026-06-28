@@ -4,7 +4,7 @@ import { type SecretFinding } from '../core/security/secretDetectors.js';
 /**
  * Supported frameworks
  */
-export type SupportedFramework = 'sveltekit' | 'nextjs';
+export type SupportedFramework = 'sveltekit' | 'nextjs' | 'nuxt';
 
 /**
  * Result of framework detection (may be unsupported)

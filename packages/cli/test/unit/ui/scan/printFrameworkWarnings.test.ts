@@ -72,6 +72,22 @@ describe('printFrameworkWarnings', () => {
     expect(logSpy).toHaveBeenCalledWith('W(▸) H(Framework issues (SvelteKit))');
   });
 
+  it('prints warnings for Nuxt framework', () => {
+    const warnings: FrameworkWarning[] = [
+      {
+        variable: 'API_SECRET',
+        reason: 'Use useRuntimeConfig()',
+        file: 'file.ts',
+        line: 5,
+        framework: 'nuxt',
+      },
+    ];
+
+    printFrameworkWarnings(warnings);
+
+    expect(logSpy).toHaveBeenCalledWith('W(▸) H(Framework issues (Nuxt))');
+  });
+
   it('deduplicates identical warnings', () => {
     const warnings: FrameworkWarning[] = [
       {

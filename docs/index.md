@@ -53,6 +53,7 @@ If you choose not to create a file, `dotenv-diff` will still scan your codebase 
 | [Framework Warnings (Index)](./frameworks/index.md) | Framework detection and links to supported framework rules |
 | [SvelteKit warnings](./frameworks/sveltekit_warnings.md) | SvelteKit-specific env validation rules |
 | [Next.js warnings](./frameworks/nextjs_warnings.md) | Next.js-specific env validation rules |
+| [Nuxt warnings](./frameworks/nuxt_warnings.md) | Nuxt-specific env validation rules |
 
 ---
 

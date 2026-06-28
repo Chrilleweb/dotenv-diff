@@ -41,6 +41,20 @@ describe('detectFramework', () => {
     expect(result.version).toBe('12.0.0');
   });
 
+  it('detects nuxt', () => {
+    vi.spyOn(fs, 'existsSync').mockReturnValue(true);
+    vi.spyOn(fs, 'readFileSync').mockReturnValue(
+      JSON.stringify({
+        dependencies: { nuxt: '3.10.0' },
+      }),
+    );
+
+    const result = detectFramework('/project');
+
+    expect(result.framework).toBe('nuxt');
+    expect(result.version).toBe('3.10.0');
+  });
+
   it('returns unknown for unrecognized frameworks', () => {
     vi.spyOn(fs, 'existsSync').mockReturnValue(true);
     vi.spyOn(fs, 'readFileSync').mockReturnValue(

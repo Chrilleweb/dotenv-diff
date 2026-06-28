@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { DEFAULT_ENV_FILE } from '../config/constants.js';
+import { compareCodePoint } from '../core/helpers/compareCodePoint.js';
 
 /**
  * Matches `.env` itself or any `.env.*` variant (e.g. `.env.local`,
@@ -25,7 +26,7 @@ export function discoverMatrixFiles(cwd: string): string[] {
     .sort((a, b) => {
       if (a === DEFAULT_ENV_FILE) return -1;
       if (b === DEFAULT_ENV_FILE) return 1;
-      return a.localeCompare(b);
+      return compareCodePoint(a, b);
     });
 }
 

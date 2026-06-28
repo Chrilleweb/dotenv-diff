@@ -8,6 +8,7 @@ vi.mock('../../../../src/core/frameworks/frameworkDetector.js', () => ({
 vi.mock('../../../../src/core/frameworks/index.js', () => ({
   applySvelteKitRules: vi.fn(),
   applyNextJsRules: vi.fn(),
+  applyNuxtRules: vi.fn(),
 }));
 
 import { frameworkValidator } from '../../../../src/core/frameworks/frameworkValidator.js';
@@ -15,6 +16,7 @@ import { detectFramework } from '../../../../src/core/frameworks/frameworkDetect
 import {
   applySvelteKitRules,
   applyNextJsRules,
+  applyNuxtRules,
 } from '../../../../src/core/frameworks/index.js';
 
 afterEach(() => {
@@ -32,7 +34,7 @@ const mockUsage: EnvUsage = {
 
 describe('frameworkValidator', () => {
   it('applies SvelteKit rules when framework is sveltekit', () => {
-    (detectFramework as any).mockReturnValue({ framework: 'sveltekit' });
+    vi.mocked(detectFramework).mockReturnValue({ framework: 'sveltekit' });
 
     const warnings = frameworkValidator([mockUsage], '/project');
 
@@ -46,7 +48,7 @@ describe('frameworkValidator', () => {
   });
 
   it('applies Next.js rules when framework is nextjs', () => {
-    (detectFramework as any).mockReturnValue({ framework: 'nextjs' });
+    vi.mocked(detectFramework).mockReturnValue({ framework: 'nextjs' });
 
     const fileContentMap = new Map<string, string>([
       ['src/index.ts', 'use client'],
@@ -68,13 +70,26 @@ describe('frameworkValidator', () => {
     expect(warnings).toEqual([]);
   });
 
+  it('applies Nuxt rules when framework is nuxt', () => {
+    vi.mocked(detectFramework).mockReturnValue({ framework: 'nuxt' });
+
+    const warnings = frameworkValidator([mockUsage], '/project');
+
+    expect(applyNuxtRules).toHaveBeenCalledOnce();
+    expect(applyNuxtRules).toHaveBeenCalledWith(mockUsage, expect.any(Array));
+    expect(applySvelteKitRules).not.toHaveBeenCalled();
+    expect(applyNextJsRules).not.toHaveBeenCalled();
+    expect(warnings).toEqual([]);
+  });
+
   it('returns empty warnings when framework is unknown', () => {
-    (detectFramework as any).mockReturnValue({ framework: 'unknown' });
+    vi.mocked(detectFramework).mockReturnValue({ framework: 'unknown' });
 
     const warnings = frameworkValidator([mockUsage], '/project');
 
     expect(applySvelteKitRules).not.toHaveBeenCalled();
     expect(applyNextJsRules).not.toHaveBeenCalled();
+    expect(applyNuxtRules).not.toHaveBeenCalled();
     expect(warnings).toEqual([]);
   });
 });

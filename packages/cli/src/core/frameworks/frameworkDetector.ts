@@ -48,6 +48,14 @@ export function detectFramework(cwd: string): FrameworkDetection {
       };
     }
 
+    // Check for Nuxt
+    if (deps['nuxt']) {
+      return {
+        framework: 'nuxt',
+        version: deps['nuxt'],
+      };
+    }
+
     return { framework: 'unknown' };
   } catch {
     return { framework: 'unknown' };

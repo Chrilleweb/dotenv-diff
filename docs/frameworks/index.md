@@ -8,6 +8,7 @@ This section explains which framework-specific environment variable are currentl
 
 - [SvelteKit warnings](./sveltekit_warnings.md)
 - [Next.js warnings](./nextjs_warnings.md)
+- [Nuxt warnings](./nuxt_warnings.md)
 
 ---
 
@@ -19,6 +20,7 @@ E.g.
 
 - If `@sveltejs/kit` is present, SvelteKit rules are enabled.
 - If `next` is present, Next.js rules are enabled.
-- If neither is detected, framework-specific warnings are skipped.
+- If `nuxt` is present, Nuxt rules are enabled.
+- If none is detected, framework-specific warnings are skipped.
 
 ---

@@ -80,11 +80,42 @@ describe('discoverMatrixFiles', () => {
   });
 
   it('excludes broken symlinks matching the .env* pattern', () => {
-    fs.symlinkSync(
-      path.join(cwd, 'does-not-exist'),
-      path.join(cwd, '.env.broken-link'),
-    );
+    try {
+      fs.symlinkSync(
+        path.join(cwd, 'does-not-exist'),
+        path.join(cwd, '.env.broken-link'),
+      );
+    } catch (err) {
+      // Creating symlinks on Windows requires elevated privileges or
+      // Developer Mode. Skip this scenario when the environment can't make
+      // one rather than failing the whole suite.
+      if ((err as NodeJS.ErrnoException).code === 'EPERM') return;
+      throw err;
+    }
     fs.writeFileSync(path.join(cwd, '.env'), '');
+
+    const result = discoverMatrixFiles(cwd);
+
+    expect(result).toEqual(['.env']);
+  });
+
+  it('excludes entries whose stat() throws (e.g. broken symlinks)', () => {
+    // Platform-independent stand-in for the broken-symlink case: symlink
+    // creation is unreliable on Windows, so force statSync to throw for the
+    // dangling entry instead. This covers the isRegularFile catch branch.
+    fs.writeFileSync(path.join(cwd, '.env'), '');
+    vi.spyOn(fs, 'readdirSync').mockReturnValueOnce(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ['.env', '.env.dangling'] as any,
+    );
+    const realStat = fs.statSync.bind(fs);
+    vi.spyOn(fs, 'statSync').mockImplementation(((p: fs.PathLike) => {
+      if (String(p).endsWith('.env.dangling')) {
+        throw Object.assign(new Error('ENOENT'), { code: 'ENOENT' });
+      }
+      return realStat(p);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any);
 
     const result = discoverMatrixFiles(cwd);
 
