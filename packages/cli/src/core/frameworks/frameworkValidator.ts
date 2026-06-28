@@ -1,6 +1,10 @@
 import type { EnvUsage, FrameworkWarning } from '../../config/types.js';
 import { detectFramework } from './frameworkDetector.js';
-import { applySvelteKitRules, applyNextJsRules } from './index.js';
+import {
+  applySvelteKitRules,
+  applyNextJsRules,
+  applyNuxtRules,
+} from './index.js';
 
 /**
  * Validates environment variable usages against framework-specific rules
@@ -20,6 +24,7 @@ export function frameworkValidator(
   for (const u of usages) {
     if (framework === 'sveltekit') applySvelteKitRules(u, warnings);
     if (framework === 'nextjs') applyNextJsRules(u, warnings, fileContentMap);
+    if (framework === 'nuxt') applyNuxtRules(u, warnings);
   }
 
   return warnings;

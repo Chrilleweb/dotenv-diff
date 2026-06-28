@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import type { Discovery } from '../config/types.js';
 import { DEFAULT_ENV_FILE, DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
+import { compareCodePoint } from '../core/helpers/compareCodePoint.js';
 
 /**
  * Arguments for the discoverEnvFiles function.
@@ -34,7 +35,7 @@ export function discoverEnvFiles({
       (f) =>
         f.startsWith(DEFAULT_ENV_FILE) && !f.startsWith(DEFAULT_EXAMPLE_FILE),
     )
-    .sort((a, b) => (b === DEFAULT_ENV_FILE ? 1 : a.localeCompare(b)));
+    .sort((a, b) => (b === DEFAULT_ENV_FILE ? 1 : compareCodePoint(a, b)));
 
   let primaryEnv = envFiles.includes(DEFAULT_ENV_FILE)
     ? DEFAULT_ENV_FILE

@@ -20,6 +20,7 @@ import { normalizePath } from '../../core/helpers/normalizePath.js';
 const FRAMEWORK_LABELS: Record<DetectedFramework, string> = {
   nextjs: 'Next.js',
   sveltekit: 'SvelteKit',
+  nuxt: 'Nuxt',
   unknown: 'Unknown Framework',
 };
 

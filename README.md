@@ -2,7 +2,7 @@
 
 Scan your codebase to detect every environment variable reference. It helps you catch missing, unused, duplicated, and misused variables early, before they cause runtime errors.
 
-First-class support for SvelteKit and Next.js. Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js, Nuxt, and Vue — or any other setup where you want reliable .env file comparison.
+First-class support for SvelteKit, Next.js, and Nuxt. Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js and Vue — or any other setup where you want reliable .env file comparison.
 
 [![Coverage Status](https://codecov.io/gh/Chrilleweb/dotenv-diff/branch/main/graph/badge.svg)](https://codecov.io/gh/Chrilleweb/dotenv-diff)
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
@@ -52,7 +52,7 @@ Easily integrate dotenv-diff into your Git hooks or CI/CD pipelines to enforce e
 
 ## Framework-Specific Warnings
 
-In SvelteKit and Next.js projects, dotenv-diff detects framework-specific
+In SvelteKit, Next.js, and Nuxt projects, dotenv-diff detects framework-specific
 environment variable misuses.
 
 Example warning:
