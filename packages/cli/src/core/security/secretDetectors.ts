@@ -199,19 +199,43 @@ function looksHarmlessLiteral(s: string): boolean {
 }
 
 /**
+ * Checks if a string literal is itself a full URL (e.g. an API endpoint).
+ *
+ * Such literals routinely contain words like `token`, `auth`, or `secret`
+ * inside their path (e.g. "https://api.example.com/v1/token/refresh"), which
+ * would otherwise be flagged as a "token-like literal assignment". Full URLs
+ * are already surfaced separately by {@link HTTPS_PATTERN} at `low` severity,
+ * so the suspicious-key path should not double-report them as `medium`.
+ *
+ * Note: this intentionally lives outside {@link looksHarmlessLiteral} because
+ * that helper gates the HTTPS detection itself — marking URLs harmless there
+ * would suppress the low-severity HTTPS finding entirely.
+ * @param s - The literal to check.
+ * @returns True if the literal is a full or protocol-relative URL.
+ */
+function looksLikeUrlLiteral(s: string): boolean {
+  return (
+    /^[a-z][a-z0-9+.-]*:\/\//i.test(s) || // scheme://… (http, https, ws, ftp, …)
+    /^\/\/[^/\s]+\//.test(s) // protocol-relative //host/…
+  );
+}
+
+/**
  * Checks if a line looks like a URL construction pattern.
  * @param line - The line to check.
  * @returns True if the line looks like URL construction, false otherwise.
  */
 function looksLikeUrlConstruction(line: string): boolean {
+  // Allow an optional JSX expression brace between `=` and the literal, e.g.
+  // `action={`${BASE}/auth/...`}` — otherwise the `{` breaks the `=`-anchor.
   // Check for template literals or string concatenation that looks like URLs
   return (
     // Template literals with URL-like patterns
-    /=\s*`[^`]*\$\{[^}]+\}[^`]*\/[^`]*`/.test(line) ||
+    /=\s*\{?\s*`[^`]*\$\{[^}]+\}[^`]*\/[^`]*`/.test(line) ||
     // String concatenation with slashes
-    /=\s*["'][^"']*\/[^"']*["']\s*\+/.test(line) ||
+    /=\s*\{?\s*["'][^"']*\/[^"']*["']\s*\+/.test(line) ||
     // Contains common URL patterns
-    /=\s*["'`][^"'`]*\/[^"'`]*(auth|api|login|redirect|callback|protocol)[^"'`]*\/[^"'`]*["'`]/.test(
+    /=\s*\{?\s*["'`][^"'`]*\/[^"'`]*(auth|api|login|redirect|callback|protocol)[^"'`]*\/[^"'`]*["'`]/.test(
       line,
     ) ||
     // Keycloak-specific patterns
@@ -347,6 +371,7 @@ export function detectSecretsInSource(
         literal &&
         !looksHarmlessLiteral(literal) &&
         !looksLikeUiLabel(literal) &&
+        !looksLikeUrlLiteral(literal) &&
         !looksLikeUrlConstruction(line) &&
         literal.length >= 12 &&
         !isEnvAccessor(line) &&
