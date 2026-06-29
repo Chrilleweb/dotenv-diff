@@ -366,6 +366,50 @@ const token = "AKIAIOSFODNN7EXAMPLE";
       expect(findings).toHaveLength(0);
     });
 
+    it('does not flag a full URL literal containing "token" in its path as a token-like assignment', () => {
+      // Regression: `token` in the URL path triggered SUSPICIOUS_KEYS, and the URL
+      // was not caught by looksLikeUrlConstruction (no auth/api/login keyword),
+      // so it slipped through as a medium "token-like literal assignment".
+      const source =
+        'const tokenUrl = "https://cdn.myservice.com/v1/token/refresh";';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      // The URL is still reported as a low-severity HTTPS finding, but never as
+      // a medium token-like literal assignment.
+      expect(
+        findings.some((f) => f.message.includes('password/secret/token-like')),
+      ).toBe(false);
+      expect(findings.every((f) => f.severity === 'low')).toBe(true);
+    });
+
+    it('does not flag a secret-containing URL path as a token-like assignment', () => {
+      const source =
+        'const endpoint = "https://api.internal.io/auth/secret/rotate";';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(
+        findings.some((f) => f.message.includes('password/secret/token-like')),
+      ).toBe(false);
+    });
+
+    it('still flags a real hardcoded secret assigned to a token-named variable', () => {
+      // Guard: the URL-literal skip must not suppress genuine secrets.
+      const source = 'const token = "MyVeryLongSecretValue123";';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(
+        findings.some((f) => f.message.includes('password/secret/token-like')),
+      ).toBe(true);
+    });
+
+    it('honors the // dotenv-diff-ignore-secret inline comment', () => {
+      const source =
+        'const token = "MyVeryLongSecretValue123"; // dotenv-diff-ignore-secret';
+      const findings = detectSecretsInSource('test.ts', source);
+
+      expect(findings).toHaveLength(0);
+    });
+
     it('should detect HTTPS URLs as low severity', () => {
       const source = 'const apiUrl = "https://api.realservice.com/endpoint";';
       const findings = detectSecretsInSource('test.ts', source);
