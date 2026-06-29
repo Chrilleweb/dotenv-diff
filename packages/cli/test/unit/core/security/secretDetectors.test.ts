@@ -410,6 +410,19 @@ const token = "AKIAIOSFODNN7EXAMPLE";
       expect(findings).toHaveLength(0);
     });
 
+    it('does not flag a JSX template-literal URL construction with token/password in the path', () => {
+      // Regression: JSX `action={`...`}` puts a `{` between `=` and the backtick,
+      // which broke the looksLikeUrlConstruction `=`-anchor, so the URL path
+      // (containing "reset-password" and "token") was flagged as a secret.
+      const source =
+        'action={`${API_BASE_URL}/auth/reset-password/${uidb64?.toString()}/${token?.toString()}/`}';
+      const findings = detectSecretsInSource('src/index.tsx', source);
+
+      expect(
+        findings.some((f) => f.message.includes('password/secret/token-like')),
+      ).toBe(false);
+    });
+
     it('should detect HTTPS URLs as low severity', () => {
       const source = 'const apiUrl = "https://api.realservice.com/endpoint";';
       const findings = detectSecretsInSource('test.ts', source);

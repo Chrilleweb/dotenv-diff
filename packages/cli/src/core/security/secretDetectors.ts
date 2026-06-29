@@ -226,14 +226,16 @@ function looksLikeUrlLiteral(s: string): boolean {
  * @returns True if the line looks like URL construction, false otherwise.
  */
 function looksLikeUrlConstruction(line: string): boolean {
+  // Allow an optional JSX expression brace between `=` and the literal, e.g.
+  // `action={`${BASE}/auth/...`}` — otherwise the `{` breaks the `=`-anchor.
   // Check for template literals or string concatenation that looks like URLs
   return (
     // Template literals with URL-like patterns
-    /=\s*`[^`]*\$\{[^}]+\}[^`]*\/[^`]*`/.test(line) ||
+    /=\s*\{?\s*`[^`]*\$\{[^}]+\}[^`]*\/[^`]*`/.test(line) ||
     // String concatenation with slashes
-    /=\s*["'][^"']*\/[^"']*["']\s*\+/.test(line) ||
+    /=\s*\{?\s*["'][^"']*\/[^"']*["']\s*\+/.test(line) ||
     // Contains common URL patterns
-    /=\s*["'`][^"'`]*\/[^"'`]*(auth|api|login|redirect|callback|protocol)[^"'`]*\/[^"'`]*["'`]/.test(
+    /=\s*\{?\s*["'`][^"'`]*\/[^"'`]*(auth|api|login|redirect|callback|protocol)[^"'`]*\/[^"'`]*["'`]/.test(
       line,
     ) ||
     // Keycloak-specific patterns
