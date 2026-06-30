@@ -1,5 +1,6 @@
 import type { EnvUsage, FrameworkWarning } from '../../config/types.js';
 import { normalizePath } from '../helpers/normalizePath.js';
+import { SENSITIVE_KEYWORDS_PATTERN } from './constants.js';
 
 /**
  * Nuxt environment variable validation rules.
@@ -59,7 +60,7 @@ export function applyNuxtRules(
   // Warn if NUXT_PUBLIC_ contains sensitive keywords (exposed to the browser)
   if (
     u.variable.startsWith('NUXT_PUBLIC_') &&
-    /SECRET|PRIVATE|PASSWORD/.test(u.variable)
+    SENSITIVE_KEYWORDS_PATTERN.test(u.variable)
   ) {
     warnings.push({
       variable: u.variable,
