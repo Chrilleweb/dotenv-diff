@@ -8,6 +8,9 @@ type Pattern = {
   sourceModule?: string;
 };
 
+/** Matches a valid UPPER_SNAKE_CASE environment variable name. */
+const ENV_VAR_NAME_PATTERN = /^[A-Z_][A-Z0-9_]*$/;
+
 /**
  * Matches SvelteKit $env imports to collect import sources per file.
  * Example: import { env } from '$env/dynamic/private'
@@ -55,7 +58,7 @@ export function buildSveltekitAliasPatterns(
             const [key] = part.split(/[:=]/);
             return key ? key.trim() : '';
           })
-          .filter((key) => /^[A-Z_][A-Z0-9_]*$/.test(key));
+          .filter((key) => ENV_VAR_NAME_PATTERN.test(key));
       },
     },
   ];
@@ -113,7 +116,7 @@ export const ENV_PATTERNS: Pattern[] = [
           const [key] = part.split(/[:=]/);
           return key ? key.trim() : '';
         })
-        .filter((key) => /^[A-Z_][A-Z0-9_]*$/.test(key));
+        .filter((key) => ENV_VAR_NAME_PATTERN.test(key));
     },
   },
 
@@ -173,7 +176,7 @@ export const ENV_PATTERNS: Pattern[] = [
           const [key] = part.split(/[:=]/);
           return key ? key.trim() : '';
         })
-        .filter((key) => /^[A-Z_][A-Z0-9_]*$/.test(key));
+        .filter((key) => ENV_VAR_NAME_PATTERN.test(key));
     },
   },
 
