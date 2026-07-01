@@ -48,7 +48,7 @@ importers:
         specifier: ^3.9.4
         version: 3.9.4
       turbo:
-        specifier: ^2.10.1
+        specifier: ^2.10.0
         version: 2.10.1
       typescript:
         specifier: ^6.0.3

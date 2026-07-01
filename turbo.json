@@ -2,26 +2,32 @@
   "$schema": "https://turborepo.org/schema.json",
   "tasks": {
     "build": {
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "format": {
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "lint": {
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "test": {
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "coverage": {
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "lint-staged": {
-      "cache": false
+      "cache": false,
+      "persistent": true
     }
   }
 }
