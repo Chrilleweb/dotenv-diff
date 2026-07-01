@@ -1,5 +1,22 @@
 # Changelog
 
+<!-- changesets: node-22-minimum.md,secret-url-literal-false-positive.md -->
+## 2026-07-01
+
+### Highlights
+- drop support for Node.js 20 - minimum supported version is now Node.js 22
+- Fix false positive where URL literals are detected as secrets.
+
+### Package Releases
+- dotenv-diff: major
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | major
+dotenv-diff | patch
+
 <!-- changesets: matrix-comparison.md,ripe-ducks-flash.md -->
 ## 2026-06-28
 

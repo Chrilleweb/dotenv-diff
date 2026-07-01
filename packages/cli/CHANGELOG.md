@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.0
+
+### Major Changes
+
+- c310629: drop support for Node.js 20 - minimum supported version is now Node.js 22
+
+### Patch Changes
+
+- 067f2cd: Fix false positive where URL literals are detected as secrets.
+
 ## 2.11.0
 
 ### Minor Changes
