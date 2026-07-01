@@ -4,7 +4,9 @@
  * @param concurrency The maximum number of concurrent tasks allowed.
  * @returns A function that wraps async tasks to enforce the concurrency limit.
  */
-export function createConcurrencyLimit(concurrency: number) {
+export function createConcurrencyLimit(
+  concurrency: number,
+): <T>(fn: () => Promise<T>) => Promise<T> {
   let active = 0;
   const queue: (() => void)[] = [];
 

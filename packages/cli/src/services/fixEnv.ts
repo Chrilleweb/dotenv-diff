@@ -51,7 +51,7 @@ export function applyFixes(options: ApplyFixesOptions): {
     const duplicateSet = new Set(duplicateKeys);
 
     const raw = fs.readFileSync(envPath, 'utf-8');
-    const eol = raw.includes('\r\n') ? '\r\n' : '\n';
+    const eol = detectEol(raw);
     const lines = raw.split(eol);
     const seen = new Set<string>();
     const newLines: string[] = [];
@@ -78,7 +78,7 @@ export function applyFixes(options: ApplyFixesOptions): {
   // --- Add missing keys to .env ---
   if (missingKeys.length) {
     const content = fs.readFileSync(envPath, 'utf-8');
-    const eol = content.includes('\r\n') ? '\r\n' : '\n';
+    const eol = detectEol(content);
     const separator = content.length > 0 && !content.endsWith('\n') ? eol : '';
     const newContent =
       content + separator + missingKeys.map((k) => `${k}=`).join(eol) + eol;
@@ -96,6 +96,16 @@ export function applyFixes(options: ApplyFixesOptions): {
     result.gitignoreUpdated;
 
   return { changed, result };
+}
+
+/**
+ * Detects the end-of-line sequence used in a text blob, so rewrites preserve
+ * the file's existing line endings (CRLF on Windows-authored files, LF otherwise).
+ * @param text - The file content to inspect.
+ * @returns '\r\n' if the text contains a CRLF, otherwise '\n'.
+ */
+function detectEol(text: string): string {
+  return text.includes('\r\n') ? '\r\n' : '\n';
 }
 
 /**

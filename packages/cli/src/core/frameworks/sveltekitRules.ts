@@ -1,5 +1,6 @@
 import type { EnvUsage, FrameworkWarning } from '../../config/types.js';
 import { normalizePath } from '../helpers/normalizePath.js';
+import { SENSITIVE_KEYWORDS_PATTERN } from './constants.js';
 
 /**
  * Applies SvelteKit specific rules to environment variable usage
@@ -157,7 +158,7 @@ export function applySvelteKitRules(
   // Warn if PUBLIC_ or VITE_ contains sensitive keywords
   if (
     (u.variable.startsWith('PUBLIC_') || u.variable.startsWith('VITE_')) &&
-    /SECRET|PRIVATE|PASSWORD/.test(u.variable)
+    SENSITIVE_KEYWORDS_PATTERN.test(u.variable)
   ) {
     warnings.push({
       variable: u.variable,

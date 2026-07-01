@@ -1,5 +1,6 @@
 import type { EnvUsage, FrameworkWarning } from '../../config/types.js';
 import { normalizePath } from '../helpers/normalizePath.js';
+import { SENSITIVE_KEYWORDS_PATTERN } from './constants.js';
 
 /**
  * Next.js environment variable validation rules
@@ -66,7 +67,7 @@ export function applyNextJsRules(
   // Warn if NEXT_PUBLIC_ contains sensitive keywords
   if (
     u.variable.startsWith('NEXT_PUBLIC_') &&
-    /SECRET|PRIVATE|PASSWORD/.test(u.variable)
+    SENSITIVE_KEYWORDS_PATTERN.test(u.variable)
   ) {
     warnings.push({
       variable: u.variable,

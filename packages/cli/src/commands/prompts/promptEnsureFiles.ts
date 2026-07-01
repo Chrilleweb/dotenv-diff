@@ -35,6 +35,16 @@ interface EnsureFilesArgs {
   isCiMode: boolean;
 }
 /**
+ * Result returned when no file is created and the caller should stop cleanly
+ * (e.g. user declined, CI mode, or already warned about the missing file).
+ */
+const EXIT_WITHOUT_CREATING: EnsureFilesResult = {
+  didCreate: false,
+  shouldExit: true,
+  exitCode: 0,
+};
+
+/**
  * Ensures that the necessary .env files exist or prompts the user to create them.
  * This function handles only scenarios where the --compare flag is set
  * @param args - The arguments for the function.
@@ -57,14 +67,14 @@ export async function promptEnsureFiles(
       .some((f) => f.startsWith(DEFAULT_ENV_FILE));
     if (!hasAnyEnv) {
       printPrompt.noEnvFound();
-      return { didCreate: false, shouldExit: true, exitCode: 0 };
+      return EXIT_WITHOUT_CREATING;
     }
   }
 
   // Case 2: missing .env but has .env.example
   if (!envExists && exampleExists) {
     if (args.alreadyWarnedMissingEnv) {
-      return { didCreate: false, shouldExit: true, exitCode: 0 };
+      return EXIT_WITHOUT_CREATING;
     }
     printPrompt.missingEnv(envPath);
     const createEnv = isYesMode
@@ -78,7 +88,7 @@ export async function promptEnsureFiles(
 
     if (!createEnv) {
       printPrompt.skipCreation(path.basename(envPath));
-      return { didCreate: false, shouldExit: true, exitCode: 0 };
+      return EXIT_WITHOUT_CREATING;
     }
 
     const exampleContent = fs.readFileSync(examplePath, 'utf-8');
@@ -91,7 +101,7 @@ export async function promptEnsureFiles(
   // Case 3: has .env but is missing .env.example
   if (envExists && !exampleExists) {
     if (args.alreadyWarnedMissingEnv) {
-      return { didCreate: false, shouldExit: true, exitCode: 0 };
+      return EXIT_WITHOUT_CREATING;
     }
     printPrompt.missingEnv(examplePath);
     let createExample: boolean;
@@ -108,7 +118,7 @@ export async function promptEnsureFiles(
 
     if (!createExample) {
       printPrompt.skipCreation(path.basename(examplePath));
-      return { didCreate: false, shouldExit: true, exitCode: 0 };
+      return EXIT_WITHOUT_CREATING;
     }
 
     const envContent = fs

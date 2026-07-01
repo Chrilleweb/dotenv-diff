@@ -271,6 +271,9 @@ function isPureInterpolationTemplate(s: string): boolean {
 // Threshold is the value between 0 and 1 that determines the sensitivity of the detection.
 const DEFAULT_SECRET_THRESHOLD = 0.85 as const;
 
+// Maximum length of the source line stored on each finding's `snippet`.
+const SNIPPET_MAX_LENGTH = 180 as const;
+
 /**
  * Optimized for sveltekit and vite env accessors
  * @param line - A line of code to check.
@@ -340,7 +343,7 @@ export function detectSecretsInSource(
           kind: 'pattern',
           message:
             'HTTPS URL detected – consider moving to an environment variable',
-          snippet: line.trim().slice(0, 180),
+          snippet: line.trim().slice(0, SNIPPET_MAX_LENGTH),
           severity: 'low',
         });
       }
@@ -382,7 +385,7 @@ export function detectSecretsInSource(
           line: lineNo,
           kind: 'pattern',
           message: 'matches password/secret/token-like literal assignment',
-          snippet: line.trim().slice(0, 180),
+          snippet: line.trim().slice(0, SNIPPET_MAX_LENGTH),
           severity: 'medium',
         });
       }
@@ -396,7 +399,7 @@ export function detectSecretsInSource(
           line: lineNo,
           kind: 'pattern',
           message: 'matches known provider key pattern',
-          snippet: line.trim().slice(0, 180),
+          snippet: line.trim().slice(0, SNIPPET_MAX_LENGTH),
           severity: 'high',
         });
       }
@@ -416,7 +419,7 @@ export function detectSecretsInSource(
           line: lineNo,
           kind: 'entropy',
           message,
-          snippet: line.trim().slice(0, 180),
+          snippet: line.trim().slice(0, SNIPPET_MAX_LENGTH),
           severity: determineEntropySeverity(literal.length),
         });
       }

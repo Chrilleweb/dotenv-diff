@@ -57,7 +57,5 @@ function areInconsistentlyNamed(key1: string, key2: string): boolean {
     return true;
   }
 
-  // Check for partial matches that might indicate inconsistency
-  // e.g., DATABASE_URL vs DATABASEURL, JWT_SECRET vs JWTSECRET
   return false;
 }

@@ -119,7 +119,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build project
-        run: pnpm build
+        run: pnpm --filter dotenv-diff run build
 
       - name: Run tests
-        run: pnpm test
+        run: pnpm --filter dotenv-diff run test
