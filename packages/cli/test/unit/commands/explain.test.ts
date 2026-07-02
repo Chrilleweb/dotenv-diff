@@ -26,7 +26,7 @@ vi.mock('../../../src/ui/scan/printExplain.js', () => ({
 
 import { scanCodebase } from '../../../src/services/scanCodebase.js';
 import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
-import { findDuplicateKeys } from '../../../src/core/duplicates.js';
+import { findDuplicateKeys } from '../../../src/services/duplicates.js';
 import { skipCommentedUsages } from '../../../src/core/scan/skipCommentedUsages.js';
 import { printExplain } from '../../../src/ui/scan/printExplain.js';
 

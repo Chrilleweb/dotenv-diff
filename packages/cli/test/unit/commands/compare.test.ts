@@ -81,7 +81,7 @@ vi.mock('../../../src/ui/compare/printErrorNotFound.js', () => ({
 import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
 import { diffEnv } from '../../../src/core/diffEnv.js';
 import { checkGitignoreStatus } from '../../../src/services/git.js';
-import { findDuplicateKeys } from '../../../src/core/duplicates.js';
+import { findDuplicateKeys } from '../../../src/services/duplicates.js';
 import { filterIgnoredKeys } from '../../../src/core/helpers/filterIgnoredKeys.js';
 import { updateTotals } from '../../../src/core/compare/updateTotals.js';
 import { applyFixes } from '../../../src/services/fixEnv.js';
