@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { scanCodebase } from '../services/scanCodebase.js';
 import { parseEnvFile } from '../services/parseEnvFile.js';
-import { findDuplicateKeys } from '../core/duplicates.js';
+import { findDuplicateKeys } from '../services/duplicates.js';
 import type { ScanOptions } from '../config/types.js';
 import { DEFAULT_ENV_FILE, DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import { printExplain, type ExplainResult } from '../ui/scan/printExplain.js';

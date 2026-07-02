@@ -23,7 +23,7 @@ vi.mock('../../../src/core/scan/compareScan.js', () => ({
   compareWithEnvFiles: vi.fn((scan) => scan),
 }));
 
-vi.mock('../../../src/core/duplicates.js', () => ({
+vi.mock('../../../src/services/duplicates.js', () => ({
   findDuplicateKeys: vi.fn(() => [{ key: 'A', count: 2 }]),
 }));
 
@@ -60,7 +60,7 @@ import fs from 'fs';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { applyFixes } from '../../../src/services/fixEnv.js';
 import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
-import { findDuplicateKeys } from '../../../src/core/duplicates.js';
+import { findDuplicateKeys } from '../../../src/services/duplicates.js';
 import { resolveFromCwd } from '../../../src/core/helpers/resolveFromCwd.js';
 
 describe('processComparisonFile', () => {

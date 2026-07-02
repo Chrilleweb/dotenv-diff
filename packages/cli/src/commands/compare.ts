@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { diffEnv } from '../core/diffEnv.js';
 import { checkGitignoreStatus } from '../services/git.js';
-import { findDuplicateKeys } from '../core/duplicates.js';
+import { findDuplicateKeys } from '../services/duplicates.js';
 import type {
   Category,
   ComparisonOptions,
