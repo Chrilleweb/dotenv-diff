@@ -23,7 +23,7 @@ vi.mock('../../../src/core/scan/compareScan.js', () => ({
   compareWithEnvFiles: vi.fn((scan) => scan),
 }));
 
-vi.mock('../../../src/core/duplicates.js', () => ({
+vi.mock('../../../src/services/duplicates.js', () => ({
   findDuplicateKeys: vi.fn(() => [{ key: 'A', count: 2 }]),
 }));
 

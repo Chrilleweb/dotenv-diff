@@ -12,7 +12,7 @@ vi.mock('../../../src/services/parseEnvFile.js', () => ({
   parseEnvFile: vi.fn(),
 }));
 
-vi.mock('../../../src/core/duplicates.js', () => ({
+vi.mock('../../../src/services/duplicates.js', () => ({
   findDuplicateKeys: vi.fn(),
 }));
 

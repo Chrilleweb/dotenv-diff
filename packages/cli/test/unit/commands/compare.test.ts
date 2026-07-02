@@ -22,7 +22,7 @@ vi.mock('../../../src/services/git.js', () => ({
   checkGitignoreStatus: vi.fn(),
 }));
 
-vi.mock('../../../src/core/duplicates.js', () => ({
+vi.mock('../../../src/services/duplicates.js', () => ({
   findDuplicateKeys: vi.fn(),
 }));
 
