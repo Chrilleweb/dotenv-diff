@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.1.0
+
+### Minor Changes
+
+- edcf089: Add "did you mean" typo suggestions for missing keys.
+- b81c102: Support nested `.env.example` files in monorepos.
+
+### Patch Changes
+
+- 44280a7: Stop flagging config loader variables as unused.
+- a4db243: Fix secret detector for false positives
+- 8ca674f: Label Vite `loadEnv(...)` usage with the new `"vite"` pattern instead of mislabeling it `"sveltekit"`.
+
 ## 3.0.0
 
 ### Major Changes

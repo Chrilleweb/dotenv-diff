@@ -1,5 +1,25 @@
 # Changelog
 
+<!-- changesets: config-loader-unused.md,fuzzy-typo-suggestions.md,monorepo-nested-example.md,secret-value-shape-gate.md,vite-loadenv-pattern-label.md -->
+## 2026-07-16
+
+### Highlights
+- Stop flagging config loader variables as unused.
+- Add "did you mean" typo suggestions for missing keys.
+- Support nested `.env.example` files in monorepos.
+- Fix secret detector for false positives
+- Label Vite `loadEnv(...)` usage with the new `"vite"` pattern instead of mislabeling it `"sveltekit"`.
+
+### Package Releases
+- dotenv-diff: patch
+- dotenv-diff: minor
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+dotenv-diff | minor
+
 <!-- changesets: node-22-minimum.md,secret-url-literal-false-positive.md -->
 ## 2026-07-06
 
