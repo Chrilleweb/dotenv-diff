@@ -2,6 +2,7 @@ import fs from 'fs';
 import { parseEnvFile } from './parseEnvFile.js';
 import { filterIgnoredKeys } from '../core/helpers/filterIgnoredKeys.js';
 import { compareWithEnvFiles } from '../core/scan/compareScan.js';
+import { discoverExampleScopes } from './exampleDiscovery.js';
 import { findDuplicateKeys } from './duplicates.js';
 import { applyFixes } from './fixEnv.js';
 import { toUpperSnakeCase } from '../core/helpers/toUpperSnakeCase.js';
@@ -84,11 +85,20 @@ export function processComparisonFile(
       opts.ignoreRegex,
     );
     envVariables = Object.fromEntries(envKeys.map((k) => [k, envFull[k]]));
+
+    // Monorepo support: also honor `.env.example` files in subdirectories, so a
+    // variable documented next to where it is used is not reported as missing.
+    const scopes = discoverExampleScopes(opts.cwd, {
+      exclude: opts.exclude,
+      ignore: opts.ignore,
+      ignoreRegex: opts.ignoreRegex,
+    });
     scanResult = compareWithEnvFiles(
       scanResult,
       envVariables,
       opts.ignore,
       opts.ignoreRegex,
+      scopes,
     );
     comparedAgainst = compareFile.name;
 
