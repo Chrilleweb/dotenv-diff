@@ -612,6 +612,66 @@ const email = "user@example.com";
       expect(findings.length).toBeGreaterThan(0);
     });
 
+    describe('suspicious-key value shape (identifier false positives)', () => {
+      const hasSuspiciousKeyFinding = (
+        findings: ReturnType<typeof detectSecretsInSource>,
+      ) =>
+        findings.some((f) => f.message.includes('password/secret/token-like'));
+
+      it('does not flag a lowercase kebab-case slug value (secret-scanning)', () => {
+        const source = 'const SecretScanning = "secret-scanning";';
+        const findings = detectSecretsInSource('src/enums.ts', source);
+
+        expect(hasSuspiciousKeyFinding(findings)).toBe(false);
+      });
+
+      it('does not flag a short single-class slug (reveal-secret)', () => {
+        const source = 'const REVEAL_SECRET = "reveal-secret";';
+        const findings = detectSecretsInSource('src/enums.ts', source);
+
+        expect(hasSuspiciousKeyFinding(findings)).toBe(false);
+      });
+
+      it('does not flag a longer single-class slug below the entropy threshold', () => {
+        const source = 'const GATEWAY_TOKEN_HEADER = "x-gateway-upload-token";';
+        const findings = detectSecretsInSource('src/headers.ts', source);
+
+        expect(hasSuspiciousKeyFinding(findings)).toBe(false);
+      });
+
+      it('still flags a mixed-character-class value (>= 2 classes)', () => {
+        const source = 'const secret = "MyVeryLongSecretValue123";';
+        const findings = detectSecretsInSource('src/config.ts', source);
+
+        expect(hasSuspiciousKeyFinding(findings)).toBe(true);
+      });
+
+      it('flags an uppercase+digit value with no lowercase (>= 2 classes)', () => {
+        // No lowercase and no known prefix, so it must reach the character-class
+        // counter and qualify on uppercase + digit alone.
+        const source = 'const secret = "UPPER-SECRET-VALUE-XYZ-123";';
+        const findings = detectSecretsInSource('src/config.ts', source);
+
+        expect(hasSuspiciousKeyFinding(findings)).toBe(true);
+      });
+
+      it('flags a single-class value carrying a known credential prefix', () => {
+        // `xoxb-` prefix marks it as a real token even though it is lowercase-only
+        // and below the entropy threshold, so the prefix branch must admit it.
+        const source = 'const token = "xoxb-sluglooking-lowercase";';
+        const findings = detectSecretsInSource('src/slack.ts', source);
+
+        expect(hasSuspiciousKeyFinding(findings)).toBe(true);
+      });
+
+      it('flags a long high-entropy single-class value via the entropy fallback', () => {
+        const source = 'const secret = "qkxjwvzhbmfpdnrtglcyuseio";';
+        const findings = detectSecretsInSource('src/config.ts', source);
+
+        expect(hasSuspiciousKeyFinding(findings)).toBe(true);
+      });
+    });
+
     describe('charset and alphabet detection', () => {
       it('should ignore full alphanumeric alphabet (customAlphabet pattern)', () => {
         // The exact case from the bug report

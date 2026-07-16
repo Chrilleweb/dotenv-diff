@@ -268,6 +268,48 @@ function isPureInterpolationTemplate(s: string): boolean {
   return /^[\s:|,._-]*$/.test(withoutInterpolations);
 }
 
+// Known credential value prefixes that mark a real secret regardless of its character mix.
+const SECRET_VALUE_PREFIXES =
+  /^(sk-|sk_|pk_|rk_|ghp_|gho_|ghu_|ghs_|ghr_|github_pat_|xox[baprs]-|eyJ|AKIA|ASIA|AIza|ya29\.)/;
+
+// A single-class value only counts as a secret when it is both long and high-entropy.
+const SINGLE_CLASS_MIN_LENGTH = 20 as const;
+const SINGLE_CLASS_MIN_ENTROPY = 0.7 as const;
+
+/**
+ * Counts how many distinct character classes (lowercase, uppercase, digit) a value uses.
+ * @param v - The value to inspect.
+ * @returns The number of character classes present (0–3).
+ */
+function characterClassCount(v: string): number {
+  let count = 0;
+  if (/[a-z]/.test(v)) count++;
+  if (/[A-Z]/.test(v)) count++;
+  if (/[0-9]/.test(v)) count++;
+  return count;
+}
+
+/**
+ * Decides whether a value assigned to a suspiciously-named key actually looks like a
+ * credential rather than a kebab/snake-case identifier or enum slug.
+ *
+ * Real credentials mix character classes (e.g. `MySecretPassword123`), carry a known
+ * provider prefix (`sk_`, `ghp_`, `eyJ`, …), or are long high-entropy blobs. Slugs such
+ * as `secret-scanning`, `reveal-secret`, or `x-gateway-upload-token` use a single
+ * character class and low entropy, so they are rejected here. This is what stops the
+ * suspicious-key heuristic from flagging identifier constants as secrets.
+ * @param v - The literal value to evaluate.
+ * @returns True when the value is shaped like a real credential.
+ */
+function looksLikeSecretValue(v: string): boolean {
+  if (SECRET_VALUE_PREFIXES.test(v)) return true;
+  if (characterClassCount(v) >= 2) return true;
+  return (
+    v.length >= SINGLE_CLASS_MIN_LENGTH &&
+    shannonEntropyNormalized(v) >= SINGLE_CLASS_MIN_ENTROPY
+  );
+}
+
 // Threshold is the value between 0 and 1 that determines the sensitivity of the detection.
 const DEFAULT_SECRET_THRESHOLD = 0.85 as const;
 
@@ -377,6 +419,7 @@ export function detectSecretsInSource(
         !looksLikeUrlLiteral(literal) &&
         !looksLikeUrlConstruction(line) &&
         literal.length >= 12 &&
+        looksLikeSecretValue(literal) &&
         !isEnvAccessor(line) &&
         !isPureInterpolationTemplate(literal)
       ) {
