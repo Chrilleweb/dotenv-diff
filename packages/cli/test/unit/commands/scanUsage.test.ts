@@ -842,6 +842,48 @@ describe('scanUsage', () => {
     );
   });
 
+  it('clears typo suggestions when suggest is false', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      suggestions: [
+        { key: 'DATABASE_URL', didYouMean: 'DATABAS_URL', distance: 1 },
+      ],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    await scanUsage({ ...baseOpts, isCiMode: true, suggest: false });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({ suggestions: [] }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('keeps typo suggestions when suggest is not disabled', async () => {
+    vi.mocked(scanCodebase).mockResolvedValue({
+      ...baseScanResult,
+      suggestions: [
+        { key: 'DATABASE_URL', didYouMean: 'DATABAS_URL', distance: 1 },
+      ],
+    });
+    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
+
+    await scanUsage({ ...baseOpts, isCiMode: true });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({
+        suggestions: [
+          { key: 'DATABASE_URL', didYouMean: 'DATABAS_URL', distance: 1 },
+        ],
+      }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
   it('writes baseline and exits cleanly in console mode', async () => {
     const result = await scanUsage({
       ...baseOpts,

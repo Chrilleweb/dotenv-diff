@@ -53,6 +53,7 @@ describe('compareJsonOutput', () => {
           actual: '2',
         },
       ],
+      suggestions: [{ key: 'A', didYouMean: 'AA', distance: 1 }],
       duplicatesEnv: [],
       duplicatesEx: [],
       gitignoreIssue: null,
@@ -68,6 +69,9 @@ describe('compareJsonOutput', () => {
     expect(result.empty).toEqual(['C']);
     expect(result.valueMismatches).toEqual([
       { key: 'D', expected: '1', actual: '2' },
+    ]);
+    expect(result.suggestions).toEqual([
+      { key: 'A', didYouMean: 'AA', distance: 1 },
     ]);
   });
 
@@ -91,6 +95,7 @@ describe('compareJsonOutput', () => {
     expect(result.extra).toBeUndefined();
     expect(result.empty).toBeUndefined();
     expect(result.valueMismatches).toBeUndefined();
+    expect(result.suggestions).toBeUndefined();
   });
 
   it('adds duplicates when both env and example contain duplicates', () => {

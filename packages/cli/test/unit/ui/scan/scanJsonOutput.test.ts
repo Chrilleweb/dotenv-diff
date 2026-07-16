@@ -43,6 +43,21 @@ describe('scanJsonOutput', () => {
     expect(result.secrets).toBeUndefined();
     expect(result.missing).toBeUndefined();
     expect(result.unused).toBeUndefined();
+    expect(result.suggestions).toBeUndefined();
+  });
+
+  it('includes typo suggestions when present', () => {
+    const scanResult = makeScanResult({
+      suggestions: [
+        { key: 'DATABASE_URL', didYouMean: 'DATABAS_URL', distance: 1 },
+      ],
+    });
+
+    const result = scanJsonOutput(scanResult, '.env');
+
+    expect(result.suggestions).toEqual([
+      { key: 'DATABASE_URL', didYouMean: 'DATABAS_URL', distance: 1 },
+    ]);
   });
 
   it('normalizes file paths in secrets', () => {
