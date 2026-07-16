@@ -267,6 +267,12 @@ export interface ScanResult {
   used: EnvUsage[];
   missing: string[];
   unused: string[];
+  /**
+   * Keys declared by a central config loader (e.g. a Zod/envalid schema over the
+   * whole `process.env`). Used only to suppress false "unused" findings — they do
+   * not count as usages for missing detection, stats, or the health score.
+   */
+  declaredKeys?: string[];
   stats: ScanStats;
   secrets: SecretFinding[];
   duplicates: {

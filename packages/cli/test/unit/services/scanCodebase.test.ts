@@ -90,6 +90,24 @@ describe('scanCodebase', () => {
       expect(result.stats.uniqueVariables).toBe(0);
     });
 
+    it('collects config-schema declared keys from a whole-process.env loader', async () => {
+      const testFile = path.join(tmpDir, 'env.ts');
+      fsSync.writeFileSync(
+        testFile,
+        'const cfg = z.object({ CLIENT_ID_GITHUB: z.string(), CLIENT_SECRET_GITHUB: z.string() }).parse(process.env);',
+      );
+
+      vi.mocked(findFiles).mockResolvedValue([testFile]);
+      vi.mocked(scanFile).mockReturnValue([]);
+
+      const result = await scanCodebase(defaultOpts);
+
+      expect(result.declaredKeys?.sort()).toEqual([
+        'CLIENT_ID_GITHUB',
+        'CLIENT_SECRET_GITHUB',
+      ]);
+    });
+
     it('handles files with no usages', async () => {
       const testFile = path.join(tmpDir, 'app.js');
       fsSync.writeFileSync(testFile, 'const x = 42;');

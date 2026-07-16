@@ -53,7 +53,13 @@ export function compareWithEnvFiles(
     return files.some((file) => !isCovered(variable, file));
   });
   const missing = filterIgnoredKeys(missingUnfiltered, ignore, ignoreRegex);
-  const unused = [...envKeys].filter((v) => !usedVariables.has(v));
+
+  // Keys declared by a central config loader (e.g. a Zod schema over the whole
+  // process.env) are read indirectly, so they must not be reported as unused.
+  const declaredKeys = new Set(scanResult.declaredKeys ?? []);
+  const unused = [...envKeys].filter(
+    (v) => !usedVariables.has(v) && !declaredKeys.has(v),
+  );
 
   // Cross-reference missing (used but undefined) keys against the defined keys
   // to surface likely typos, e.g. code uses DATABASE_URL but .env has DATABAS_URL.

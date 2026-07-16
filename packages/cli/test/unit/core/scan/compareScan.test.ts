@@ -65,6 +65,25 @@ describe('compareWithEnvFiles', () => {
     expect(result.unused).toEqual(['B']);
   });
 
+  it('does not report a config-schema declared key as unused', () => {
+    const result = compareWithEnvFiles(
+      makeScanResult({ declaredKeys: ['CLIENT_SECRET_GITHUB'] }),
+      { CLIENT_SECRET_GITHUB: 'x', REALLY_UNUSED: 'y' },
+    );
+
+    // Declared via a loader schema → not unused; the truly unreferenced key stays.
+    expect(result.unused).toEqual(['REALLY_UNUSED']);
+  });
+
+  it('ignores declared keys that are not present in the env file', () => {
+    const result = compareWithEnvFiles(
+      makeScanResult({ declaredKeys: ['NOT_IN_ENV'] }),
+      { REALLY_UNUSED: 'y' },
+    );
+
+    expect(result.unused).toEqual(['REALLY_UNUSED']);
+  });
+
   it('preserves other ScanResult fields', () => {
     const scanResult = makeScanResult({
       stats: {
