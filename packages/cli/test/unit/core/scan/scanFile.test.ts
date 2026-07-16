@@ -332,6 +332,66 @@ import.meta.env.VAR2;
 
     expect(usages[0]?.context).toBeTruthy();
   });
+
+  describe('bare env object accessor labeling', () => {
+    it('labels env.X as "vite" when the file uses loadEnv (issue #4)', () => {
+      const content = `import { loadEnv } from 'vite';
+const env = loadEnv(mode, process.cwd());
+const v = env.INFISICAL_PLATFORM_VERSION;`;
+      const usages = scanFile(
+        '/test/project/frontend/vite.config.ts',
+        content,
+        baseOpts,
+      );
+
+      expect(usages).toHaveLength(1);
+      expect(usages[0]?.variable).toBe('INFISICAL_PLATFORM_VERSION');
+      expect(usages[0]?.pattern).toBe('vite');
+    });
+
+    it('labels destructuring from a loadEnv result as "vite"', () => {
+      const content = `const env = loadEnv(mode, process.cwd(), '');
+const { VITE_API_URL, VITE_APP_NAME } = env;`;
+      const usages = scanFile(
+        '/test/project/frontend/vite.config.ts',
+        content,
+        baseOpts,
+      );
+
+      expect(usages.map((u) => u.variable)).toEqual([
+        'VITE_API_URL',
+        'VITE_APP_NAME',
+      ]);
+      expect(usages.every((u) => u.pattern === 'vite')).toBe(true);
+    });
+
+    it('keeps env.X labeled "sveltekit" when a $env import is present', () => {
+      const content = `import { env } from '$env/dynamic/private';
+const s = env.MY_SECRET;`;
+      const usages = scanFile('/test/project/src/hooks.ts', content, baseOpts);
+
+      expect(usages).toHaveLength(1);
+      expect(usages[0]?.pattern).toBe('sveltekit');
+    });
+
+    it('prefers "sveltekit" over "vite" when both a $env import and loadEnv appear', () => {
+      const content = `import { env } from '$env/dynamic/private';
+const other = loadEnv(mode, process.cwd());
+const s = env.MY_SECRET;`;
+      const usages = scanFile('/test/project/src/hooks.ts', content, baseOpts);
+
+      expect(usages[0]?.pattern).toBe('sveltekit');
+    });
+
+    it('falls back to "sveltekit" for a bare env accessor with no framework context', () => {
+      const content = `const env = getEnv();
+const x = env.FOO_BAR;`;
+      const usages = scanFile('/test/project/src/util.ts', content, baseOpts);
+
+      expect(usages).toHaveLength(1);
+      expect(usages[0]?.pattern).toBe('sveltekit');
+    });
+  });
 });
 
 describe('scanFile – line 48 false variable guard', () => {

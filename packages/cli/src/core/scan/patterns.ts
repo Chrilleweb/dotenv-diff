@@ -6,6 +6,13 @@ type Pattern = {
   processor?: (match: RegExpExecArray) => string[];
   /** When set, overrides the file-level imports list for usages from this pattern */
   sourceModule?: string;
+  /**
+   * Marks a pattern that matches a bare `env` object accessor (`env.X` or
+   * `{ ... } = env`). The accessor is identical across frameworks, so its label
+   * is resolved from file context at scan time (SvelteKit `$env/*` import vs.
+   * Vite `loadEnv`) rather than being fixed here.
+   */
+  envObject?: boolean;
 };
 
 /** Matches a valid UPPER_SNAKE_CASE environment variable name. */
@@ -149,17 +156,19 @@ export const ENV_PATTERNS: Pattern[] = [
       /import\s*\{\s*([A-Z_][A-Z0-9_]*)\s*\}\s*from\s*['"]\$env\/static\/(?:private|public)['"]/g,
   },
 
-  // SvelteKit dynamic env object
-  // env.SECRET (Only matches .env variables accessed via env.VAR syntax)
+  // Bare env object accessor (framework resolved from file context at scan time)
+  // env.SECRET — SvelteKit `$env/dynamic/*` or Vite `loadEnv(...)` result
   {
     name: 'sveltekit' as const,
+    envObject: true,
     regex: /(?<![.\w])env\.([A-Z_][A-Z0-9_]*)/g,
   },
 
-  // SvelteKit object destructuring from env
-  // const { VAR1, VAR2 } = env; (destructured from $env/dynamic/* or $env/static/*)
+  // Bare env object destructuring (framework resolved from file context)
+  // const { VAR1, VAR2 } = env;
   {
     name: 'sveltekit' as const,
+    envObject: true,
     regex: /\{([^}]*)\}\s*=\s*env\b/g,
     processor: (match) => {
       const content = match[1];
