@@ -1,5 +1,9 @@
 import path from 'path';
-import type { EnvUsage, ScanOptions } from '../../config/types.js';
+import type {
+  EnvPatternName,
+  EnvUsage,
+  ScanOptions,
+} from '../../config/types.js';
 import {
   ENV_PATTERNS,
   buildSveltekitAliasPatterns,
@@ -46,6 +50,17 @@ export function scanFile(
   while ((importMatch = SVELTEKIT_IMPORT_REGEX.exec(content)) !== null) {
     envImports.push(importMatch[1]!);
   }
+
+  // Resolve the framework label for bare `env` object accessors (`env.X`,
+  // `{ ... } = env`), which look identical across frameworks. A `$env/*` import
+  // means SvelteKit; otherwise a `loadEnv(` call means Vite. When neither is
+  // present the label stays 'sveltekit' (the historical default).
+  const envObjectKind: EnvPatternName =
+    envImports.length > 0
+      ? 'sveltekit'
+      : /\bloadEnv\s*\(/.test(content)
+        ? 'vite'
+        : 'sveltekit';
 
   // Detect aliased $env imports and build dynamic patterns for them
   const allPatterns = [...ENV_PATTERNS];
@@ -118,7 +133,7 @@ export function scanFile(
           file: relativePath,
           line: lineNumber,
           column,
-          pattern: pattern.name,
+          pattern: pattern.envObject ? envObjectKind : pattern.name,
           imports: pattern.sourceModule ? [pattern.sourceModule] : envImports,
           context: contextLine,
           isLogged,

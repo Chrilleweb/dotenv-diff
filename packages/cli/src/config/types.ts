@@ -148,7 +148,8 @@ export interface Options {
   suggest: boolean;
 }
 
-export type EnvPatternName = 'process.env' | 'import.meta.env' | 'sveltekit';
+export type EnvPatternName =
+  'process.env' | 'import.meta.env' | 'sveltekit' | 'vite';
 
 /**
  * Represents a single usage of an environment variable in the codebase.

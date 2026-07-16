@@ -21,6 +21,11 @@ import.meta.env.MY_KEY
 import.meta.env["MY_KEY"]
 import.meta.env['MY_KEY']
 
+// Vite – loadEnv result (e.g. in vite.config.ts)
+const env = loadEnv(mode, process.cwd());
+env.MY_KEY
+const { MY_KEY } = env
+
 // SvelteKit – dynamic (env object)
 import { env } from '$env/dynamic/private';
 import { env } from '$env/dynamic/public';
