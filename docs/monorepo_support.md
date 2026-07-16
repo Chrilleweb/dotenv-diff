@@ -4,6 +4,15 @@ In monorepos with multiple apps and shared packages, environment variables are o
 
 `dotenv-diff` supports this by scanning from your current app and letting you extend the scan scope to shared folders.
 
+## Nested `.env.example` files (nearest wins)
+
+`dotenv-diff` scans the whole tree, but many monorepos keep a separate `.env.example` per sub-project (e.g. `apps/api/.env.example`, `packages/worker/.env.example`).
+
+When checking for **missing** variables, a variable used in a file is considered defined when it appears in:
+
+- the primary comparison file at the root (shared variables cascade down to every folder), **or**
+- any `.env.example` in an **ancestor directory** of the file that uses it.
+
 ## Scanning shared packages
 
 By default, `dotenv-diff` scans from the current working directory.

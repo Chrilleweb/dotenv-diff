@@ -27,6 +27,40 @@ function tmpDir() {
   return dir;
 }
 
+describe('monorepo nested .env.example matching', () => {
+  it('does not flag a variable documented in a nested .env.example (issue #3)', () => {
+    const cwd = tmpDir();
+
+    // Root example documents a shared variable; nested example documents its own.
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'DATABASE_URL=\n');
+    fs.mkdirSync(path.join(cwd, 'upgrade-impact', 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'upgrade-impact', '.env.example'),
+      'OPENAI_API_KEY=\n',
+    );
+    fs.writeFileSync(
+      path.join(cwd, 'upgrade-impact', 'src', 'generate-ai.ts'),
+      'const a = process.env.OPENAI_API_KEY;\nconst b = process.env.DATABASE_URL;\n',
+    );
+    // A variable that is documented nowhere must still be reported.
+    fs.mkdirSync(path.join(cwd, 'e2e'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'e2e', 'run.ts'),
+      'const c = process.env.TOTALLY_UNDOCUMENTED;\n',
+    );
+
+    const res = runCli(cwd, ['--example', '.env.example', '--json']);
+    const output = JSON.parse(res.stdout);
+    const missing = (output.missing ?? []).map(
+      (m: { variable: string }) => m.variable,
+    );
+
+    expect(missing).toContain('TOTALLY_UNDOCUMENTED');
+    expect(missing).not.toContain('OPENAI_API_KEY');
+    expect(missing).not.toContain('DATABASE_URL');
+  });
+});
+
 describe('no-flag autoscan', () => {
   it('will warn about .env not ignored by .gitignore', () => {
     const cwd = tmpDir();
@@ -235,7 +269,7 @@ describe('no-flag autoscan', () => {
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
     fs.writeFileSync(
       path.join(cwd, 'src', 'index.js'),
-      'console.log(\'hello\');',
+      "console.log('hello');",
     );
 
     fs.writeFileSync(path.join(cwd, '.env.example'), 'API_KEY=EXAMPLE_KEY\n');

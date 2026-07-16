@@ -245,6 +245,21 @@ export interface ScanUsageOptions extends ScanOptions {
 }
 
 /**
+ * A directory-scoped set of documented env keys, sourced from an `.env.example`
+ * (or `.env-example`/`.env.sample`/`.env.template`) file in a subdirectory.
+ *
+ * Used for monorepo "nearest example wins" matching: a variable used in a file is
+ * considered defined when it appears in the env keys of any ancestor scope (or the
+ * primary comparison file), not only the root file.
+ */
+export interface EnvScope {
+  /** Directory of the example file, relative to cwd, forward-slashed (e.g. "packages/api"). */
+  dir: string;
+  /** Keys documented in that example file (already ignore-filtered). */
+  keys: Set<string>;
+}
+
+/**
  * Result of scanning the codebase for environment variable usages.
  */
 export interface ScanResult {
