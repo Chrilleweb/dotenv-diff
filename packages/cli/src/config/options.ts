@@ -57,6 +57,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const uppercaseKeys = raw.uppercaseKeys !== false;
   const expireWarnings = raw.expireWarnings !== false;
   const inconsistentNamingWarnings = raw.inconsistentNamingWarnings !== false;
+  const suggest = raw.suggest !== false;
   const listAll = toBool(raw.listAll);
   const explain =
     typeof raw.explain === 'string' ? raw.explain.trim() : undefined;
@@ -108,6 +109,7 @@ export function normalizeOptions(raw: RawOptions): Options {
     explain,
     matrix,
     matrixFiles,
+    suggest,
   };
 }
 

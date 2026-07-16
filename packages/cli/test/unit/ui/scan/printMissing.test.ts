@@ -38,6 +38,42 @@ describe('printMissing', () => {
     );
   });
 
+  it('appends a "did you mean" hint for variables that have a suggestion', () => {
+    const used: EnvUsage[] = [
+      {
+        variable: 'DATABASE_URL',
+        file: 'src/a.ts',
+        line: 3,
+        column: 1,
+        pattern: 'process.env',
+        context: 'process.env.DATABASE_URL',
+      },
+      {
+        variable: 'API_KEY',
+        file: 'src/b.ts',
+        line: 5,
+        column: 1,
+        pattern: 'process.env',
+        context: 'process.env.API_KEY',
+      },
+    ];
+
+    const result = printMissing(['DATABASE_URL', 'API_KEY'], used, '.env', [
+      { key: 'DATABASE_URL', didYouMean: 'DATABAS_URL', distance: 1 },
+    ]);
+
+    expect(result).toBe(true);
+    // Variable with a suggestion gets the hint appended.
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('→ did you mean DATABAS_URL?'),
+    );
+    // Variable without a suggestion has no hint on its line.
+    expect(logSpy).toHaveBeenNthCalledWith(
+      5,
+      expect.not.stringContaining('did you mean'),
+    );
+  });
+
   it('prints one line per missing variable and falls back to environment file label', () => {
     const used: EnvUsage[] = [
       {

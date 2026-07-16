@@ -59,7 +59,14 @@ export function printScanResult(
   }
 
   // Missing variables (used in code but not in env file)
-  if (printMissing(scanResult.missing, scanResult.used, comparedAgainst)) {
+  if (
+    printMissing(
+      scanResult.missing,
+      scanResult.used,
+      comparedAgainst,
+      scanResult.suggestions ?? [],
+    )
+  ) {
     exitWithError = true;
   }
 

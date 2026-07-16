@@ -24,11 +24,19 @@ export function printIssues(
   if (json) return;
 
   if (filtered.missing.length && !fix) {
+    const suggestionByKey = new Map(
+      (filtered.suggestions ?? []).map((s) => [s.key, s.didYouMean]),
+    );
+
     console.log();
     console.log(`${error('▸')} ${header('Missing keys')}`);
     console.log(`${divider}`);
     for (const key of filtered.missing) {
-      console.log(`${label(padLabel(key))}${error('missing')}`);
+      const didYouMean = suggestionByKey.get(key);
+      const hint = didYouMean
+        ? `  ${dim(`→ did you mean ${didYouMean}?`)}`
+        : '';
+      console.log(`${label(padLabel(key))}${error('missing')}${hint}`);
     }
     console.log(`${divider}`);
   }

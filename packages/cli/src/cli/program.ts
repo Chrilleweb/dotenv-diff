@@ -95,6 +95,14 @@ export function createProgram() {
         '--no-inconsistent-naming-warnings',
         'Disable inconsistent naming pattern warnings',
       )
+      .option(
+        '--suggest',
+        'Suggest the closest existing key for likely typos (enabled by default)',
+      )
+      .option(
+        '--no-suggest',
+        'Disable "did you mean" typo suggestions for missing keys',
+      )
       .option('--init', 'Create a sample dotenv-diff.config.json file')
       .option(
         '--list-all',

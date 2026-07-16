@@ -49,6 +49,27 @@ describe('printIssues', () => {
     );
   });
 
+  it('appends a "did you mean" hint to missing keys that have a suggestion', () => {
+    const filtered: Filtered = {
+      ...baseFiltered,
+      missing: ['DATABASE_URL', 'API_KEY'],
+      suggestions: [
+        { key: 'DATABASE_URL', didYouMean: 'DATABAS_URL', distance: 1 },
+      ],
+    };
+
+    printIssues(filtered, false, false);
+
+    // Key with a suggestion gets the hint appended.
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('DATABASE_URL'.padEnd(UI_LABEL_WIDTH))}${error('missing')}  ${dim('→ did you mean DATABAS_URL?')}`,
+    );
+    // Key without a suggestion is printed without a hint.
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('API_KEY'.padEnd(UI_LABEL_WIDTH))}${error('missing')}`,
+    );
+  });
+
   it('does not print missing keys when fix=true', () => {
     const filtered: Filtered = { ...baseFiltered, missing: ['A'] };
 

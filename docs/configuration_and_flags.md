@@ -48,6 +48,8 @@ CLI flags always take precedence over configuration file values.
 - [--no-expire-warnings](#--no-expire-warnings)
 - [--inconsistent-naming-warnings](#--inconsistent-naming-warnings)
 - [--no-inconsistent-naming-warnings](#--no-inconsistent-naming-warnings)
+- [--suggest](#--suggest)
+- [--no-suggest](#--no-suggest)
 
 ### Comparison Flags
 
@@ -819,6 +821,42 @@ Usage in the configuration file:
 ```json
 {
   "inconsistentNamingWarnings": false
+}
+```
+
+### `--suggest`
+
+Suggests the closest existing key when a missing variable looks like a typo (enabled by default). Missing entries are annotated with a `→ did you mean DATABAS_URL?` hint by cross-referencing the missing key against the keys that already exist (defined keys in scan mode, extra keys in compare mode). Only close matches are shown, and suggestions never change the exit code or health score.
+
+Example usage:
+
+```bash
+dotenv-diff --suggest
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "suggest": true
+}
+```
+
+### `--no-suggest`
+
+Disable "did you mean" typo suggestions for missing keys.
+
+Example usage:
+
+```bash
+dotenv-diff --no-suggest
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "suggest": false
 }
 ```
 

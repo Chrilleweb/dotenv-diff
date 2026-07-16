@@ -57,6 +57,9 @@ export function compareJsonOutput({
     if (filtered.mismatches && filtered.mismatches.length > 0) {
       entry.valueMismatches = filtered.mismatches;
     }
+    if (filtered.suggestions && filtered.suggestions.length > 0) {
+      entry.suggestions = filtered.suggestions;
+    }
   }
 
   if (dupsEnv.length || dupsEx.length) {

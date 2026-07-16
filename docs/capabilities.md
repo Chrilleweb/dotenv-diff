@@ -92,6 +92,17 @@ Warnings for environment values that look like expiring tokens/credentials or co
 
 Checks whether `.env` is properly ignored by `.gitignore`.
 
-### 12 Health Score
+### 12 Typo Suggestions ("did you mean")
+
+When a variable is reported as missing, `dotenv-diff` cross-references it against the keys that already exist and suggests the closest match when it looks like a simple spelling mistake.
+
+- **Scan mode:** a variable used in code but not defined is matched against the keys defined in your env file.
+- **Compare mode:** a key present in the example file but missing from the current file is matched against the extra keys the current file has.
+
+For example, if your code uses `DATABASE_URL` but your `.env` defines `DATABAS_URL`, the missing entry is annotated with `→ did you mean DATABAS_URL?`.
+
+Only close matches are suggested (small edit distance, scaled to key length), and only the single closest key is shown per missing variable. Suggestions are advisory — they do **not** affect the exit code or the health score. Disable them with `--no-suggest`.
+
+### 13 Health Score
 
 A final score based on scan findings (missing, unused, duplicates, security warnings, and more).
