@@ -8,6 +8,7 @@ import type {
   UppercaseWarning,
   FrameworkWarning,
   ExampleSecretWarning,
+  TypoSuggestion,
 } from '../../config/types.js';
 import { computeHealthScore } from '../../core/scan/computeHealthScore.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
@@ -28,6 +29,7 @@ interface ScanJsonOutput {
     }>;
   }>;
   unused?: string[];
+  suggestions?: TypoSuggestion[];
   allUsages?: Array<{
     variable: string;
     file: string;
@@ -112,6 +114,10 @@ export function scanJsonOutput(
         context: u.context.trim(),
       })),
     }));
+  }
+
+  if (scanResult.suggestions?.length) {
+    output.suggestions = scanResult.suggestions;
   }
 
   if (scanResult.frameworkWarnings?.length) {

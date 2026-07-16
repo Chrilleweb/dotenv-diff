@@ -123,6 +123,7 @@ async function runScanMode(opts: Options): Promise<boolean> {
     inconsistentNamingWarnings: opts.inconsistentNamingWarnings,
     listAll: opts.listAll,
     baseline: opts.baseline,
+    suggest: opts.suggest,
   });
 
   return exitWithError;
@@ -286,6 +287,7 @@ function buildCompareOptions(
     ignoreRegex: opts.ignoreRegex,
     showStats: opts.showStats,
     uppercaseKeys: opts.uppercaseKeys,
+    suggest: opts.suggest,
     collect: (e: CompareJsonEntry) => report.push(e),
     ...(opts.only ? { only: opts.only } : {}),
   };

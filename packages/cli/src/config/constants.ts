@@ -80,3 +80,16 @@ export const EXPIRE_THRESHOLD_DAYS = 20;
  * Expiration warnings at or below this value trigger an error exit even without strict mode.
  */
 export const URGENT_EXPIRE_DAYS = 7;
+
+/**
+ * Maximum Levenshtein distance for a key to be considered a likely typo of another key.
+ * Keeps "did you mean" suggestions limited to small, realistic spelling mistakes.
+ */
+export const MAX_TYPO_DISTANCE = 2;
+
+/**
+ * Maximum ratio of edit distance to key length for a typo suggestion.
+ * Scales the distance threshold with key length so short keys require a closer match
+ * (e.g. a 3-character key is not matched against a completely different 3-character key).
+ */
+export const MAX_TYPO_RATIO = 0.34;

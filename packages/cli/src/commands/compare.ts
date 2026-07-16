@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { diffEnv } from '../core/diffEnv.js';
+import { suggestTypos } from '../core/suggestTypos.js';
 import { checkGitignoreStatus } from '../services/git.js';
 import { findDuplicateKeys } from '../services/duplicates.js';
 import type {
@@ -197,11 +198,19 @@ function computePairComparison(
     ? checkGitignoreStatus({ cwd: opts.cwd, envFile: envName })
     : null;
 
+  // Cross-reference missing keys (in example, absent from current) against the
+  // extra keys the current file has, to surface likely typos like DATABAS_URL.
+  const suggestions =
+    opts.suggest !== false && run('missing')
+      ? suggestTypos(diff.missing, diff.extra)
+      : [];
+
   const filtered: Filtered = {
     missing: run('missing') ? diff.missing : [],
     extra: run('extra') ? diff.extra : [],
     empty: run('empty') ? emptyKeys : [],
     mismatches: opts.checkValues ? diff.valueMismatches : [],
+    suggestions,
     duplicatesEnv: run('duplicate') ? dupsEnv : [],
     duplicatesEx: run('duplicate') ? dupsEx : [],
     gitignoreIssue,

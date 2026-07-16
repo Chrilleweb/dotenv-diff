@@ -142,6 +142,11 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
     }
   }
 
+  // Typo suggestions are advisory; drop them entirely when disabled via --no-suggest
+  if (opts.suggest === false) {
+    scanResult.suggestions = [];
+  }
+
   // Recalculate stats after filtering
   calculateStats(scanResult);
 

@@ -102,6 +102,7 @@ function createBaseOptions(overrides: Partial<Options> = {}): Options {
     baseline: false,
     matrix: false,
     matrixFiles: [],
+    suggest: true,
     ...overrides,
   };
 }

@@ -97,6 +97,7 @@ export interface RawOptions {
   listAll?: boolean;
   explain?: string;
   matrix?: boolean | string[];
+  suggest?: boolean;
 }
 
 /**
@@ -144,6 +145,7 @@ export interface Options {
   explain: string | undefined;
   matrix: boolean;
   matrixFiles: string[];
+  suggest: boolean;
 }
 
 export type EnvPatternName = 'process.env' | 'import.meta.env' | 'sveltekit';
@@ -239,6 +241,7 @@ export interface ScanUsageOptions extends ScanOptions {
   inconsistentNamingWarnings?: boolean;
   listAll?: boolean;
   baseline?: boolean;
+  suggest?: boolean;
 }
 
 /**
@@ -260,6 +263,8 @@ export interface ScanResult {
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
+  /** Typo suggestions for variables used in code but not defined in the env file */
+  suggestions?: TypoSuggestion[];
   fileContentMap?: Map<string, string>;
 }
 
@@ -290,6 +295,7 @@ export type CompareJsonEntry = {
   empty?: string[];
   gitignoreIssue?: { reason: GitignoreIssue };
   valueMismatches?: Array<{ key: string; expected: string; actual: string }>;
+  suggestions?: TypoSuggestion[];
   ok?: boolean;
 };
 
@@ -311,6 +317,7 @@ export interface ComparisonOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+  suggest?: boolean;
 }
 
 /**
@@ -362,6 +369,7 @@ export type Filtered = {
   extra?: string[];
   empty?: string[];
   mismatches?: Array<{ key: string; expected: string; actual: string }>;
+  suggestions?: TypoSuggestion[];
   duplicatesEnv: Duplicate[];
   duplicatesEx: Duplicate[];
   gitignoreIssue: { reason: GitignoreIssue } | null;
@@ -421,6 +429,20 @@ export interface ExpireWarning {
   date: string;
   /** The number of days left until the environment variable expires */
   daysLeft: number;
+}
+
+/**
+ * A "did you mean" suggestion produced when a reported key looks like a typo
+ * of an existing key.
+ * fx: DATABASE_URL is missing while DATABAS_URL exists → suggest DATABASE_URL.
+ */
+export interface TypoSuggestion {
+  /** The key reported as missing (compare) or used-but-undefined (scan) */
+  key: string;
+  /** The closest existing key that was likely intended */
+  didYouMean: string;
+  /** The Levenshtein distance between the two keys */
+  distance: number;
 }
 
 /**

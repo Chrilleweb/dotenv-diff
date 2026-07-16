@@ -1,5 +1,6 @@
 import type { ScanResult } from '../../config/types.js';
 import { filterIgnoredKeys } from '../helpers/filterIgnoredKeys.js';
+import { suggestTypos } from '../suggestTypos.js';
 
 /**
  * Compares the scan result with the environment variables.
@@ -23,9 +24,14 @@ export function compareWithEnvFiles(
   const missing = filterIgnoredKeys(missingUnfiltered, ignore, ignoreRegex);
   const unused = [...envKeys].filter((v) => !usedVariables.has(v));
 
+  // Cross-reference missing (used but undefined) keys against the defined keys
+  // to surface likely typos, e.g. code uses DATABASE_URL but .env has DATABAS_URL.
+  const suggestions = suggestTypos(missing, [...envKeys]);
+
   return {
     ...scanResult,
     missing,
     unused,
+    suggestions,
   };
 }
