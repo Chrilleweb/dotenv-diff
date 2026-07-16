@@ -8,6 +8,7 @@ import {
 } from '../core/security/secretDetectors.js';
 import { DEFAULT_EXCLUDE_PATTERNS } from '../core/scan/patterns.js';
 import { scanFile } from '../core/scan/scanFile.js';
+import { detectConfigSchemaKeys } from '../core/scan/detectConfigSchemaKeys.js';
 import { createConcurrencyLimit } from '../core/helpers/concurrencyLimit.js';
 import { findFiles } from './fileWalker.js';
 import { normalizePath } from '../core/helpers/normalizePath.js';
@@ -36,8 +37,9 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     const relativePath = normalizePath(path.relative(opts.cwd, filePath));
     const fileUsages = scanFile(filePath, content, opts);
     const secrets = safeDetectSecrets(relativePath, content, opts);
+    const declaredKeys = detectConfigSchemaKeys(content);
 
-    return { fileUsages, relativePath, content, secrets };
+    return { fileUsages, relativePath, content, secrets, declaredKeys };
   };
 
   const results = await Promise.all(
@@ -46,15 +48,17 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
 
   const allUsages: EnvUsage[] = [];
   const allSecrets: SecretFinding[] = [];
+  const allDeclaredKeys = new Set<string>();
   const fileContentMap = new Map<string, string>();
   let filesScanned = 0;
 
   for (const result of results) {
     if (!result) continue;
-    const { fileUsages, relativePath, content, secrets } = result;
+    const { fileUsages, relativePath, content, secrets, declaredKeys } = result;
     allUsages.push(...fileUsages);
     fileContentMap.set(relativePath, content);
     if (secrets.length) allSecrets.push(...secrets);
+    for (const key of declaredKeys) allDeclaredKeys.add(key);
     filesScanned++;
   }
 
@@ -72,6 +76,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     used: filteredUsages,
     missing: [],
     unused: [],
+    declaredKeys: [...allDeclaredKeys],
     secrets: allSecrets,
     stats: {
       filesScanned,
