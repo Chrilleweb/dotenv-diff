@@ -167,31 +167,29 @@ Usage in the configuration file:
 
 ### `--ignore <keys>`
 
-Specify a comma-separated list of keys to ignore during the comparison other than the default ignored keys which is:
+Specify a comma-separated list of keys to ignore during the comparison. These are added on top of the default ignored keys listed below.
 
-- `PWD`
-- `NODE_ENV`
-- `VITE_MODE`
-- `MODE`
-- `BASE_URL`
-- `PROD`
-- `DEV`
-- `SSR`
-- `CI`
-- `SLOW_MO`
-- `GITHUB_ACTIONS`
-- `INIT_CWD`
-- `TZ`
-- `PORT`
-- `PATH`
-- `HOME`
-- `USER`
-- `SHELL`
-- `LANG`
-- `TMP`
-- `TEMP`
-- `TMPDIR`
-- `NODE_PATH`
+#### Default ignored keys
+
+The following keys are **ignored by default** — you don't need to list them in `--ignore`. They are variables typically injected by the OS, the runtime, the framework, or CI, so they are used in code but should never be documented in a `.env` file:
+
+**OS / shell:** `PWD`, `INIT_CWD`, `TZ`, `PATH`, `HOME`, `USER`, `SHELL`, `LANG`, `TMP`, `TEMP`, `TMPDIR`
+
+**Node / server runtime:** `NODE_ENV`, `NODE_PATH`, `PORT`
+
+**Framework (Vite, etc.):** `VITE_MODE`, `MODE`, `BASE_URL`, `PROD`, `DEV`, `SSR`, `SLOW_MO`
+
+**Generic CI flags:** `CI`, `CONTINUOUS_INTEGRATION`, `BUILD_NUMBER`, `BUILD_ID`, `VERCEL`, `NETLIFY`, `GITLAB_CI`, `CIRCLECI`, `BUILDKITE`, `DRONE`, `TRAVIS`, `APPVEYOR`, `TEAMCITY_VERSION`, `JENKINS_URL`
+
+In addition, CI-injected variables that arrive in large, predictable provider-specific families are matched by prefix and **also ignored by default**:
+
+| Prefix | Provider | Examples |
+| --- | --- | --- |
+| `GITHUB_*` | GitHub Actions | `GITHUB_SHA`, `GITHUB_REF_NAME`, `GITHUB_RUN_ID`, `GITHUB_ACTIONS` |
+| `RUNNER_*` | GitHub Actions runner | `RUNNER_OS`, `RUNNER_TEMP` |
+| `VERCEL_*` | Vercel | `VERCEL_ENV`, `VERCEL_URL`, `VERCEL_GIT_COMMIT_SHA` |
+| `CI_*` | GitLab CI | `CI_COMMIT_SHA`, `CI_PIPELINE_ID` |
+| `CIRCLE_*` | CircleCI | `CIRCLE_SHA1`, `CIRCLE_BRANCH` |
 
 This is useful when you have certain environment variables that are expected to differ between environments and you want to exclude them from the comparison.
 
