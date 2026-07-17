@@ -383,6 +383,8 @@ Usage in the configuration file:
 ## File Scanning Flags
 
 > **Note:** Default file patterns: .ts, .js, jsx, tsx, vue, .mjs, .mts, .cjs, .cts, .svelte
+>
+> Docker Compose files (`docker-compose*.yml`/`.yaml`, `compose*.yml`/`.yaml`) are also scanned by default for `${VAR}` interpolation. Other YAML files are not scanned.
 
 ### `--files <patterns>`
 

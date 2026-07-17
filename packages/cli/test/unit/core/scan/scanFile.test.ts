@@ -54,6 +54,76 @@ const port = process.env.PORT;
     });
   });
 
+  describe('docker-compose interpolation (Issue B)', () => {
+    const compose = '/test/project/docker-compose.prod.yml';
+
+    it('detects ${VAR} interpolation as usage', () => {
+      const content = '      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}';
+      const usages = scanFile(compose, content, baseOpts);
+
+      expect(usages).toHaveLength(1);
+      expect(usages[0]).toMatchObject({
+        variable: 'POSTGRES_PASSWORD',
+        pattern: 'docker-compose',
+        file: 'docker-compose.prod.yml',
+      });
+    });
+
+    it('detects ${VAR:-default} and ${VAR:?err} default-modifier forms', () => {
+      const content = [
+        '      - DOMAINPASS=${SAMBA_ADMIN_PASSWORD:-Passw0rd!}',
+        '      - DB=${POSTGRES_DB:?required}',
+      ].join('\n');
+      const usages = scanFile(compose, content, baseOpts);
+
+      expect(usages.map((u) => u.variable)).toEqual([
+        'SAMBA_ADMIN_PASSWORD',
+        'POSTGRES_DB',
+      ]);
+    });
+
+    it('detects bare $VAR interpolation', () => {
+      const content =
+        '    test: "pg_isready --username=${POSTGRES_USER} --dbname=$POSTGRES_DB"';
+      const usages = scanFile(compose, content, baseOpts);
+
+      expect(usages.map((u) => u.variable)).toEqual([
+        'POSTGRES_USER',
+        'POSTGRES_DB',
+      ]);
+    });
+
+    it('ignores the $$ escape for a literal dollar sign', () => {
+      const content = '    command: echo $$NOT_A_VAR';
+      const usages = scanFile(compose, content, baseOpts);
+
+      expect(usages).toHaveLength(0);
+    });
+
+    it('does not apply compose patterns to JS/TS files', () => {
+      // A bare ${VAR} in a template literal is a JS expression, not an env ref.
+      const content = 'const url = `${API_HOST}/v1`;';
+      const usages = scanFile('/test/project/src/app.ts', content, baseOpts);
+
+      expect(usages).toHaveLength(0);
+    });
+
+    it('recognises compose.yaml and docker-compose.<env>.yml names', () => {
+      for (const name of [
+        'compose.yaml',
+        'compose.dev.yml',
+        'docker-compose.yml',
+      ]) {
+        const usages = scanFile(
+          `/test/project/${name}`,
+          '      - X=${SOME_VAR}',
+          baseOpts,
+        );
+        expect(usages.map((u) => u.variable)).toEqual(['SOME_VAR']);
+      }
+    });
+  });
+
   it('calculates correct line and column numbers', () => {
     const content = `const x = 1;
 const y = 2;

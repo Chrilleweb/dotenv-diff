@@ -5,6 +5,7 @@ import {
   DEFAULT_EXCLUDE_PATTERNS,
   ENV_PATTERNS,
   buildSveltekitAliasPatterns,
+  isDockerComposeFile,
   SVELTEKIT_IMPORT_REGEX,
   SVELTEKIT_ALIAS_IMPORT_REGEX,
 } from '../../../../src/core/scan/patterns';
@@ -744,6 +745,36 @@ import { env as privateEnv } from '$env/dynamic/private';`;
         'KEYCLOAK_REALM',
         'KEYCLOAK_URL',
       ]);
+    });
+  });
+
+  describe('isDockerComposeFile', () => {
+    it.each([
+      'compose.yml',
+      'compose.yaml',
+      'compose.prod.yaml',
+      'docker-compose.yml',
+      'docker-compose.dev.yml',
+      'src/docker-compose.override.yaml',
+      '/abs/path/to/compose.yml',
+      'DOCKER-COMPOSE.YML', // case-insensitive
+    ])('treats %s as a compose file', (p) => {
+      expect(isDockerComposeFile(p)).toBe(true);
+    });
+
+    it('matches the basename on Windows-style backslash paths', () => {
+      expect(isDockerComposeFile('C:\\proj\\docker-compose.yml')).toBe(true);
+    });
+
+    it.each([
+      'composer.yml', // lock file, not compose
+      'app.yml',
+      'k8s-deployment.yaml',
+      'compose.txt',
+      'docker-compose.yml.bak',
+      'not-compose.yml', // "compose" not at a path boundary
+    ])('does not treat %s as a compose file', (p) => {
+      expect(isDockerComposeFile(p)).toBe(false);
     });
   });
 });

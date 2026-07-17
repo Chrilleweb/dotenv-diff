@@ -434,6 +434,22 @@ describe('filewalker', () => {
       expect(result).not.toContain(testFile);
     });
 
+    it('discovers docker-compose files by default but not arbitrary YAML', async () => {
+      fs.writeFileSync(path.join(tmpDir, 'docker-compose.yml'), '');
+      fs.writeFileSync(path.join(tmpDir, 'docker-compose.prod.yml'), '');
+      fs.writeFileSync(path.join(tmpDir, 'compose.yaml'), '');
+      fs.writeFileSync(path.join(tmpDir, 'k8s-deployment.yaml'), '');
+
+      const result = await findFiles(tmpDir, {});
+      const basenames = result.map((f) => path.basename(f));
+
+      expect(basenames).toContain('docker-compose.yml');
+      expect(basenames).toContain('docker-compose.prod.yml');
+      expect(basenames).toContain('compose.yaml');
+      // Arbitrary YAML is deliberately not pulled into the scan surface.
+      expect(basenames).not.toContain('k8s-deployment.yaml');
+    });
+
     it('handles directory read errors gracefully', async () => {
       const result = await findFiles('/nonexistent', {});
       expect(result).toEqual([]);

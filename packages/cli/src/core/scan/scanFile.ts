@@ -6,7 +6,9 @@ import type {
 } from '../../config/types.js';
 import {
   ENV_PATTERNS,
+  DOCKER_COMPOSE_PATTERNS,
   buildSveltekitAliasPatterns,
+  isDockerComposeFile,
   SVELTEKIT_IMPORT_REGEX,
   SVELTEKIT_ALIAS_IMPORT_REGEX,
 } from './patterns.js';
@@ -42,40 +44,50 @@ export function scanFile(
   // Get relative path from cwd cross-platform compatible
   const relativePath = normalizePath(path.relative(opts.cwd, filePath));
 
-  // Collect all $env imports used in this file
+  // Docker Compose files use shell-style `${VAR}` interpolation rather than any
+  // JS/TS accessor, so they get their own pattern set. Running the JS patterns
+  // on them (or the compose patterns on JS) would only produce false matches.
+  const isCompose = isDockerComposeFile(filePath);
+
+  // Collect all $env imports used in this file (SvelteKit only)
   const envImports: string[] = [];
-
-  SVELTEKIT_IMPORT_REGEX.lastIndex = 0;
-  let importMatch: RegExpExecArray | null;
-  while ((importMatch = SVELTEKIT_IMPORT_REGEX.exec(content)) !== null) {
-    envImports.push(importMatch[1]!);
-  }
-
   // Resolve the framework label for bare `env` object accessors (`env.X`,
   // `{ ... } = env`), which look identical across frameworks. A `$env/*` import
   // means SvelteKit; otherwise a `loadEnv(` call means Vite. When neither is
   // present the label stays 'sveltekit' (the historical default).
-  const envObjectKind: EnvPatternName =
-    envImports.length > 0
-      ? 'sveltekit'
-      : /\bloadEnv\s*\(/.test(content)
-        ? 'vite'
-        : 'sveltekit';
+  let envObjectKind: EnvPatternName = 'sveltekit';
 
-  // Detect aliased $env imports and build dynamic patterns for them
-  const allPatterns = [...ENV_PATTERNS];
+  const allPatterns = isCompose
+    ? [...DOCKER_COMPOSE_PATTERNS]
+    : [...ENV_PATTERNS];
 
-  SVELTEKIT_ALIAS_IMPORT_REGEX.lastIndex = 0;
-  let aliasImportMatch: RegExpExecArray | null;
-  while (
-    (aliasImportMatch = SVELTEKIT_ALIAS_IMPORT_REGEX.exec(content)) !== null
-  ) {
-    allPatterns.push(
-      ...buildSveltekitAliasPatterns(
-        aliasImportMatch[1]!,
-        aliasImportMatch[2]!,
-      ),
-    );
+  if (!isCompose) {
+    SVELTEKIT_IMPORT_REGEX.lastIndex = 0;
+    let importMatch: RegExpExecArray | null;
+    while ((importMatch = SVELTEKIT_IMPORT_REGEX.exec(content)) !== null) {
+      envImports.push(importMatch[1]!);
+    }
+
+    envObjectKind =
+      envImports.length > 0
+        ? 'sveltekit'
+        : /\bloadEnv\s*\(/.test(content)
+          ? 'vite'
+          : 'sveltekit';
+
+    // Detect aliased $env imports and build dynamic patterns for them
+    SVELTEKIT_ALIAS_IMPORT_REGEX.lastIndex = 0;
+    let aliasImportMatch: RegExpExecArray | null;
+    while (
+      (aliasImportMatch = SVELTEKIT_ALIAS_IMPORT_REGEX.exec(content)) !== null
+    ) {
+      allPatterns.push(
+        ...buildSveltekitAliasPatterns(
+          aliasImportMatch[1]!,
+          aliasImportMatch[2]!,
+        ),
+      );
+    }
   }
 
   for (const pattern of allPatterns) {
