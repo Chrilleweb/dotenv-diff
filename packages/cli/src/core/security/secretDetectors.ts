@@ -293,6 +293,22 @@ function characterClassCount(v: string): number {
 }
 
 /**
+ * Checks if a value is a delimited identifier — lowercase words/numbers joined by
+ * `-`, `_`, or `.` (e.g. `secret-rotation-v2-rotate-secrets`, `inject-k8s-sa-auth-token`).
+ *
+ * These kebab/snake/dot slugs and enum constants are not credentials, but a version
+ * suffix like `v2` or a token like `k8s` sneaks a digit in, pushing them to two
+ * character classes (lowercase + digit) — which would otherwise trip the class-count
+ * check in {@link looksLikeSecretValue}. Rejecting the whole shape up front keeps that
+ * heuristic honest to its documented promise of ignoring identifier slugs.
+ * @param v - The value to check.
+ * @returns True when the value is a lowercase delimited identifier.
+ */
+function isDelimitedIdentifier(v: string): boolean {
+  return /^[a-z0-9]+([._-][a-z0-9]+)+$/.test(v);
+}
+
+/**
  * Decides whether a value assigned to a suspiciously-named key actually looks like a
  * credential rather than a kebab/snake-case identifier or enum slug.
  *
@@ -306,6 +322,7 @@ function characterClassCount(v: string): number {
  */
 function looksLikeSecretValue(v: string): boolean {
   if (SECRET_VALUE_PREFIXES.test(v)) return true;
+  if (isDelimitedIdentifier(v)) return false;
   if (characterClassCount(v) >= 2) return true;
   return (
     v.length >= SINGLE_CLASS_MIN_LENGTH &&
