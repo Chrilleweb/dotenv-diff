@@ -1,5 +1,22 @@
 # Changelog
 
+<!-- changesets: chilly-windows-tease.md,docker-compose-usage.md,giant-foxes-boil.md,real-pans-cry.md -->
+## 2026-07-17
+
+### Highlights
+- fix secret detector false warnings
+- fix: count docker-compose `${VAR}` interpolation as usage to avoid false "unused"
+- add default exclude keys regex
+- fix false warning with jsx secret detector
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: config-loader-unused.md,fuzzy-typo-suggestions.md,monorepo-nested-example.md,secret-value-shape-gate.md,vite-loadenv-pattern-label.md -->
 ## 2026-07-16
 

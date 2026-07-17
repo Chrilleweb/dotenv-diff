@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.1.1
+
+### Patch Changes
+
+- 016cdf1: fix secret detector false warnings
+- 6a33006: fix: count docker-compose `${VAR}` interpolation as usage to avoid false "unused"
+- 8062cf2: add default exclude keys regex
+- 050ff8e: fix false warning with jsx secret detector
+
 ## 3.1.0
 
 ### Minor Changes
