@@ -206,6 +206,63 @@ export const ENV_PATTERNS: Pattern[] = [
   },
 ];
 
+/**
+ * Patterns for detecting environment variable usage inside Docker Compose files
+ * via shell-style interpolation. These run only on compose files (see
+ * {@link isDockerComposeFile}), never on JS/TS sources, because a bare `${VAR}`
+ * matcher would misfire on ordinary template literals.
+ *
+ * Covers, with the variable captured in group 1:
+ *   ${VAR}                    – plain interpolation
+ *   ${VAR:-default} / ${VAR-default}
+ *   ${VAR:?error}   / ${VAR?error}
+ *   ${VAR:+alt}     / ${VAR+alt}
+ *   $VAR                      – bare interpolation
+ *
+ * A doubled `$$` is Compose's escape for a literal `$`, so `$$VAR` must not be
+ * treated as a reference — the lookbehind on the bare form guards against that.
+ */
+export const DOCKER_COMPOSE_PATTERNS: Pattern[] = [
+  {
+    name: 'docker-compose' as const,
+    // Braced form, optionally followed by a :-/-/:?/?/:+/+ modifier and value.
+    regex: /\$\{([A-Z_][A-Z0-9_]*)(?::?[-?+][^}]*)?\}/g,
+  },
+  {
+    name: 'docker-compose' as const,
+    // Bare form. Not preceded by `$` (escape) or a word char (e.g. `PG$HOST`).
+    regex: /(?<![$\w])\$([A-Z_][A-Z0-9_]*)/g,
+  },
+];
+
+/**
+ * Filename globs, matched against the basename, for Docker Compose files that
+ * should be scanned for `${VAR}` interpolation. Kept deliberately narrow
+ * (compose files only, not arbitrary YAML) so the scanner's file surface — and
+ * with it the secret detector — is not widened to every `.yml` in the repo.
+ */
+export const DEFAULT_INCLUDE_FILE_GLOBS = [
+  'docker-compose*.yml',
+  'docker-compose*.yaml',
+  'compose*.yml',
+  'compose*.yaml',
+];
+
+/**
+ * Checks whether a file is a Docker Compose file, based on its name.
+ * @param filePath - The path (or basename) of the file to check.
+ * @returns True if the file is a Docker Compose file.
+ */
+export function isDockerComposeFile(filePath: string): boolean {
+  // Anchored to a path separator (or the start), so only the basename is
+  // matched — regardless of `/` or `\` separators. Matches compose.yml,
+  // docker-compose.yaml, docker-compose.dev.yml, compose.prod.yaml… but not
+  // composer.yml (any extra segment must start with '.' or '-').
+  return /(?:^|[\\/])(?:docker-)?compose(?:[.-][^\\/]*)?\.ya?ml$/i.test(
+    filePath,
+  );
+}
+
 // Default file extensions to include in scans
 export const DEFAULT_INCLUDE_EXTENSIONS = [
   '.js',

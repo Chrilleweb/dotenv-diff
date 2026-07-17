@@ -45,6 +45,25 @@ import { MY_KEY } from '$env/static/public';
 MY_KEY
 ```
 
+Docker Compose files are also scanned for shell-style interpolation, so
+variables referenced only from a `compose` file are not reported as unused:
+
+```yaml
+# docker-compose.yml, docker-compose.<env>.yml, compose.yml, compose.<env>.yaml
+services:
+  db:
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD} # ${VAR}
+      - POSTGRES_DB=${POSTGRES_DB:-app} # ${VAR:-default}, ${VAR:?err}, ${VAR:+alt}
+    healthcheck:
+      test: 'pg_isready --username=$POSTGRES_USER' # bare $VAR
+```
+
+> **Note:** Only files named like `docker-compose*.yml`/`.yaml` or
+> `compose*.yml`/`.yaml` are treated as Compose files. Other YAML files are not
+> scanned. A doubled `$$` (Compose's escape for a literal `$`) is not treated as
+> a reference.
+
 ## What It Checks For
 
 > **Note:** The scanner skips files containing any line over 500 characters, as these are likely minified or bundled — this avoids false positives across all checks below.

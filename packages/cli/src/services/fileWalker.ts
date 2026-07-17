@@ -3,6 +3,7 @@ import path from 'path';
 import fsSync from 'fs';
 import {
   DEFAULT_INCLUDE_EXTENSIONS,
+  DEFAULT_INCLUDE_FILE_GLOBS,
   DEFAULT_EXCLUDE_PATTERNS,
 } from '../core/scan/patterns.js';
 
@@ -224,7 +225,12 @@ export async function findFilesByPatterns(
  * @returns An array of default glob patterns.
  */
 export function getDefaultPatterns(): string[] {
-  return DEFAULT_INCLUDE_EXTENSIONS.map((ext) => `**/*${ext}`);
+  return [
+    ...DEFAULT_INCLUDE_EXTENSIONS.map((ext) => `**/*${ext}`),
+    // Compose files are matched by basename glob (not extension) so arbitrary
+    // YAML is not pulled into the scan / secret-detection surface.
+    ...DEFAULT_INCLUDE_FILE_GLOBS,
+  ];
 }
 
 /**
