@@ -322,10 +322,6 @@ function isDelimitedIdentifier(v: string): boolean {
  */
 function looksLikeSecretValue(v: string): boolean {
   if (SECRET_VALUE_PREFIXES.test(v)) return true;
-  // Lowercase delimited slugs (`secret-rotation-v2-...`) are identifiers, not secrets —
-  // reject them before the class-count check, which a version digit would otherwise pass.
-  // Trade-off: a lowercase-only secret with delimiters and no known prefix can slip
-  // through; real 2-class secrets (`MySecretPass123`) have uppercase and are unaffected.
   if (isDelimitedIdentifier(v)) return false;
   if (characterClassCount(v) >= 2) return true;
   return (
