@@ -257,15 +257,18 @@ function isProbablyTestPath(p: string): boolean {
 }
 
 /**
- * Checks if a string is a pure interpolation template.
+ * Checks if a string is a template literal assembled from interpolated variables.
+ *
+ * A secret cannot be hardcoded through interpolation — the value comes from the
+ * `${...}` expressions at runtime — so any template containing an interpolation
+ * is a constructed string, not a literal secret assignment. This covers things
+ * like React list-reconciliation keys (`secret-expanded-${slug}-${secretKey}`),
+ * dynamic URLs, and cache keys, regardless of the static text around them.
  * @param s - The string to check.
- * @returns True if the string is a pure interpolation template, false otherwise.
+ * @returns True if the string contains a `${...}` interpolation.
  */
-function isPureInterpolationTemplate(s: string): boolean {
-  // Matches templates like `${a}`, `${a}:${b}`, `${a}|${b}|${c}`
-  // i.e. no meaningful static content
-  const withoutInterpolations = s.replace(/\$\{[^}]+\}/g, '');
-  return /^[\s:|,._-]*$/.test(withoutInterpolations);
+function isInterpolatedTemplate(s: string): boolean {
+  return /\$\{[^}]+\}/.test(s);
 }
 
 // Known credential value prefixes that mark a real secret regardless of its character mix.
@@ -421,7 +424,7 @@ export function detectSecretsInSource(
         literal.length >= 12 &&
         looksLikeSecretValue(literal) &&
         !isEnvAccessor(line) &&
-        !isPureInterpolationTemplate(literal)
+        !isInterpolatedTemplate(literal)
       ) {
         findings.push({
           file,

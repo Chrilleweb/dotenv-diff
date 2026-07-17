@@ -612,6 +612,41 @@ const email = "user@example.com";
       expect(findings.length).toBeGreaterThan(0);
     });
 
+    describe('interpolated template literals (Issue A false positives)', () => {
+      const hasSuspiciousKeyFinding = (
+        findings: ReturnType<typeof detectSecretsInSource>,
+      ) =>
+        findings.some((f) => f.message.includes('password/secret/token-like'));
+
+      // A secret cannot be hardcoded through `${...}` interpolation — the value
+      // comes from variables at runtime — so these are constructed strings, not
+      // literal secret assignments. React list keys are the common case, but the
+      // rule is not React-specific.
+      it.each([
+        'key={`secret-expanded-${slug}-${secretKey}`}',
+        'key={`import-secret-${envSlug}-${secret.key}`}',
+        'key={`secret-rotation-${slug}-${secretRotationName}`}',
+        'key={`breadcrumb-secret-path-${folderName}`}',
+      ])('does not flag JSX list-key %s', (attr) => {
+        const source = `<li ${attr}>{secret.key}</li>`;
+        const findings = detectSecretsInSource('Component.tsx', source);
+        expect(hasSuspiciousKeyFinding(findings)).toBe(false);
+      });
+
+      it('does not flag a non-JSX interpolated cache key with a suspicious name', () => {
+        const source =
+          'const cacheKey = `session-token-${userId}-${tenantId}`;';
+        const findings = detectSecretsInSource('cache.ts', source);
+        expect(hasSuspiciousKeyFinding(findings)).toBe(false);
+      });
+
+      it('still flags a genuinely hardcoded secret (no interpolation)', () => {
+        const source = 'const apiSecret = "token-Ab9-Cd8-Ef7wq-Gh6";';
+        const findings = detectSecretsInSource('Component.tsx', source);
+        expect(hasSuspiciousKeyFinding(findings)).toBe(true);
+      });
+    });
+
     describe('suspicious-key value shape (identifier false positives)', () => {
       const hasSuspiciousKeyFinding = (
         findings: ReturnType<typeof detectSecretsInSource>,
