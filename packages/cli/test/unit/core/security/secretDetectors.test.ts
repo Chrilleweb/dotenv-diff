@@ -690,6 +690,32 @@ const email = "user@example.com";
         expect(hasSuspiciousKeyFinding(findings)).toBe(true);
       });
 
+      // Regression: a version digit (v1/v2) or token like `k8s` inside an
+      // otherwise lowercase kebab slug used to push it to two character classes
+      // (lowercase + digit) and trip the class-count check. Delimited lowercase
+      // identifiers must be rejected regardless of embedded digits.
+      it.each([
+        ['secret-rotation-v2-rotate-secrets', 'src/queue-service.ts'],
+        ['secret-scanning-v2-full-scan', 'src/queue-service.ts'],
+        ['inject-k8s-sa-auth-token', 'src/gateway/types.ts'],
+        ['infisical-secret-value-blind-index-v1', 'src/blind-index.ts'],
+      ])(
+        'does not flag a lowercase delimited slug with an embedded digit (%s)',
+        (value, file) => {
+          const source = `const SECRET_KIND = "${value}";`;
+          const findings = detectSecretsInSource(file, source);
+
+          expect(hasSuspiciousKeyFinding(findings)).toBe(false);
+        },
+      );
+
+      it('does not flag a snake_case slug with an embedded digit', () => {
+        const source = 'const TOKEN_KIND = "auth_token_rotation_v2";';
+        const findings = detectSecretsInSource('src/enums.ts', source);
+
+        expect(hasSuspiciousKeyFinding(findings)).toBe(false);
+      });
+
       it('flags a single-class value carrying a known credential prefix', () => {
         // `xoxb-` prefix marks it as a real token even though it is lowercase-only
         // and below the entropy threshold, so the prefix branch must admit it.
