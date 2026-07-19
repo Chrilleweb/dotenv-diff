@@ -7,6 +7,10 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+# Restrict the default GITHUB_TOKEN to read-only; jobs escalate only what they need
+permissions:
+  contents: read
+
 jobs:
   release:
     name: Release
@@ -14,8 +18,8 @@ jobs:
     if: github.repository == 'Chrilleweb/dotenv-diff'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
+      # Required for npm provenance (OIDC); all git/PR writes use the GitHub App token
       id-token: write
 
     steps:
