@@ -28,8 +28,9 @@
     "dev": "npx dotenv-diff",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
-    "test:unit": "vitest run ../../test/unit",
-    "test:e2e": "vitest run ../../test/e2e",
+    "test:unit": "vitest run test/unit",
+    "test:e2e": "vitest run test/e2e",
+    "test:fuzz": "vitest run test/property",
     "lint": "eslint ./src --ext .ts",
     "format": "prettier --write \"**/*.{ts,js,json,md,yml}\"",
     "start": "node dist/bin/dotenv-diff.js",
@@ -72,5 +73,8 @@
     "chalk": "5.6.2",
     "commander": "^15.0.0",
     "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "fast-check": "^4.9.0"
   }
 }

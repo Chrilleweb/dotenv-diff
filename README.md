@@ -5,6 +5,7 @@ Scan your codebase to detect every environment variable reference. It helps you 
 First-class support for SvelteKit, Next.js, and Nuxt. Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js and Vue — or any other setup where you want reliable .env file comparison.
 
 [![Coverage Status](https://codecov.io/gh/Chrilleweb/dotenv-diff/branch/main/graph/badge.svg)](https://codecov.io/gh/Chrilleweb/dotenv-diff)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Chrilleweb/dotenv-diff/badge)](https://scorecard.dev/viewer/?uri=github.com/Chrilleweb/dotenv-diff)
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 

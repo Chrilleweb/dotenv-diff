@@ -109,6 +109,12 @@ function determineEntropySeverity(literalLength: number): SecretSeverity {
 export function hasIgnoreComment(line: string): boolean {
   const normalized = line.trim();
 
+  // Cheap linear pre-check: the directive token must appear at all. This short
+  // circuits pathological lines (e.g. long runs of "/") before they reach the
+  // comment-marker regexes below, whose unbounded `.*` would otherwise rescan
+  // from every marker position and go quadratic (O(n²)) on the line length.
+  if (!/dotenv[\s-]*diff[\s-]*ignore/i.test(normalized)) return false;
+
   // Allow mixed casing, extra spaces, and optional dashes
   return (
     /\/\/.*dotenv[\s-]*diff[\s-]*ignore/i.test(normalized) ||
@@ -382,14 +388,16 @@ export function detectSecretsInSource(
     // Skip if inside ignore block
     if (insideIgnoreBlock) continue;
 
+    // Ignore likely minified / bundled lines before any secret detection.
+    // This runs before the comment/ignore regexes so pathologically long lines
+    // (e.g. bundled code with long runs of "/") never reach them.
+    if (isLikelyMinified(line)) continue;
+
     // Skip comments
     if (/^\s*\/\//.test(line)) continue;
 
     // Check if line has ignore comment
     if (hasIgnoreComment(line)) continue;
-
-    // Ignore likely minified / bundled lines before any secret detection
-    if (isLikelyMinified(line)) continue;
 
     // Check for HTTPS URLs
     HTTPS_PATTERN.lastIndex = 0;
