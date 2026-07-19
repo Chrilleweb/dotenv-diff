@@ -25,3 +25,14 @@ updates:
     commit-message:
       prefix: 'bump'
       include: 'scope'
+
+  # Hash-pinned diff-cover requirements for the coverage workflow
+  - package-ecosystem: 'pip'
+    directory: '/.github'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+    target-branch: main
+    commit-message:
+      prefix: 'bump'
+      include: 'scope'
