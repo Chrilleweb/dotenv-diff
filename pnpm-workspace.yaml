@@ -5,5 +5,11 @@ packages:
 allowBuilds:
   esbuild: false
 
+# Force patched versions of transitive (dev-only) dependencies flagged by
+# security advisories. Both come in via vitest → vite → esbuild.
+overrides:
+  vite@>=7.0.0 <7.3.6: '^7.3.6'
+  esbuild@>=0.27.3 <0.28.1: '^0.28.1'
+
 # The minimum age of a release before it can be automatically updated by pnpm.
 minimumReleaseAge: 1440 # 1 day in minutes
