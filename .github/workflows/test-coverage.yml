@@ -4,12 +4,17 @@ on:
   pull_request:
     branches: [main]
 
+# Restrict the default GITHUB_TOKEN to read-only; jobs escalate only what they need
+permissions:
+  contents: read
+
 jobs:
   test:
     if: github.actor != 'dotenv-diff-release-bot'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+      # Required to post the sticky coverage comment on the PR
       pull-requests: write
 
     steps:

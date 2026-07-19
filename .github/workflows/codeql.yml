@@ -8,12 +8,17 @@ on:
   schedule:
     - cron: '0 6 * * 1'
 
+# Restrict the default GITHUB_TOKEN to read-only; jobs escalate only what they need
+permissions:
+  contents: read
+
 jobs:
   analyze:
     name: Analyze (javascript-typescript)
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Required for CodeQL to upload analysis results
       security-events: write
 
     steps:
