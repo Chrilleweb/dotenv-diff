@@ -56,6 +56,18 @@ describe('detectSecretsInExample', () => {
     expect(warnings[0]!.reason).toContain('Entropy');
   });
 
+  it('does not flag long low-entropy values', () => {
+    const env = {
+      // >= 24 chars, so it reaches the entropy check, but the value is highly
+      // repetitive (entropy ≈ 0), so the `entropy > 0.8` branch is false and no
+      // warning is produced.
+      REPEATED: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa', // 28 chars
+    };
+
+    const warnings = detectSecretsInExample(env);
+    expect(warnings).toHaveLength(0);
+  });
+
   it('returns no warnings when nothing matches', () => {
     const env = {
       PORT: '3000',
