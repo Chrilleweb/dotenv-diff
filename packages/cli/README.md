@@ -6,6 +6,7 @@ First-class support for SvelteKit, Next.js, and Nuxt. Also works well in modern 
 
 [![Coverage Status](https://codecov.io/gh/Chrilleweb/dotenv-diff/branch/main/graph/badge.svg)](https://codecov.io/gh/Chrilleweb/dotenv-diff)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Chrilleweb/dotenv-diff/badge)](https://scorecard.dev/viewer/?uri=github.com/Chrilleweb/dotenv-diff)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13691/badge)](https://www.bestpractices.dev/projects/13691)
 [![npm version](https://img.shields.io/npm/v/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 [![npm downloads](https://img.shields.io/npm/dt/dotenv-diff.svg)](https://www.npmjs.com/package/dotenv-diff)
 
