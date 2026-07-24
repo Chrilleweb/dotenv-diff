@@ -1,5 +1,26 @@
 # Changelog
 
+<!-- changesets: diffmatrix-prototype-keys.md,gentle-expire-rollover.md,inconsistent-naming-dedup-collision.md,quiet-plants-fuzz.md,skip-commented-usages-markers.md,sveltekit-lib-server-false-positive.md,tidy-secrets-report.md,wise-entropy-codepoints.md -->
+## 2026-07-24
+
+### Highlights
+- fix matrix mode (`--matrix`) misreporting keys that share a name with a built in object member
+- fix `@expire` dates with impossible calendar values (e.g. `2024-13-45`, `2024-02-30`) being silently rolled over into a valid but wrong date, producing a bogus days left count. Such dates are now rejected and the key is skipped.
+- fix an inconsistent naming warning being silently dropped when a key contained the character `|`.
+- Fix quadratic slowdown in secret scanner when processing long lines with `/`.
+- fix env var usages being silently dropped from the scan when their line merely contained the substrings `<!--` or `-->`
+- fix a false positive SvelteKit warning for `process.env` used inside the `$lib/server` (`src/lib/server`) directory.
+- fix duplicate secret warnings for a single `.env.example` key.
+- fix shannon entropy miscalculation for values containing astral (non-BMP) characters.
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: chilly-windows-tease.md,docker-compose-usage.md,giant-foxes-boil.md,real-pans-cry.md -->
 ## 2026-07-17
 
