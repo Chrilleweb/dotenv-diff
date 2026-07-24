@@ -175,4 +175,52 @@ describe('skipCommentedUsages', () => {
   it('handles empty array', () => {
     expect(skipCommentedUsages([])).toEqual([]);
   });
+
+  // ---- regressions: markers embedded in code/strings must not drop usages ----
+
+  it('keeps a usage after an ignore block even if a line inside it had a stray <!--', () => {
+    // Regression (case A): the stray `<!--` used to set insideHtmlComment, which
+    // ignore-end never reset, silently dropping AFTER.
+    const usages = [
+      usage('START', '<!-- dotenv-diff-ignore-start -->'),
+      usage('MID', 'process.env.MID <!-- stray open'),
+      usage('END', '<!-- dotenv-diff-ignore-end -->'),
+      usage('AFTER', 'process.env.AFTER'),
+    ];
+    expect(skipCommentedUsages(usages).map((u) => u.variable)).toEqual([
+      'AFTER',
+    ]);
+  });
+
+  it('keeps a usage on a line containing --> in real code', () => {
+    // Regression (case B): `-->` is the "goes to" idiom here, not a comment close.
+    const usages = [usage('X', 'while (i --> 0) { use(process.env.X) }')];
+    expect(skipCommentedUsages(usages).map((u) => u.variable)).toEqual(['X']);
+  });
+
+  it('treats the abrupt-close form --!> as a comment terminator', () => {
+    // Per the WHATWG spec `--!>` also closes an HTML comment, so the usage on
+    // the following line must be kept (the comment ends, it is not inside it).
+    const usages = [
+      usage('OPEN', '<!-- commented out'),
+      usage('INSIDE', 'process.env.INSIDE'),
+      usage('CLOSE', '--!>'),
+      usage('AFTER', 'process.env.AFTER'),
+    ];
+    expect(skipCommentedUsages(usages).map((u) => u.variable)).toEqual([
+      'AFTER',
+    ]);
+  });
+
+  it('does not let a mid-line <!-- inside a string poison following usages', () => {
+    // Regression (case C): `<!--` inside a string literal is not a comment.
+    const usages = [
+      usage('P', 'const s = "<!-- not a comment" + process.env.P'),
+      usage('Q', 'process.env.Q'),
+    ];
+    expect(skipCommentedUsages(usages).map((u) => u.variable)).toEqual([
+      'P',
+      'Q',
+    ]);
+  });
 });
