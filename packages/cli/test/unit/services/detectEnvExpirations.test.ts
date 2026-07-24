@@ -175,4 +175,46 @@ describe('detectEnvExpirations', () => {
 
     expect(result).toEqual([]);
   });
+
+  // Regression: the regex only checks the digit shape (\d{4}-\d{2}-\d{2}), so
+  // impossible dates whose parts are all non-zero passed the old guard and were
+  // silently rolled over by Date.UTC (e.g. 2024-13-45 -> 2025-02-14), producing
+  // a bogus daysLeft. These must now be rejected outright.
+  it.each([
+    ['month out of range', '2024-13-45'],
+    ['absurd month and day', '2024-99-99'],
+    ['day past end of February', '2024-02-30'],
+    ['day past end of April', '2024-04-31'],
+    ['Feb 29 in a non-leap year', '2023-02-29'],
+  ])('skips env key when expire date is impossible (%s)', (_label, date) => {
+    fs.writeFileSync(
+      envPath,
+      `
+    # @expire ${date}
+    API_KEY=123
+    `,
+    );
+
+    expect(detectEnvExpirations(envPath)).toEqual([]);
+  });
+
+  it('accepts a real leap day (Feb 29 in a leap year)', () => {
+    fs.writeFileSync(
+      envPath,
+      `
+    # @expire 2024-02-29
+    API_KEY=123
+    `,
+    );
+
+    const result = detectEnvExpirations(envPath);
+
+    expect(result).toEqual([
+      {
+        key: 'API_KEY',
+        date: '2024-02-29',
+        daysLeft: -276,
+      },
+    ]);
+  });
 });

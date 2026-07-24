@@ -68,12 +68,29 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
  * @param now - Current date
  * @returns Number of days left until expiration, or null if invalid date
  */
-function calculateDaysLeft(expireDateStr: string, now: Date): number | null {
+export function calculateDaysLeft(
+  expireDateStr: string,
+  now: Date,
+): number | null {
   const parts = expireDateStr.split('-').map(Number);
   const [year, month, day] = parts;
   if (!year || !month || !day) return null;
 
   const expireUtc = Date.UTC(year, month - 1, day);
+
+  // Reject non-existent calendar dates (e.g. 2024-13-45, 2024-02-30). The
+  // regex only checks the digit shape, so `Date.UTC` would otherwise silently
+  // roll them over into a valid-but-wrong date. Round-tripping the timestamp
+  // back to its components proves nothing rolled over.
+  const roundTrip = new Date(expireUtc);
+  if (
+    roundTrip.getUTCFullYear() !== year ||
+    roundTrip.getUTCMonth() !== month - 1 ||
+    roundTrip.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
   const todayUtc = Date.UTC(
     now.getUTCFullYear(),
     now.getUTCMonth(),
