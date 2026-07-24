@@ -2,6 +2,15 @@ import type { EnvUsage } from '../../config/types.js';
 import { hasIgnoreComment } from '../../core/security/secretDetectors.js';
 
 /**
+ * Matches an HTML comment terminator anywhere on a line. Per the WHATWG spec a
+ * comment closes with `-->` or the "abrupt closing" form `--!>`, so both count.
+ */
+const HTML_COMMENT_END = /--!?>/;
+
+/** Anchored comment-line prefixes: `//`, `#`, `/*`, `*`, or a closing `-->`/`--!>`. */
+const COMMENT_LINE_PREFIX = /^(\/\/|#|\/\*|\*|--!?>)/;
+
+/**
  * Filters out commented usages from the list.
  * Skipping comments:
  *   // process.env.API_URL
@@ -41,18 +50,18 @@ export function skipCommentedUsages(usages: readonly EnvUsage[]): EnvUsage[] {
     // never fake a comment and silently drop a real usage.
     if (insideHtmlComment) {
       // Somewhere inside a multi-line HTML comment: this usage is commented
-      // out. A `-->` anywhere on the line closes the comment.
-      if (line.includes('-->')) insideHtmlComment = false;
+      // out. A comment terminator anywhere on the line closes the comment.
+      if (HTML_COMMENT_END.test(line)) insideHtmlComment = false;
       return false;
     }
 
     if (line.startsWith('<!--')) {
       // Opens an HTML comment. Unless it also closes on the same line, the
       // comment continues onto the following usages.
-      if (!line.includes('-->')) insideHtmlComment = true;
+      if (!HTML_COMMENT_END.test(line)) insideHtmlComment = true;
       return false;
     }
 
-    return !/^(\/\/|#|\/\*|\*|-->)/.test(line) && !hasIgnoreComment(line);
+    return !COMMENT_LINE_PREFIX.test(line) && !hasIgnoreComment(line);
   });
 }

@@ -198,6 +198,20 @@ describe('skipCommentedUsages', () => {
     expect(skipCommentedUsages(usages).map((u) => u.variable)).toEqual(['X']);
   });
 
+  it('treats the abrupt-close form --!> as a comment terminator', () => {
+    // Per the WHATWG spec `--!>` also closes an HTML comment, so the usage on
+    // the following line must be kept (the comment ends, it is not inside it).
+    const usages = [
+      usage('OPEN', '<!-- commented out'),
+      usage('INSIDE', 'process.env.INSIDE'),
+      usage('CLOSE', '--!>'),
+      usage('AFTER', 'process.env.AFTER'),
+    ];
+    expect(skipCommentedUsages(usages).map((u) => u.variable)).toEqual([
+      'AFTER',
+    ]);
+  });
+
   it('does not let a mid-line <!-- inside a string poison following usages', () => {
     // Regression (case C): `<!--` inside a string literal is not a comment.
     const usages = [
