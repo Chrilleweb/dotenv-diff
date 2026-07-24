@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.1.2
+
+### Patch Changes
+
+- e561cb5: fix matrix mode (`--matrix`) misreporting keys that share a name with a built in object member
+- 3a2135c: fix `@expire` dates with impossible calendar values (e.g. `2024-13-45`, `2024-02-30`) being silently rolled over into a valid but wrong date, producing a bogus days left count. Such dates are now rejected and the key is skipped.
+- 488a403: fix an inconsistent naming warning being silently dropped when a key contained the character `|`.
+- 7289da8: Fix quadratic slowdown in secret scanner when processing long lines with `/`.
+- 8b4258a: fix env var usages being silently dropped from the scan when their line merely contained the substrings `<!--` or `-->`
+- bc6b3af: fix a false positive SvelteKit warning for `process.env` used inside the `$lib/server` (`src/lib/server`) directory.
+- d266324: fix duplicate secret warnings for a single `.env.example` key.
+- fc0467e: fix shannon entropy miscalculation for values containing astral (non-BMP) characters.
+
 ## 3.1.1
 
 ### Patch Changes
