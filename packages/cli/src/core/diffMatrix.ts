@@ -48,8 +48,10 @@ function buildRow(
   files: MatrixFileInput[],
   checkValues: boolean,
 ): MatrixRow {
-  const presence = files.map((f) => key in f.values);
-  const values = files.map((f) => f.values[key]);
+  const presence = files.map((f) => Object.hasOwn(f.values, key));
+  const values = files.map((f) =>
+    Object.hasOwn(f.values, key) ? f.values[key] : undefined,
+  );
 
   const hasMismatch =
     checkValues && new Set(values.filter((_, i) => presence[i])).size > 1;

@@ -111,6 +111,40 @@ describe('diffMatrix', () => {
     expect(result.allMatch).toBe(true);
   });
 
+  it('does not report a prototype-named key as present in files that omit it', () => {
+    // Regression: `toString` is inherited from Object.prototype, so `key in
+    // values` / `values[key]` used to report phantom presence (and leak the
+    // inherited function as the value) for the file that never defined it.
+    const result = diffMatrix(
+      [
+        { name: 'a.env', values: { toString: 'foo' } },
+        { name: 'b.env', values: { OTHER: 'x' } },
+      ],
+      true,
+    );
+
+    const row = result.rows.find((r) => r.key === 'toString')!;
+    expect(row.presence).toEqual([true, false]);
+    expect(row.values).toEqual(['foo', undefined]);
+    expect(row.hasMismatch).toBe(false);
+  });
+
+  it('treats a shared prototype-named key like any other matching key', () => {
+    const result = diffMatrix(
+      [
+        { name: 'a.env', values: { constructor: '1', valueOf: 'x' } },
+        { name: 'b.env', values: { constructor: '1', valueOf: 'x' } },
+      ],
+      true,
+    );
+
+    expect(result.allMatch).toBe(true);
+    for (const row of result.rows) {
+      expect(row.presence).toEqual([true, true]);
+      expect(row.values.every((v) => typeof v === 'string')).toBe(true);
+    }
+  });
+
   it('supports comparing 3+ files at once', () => {
     const result = diffMatrix([
       { name: '.env.production', values: { DATABASE_URL: 'a', API_KEY: 'k' } },
