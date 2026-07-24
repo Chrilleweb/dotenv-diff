@@ -30,18 +30,29 @@ export function skipCommentedUsages(usages: readonly EnvUsage[]): EnvUsage[] {
       return false;
     }
 
-    if (line.includes('<!--')) insideHtmlComment = true;
-    if (line.includes('-->')) {
-      insideHtmlComment = false;
+    // Short-circuit before any HTML-comment bookkeeping: a stray `<!--`/`-->`
+    // on a line inside an ignore block must not leak into `insideHtmlComment`
+    // and drop live usages after the block ends.
+    if (insideIgnoreBlock) return false;
+
+    // HTML comment span tracking. Markers are only honoured at the *start* of
+    // the trimmed line — i.e. a genuine comment line — so `<!--`/`-->` embedded
+    // in code or string literals (e.g. `while (i --> 0)` or a `"<!--"` literal)
+    // never fake a comment and silently drop a real usage.
+    if (insideHtmlComment) {
+      // Somewhere inside a multi-line HTML comment: this usage is commented
+      // out. A `-->` anywhere on the line closes the comment.
+      if (line.includes('-->')) insideHtmlComment = false;
       return false;
     }
 
-    if (insideIgnoreBlock) return false;
+    if (line.startsWith('<!--')) {
+      // Opens an HTML comment. Unless it also closes on the same line, the
+      // comment continues onto the following usages.
+      if (!line.includes('-->')) insideHtmlComment = true;
+      return false;
+    }
 
-    return (
-      !insideHtmlComment &&
-      !/^\s*(\/\/|#|\/\*|\*|<!--|-->)/.test(line) &&
-      !hasIgnoreComment(line)
-    );
+    return !/^(\/\/|#|\/\*|\*|-->)/.test(line) && !hasIgnoreComment(line);
   });
 }
