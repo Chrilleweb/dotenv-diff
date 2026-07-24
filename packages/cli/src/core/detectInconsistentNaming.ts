@@ -20,8 +20,11 @@ export function detectInconsistentNaming(
       // Skip if either key is undefined
       if (!key1 || !key2) continue;
 
-      // Create a sorted pair key to avoid duplicate checking
-      const pairKey = [key1, key2].sort().join('|');
+      // Create a sorted pair key to avoid duplicate checking. JSON.stringify
+      // keeps the encoding injective — a plain `join('|')` would let keys that
+      // themselves contain the separator collide (e.g. `("||","_")` and
+      // `("|","_|")` both map to `_|||`), silently dropping a real warning.
+      const pairKey = JSON.stringify([key1, key2].sort());
       if (processedPairs.has(pairKey)) continue;
       processedPairs.add(pairKey);
 

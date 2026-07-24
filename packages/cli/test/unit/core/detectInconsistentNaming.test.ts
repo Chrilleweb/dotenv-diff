@@ -67,8 +67,7 @@ describe('detectInconsistentNaming', () => {
 
   it('skips undefined keys in the array', () => {
     const keys = ['API_KEY', undefined, 'APIKEY', undefined] as (
-      | string
-      | undefined
+      string | undefined
     )[];
     const warnings = detectInconsistentNaming(keys as string[]);
 
@@ -91,6 +90,17 @@ describe('detectInconsistentNaming', () => {
 
     expect(warnings).toHaveLength(1);
     expect(warnings[0]!.suggestion).toContain('API_KEY');
+  });
+
+  it('does not drop a real inconsistency when keys contain the dedup separator', () => {
+    // Regression: with a `join('|')` dedup key, the pair ("||","_") and the
+    // pair ("|","_|") collided on "_|||", so the genuine "|"/"_|" inconsistency
+    // (both normalise to "|") was silently skipped.
+    const keys = ['||', '|', '_|', '_'];
+    const warnings = detectInconsistentNaming(keys);
+
+    const pairs = warnings.map((w) => [w.key1, w.key2].sort());
+    expect(pairs).toContainEqual(['_|', '|']);
   });
 
   it('avoids duplicate warnings when same key appears multiple times', () => {
