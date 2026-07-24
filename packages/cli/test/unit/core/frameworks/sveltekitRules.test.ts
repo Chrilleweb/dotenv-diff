@@ -66,6 +66,30 @@ describe('applySvelteKitRules', () => {
     expect(warnings).toHaveLength(0);
   });
 
+  it('allows process.env in $lib/server directory', () => {
+    // Regression: src/lib/server is SvelteKit's enforced server-only directory,
+    // so process.env there must not be flagged as client-side usage.
+    applySvelteKitRules(
+      { ...baseUsage, file: 'src/lib/server/db.ts' },
+      warnings,
+    );
+    expect(warnings).toHaveLength(0);
+  });
+
+  it('allows process.env in a nested $lib/server file', () => {
+    applySvelteKitRules(
+      { ...baseUsage, file: 'src/lib/server/auth/tokens.ts' },
+      warnings,
+    );
+    expect(warnings).toHaveLength(0);
+  });
+
+  it('still warns for process.env in a non-server $lib file', () => {
+    applySvelteKitRules({ ...baseUsage, file: 'src/lib/utils.ts' }, warnings);
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]!.reason).toMatch(/process\.env should only be used/);
+  });
+
   it('allows process.env in svelte.config.js', () => {
     applySvelteKitRules({ ...baseUsage, file: 'svelte.config.js' }, warnings);
     expect(warnings).toHaveLength(0);

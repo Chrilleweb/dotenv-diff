@@ -29,7 +29,10 @@ export function applySvelteKitRules(
     // hooks.server.ts / handle.server.ts etc.
     /\/(hooks|handle)\.server\.(ts|js)$/.test(normalizedFile) ||
     // generic server.ts fallback
-    /\/server\.(ts|js)$/.test(normalizedFile);
+    /\/server\.(ts|js)$/.test(normalizedFile) ||
+    // $lib/server (src/lib/server) — SvelteKit's enforced server-only directory,
+    // never bundled to the client, so process.env there is legitimate.
+    /(^|\/)lib\/server\//.test(normalizedFile);
 
   const isClientFile =
     !normalizedFile.includes('.server.') &&
