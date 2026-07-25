@@ -39,10 +39,10 @@
     "@vitest/coverage-v8": "4.1.10",
     "eslint": "^10.7.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.1.1",
+    "lint-staged": "^17.2.0",
     "prettier": "^3.9.6",
     "turbo": "^2.10.6",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   },
   "packageManager": "pnpm@11.17.0"
