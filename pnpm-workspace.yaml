@@ -10,6 +10,7 @@ allowBuilds:
 overrides:
   vite@>=7.0.0 <7.3.6: '^7.3.6'
   esbuild@>=0.27.3 <0.28.1: '^0.28.1'
+  postcss: "^8.5.23"
 
 # The minimum age of a release before it can be automatically updated by pnpm.
 minimumReleaseAge: 1440 # 1 day in minutes
