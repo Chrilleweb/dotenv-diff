@@ -56,6 +56,10 @@ vi.mock('../../../src/core/detectInconsistentNaming.js', () => ({
   ]),
 }));
 
+vi.mock('../../../src/services/detectMissingComments.js', () => ({
+  detectMissingComments: vi.fn(() => [{ key: 'UNDOC', line: 2 }]),
+}));
+
 import fs from 'fs';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { applyFixes } from '../../../src/services/fixEnv.js';
@@ -115,6 +119,27 @@ describe('processComparisonFile', () => {
     });
 
     expect(result.uppercaseWarnings?.length).toBeGreaterThan(0);
+  });
+
+  it('detects comment warnings on the example file when enabled', () => {
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      commentWarnings: true,
+    });
+
+    expect(result.commentWarnings).toEqual([{ key: 'UNDOC', line: 2 }]);
+  });
+
+  it('falls back to the default example file and skips when it does not exist', () => {
+    // examplePath undefined → resolves DEFAULT_EXAMPLE_FILE; existsSync false → no detection.
+    vi.mocked(fs.existsSync).mockReturnValueOnce(false);
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      examplePath: undefined,
+      commentWarnings: true,
+    });
+
+    expect(result.commentWarnings).toEqual([]);
   });
 
   it('detects duplicates when not allowed', () => {

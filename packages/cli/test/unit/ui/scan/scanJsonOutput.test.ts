@@ -320,6 +320,21 @@ describe('scanJsonOutput', () => {
     });
   });
 
+  it('includes comment warnings', () => {
+    const scanResult = makeScanResult({
+      commentWarnings: [
+        { key: 'DB_HOST', line: 3 },
+        { key: 'SECRET', line: 5 },
+      ],
+    });
+
+    const result = scanJsonOutput(scanResult, '');
+
+    expect(result.commentWarnings).toHaveLength(2);
+    expect(result.commentWarnings?.[0]).toEqual({ key: 'DB_HOST', line: 3 });
+    expect(result.commentWarnings?.[1]).toEqual({ key: 'SECRET', line: 5 });
+  });
+
   it('includes healthScore', () => {
     const scanResult = makeScanResult();
 

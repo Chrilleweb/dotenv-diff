@@ -270,6 +270,14 @@ describe('collectBaselineEntries', () => {
     expect(result).toContainEqual({ rule: 'expire', key: 'OLD_KEY' });
   });
 
+  it('collects comment warnings', () => {
+    const result = collectBaselineEntries({
+      ...emptyScanResult,
+      commentWarnings: [{ key: 'UNDOCUMENTED', line: 2 }],
+    });
+    expect(result).toContainEqual({ rule: 'comment', key: 'UNDOCUMENTED' });
+  });
+
   it('collects inconsistent-naming warnings as sorted key pair', () => {
     const result = collectBaselineEntries({
       ...emptyScanResult,
@@ -571,6 +579,22 @@ describe('applyBaselineEntries', () => {
     const result: ScanResult = { ...emptyScanResult };
     const after = applyBaselineEntries(result, [{ rule: 'expire', key: 'x' }]);
     expect(after.expireWarnings).toBeUndefined();
+  });
+
+  it('suppresses comment warning', () => {
+    const result: ScanResult = {
+      ...emptyScanResult,
+      commentWarnings: [{ key: 'UNDOC', line: 2 }],
+    };
+    const entries: BaselineEntry[] = [{ rule: 'comment', key: 'UNDOC' }];
+    const after = applyBaselineEntries(result, entries);
+    expect(after.commentWarnings).toHaveLength(0);
+  });
+
+  it('does not touch commentWarnings when field is absent', () => {
+    const result: ScanResult = { ...emptyScanResult };
+    const after = applyBaselineEntries(result, [{ rule: 'comment', key: 'x' }]);
+    expect(after.commentWarnings).toBeUndefined();
   });
 
   it('suppresses inconsistent-naming warning (sorted pair)', () => {
