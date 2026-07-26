@@ -57,6 +57,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const uppercaseKeys = raw.uppercaseKeys !== false;
   const expireWarnings = raw.expireWarnings !== false;
   const inconsistentNamingWarnings = raw.inconsistentNamingWarnings !== false;
+  const commentWarnings = toBool(raw.commentWarnings);
   const suggest = raw.suggest !== false;
   const listAll = toBool(raw.listAll);
   const explain =
@@ -105,6 +106,7 @@ export function normalizeOptions(raw: RawOptions): Options {
     uppercaseKeys,
     expireWarnings,
     inconsistentNamingWarnings,
+    commentWarnings,
     listAll,
     explain,
     matrix,

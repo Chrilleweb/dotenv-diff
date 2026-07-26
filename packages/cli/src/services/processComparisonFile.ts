@@ -9,6 +9,8 @@ import { toUpperSnakeCase } from '../core/helpers/toUpperSnakeCase.js';
 import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 import { detectEnvExpirations } from './detectEnvExpirations.js';
 import { detectInconsistentNaming } from '../core/detectInconsistentNaming.js';
+import { detectMissingComments } from './detectMissingComments.js';
+import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import type {
   ScanUsageOptions,
   ScanResult,
@@ -18,6 +20,7 @@ import type {
   ComparisonFile,
   ExpireWarning,
   InconsistentNamingWarning,
+  CommentWarning,
   FixContext,
 } from '../config/types.js';
 
@@ -36,6 +39,7 @@ export interface ProcessComparisonResult {
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
+  commentWarnings?: CommentWarning[];
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -60,6 +64,7 @@ export function processComparisonFile(
   let uppercaseWarnings: UppercaseWarning[] = [];
   let expireWarnings: ExpireWarning[] = [];
   let inconsistentNamingWarnings: InconsistentNamingWarning[] = [];
+  let commentWarnings: CommentWarning[] = [];
 
   const fix: FixContext = {
     fixApplied: false,
@@ -134,6 +139,19 @@ export function processComparisonFile(
       inconsistentNamingWarnings = detectInconsistentNaming(allKeys);
     }
 
+    // Warn about .env.example keys without a documenting comment. Runs on the
+    // example file (documentation lives there), not the env file — using the
+    // explicit --example path when given, else the default `.env.example`.
+    if (opts.commentWarnings) {
+      const examplePath = resolveFromCwd(
+        opts.cwd,
+        opts.examplePath ?? DEFAULT_EXAMPLE_FILE,
+      );
+      if (fs.existsSync(examplePath)) {
+        commentWarnings = detectMissingComments(examplePath);
+      }
+    }
+
     // Apply fixes (both duplicates + missing keys + gitignore)
     if (opts.fix) {
       const { changed, result } = applyFixes({
@@ -178,6 +196,7 @@ export function processComparisonFile(
       uppercaseWarnings,
       expireWarnings,
       inconsistentNamingWarnings,
+      commentWarnings,
       error: {
         message: errorMessage,
         shouldExit: opts.isCiMode ?? false,
@@ -197,6 +216,7 @@ export function processComparisonFile(
     uppercaseWarnings,
     expireWarnings,
     inconsistentNamingWarnings,
+    commentWarnings,
   };
 }
 

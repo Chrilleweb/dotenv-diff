@@ -282,6 +282,37 @@ describe('scanUsage', () => {
     expect(processComparisonFile).toHaveBeenCalled();
   });
 
+  it('attaches commentWarnings from processComparisonFile onto the scan result', async () => {
+    vi.mocked(determineComparisonFile).mockResolvedValue({
+      type: 'found',
+      file: { path: '/env/.env', name: '.env' },
+    });
+    vi.mocked(processComparisonFile).mockReturnValue({
+      scanResult: { ...baseScanResult },
+      comparedAgainst: '.env',
+      envVariables: {},
+      duplicatesFound: false,
+      dupsEnv: [],
+      dupsEx: [],
+      fix: {
+        fixApplied: false,
+        removedDuplicates: [],
+        addedEnv: [],
+        gitignoreUpdated: false,
+      },
+      commentWarnings: [{ key: 'UNDOC', line: 2 }],
+    } as ProcessComparisonResult);
+
+    await scanUsage({ ...baseOpts, json: false });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({ commentWarnings: [{ key: 'UNDOC', line: 2 }] }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
   it('sets frameworkWarnings on scanResult when frameworkValidator returns results', async () => {
     const { frameworkValidator } =
       await import('../../../src/core/frameworks/frameworkValidator.js');

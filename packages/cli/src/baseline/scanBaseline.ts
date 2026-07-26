@@ -129,6 +129,10 @@ export function collectBaselineEntries(
     entries.push({ rule: 'expire', key: warning.key });
   }
 
+  for (const warning of scanResult.commentWarnings ?? []) {
+    entries.push({ rule: 'comment', key: warning.key });
+  }
+
   // Sort the key pair so the entry is identical regardless of scanner order
   for (const warning of scanResult.inconsistentNamingWarnings ?? []) {
     const pair = [warning.key1, warning.key2].sort().join('|');
@@ -203,6 +207,11 @@ export function applyBaselineEntries(
           const pair = [w.key1, w.key2].sort().join('|');
           return !has('inconsistent-naming', pair);
         },
+      ),
+    }),
+    ...(scanResult.commentWarnings != null && {
+      commentWarnings: scanResult.commentWarnings.filter(
+        (w) => !has('comment', w.key),
       ),
     }),
   };

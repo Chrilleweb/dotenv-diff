@@ -133,6 +133,9 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
         scanResult.inconsistentNamingWarnings =
           result.inconsistentNamingWarnings;
       }
+      if (result.commentWarnings) {
+        scanResult.commentWarnings = result.commentWarnings;
+      }
       if (
         result.exampleFull &&
         result.comparedAgainst === DEFAULT_EXAMPLE_FILE
@@ -204,6 +207,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
               (w) => w.daysLeft <= EXPIRE_THRESHOLD_DAYS,
             ).length ?? 0) > 0 ||
             (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0 ||
+            (scanResult.commentWarnings?.length ?? 0) > 0 ||
             (scanResult.exampleWarnings?.length ?? 0) > 0)
         ),
     };
@@ -278,6 +282,7 @@ function calculateStats(scanResult: ScanResult): void {
     (scanResult.uppercaseWarnings?.length ?? 0) +
     (scanResult.expireWarnings?.length ?? 0) +
     (scanResult.inconsistentNamingWarnings?.length ?? 0) +
+    (scanResult.commentWarnings?.length ?? 0) +
     (scanResult.secrets?.length ?? 0) +
     scanResult.missing.length +
     scanResult.unused.length +

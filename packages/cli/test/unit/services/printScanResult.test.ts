@@ -60,6 +60,10 @@ vi.mock('../../../src/ui/scan/printUppercaseWarning.js', () => ({
   printUppercaseWarning: vi.fn(),
 }));
 
+vi.mock('../../../src/ui/scan/printCommentWarnings.js', () => ({
+  printCommentWarnings: vi.fn(),
+}));
+
 vi.mock('../../../src/ui/scan/printExpireWarnings.js', () => ({
   printExpireWarnings: vi.fn(),
 }));
@@ -103,6 +107,7 @@ import { printListAll } from '../../../src/ui/scan/printListAll.js';
 import { printExampleWarnings } from '../../../src/ui/scan/printExampleWarnings.js';
 import { printSecrets } from '../../../src/ui/scan/printSecrets.js';
 import { printExpireWarnings } from '../../../src/ui/scan/printExpireWarnings.js';
+import { printCommentWarnings } from '../../../src/ui/scan/printCommentWarnings.js';
 import { printConsolelogWarning } from '../../../src/ui/scan/printConsolelogWarning.js';
 import type { SecretFinding } from '../../../src/core/security/secretDetectors.js';
 import type {
@@ -343,6 +348,19 @@ describe('printScanResult', () => {
     );
 
     expect(printExpireWarnings).toHaveBeenCalled();
+  });
+
+  it('prints comment warnings when present', () => {
+    printScanResult(
+      {
+        ...baseScanResult,
+        commentWarnings: [{ key: 'DB_HOST', line: 3 }],
+      },
+      baseOpts,
+      '.env',
+    );
+
+    expect(printCommentWarnings).toHaveBeenCalled();
   });
 
   it('returns exitWithError true when high severity example warning exists', () => {

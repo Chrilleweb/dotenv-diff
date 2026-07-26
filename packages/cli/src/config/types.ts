@@ -94,6 +94,7 @@ export interface RawOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+  commentWarnings?: boolean;
   listAll?: boolean;
   explain?: string;
   matrix?: boolean | string[];
@@ -141,6 +142,7 @@ export interface Options {
   uppercaseKeys: boolean;
   expireWarnings: boolean;
   inconsistentNamingWarnings: boolean;
+  commentWarnings: boolean;
   listAll: boolean;
   explain: string | undefined;
   matrix: boolean;
@@ -240,6 +242,7 @@ export interface ScanUsageOptions extends ScanOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+  commentWarnings?: boolean;
   listAll?: boolean;
   baseline?: boolean;
   suggest?: boolean;
@@ -285,6 +288,7 @@ export interface ScanResult {
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
+  commentWarnings?: CommentWarning[];
   /** Typo suggestions for variables used in code but not defined in the env file */
   suggestions?: TypoSuggestion[];
   fileContentMap?: Map<string, string>;
@@ -339,6 +343,7 @@ export interface ComparisonOptions {
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
+  commentWarnings?: boolean;
   suggest?: boolean;
 }
 
@@ -454,6 +459,17 @@ export interface ExpireWarning {
 }
 
 /**
+ * Warning about an `.env.example` key that has no documenting comment.
+ * fx: `API_KEY=` with no `#` comment on the line above and no inline `#` comment.
+ */
+export interface CommentWarning {
+  /** The undocumented environment variable key */
+  key: string;
+  /** 1-based line number of the key in the example file */
+  line: number;
+}
+
+/**
  * A "did you mean" suggestion produced when a reported key looks like a typo
  * of an existing key.
  * fx: DATABASE_URL is missing while DATABAS_URL exists → suggest DATABASE_URL.
@@ -494,7 +510,8 @@ export type BaselineRule =
   | 'framework'
   | 'uppercase'
   | 'expire'
-  | 'inconsistent-naming';
+  | 'inconsistent-naming'
+  | 'comment';
 
 /**
  * A single suppressed warning in the baseline file.
