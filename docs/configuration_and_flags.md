@@ -48,6 +48,7 @@ CLI flags always take precedence over configuration file values.
 - [--no-expire-warnings](#--no-expire-warnings)
 - [--inconsistent-naming-warnings](#--inconsistent-naming-warnings)
 - [--no-inconsistent-naming-warnings](#--no-inconsistent-naming-warnings)
+- [--comment-warnings](#--comment-warnings)
 - [--suggest](#--suggest)
 - [--no-suggest](#--no-suggest)
 
@@ -821,6 +822,42 @@ Usage in the configuration file:
 ```json
 {
   "inconsistentNamingWarnings": false
+}
+```
+
+### `--comment-warnings`
+
+Warn about `.env.example` keys that lack a documenting comment (disabled by default — opt in with this flag).
+
+A well documented `.env.example` is the fastest onboarding for a new contributor.
+
+A key counts as **documented** when either:
+
+- a `#` comment sits on the line **directly above** it, or
+- it has an **inline** `#` comment after the value.
+
+```dotenv
+# Stripe webhook signing secret (dashboard.stripe.com/webhooks)
+STRIPE_WEBHOOK_SECRET=      # ✓ documented (comment above)
+PORT=3000 # server port     # ✓ documented (inline comment)
+API_KEY=                    # ✗ reported (undocumented)
+```
+
+Undocumented keys are listed in the console output and in JSON (`commentWarnings`), count toward the [health score](./capabilities.md), can be suppressed with a [baseline](./baseline.md) (`comment` rule), and cause a non-zero exit under [`--strict`](#--strict).
+
+> Note: the rule is intentionally simple. A shared section header (e.g. `# === Database ===`) counts only for the first key directly beneath it, so keys further down may still be reported.
+
+Example usage:
+
+```bash
+dotenv-diff --comment-warnings
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "commentWarnings": true
 }
 ```
 

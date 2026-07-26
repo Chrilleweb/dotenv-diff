@@ -26,6 +26,7 @@ import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
 import { computeHealthScore } from '../core/scan/computeHealthScore.js';
 import { printHealthScore } from '../ui/scan/printHealthScore.js';
 import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
+import { printCommentWarnings } from '../ui/scan/printCommentWarnings.js';
 import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
 import { printListAll } from '../ui/scan/printListAll.js';
 
@@ -122,6 +123,10 @@ export function printScanResult(
   if (scanResult.expireWarnings) {
     printExpireWarnings(scanResult.expireWarnings, opts.strict);
   }
+  // Undocumented example keys
+  if (scanResult.commentWarnings) {
+    printCommentWarnings(scanResult.commentWarnings, opts.strict);
+  }
   // Check for high severity secrets - ALWAYS exit with error
   const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
     (s) => s.severity === 'high',
@@ -178,7 +183,8 @@ export function printScanResult(
       (scanResult.expireWarnings?.filter(
         (w) => w.daysLeft <= EXPIRE_THRESHOLD_DAYS,
       ).length ?? 0) > 0 ||
-      (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0;
+      (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0 ||
+      (scanResult.commentWarnings?.length ?? 0) > 0;
 
     if (hasStrictViolations) exitWithError = true;
   }

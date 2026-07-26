@@ -96,6 +96,10 @@ export function createProgram() {
         'Disable inconsistent naming pattern warnings',
       )
       .option(
+        '--comment-warnings',
+        'Warn about .env.example keys that lack a documenting # comment',
+      )
+      .option(
         '--suggest',
         'Suggest the closest existing key for likely typos (enabled by default)',
       )

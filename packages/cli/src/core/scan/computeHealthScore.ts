@@ -39,6 +39,9 @@ export function computeHealthScore(scan: ScanResult): number {
   // === 9. Inconsistent naming warnings ===
   score -= (scan.inconsistentNamingWarnings?.length ?? 0) * 3;
 
+  // === 9b. Undocumented example keys (advisory) ===
+  score -= (scan.commentWarnings?.length ?? 0) * 2;
+
   // === 10. Duplicate definitions ===
   score -= (scan.duplicates?.env?.length ?? 0) * 10;
   score -= (scan.duplicates?.example?.length ?? 0) * 10;

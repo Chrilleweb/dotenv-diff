@@ -5,6 +5,7 @@ import type {
   Duplicate,
   ExpireWarning,
   InconsistentNamingWarning,
+  CommentWarning,
   UppercaseWarning,
   FrameworkWarning,
   ExampleSecretWarning,
@@ -51,6 +52,7 @@ interface ScanJsonOutput {
   };
   logged?: EnvUsage[];
   expireWarnings?: ExpireWarning[];
+  commentWarnings?: CommentWarning[];
   uppercaseWarnings?: UppercaseWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
   frameworkWarnings?: FrameworkWarning[];
@@ -186,6 +188,14 @@ export function scanJsonOutput(
       key: w.key,
       date: w.date,
       daysLeft: w.daysLeft,
+    }));
+  }
+
+  // Undocumented example keys
+  if (scanResult.commentWarnings?.length) {
+    output.commentWarnings = scanResult.commentWarnings.map((w) => ({
+      key: w.key,
+      line: w.line,
     }));
   }
 

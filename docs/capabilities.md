@@ -127,6 +127,10 @@ For example, if your code uses `DATABASE_URL` but your `.env` defines `DATABAS_U
 
 Only close matches are suggested (small edit distance, scaled to key length), and only the single closest key is shown per missing variable. Suggestions are advisory — they do **not** affect the exit code or the health score. Disable them with `--no-suggest`.
 
-### 13 Health Score
+### 13 Undocumented Example Keys (opt-in)
+
+With `--comment-warnings`, flags `.env.example` keys that have no documenting comment — either a `#` comment on the line directly above or an inline `#` comment after the value. Off by default. See [`--comment-warnings`](./configuration_and_flags.md#--comment-warnings).
+
+### 14 Health Score
 
 A final score based on scan findings (missing, unused, duplicates, security warnings, and more).

@@ -97,6 +97,7 @@ function createBaseOptions(overrides: Partial<Options> = {}): Options {
     uppercaseKeys: true,
     expireWarnings: true,
     inconsistentNamingWarnings: true,
+    commentWarnings: false,
     listAll: false,
     explain: undefined,
     baseline: false,
