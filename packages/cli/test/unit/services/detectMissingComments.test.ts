@@ -53,4 +53,72 @@ describe('detectMissingComments', () => {
     // The line directly above the key is blank, not a comment.
     expect(run('# note\n\nAPI_KEY=')).toEqual([{ key: 'API_KEY', line: 3 }]);
   });
+
+  it('does not treat a bare @expire annotation above a key as documentation', () => {
+    // An `@expire` annotation is a machine hint, not human docs, so the key
+    // below it is still undocumented and must be reported.
+    expect(run('# @expire 2025-12-12\nAPI_KEY=')).toEqual([
+      { key: 'API_KEY', line: 2 },
+    ]);
+  });
+
+  it('does not treat a bare expire annotation (no @) above a key as documentation', () => {
+    expect(run('# expire 2025-12-12\nAPI_KEY=')).toEqual([
+      { key: 'API_KEY', line: 2 },
+    ]);
+  });
+
+  it('treats a comment that adds prose alongside an expire annotation as documentation', () => {
+    // The comment carries real information beyond the annotation, so it counts.
+    expect(run('# @expire 2025-12-12 rotate before then\nAPI_KEY=')).toEqual(
+      [],
+    );
+  });
+
+  it('accepts a key whose line directly above is a real comment, even with an expire annotation earlier', () => {
+    // Mirrors the user scenario: annotation, then a documenting comment, then
+    // the key. The line directly above the key is a real comment.
+    expect(
+      run('# @expire 2025-12-12\n# what this key is for\nAPI_KEY='),
+    ).toEqual([]);
+  });
+
+  it('sees a real comment above an @expire annotation that sits directly on the key', () => {
+    // The annotation is transparent: a real comment above it still documents
+    // the key, even though the annotation is the line immediately above.
+    expect(
+      run('# Stripe webhook secret\n# @expire 2026-12-31\nSTRIPE_KEY='),
+    ).toEqual([]);
+  });
+
+  it('sees a real comment above a bare (no #) @expire annotation', () => {
+    expect(run('# Expiring secret\n@expire 2025-12-31\nOLD_API_KEY=')).toEqual(
+      [],
+    );
+  });
+
+  it('sees a real comment above a // style @expire annotation', () => {
+    expect(run('# legacy token\n// @expire 2024-01-01\nLEGACY=')).toEqual([]);
+  });
+
+  it('still reports a key when only annotations (no prose) sit above it', () => {
+    // Two annotations and nothing else — no human documentation, so reported.
+    expect(run('# @expire 2026-01-01\n# @expire 2026-02-01\nAPI_KEY=')).toEqual(
+      [{ key: 'API_KEY', line: 3 }],
+    );
+  });
+
+  it('does not let a comment leak across a blank line above the annotation', () => {
+    // Blank line ends the run, so the comment does not document ORPHAN.
+    expect(run('# note\n\n# @expire 2026-01-01\nORPHAN=')).toEqual([
+      { key: 'ORPHAN', line: 4 },
+    ]);
+  });
+
+  it('does not carry a comment across an intervening key line', () => {
+    // `# doc` documents FIRST; SECOND has a key line directly above it.
+    expect(run('# doc\nFIRST=1\nSECOND=2')).toEqual([
+      { key: 'SECOND', line: 3 },
+    ]);
+  });
 });

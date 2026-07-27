@@ -27,6 +27,15 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
   for (const raw of lines) {
     const line = raw.trim();
 
+    // A blank line ends the current annotation block. Comments are carried
+    // over (an `@expire` may sit above a documented key), but an empty line
+    // signals "end of block" so a pending annotation cannot leak across a gap
+    // and attach itself to an unrelated key further down the file.
+    if (line === '') {
+      pendingExpire = null;
+      continue;
+    }
+
     const expireMatch = line.match(reg);
 
     if (expireMatch) {

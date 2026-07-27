@@ -17,7 +17,7 @@ export function printCommentWarnings(
   const rowColor = strict ? error : warning;
 
   console.log();
-  console.log(`${indicator} ${header('Undocumented keys')}`);
+  console.log(`${indicator} ${header('Undocumented keys in .env.example')}`);
   console.log(`${divider}`);
 
   for (const warn of warnings) {
