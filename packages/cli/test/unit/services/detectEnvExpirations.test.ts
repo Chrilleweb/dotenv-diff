@@ -106,6 +106,56 @@ describe('detectEnvExpirations', () => {
     expect(result[0]!.key).toBe('A');
   });
 
+  it('attaches expiration across a comment line to the following key', () => {
+    // A comment between the annotation and the key does not break the link.
+    fs.writeFileSync(
+      envPath,
+      `
+      @expire 2024-12-31
+      # what this key is for
+      API_KEY=123
+      `,
+    );
+
+    const result = detectEnvExpirations(envPath);
+
+    expect(result).toEqual([
+      { key: 'API_KEY', date: '2024-12-31', daysLeft: 30 },
+    ]);
+  });
+
+  it('does not attach expiration across a blank line (blank line ends the block)', () => {
+    // A blank line signals the end of the annotation block, so the annotation
+    // must not leak onto an unrelated key further down.
+    fs.writeFileSync(
+      envPath,
+      `# @expire 2024-12-31
+
+API_KEY=123
+`,
+    );
+
+    const result = detectEnvExpirations(envPath);
+
+    expect(result).toEqual([]);
+  });
+
+  it('does not let an annotation leak across a blank line to a distant key', () => {
+    fs.writeFileSync(
+      envPath,
+      `# @expire 2024-12-31
+# some documentation
+
+# an unrelated section
+DATABASE_URL=postgres://localhost
+`,
+    );
+
+    const result = detectEnvExpirations(envPath);
+
+    expect(result).toEqual([]);
+  });
+
   it('handles multiple expiration blocks', () => {
     fs.writeFileSync(
       envPath,
