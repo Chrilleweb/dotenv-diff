@@ -861,6 +861,8 @@ Usage in the configuration file:
 }
 ```
 
+See [Comment Warnings](./comment_warnings.md) for more details.
+
 ### `--suggest`
 
 Suggests the closest existing key when a missing variable looks like a typo (enabled by default). Missing entries are annotated with a `→ did you mean DATABAS_URL?` hint by cross-referencing the missing key against the keys that already exist (defined keys in scan mode, extra keys in compare mode). Only close matches are shown, and suggestions never change the exit code or health score.
