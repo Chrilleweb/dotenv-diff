@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.2.0
+
+### Minor Changes
+
+- 4b8fa66: add `--comment-warnings` flag (opt-in, off by default) that warns about `.env.example` keys lacking a documenting comment.
+
+### Patch Changes
+
+- 4487e21: fix `@expire` and `--comment-warnings` interaction
+- 3ec11e8: updated chalk to 6.0.0
+
 ## 3.1.2
 
 ### Patch Changes

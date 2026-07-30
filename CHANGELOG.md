@@ -1,5 +1,23 @@
 # Changelog
 
+<!-- changesets: comments-flag.md,expire-comment-interaction.md,tiny-apples-stare.md -->
+## 2026-07-30
+
+### Highlights
+- add `--comment-warnings` flag (opt-in, off by default) that warns about `.env.example` keys lacking a documenting comment.
+- fix `@expire` and `--comment-warnings` interaction
+- updated chalk to 6.0.0
+
+### Package Releases
+- dotenv-diff: minor
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | minor
+dotenv-diff | patch
+
 <!-- changesets: diffmatrix-prototype-keys.md,gentle-expire-rollover.md,inconsistent-naming-dedup-collision.md,quiet-plants-fuzz.md,skip-commented-usages-markers.md,sveltekit-lib-server-false-positive.md,tidy-secrets-report.md,wise-entropy-codepoints.md -->
 ## 2026-07-24
 
