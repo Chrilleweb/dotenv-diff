@@ -9,51 +9,46 @@ export function createProgram() {
     new Command()
       .name('dotenv-diff')
       .description('Compare .env and .env.example files')
-      // Ignore extra positional args
       .allowExcessArguments(true)
-      .option('--check-values', 'Compare actual values if example has values')
-      .option('--ci', 'Run non-interactively and never create files')
-      .option('-y, --yes', 'Run non-interactively and answer Yes to prompts')
+
+      // Files & input
       .option('--env <file>', 'Path to a specific .env file')
       .option('--example <file>', 'Path to a specific .env.example file')
       .option(
-        '--allow-duplicates',
-        'Do not warn about duplicate keys in .env* files',
-      )
-      .option('--ignore <keys>', 'Comma-separated list of keys to ignore')
-      .option(
-        '--ignore-regex <pattern>',
-        'Regex pattern to ignore matching keys',
-      )
-      .option(
-        '--fix',
-        'Automatically fix common issues: remove duplicates, add missing keys',
-      )
-      .option('--json', 'Output results in JSON format')
-      .option('--color', 'Enable colored output')
-      .option('--no-color', 'Disable colored output')
-      .option(
-        '--only <list>',
-        'Comma-separated categories to only run (missing,extra,empty,duplicate,gitignore)',
-      )
-      .option('--scan-usage', 'Scan codebase for environment variable usage')
-      .option('--compare', 'Compare .env and .env.example files')
-      .option(
-        '--matrix [files...]',
-        'Compare 2+ env files as a key matrix (auto-discovers all .env* files if none given)',
+        '--files <patterns>',
+        'Comma-separated file patterns to scan (completely replaces default patterns)',
       )
       .option(
         '--include-files <patterns>',
         'Comma-separated file patterns to ADD to default scan patterns (extends default)',
       )
       .option(
-        '--files <patterns>',
-        'Comma-separated file patterns to scan (completely replaces default patterns)',
-      )
-      .option(
         '--exclude-files <patterns>',
         'Comma-separated file patterns to exclude from scan',
       )
+      .option(
+        '--matrix [files...]',
+        'Compare 2+ env files as a key matrix (auto-discovers all .env* files if none given)',
+      )
+
+      // Comparison & checks
+      .option('--compare', 'Compare .env and .env.example files')
+      .option('--check-values', 'Compare actual values if example has values')
+      .option(
+        '--only <categories>',
+        'Comma-separated categories to only run (missing,extra,empty,duplicate,gitignore)',
+      )
+      .option('--strict', 'Enable fail on warnings')
+
+      // Filtering
+      .option('--ignore <keys>', 'Comma-separated list of keys to ignore')
+      .option(
+        '--ignore-regex <pattern>',
+        'Regex pattern to ignore matching keys',
+      )
+
+      // Usage & scanning
+      .option('--scan-usage', 'Scan codebase for environment variable usage')
       .option(
         '--show-unused',
         'List variables that are defined in .env but not used in code',
@@ -62,9 +57,12 @@ export function createProgram() {
         '--no-show-unused',
         'Do not list variables that are defined in .env but not used in code',
       )
-      .option('--show-stats', 'Show statistics')
-      .option('--no-show-stats', 'Do not show statistics')
-      .option('--strict', 'Enable fail on warnings')
+      .option(
+        '--list-all',
+        'List all unique environment variable keys found in codebase',
+      )
+
+      // Validation & warnings
       .option(
         '--secrets',
         'Enable secret detection during scan (enabled by default)',
@@ -74,7 +72,7 @@ export function createProgram() {
         'Disable secret detection during scan (enabled by default)',
       )
       .option(
-        '--ignore-urls <list>',
+        '--ignore-urls <urls>',
         'Comma-separated URLs to ignore in secret scan',
       )
       .option(
@@ -107,18 +105,35 @@ export function createProgram() {
         '--no-suggest',
         'Disable "did you mean" typo suggestions for missing keys',
       )
+
+      // Fixes & automation
+      .option(
+        '--fix',
+        'Automatically fix common issues: remove duplicates, add missing keys',
+      )
+      .option(
+        '--allow-duplicates',
+        'Do not warn about duplicate keys in .env* files',
+      )
       .option('--init', 'Create a sample dotenv-diff.config.json file')
-      .option(
-        '--list-all',
-        'List all unique environment variable keys found in codebase',
-      )
-      .option(
-        '--explain <key>',
-        'Show where a specific key is defined, used, and its status',
-      )
       .option(
         '--baseline',
         'Set current codebase state as baseline for future comparisons',
+      )
+      .option('--ci', 'Run non-interactively and never create files')
+      .option('-y, --yes', 'Run non-interactively and answer Yes to prompts')
+
+      // Output
+      .option('--json', 'Output results in JSON format')
+      .option('--color', 'Enable colored output')
+      .option('--no-color', 'Disable colored output')
+      .option('--show-stats', 'Show statistics')
+      .option('--no-show-stats', 'Do not show statistics')
+
+      // Information
+      .option(
+        '--explain <key>',
+        'Show where a specific key is defined, used, and its status',
       )
   );
 }
