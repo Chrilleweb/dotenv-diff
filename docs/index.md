@@ -44,6 +44,7 @@ If you choose not to create a file, `dotenv-diff` will still scan your codebase 
 | [Capabilities](./capabilities.md) | What the scanner checks for and how it works |and rules |
 | [Configuration and Flags](./configuration_and_flags.md) | Full CLI/config reference for options and behavior |
 | [Baseline Workflow](./baseline.md) | Set a warning baseline and suppress already-known findings safely |
+| [Writing a Good `.env.example`](./env_example_best_practices.md) | Minimal vs. fully documented example files, with comments and `@expire` |
 | [Comparing Files](./compare.md) | How to compare two `.env` files to detect differences |
 | [Matrix Comparison](./matrix.md) | Compare 3+ env files side-by-side to spot drift between environments |
 | [Expiration Warnings](./expiration_warnings.md) | How `@expire` annotations work and strict mode integration |

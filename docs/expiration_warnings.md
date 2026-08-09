@@ -139,3 +139,5 @@ See [Comment Warnings](./comment_warnings.md) for more details.
 - Add a short comment describing why the key expires
 - Combine with `--strict` in CI/CD to catch expired credentials early
 - Pair with `--comment-warnings` so every expiring key also explains itself
+
+See [Writing a Good `.env.example`](./env_example_best_practices.md) for a complete example file using `@expire` alongside documenting comments.

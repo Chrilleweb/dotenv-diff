@@ -49,5 +49,6 @@ Or in `dotenv-diff.config.json`:
 
 ## See also
 
+- [Writing a Good `.env.example`](./env_example_best_practices.md) — a full example file that passes this check
 - [Expiration Warnings](./expiration_warnings.md) — why `--comment-warnings` pairs well with `@expire`
 - [Configuration and Flags](./configuration_and_flags.md#--comment-warnings) — full flag reference
