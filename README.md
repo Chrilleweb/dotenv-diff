@@ -52,17 +52,18 @@ Easily integrate dotenv-diff into your Git hooks or CI/CD pipelines to enforce e
 
 → See [Git Hooks Documentation](./docs/git_hooks_ci.md) for more details.
 
-## Framework-Specific Warnings
+## Framework Specific Warnings
 
-In SvelteKit, Next.js, and Nuxt projects, dotenv-diff detects framework-specific
-environment variable misuses.
-
-Example warning:
+In SvelteKit, Next.js, and Nuxt projects, dotenv-diff detects framework specific environment variable misuse.
 
 ```bash
-Framework issues (Sveltekit):
-  - PUBLIC_API_URL (src/routes/+page.ts:1)
-    → $env/dynamic/private variables must not start with "PUBLIC_"
+▸ Framework issues (SvelteKit)
+──────────────────────────────────────────────────────────────────────
+PUBLIC_API_URL              $env/dynamic/private
+                            variables must not start
+                            with "PUBLIC_"
+                            src/routes/+page.server.ts:3
+──────────────────────────────────────────────────────────────────────
 ```
 
 → See [Framework Documentation](./docs/frameworks/index.md) for more details.
