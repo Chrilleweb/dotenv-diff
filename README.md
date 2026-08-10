@@ -81,6 +81,27 @@ This is helpful when you know a specific warning is safe in your source code.
 
 ---
 
+## Writing a good `.env.example`
+
+An `.env.example` written so it's easier to understand for new contributors to the team:
+
+```env
+# Node environment (development, production, etc.)
+# @optional
+NODE_ENV=development
+
+# Public API URL is used to call our backend
+PUBLIC_API_URL=http://localhost:3000
+
+# Temporary token for the partner API sandbox — ask the integrations team for a new one
+# @expire 2027-03-31
+PARTNER_API_TOKEN=
+```
+
+→ Read more: [Writing a Good `.env.example`](./docs/env_example_best_practices.md)
+
+---
+
 ## Expiration Warnings
 
 Add expiration metadata to your environment variables to get warnings when they are about to expire. For example, in your `.env` file:
