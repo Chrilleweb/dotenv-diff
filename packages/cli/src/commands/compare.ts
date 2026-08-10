@@ -13,6 +13,7 @@ import type {
   DuplicateResult,
 } from '../config/types.js';
 import { parseAndFilterEnv } from '../core/compare/parseAndFilterEnv.js';
+import { detectOptionalKeys } from '../services/detectOptionalKeys.js';
 import { updateTotals } from '../core/compare/updateTotals.js';
 import { applyFixes } from '../services/fixEnv.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
@@ -188,9 +189,17 @@ function computePairComparison(
   );
 
   const diff = diffEnv(current, example, opts.checkValues);
+
+  // A key marked `@optional` in the example file does not have to be set, so
+  // neither leaving it out of the env file nor leaving it empty is a problem.
+  const optionalKeys = new Set(detectOptionalKeys(examplePath));
+  const isRequired = (key: string) => !optionalKeys.has(key);
+
+  const missingKeys = diff.missing.filter(isRequired);
   const emptyKeys = Object.entries(current)
     .filter(([, v]) => (v ?? '').trim() === '')
-    .map(([k]) => k);
+    .map(([k]) => k)
+    .filter(isRequired);
 
   const { dupsEnv, dupsEx } = findDuplicates(envPath, examplePath, opts, run);
 
@@ -202,11 +211,11 @@ function computePairComparison(
   // extra keys the current file has, to surface likely typos like DATABAS_URL.
   const suggestions =
     opts.suggest !== false && run('missing')
-      ? suggestTypos(diff.missing, diff.extra)
+      ? suggestTypos(missingKeys, diff.extra)
       : [];
 
   const filtered: Filtered = {
-    missing: run('missing') ? diff.missing : [],
+    missing: run('missing') ? missingKeys : [],
     extra: run('extra') ? diff.extra : [],
     empty: run('empty') ? emptyKeys : [],
     mismatches: opts.checkValues ? diff.valueMismatches : [],

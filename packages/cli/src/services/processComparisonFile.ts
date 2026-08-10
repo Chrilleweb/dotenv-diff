@@ -10,6 +10,7 @@ import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 import { detectEnvExpirations } from './detectEnvExpirations.js';
 import { detectInconsistentNaming } from '../core/detectInconsistentNaming.js';
 import { detectMissingComments } from './detectMissingComments.js';
+import { detectOptionalKeys } from './detectOptionalKeys.js';
 import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import type {
   ScanUsageOptions,
@@ -106,6 +107,25 @@ export function processComparisonFile(
       scopes,
     );
     comparedAgainst = compareFile.name;
+
+    // Keys marked `@optional` in the example file may be left out of the env
+    // file entirely — that is what the annotation means — so they must not be
+    // reported as missing. The typo suggestions derived from them go too.
+    const optionalKeys = new Set(
+      detectOptionalKeys(
+        resolveFromCwd(opts.cwd, opts.examplePath ?? DEFAULT_EXAMPLE_FILE),
+      ),
+    );
+    if (optionalKeys.size > 0) {
+      scanResult.missing = scanResult.missing.filter(
+        (key) => !optionalKeys.has(key),
+      );
+      if (scanResult.suggestions) {
+        scanResult.suggestions = scanResult.suggestions.filter(
+          (suggestion) => !optionalKeys.has(suggestion.key),
+        );
+      }
+    }
 
     // Detect uppercase keys
     if (opts.uppercaseKeys) {

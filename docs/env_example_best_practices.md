@@ -47,10 +47,15 @@ PARTNER_API_TOKEN=
 
 Every key above is documented — so this file passes `dotenv-diff --comment-warnings`.
 
-`PARTNER_API_TOKEN` also has an `@expire` annotation, so `dotenv-diff` warns you when the token is close to expiring — and fails the build when it has less than 7 days left. Note that the annotation on its own is not documentation: the real comment above it is what makes the key documented.
+Two keys carry an annotation as well:
 
+- `NODE_ENV` is `@optional`, so `dotenv-diff` does not report it as missing when you leave it out of your `.env` — the code has a sensible default for it.
+- `PARTNER_API_TOKEN` has an `@expire` date, so `dotenv-diff` warns you when the token is close to expiring — and fails the build when it has less than 7 days left.
+
+Note that an annotation on its own is not documentation: the real comment above it is what makes the key documented.
 
 ## See also
 
 - [Comment Warnings](./comment_warnings.md) — what counts as a documented key
+- [Optional Keys](./optional_keys.md) — `@optional` syntax and behavior
 - [Expiration Warnings](./expiration_warnings.md) — `@expire` syntax and thresholds

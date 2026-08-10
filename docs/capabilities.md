@@ -76,6 +76,8 @@ Variables that are **used in code** but **not defined** in the selected env comp
 In the standard text output, each missing variable is shown once with the first matching usage location.
 Use `--json` if you need the full list of usages for the same variable.
 
+Keys marked `@optional` in `.env.example` are exempt — they may be left unset. See [Optional Keys](./optional_keys.md).
+
 ### 2 Unused Variables
 
 Variables that are **defined in env files** but **never used** in the scanned codebase.
