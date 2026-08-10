@@ -1,6 +1,6 @@
 # Writing a Good `.env.example`
 
-This page shows two versions of a `.env.example` file. Both are valid. The second one is what `dotenv-diff` is built to reward.
+This page shows two versions of a `.env.example` file. Both are valid, but the second one is what `dotenv-diff` is suggesting as a best practice for your team.
 
 ## Minimal version
 
@@ -34,6 +34,7 @@ SMTP_PORT=587
 PORT=3000
 
 # Node environment (development, production, etc.)
+# @optional
 NODE_ENV=development
 
 # Public API URL is used to call our backend
