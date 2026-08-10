@@ -2,7 +2,7 @@
 
 Scan your codebase to detect every environment variable reference. It helps you catch missing, unused, duplicated, and misused variables early, before they cause runtime errors.
 
-First-class support for SvelteKit, Next.js, and Nuxt. Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js and Vue — or any other setup where you want reliable .env file comparison.
+First class support for SvelteKit, Next.js, and Nuxt. Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js and Vue — or any other setup where you want reliable .env file comparison.
 
 [![Coverage Status](https://codecov.io/gh/Chrilleweb/dotenv-diff/branch/main/graph/badge.svg)](https://codecov.io/gh/Chrilleweb/dotenv-diff)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Chrilleweb/dotenv-diff/badge)](https://scorecard.dev/viewer/?uri=github.com/Chrilleweb/dotenv-diff)
@@ -20,8 +20,8 @@ First-class support for SvelteKit, Next.js, and Nuxt. Also works well in modern 
 
 ## Why dotenv-diff?
 
-- Ensure all required environment variables are defined before deploying
-- Catch missing or misconfigured variables early in development
+- Ensure all required environment variables are defined
+- Catch missing or misconfigured variables
 - Improve collaboration by keeping teams aligned on required variables
 - Reduce the risk of committing sensitive data
 - Scale easily for monorepos and multi-environment setups
@@ -68,18 +68,6 @@ PUBLIC_API_URL              $env/dynamic/private
 
 → See [Framework Documentation](https://github.com/Chrilleweb/dotenv-diff/blob/main/docs/frameworks/index.md) for more details.
 
-## Ignore Comments
-
-You can ignore specific environment variable warnings by adding comments in your code. For example:
-
-```javascript
-const apiKey = process.env.API_KEY; // dotenv-diff-ignore
-```
-
-This is helpful when you know a specific warning is safe in your source code.
-
-→ See [Ignore Comments Documentation](https://github.com/Chrilleweb/dotenv-diff/blob/main/docs/ignore_comments.md) for more details.
-
 ---
 
 ## Writing a good `.env.example`
@@ -115,6 +103,18 @@ API_TOKEN=
 → See [Expiration Documentation](https://github.com/Chrilleweb/dotenv-diff/blob/main/docs/expiration_warnings.md) for more details.
 
 ---
+
+## Ignore Comments
+
+You can ignore specific environment variable warnings by adding comments in your code. For example:
+
+```javascript
+const apiKey = process.env.API_KEY; // dotenv-diff-ignore
+```
+
+This is helpful when you know a specific warning is safe in your source code.
+
+→ See [Ignore Comments Documentation](https://github.com/Chrilleweb/dotenv-diff/blob/main/docs/ignore_comments.md) for more details.
 
 ---
 
