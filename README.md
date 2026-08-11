@@ -2,7 +2,7 @@
 
 Scan your codebase to detect every environment variable reference. It helps you catch missing, unused, duplicated, and misused variables early, before they cause runtime errors.
 
-First-class support for SvelteKit, Next.js, and Nuxt. Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js and Vue — or any other setup where you want reliable .env file comparison.
+First class support for SvelteKit, Next.js, and Nuxt. Also works well in modern JavaScript/TypeScript projects and frameworks like Node.js and Vue — or any other setup where you want reliable .env file comparison.
 
 [![Coverage Status](https://codecov.io/gh/Chrilleweb/dotenv-diff/branch/main/graph/badge.svg)](https://codecov.io/gh/Chrilleweb/dotenv-diff)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Chrilleweb/dotenv-diff/badge)](https://scorecard.dev/viewer/?uri=github.com/Chrilleweb/dotenv-diff)
@@ -20,8 +20,8 @@ First-class support for SvelteKit, Next.js, and Nuxt. Also works well in modern 
 
 ## Why dotenv-diff?
 
-- Ensure all required environment variables are defined before deploying
-- Catch missing or misconfigured variables early in development
+- Ensure all required environment variables are defined
+- Catch missing or misconfigured variables
 - Improve collaboration by keeping teams aligned on required variables
 - Reduce the risk of committing sensitive data
 - Scale easily for monorepos and multi-environment setups
@@ -52,32 +52,42 @@ Easily integrate dotenv-diff into your Git hooks or CI/CD pipelines to enforce e
 
 → See [Git Hooks Documentation](./docs/git_hooks_ci.md) for more details.
 
-## Framework-Specific Warnings
+## Framework Specific Warnings
 
-In SvelteKit, Next.js, and Nuxt projects, dotenv-diff detects framework-specific
-environment variable misuses.
-
-Example warning:
+In SvelteKit, Next.js, and Nuxt projects, dotenv-diff detects framework specific environment variable misuse.
 
 ```bash
-Framework issues (Sveltekit):
-  - PUBLIC_API_URL (src/routes/+page.ts:1)
-    → $env/dynamic/private variables must not start with "PUBLIC_"
+▸ Framework issues (SvelteKit)
+──────────────────────────────────────────────────────────────────────
+PUBLIC_API_URL              $env/dynamic/private
+                            variables must not start
+                            with "PUBLIC_"
+                            src/routes/+page.server.ts:3
+──────────────────────────────────────────────────────────────────────
 ```
 
 → See [Framework Documentation](./docs/frameworks/index.md) for more details.
 
-## Ignore Comments
+---
 
-You can ignore specific environment variable warnings by adding comments in your code. For example:
+## Writing a good `.env.example`
 
-```javascript
-const apiKey = process.env.API_KEY; // dotenv-diff-ignore
+An `.env.example` written so it's easier to understand for new contributors to the team:
+
+```env
+# Node environment (development, production, etc.)
+# @optional
+NODE_ENV=development
+
+# Public API URL is used to call our backend
+PUBLIC_API_URL=http://localhost:3000
+
+# Temporary token for the partner API sandbox — ask the integrations team for a new one
+# @expire 2027-03-31
+PARTNER_API_TOKEN=
 ```
 
-This is helpful when you know a specific warning is safe in your source code.
-
-→ See [Ignore Comments Documentation](./docs/ignore_comments.md) for more details.
+→ Read more: [Writing a Good `.env.example`](./docs/env_example_best_practices.md)
 
 ---
 
@@ -91,6 +101,20 @@ API_TOKEN=
 ```
 
 → See [Expiration Documentation](./docs/expiration_warnings.md) for more details.
+
+---
+
+## Ignore Comments
+
+You can ignore specific environment variable warnings by adding comments in your code. For example:
+
+```javascript
+const apiKey = process.env.API_KEY; // dotenv-diff-ignore
+```
+
+This is helpful when you know a specific warning is safe in your source code.
+
+→ See [Ignore Comments Documentation](./docs/ignore_comments.md) for more details.
 
 ---
 

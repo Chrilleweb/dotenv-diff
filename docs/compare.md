@@ -32,6 +32,8 @@ By default, the comparison checks for:
 - **Duplicates**: Duplicate keys in either file
 - **.gitignore**: Whether the runtime `.env` file is listed in `.gitignore`
 
+Keys marked `@optional` in the example file are exempt from the missing and empty checks — they may be left unset. See [Optional Keys](./optional_keys.md).
+
 ## Checking Values Too
 
 By default, only keys are compared. To also compare the **values** of environment variables:

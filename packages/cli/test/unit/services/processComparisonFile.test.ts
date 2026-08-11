@@ -60,12 +60,17 @@ vi.mock('../../../src/services/detectMissingComments.js', () => ({
   detectMissingComments: vi.fn(() => [{ key: 'UNDOC', line: 2 }]),
 }));
 
+vi.mock('../../../src/services/detectOptionalKeys.js', () => ({
+  detectOptionalKeys: vi.fn(() => []),
+}));
+
 import fs from 'fs';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { applyFixes } from '../../../src/services/fixEnv.js';
 import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
 import { findDuplicateKeys } from '../../../src/services/duplicates.js';
 import { resolveFromCwd } from '../../../src/core/helpers/resolveFromCwd.js';
+import { detectOptionalKeys } from '../../../src/services/detectOptionalKeys.js';
 
 describe('processComparisonFile', () => {
   const baseScanResult: ScanResult = {
@@ -140,6 +145,39 @@ describe('processComparisonFile', () => {
     });
 
     expect(result.commentWarnings).toEqual([]);
+  });
+
+  it('does not report a key marked @optional in the example file as missing', () => {
+    // An optional key may be left out of the env file entirely.
+    vi.mocked(detectOptionalKeys).mockReturnValueOnce(['NEW_KEY']);
+
+    const result = processComparisonFile(
+      { ...baseScanResult, missing: ['NEW_KEY', 'REQUIRED_KEY'] },
+      compareFile,
+      baseOpts,
+    );
+
+    expect(result.scanResult.missing).toEqual(['REQUIRED_KEY']);
+  });
+
+  it('drops typo suggestions for keys marked @optional', () => {
+    vi.mocked(detectOptionalKeys).mockReturnValueOnce(['NEW_KEY']);
+
+    const result = processComparisonFile(
+      {
+        ...baseScanResult,
+        suggestions: [
+          { key: 'NEW_KEY', didYouMean: 'NEW_KEYS', distance: 1 },
+          { key: 'OTHER', didYouMean: 'OTHERS', distance: 1 },
+        ],
+      },
+      compareFile,
+      baseOpts,
+    );
+
+    expect(result.scanResult.suggestions).toEqual([
+      { key: 'OTHER', didYouMean: 'OTHERS', distance: 1 },
+    ]);
   });
 
   it('detects duplicates when not allowed', () => {
