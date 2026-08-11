@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: thick-results-repair.md -->
+## 2026-08-11
+
+### Highlights
+- Add @optional for .env.example
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: comments-flag.md,expire-comment-interaction.md,tiny-apples-stare.md -->
 ## 2026-07-30
 

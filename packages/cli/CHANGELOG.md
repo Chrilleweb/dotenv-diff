@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.1
+
+### Patch Changes
+
+- b59022f: Add @optional for .env.example
+
 ## 3.2.0
 
 ### Minor Changes
