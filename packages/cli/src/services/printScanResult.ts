@@ -6,11 +6,7 @@ import type {
   ExitResult,
   FixContext,
 } from '../config/types.js';
-import {
-  DEFAULT_ENV_FILE,
-  EXPIRE_THRESHOLD_DAYS,
-  URGENT_EXPIRE_DAYS,
-} from '../config/constants.js';
+import { DEFAULT_ENV_FILE } from '../config/constants.js';
 import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
 import { printMissing } from '../ui/scan/printMissing.js';
@@ -24,6 +20,7 @@ import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
 import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
 import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
 import { computeHealthScore } from '../core/scan/computeHealthScore.js';
+import { computeExitDecision } from '../core/scan/computeExitDecision.js';
 import { printHealthScore } from '../ui/scan/printHealthScore.js';
 import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
 import { printCommentWarnings } from '../ui/scan/printCommentWarnings.js';
@@ -43,8 +40,6 @@ export function printScanResult(
   comparedAgainst: string,
   fixContext?: FixContext,
 ): ExitResult {
-  let exitWithError = false;
-
   // Determine if output should be in JSON format
   const isJson = opts.json;
 
@@ -60,16 +55,12 @@ export function printScanResult(
   }
 
   // Missing variables (used in code but not in env file)
-  if (
-    printMissing(
-      scanResult.missing,
-      scanResult.used,
-      comparedAgainst,
-      scanResult.suggestions ?? [],
-    )
-  ) {
-    exitWithError = true;
-  }
+  printMissing(
+    scanResult.missing,
+    scanResult.used,
+    comparedAgainst,
+    scanResult.suggestions ?? [],
+  );
 
   if (scanResult.frameworkWarnings) {
     printFrameworkWarnings(scanResult.frameworkWarnings, opts.strict);
@@ -127,32 +118,6 @@ export function printScanResult(
   if (scanResult.commentWarnings) {
     printCommentWarnings(scanResult.commentWarnings, opts.strict);
   }
-  // Check for high severity secrets - ALWAYS exit with error
-  const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
-    (s) => s.severity === 'high',
-  );
-
-  if (hasHighSeveritySecrets) {
-    exitWithError = true;
-  }
-
-  // Check for high severity example secrets - ALWAYS exit with error
-  const hasHighSeverityExampleSecrets = (scanResult.exampleWarnings ?? []).some(
-    (w) => w.severity === 'high',
-  );
-
-  if (hasHighSeverityExampleSecrets) {
-    exitWithError = true;
-  }
-
-  const hasUrgentExpireWarnings = (scanResult.expireWarnings ?? []).some(
-    (w) => w.daysLeft <= URGENT_EXPIRE_DAYS,
-  );
-
-  if (hasUrgentExpireWarnings) {
-    exitWithError = true;
-  }
-
   // Gitignore check
   const gitignoreIssue = checkGitignoreStatus({
     cwd: opts.cwd,
@@ -169,25 +134,10 @@ export function printScanResult(
 
   const hasGitignoreIssue = gitignoreIssue !== null;
 
-  if (opts.strict) {
-    const hasStrictViolations =
-      scanResult.unused.length > 0 ||
-      (scanResult.duplicates?.env?.length ?? 0) > 0 ||
-      (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-      (scanResult.secrets?.length ?? 0) > 0 ||
-      (scanResult.exampleWarnings?.length ?? 0) > 0 ||
-      hasGitignoreIssue ||
-      (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
-      (scanResult.logged?.length ?? 0) > 0 ||
-      (scanResult.uppercaseWarnings?.length ?? 0) > 0 ||
-      (scanResult.expireWarnings?.filter(
-        (w) => w.daysLeft <= EXPIRE_THRESHOLD_DAYS,
-      ).length ?? 0) > 0 ||
-      (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0 ||
-      (scanResult.commentWarnings?.length ?? 0) > 0;
-
-    if (hasStrictViolations) exitWithError = true;
-  }
+  const { exitWithError } = computeExitDecision(scanResult, {
+    strict: opts.strict,
+    hasGitignoreIssue,
+  });
 
   if (opts.fix && fixContext) {
     printAutoFix(fixContext, comparedAgainst || DEFAULT_ENV_FILE, isJson);
