@@ -11,9 +11,8 @@ export interface ExitDecisionOptions {
   /** Whether --strict is enabled, promoting warnings to failures */
   strict?: boolean | undefined;
   /**
-   * Whether a .gitignore issue was detected. Only the console output path runs
-   * the .gitignore check, so the JSON path leaves this unset — a finding that is
-   * never reported must not silently fail the build.
+   * Whether a .gitignore issue was detected. Passed in rather than checked here
+   * because it needs the filesystem, while this function stays pure.
    */
   hasGitignoreIssue?: boolean | undefined;
 }

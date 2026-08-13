@@ -23,6 +23,10 @@ vi.mock('../../../src/ui/scan/scanJsonOutput.js', () => ({
   scanJsonOutput: vi.fn(() => ({ ok: true })),
 }));
 
+vi.mock('../../../src/services/git.js', () => ({
+  checkGitignoreStatus: vi.fn(() => null),
+}));
+
 vi.mock('../../../src/ui/scan/printMissingExample.js', () => ({
   printMissingExample: vi.fn(() => false),
 }));
@@ -75,6 +79,8 @@ import { scanUsage } from '../../../src/commands/scanUsage.js';
 import { scanCodebase } from '../../../src/services/scanCodebase.js';
 import { determineComparisonFile } from '../../../src/core/scan/determineComparisonFile.js';
 import { printScanResult } from '../../../src/services/printScanResult.js';
+import { checkGitignoreStatus } from '../../../src/services/git.js';
+import { scanJsonOutput } from '../../../src/ui/scan/scanJsonOutput.js';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { printMissingExample } from '../../../src/ui/scan/printMissingExample.js';
 import { printComparisonError } from '../../../src/ui/scan/printComparisonError.js';
@@ -132,6 +138,7 @@ describe('scanUsage', () => {
     vi.mocked(scanCodebase).mockResolvedValue({ ...baseScanResult });
     vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
     vi.mocked(printScanResult).mockReturnValue({ exitWithError: false });
+    vi.mocked(checkGitignoreStatus).mockReturnValue(null);
     vi.mocked(printMissingExample).mockReturnValue(false);
     vi.mocked(promptNoEnvScenario).mockResolvedValue({
       compareFile: undefined,
@@ -153,6 +160,62 @@ describe('scanUsage', () => {
     const result = await scanUsage(baseOpts);
 
     expect(result.exitWithError).toBe(true);
+  });
+
+  describe('gitignore in JSON mode', () => {
+    const issue = { reason: 'not-ignored' as const };
+
+    it('checks gitignore with cwd and the default env file', async () => {
+      await scanUsage({ ...baseOpts, json: true });
+
+      expect(checkGitignoreStatus).toHaveBeenCalledWith({
+        cwd: '/root',
+      });
+    });
+
+    it('passes the issue to the JSON output', async () => {
+      vi.mocked(checkGitignoreStatus).mockReturnValue(issue);
+
+      await scanUsage({ ...baseOpts, json: true });
+
+      expect(scanJsonOutput).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        issue,
+      );
+    });
+
+    it('passes null to the JSON output when there is no issue', async () => {
+      await scanUsage({ ...baseOpts, json: true });
+
+      expect(scanJsonOutput).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        null,
+      );
+    });
+
+    it('fails under --strict when an issue exists', async () => {
+      vi.mocked(checkGitignoreStatus).mockReturnValue(issue);
+
+      const result = await scanUsage({ ...baseOpts, json: true, strict: true });
+
+      expect(result.exitWithError).toBe(true);
+    });
+
+    it('does not fail without --strict', async () => {
+      vi.mocked(checkGitignoreStatus).mockReturnValue(issue);
+
+      const result = await scanUsage({
+        ...baseOpts,
+        json: true,
+        strict: false,
+      });
+
+      expect(result.exitWithError).toBe(false);
+    });
   });
 
   it('exits when comparison error requests exit', async () => {

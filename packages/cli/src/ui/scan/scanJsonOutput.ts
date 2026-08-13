@@ -10,6 +10,7 @@ import type {
   FrameworkWarning,
   ExampleSecretWarning,
   TypoSuggestion,
+  GitignoreIssue,
 } from '../../config/types.js';
 import { computeHealthScore } from '../../core/scan/computeHealthScore.js';
 import { normalizePath } from '../../core/helpers/normalizePath.js';
@@ -50,6 +51,7 @@ interface ScanJsonOutput {
     env?: Duplicate[];
     example?: Duplicate[];
   };
+  gitignoreIssue?: { reason: GitignoreIssue };
   logged?: EnvUsage[];
   expireWarnings?: ExpireWarning[];
   commentWarnings?: CommentWarning[];
@@ -65,12 +67,14 @@ interface ScanJsonOutput {
  * @param scanResult - The result of the scan.
  * @param comparedAgainst - The file being compared against.
  * @param listAll - Whether it should list all variables
+ * @param gitignoreIssue - A detected .gitignore issue, or null when there is none.
  * @returns The JSON output.
  */
 export function scanJsonOutput(
   scanResult: ScanResult,
   comparedAgainst: string,
   listAll: boolean = false,
+  gitignoreIssue: { reason: GitignoreIssue } | null = null,
 ): ScanJsonOutput {
   const output: ScanJsonOutput = {};
 
@@ -159,6 +163,10 @@ export function scanJsonOutput(
 
   if (hasDuplicates) {
     output.duplicates = scanResult.duplicates;
+  }
+
+  if (gitignoreIssue) {
+    output.gitignoreIssue = gitignoreIssue;
   }
 
   // Add logged variables if any

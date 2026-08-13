@@ -17,6 +17,7 @@ import { skipCommentedUsages } from '../core/scan/skipCommentedUsages.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
 import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
+import { checkGitignoreStatus } from '../services/git.js';
 import { promptNoEnvScenario } from './prompts/promptNoEnvScenario.js';
 import {
   printBaselineWritten,
@@ -164,16 +165,24 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
 
   // JSON output
   if (opts.json) {
+    // The console path runs this same check inside printScanResult. Both paths
+    // need it, and only one of them ever runs, so it is checked per branch.
+    const gitignoreIssue = checkGitignoreStatus({
+      cwd: opts.cwd,
+    });
+
     const jsonOutput = scanJsonOutput(
       scanResult,
       comparedAgainst,
       opts.listAll ?? false,
+      gitignoreIssue,
     );
     console.log(JSON.stringify(jsonOutput, null, 2));
 
-    // The JSON output does not include the .gitignore check, so it is left out
-    // of the decision here as well.
-    return computeExitDecision(scanResult, { strict: opts.strict });
+    return computeExitDecision(scanResult, {
+      strict: opts.strict,
+      hasGitignoreIssue: gitignoreIssue !== null,
+    });
   }
 
   // Console output

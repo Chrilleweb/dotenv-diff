@@ -27,6 +27,25 @@ function makeScanResult(partial: Partial<ScanResult> = {}): ScanResult {
 }
 
 describe('scanJsonOutput', () => {
+  it('includes the gitignore issue when one is passed', () => {
+    const scanResult = makeScanResult();
+
+    const result = scanJsonOutput(scanResult, '', false, {
+      reason: 'not-ignored',
+    });
+
+    expect(result.gitignoreIssue).toEqual({ reason: 'not-ignored' });
+  });
+
+  it('omits the gitignore issue when there is none', () => {
+    const scanResult = makeScanResult();
+
+    expect(
+      scanJsonOutput(scanResult, '', false, null).gitignoreIssue,
+    ).toBeUndefined();
+    expect(scanJsonOutput(scanResult, '').gitignoreIssue).toBeUndefined();
+  });
+
   it('includes comparedAgainst when provided', () => {
     const scanResult = makeScanResult();
 
