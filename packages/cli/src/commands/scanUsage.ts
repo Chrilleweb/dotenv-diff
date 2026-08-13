@@ -7,6 +7,7 @@ import type {
   ComparisonFile,
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/scan/determineComparisonFile.js';
+import { computeExitDecision } from '../core/scan/computeExitDecision.js';
 import { printScanResult } from '../services/printScanResult.js';
 import { scanJsonOutput } from '../ui/scan/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
@@ -15,11 +16,8 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { skipCommentedUsages } from '../core/scan/skipCommentedUsages.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
-import {
-  DEFAULT_EXAMPLE_FILE,
-  URGENT_EXPIRE_DAYS,
-  EXPIRE_THRESHOLD_DAYS,
-} from '../config/constants.js';
+import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
+import { checkGitignoreStatus } from '../services/git.js';
 import { promptNoEnvScenario } from './prompts/promptNoEnvScenario.js';
 import {
   printBaselineWritten,
@@ -167,50 +165,24 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
 
   // JSON output
   if (opts.json) {
+    // The console path runs this same check inside printScanResult. Both paths
+    // need it, and only one of them ever runs, so it is checked per branch.
+    const gitignoreIssue = checkGitignoreStatus({
+      cwd: opts.cwd,
+    });
+
     const jsonOutput = scanJsonOutput(
       scanResult,
       comparedAgainst,
       opts.listAll ?? false,
+      gitignoreIssue,
     );
     console.log(JSON.stringify(jsonOutput, null, 2));
 
-    // Check for high severity secrets
-    const hasHighSeveritySecrets = (scanResult.secrets ?? []).some(
-      (s) => s.severity === 'high',
-    );
-
-    // Check for high potential secrets in example warnings
-    const hasHighSeverityExampleWarnings = (
-      scanResult.exampleWarnings ?? []
-    ).some((w) => w.severity === 'high');
-
-    const hasUrgentExpireWarnings = (scanResult.expireWarnings ?? []).some(
-      (w) => w.daysLeft <= URGENT_EXPIRE_DAYS,
-    );
-
-    return {
-      exitWithError:
-        scanResult.missing.length > 0 ||
-        hasHighSeveritySecrets ||
-        hasUrgentExpireWarnings ||
-        hasHighSeverityExampleWarnings ||
-        !!(
-          opts.strict &&
-          (scanResult.unused.length > 0 ||
-            (scanResult.duplicates?.env?.length ?? 0) > 0 ||
-            (scanResult.duplicates?.example?.length ?? 0) > 0 ||
-            (scanResult.secrets?.length ?? 0) > 0 ||
-            (scanResult.frameworkWarnings?.length ?? 0) > 0 ||
-            (scanResult.logged?.length ?? 0) > 0 ||
-            (scanResult.uppercaseWarnings?.length ?? 0) > 0 ||
-            (scanResult.expireWarnings?.filter(
-              (w) => w.daysLeft <= EXPIRE_THRESHOLD_DAYS,
-            ).length ?? 0) > 0 ||
-            (scanResult.inconsistentNamingWarnings?.length ?? 0) > 0 ||
-            (scanResult.commentWarnings?.length ?? 0) > 0 ||
-            (scanResult.exampleWarnings?.length ?? 0) > 0)
-        ),
-    };
+    return computeExitDecision(scanResult, {
+      strict: opts.strict,
+      hasGitignoreIssue: gitignoreIssue !== null,
+    });
   }
 
   // Console output

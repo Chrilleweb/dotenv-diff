@@ -153,9 +153,11 @@ describe('printScanResult', () => {
   });
 
   it('returns exitWithError true when missing variables exist', () => {
-    vi.mocked(printMissing).mockReturnValue(true);
-
-    const result = printScanResult(baseScanResult, baseOpts, '.env');
+    const result = printScanResult(
+      { ...baseScanResult, missing: ['API_KEY'] },
+      baseOpts,
+      '.env',
+    );
 
     expect(result.exitWithError).toBe(true);
   });
