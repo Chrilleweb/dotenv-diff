@@ -64,6 +64,7 @@ interface ScanJsonOutput {
  * Creates a JSON output for the scan results.
  * @param scanResult - The result of the scan.
  * @param comparedAgainst - The file being compared against.
+ * @param listAll - Whether it should list all variables
  * @returns The JSON output.
  */
 export function scanJsonOutput(

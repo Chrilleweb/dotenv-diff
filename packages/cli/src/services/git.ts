@@ -24,7 +24,7 @@ interface GitignoreCheckOptions {
 
 /** Are we in a git repo? (checks for .git directory in cwd) */
 export function isGitRepo(cwd = process.cwd()): boolean {
-  return fs.existsSync(path.resolve(cwd, GIT_DIR));
+  return findGitRoot(cwd) !== null;
 }
 
 /**
