@@ -4,10 +4,8 @@
 export type DiffResult = {
   /** Keys present in the example file but missing from the current file */
   missing: string[];
-
   /** Keys present in the current file but not defined in the example file */
   extra: string[];
-
   /** Keys that exist in both files but have mismatched values */
   valueMismatches: {
     /** The environment variable key */

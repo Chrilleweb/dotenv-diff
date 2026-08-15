@@ -3,6 +3,16 @@ import { MAX_TYPO_DISTANCE, MAX_TYPO_RATIO } from '../config/constants.js';
 import { levenshtein } from './helpers/levenshtein.js';
 
 /**
+ * A candidate key that qualifies as a likely typo of a reported key
+ */
+interface ClosestMatch {
+  /** The candidate key from the existing key pool */
+  key: string;
+  /** Levenshtein distance between the reported key and this candidate */
+  distance: number;
+}
+
+/**
  * Cross-references reported keys against a pool of existing candidate keys and
  * suggests the closest match when a key looks like a simple typo of another.
  *
@@ -50,8 +60,8 @@ export function suggestTypos(
 function findClosestKey(
   key: string,
   candidateKeys: string[],
-): { key: string; distance: number } | null {
-  let best: { key: string; distance: number } | null = null;
+): ClosestMatch | null {
+  let best: ClosestMatch | null = null;
 
   for (const candidate of candidateKeys) {
     if (candidate === key) continue;

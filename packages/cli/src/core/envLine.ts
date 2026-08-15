@@ -2,10 +2,13 @@
  * This module provides utility functions for parsing and handling dotenv files.
  */
 export interface EnvKeyValue {
+  /** The key of the environment variable. */
   key: string;
+  /** The value of the environment variable. */
   value: string;
 }
 
+/** BOM (Byte Order Mark) character used to indicate UTF-8 encoding. */
 const BOM = '\uFEFF';
 
 /** Strips a UTF-8 BOM from the start of the content, if present.
