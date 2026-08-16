@@ -59,7 +59,6 @@ jobs:
           publish-script: pnpm run release
           commit-message: 'chore(release): publish to npm'
           pr-title: 'chore(release): publish to npm'
-          # v2 ignores the GITHUB_TOKEN env var; the App token must come in here
           github-token: ${{ steps.app-token.outputs.token }}
         env:
           NPM_CONFIG_PROVENANCE: true
