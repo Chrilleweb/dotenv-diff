@@ -17,6 +17,7 @@ import { findFiles } from './fileWalker.js';
 import { normalizePath } from '../core/helpers/normalizePath.js';
 import { isLikelyMinified } from '../core/helpers/isLikelyMinified.js';
 
+/** This limits the number of files processed concurrently */
 const FILE_CONCURRENCY = 50;
 
 /**
