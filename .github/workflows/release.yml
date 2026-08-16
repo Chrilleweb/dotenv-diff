@@ -53,12 +53,12 @@ jobs:
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        uses: changesets/action@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2.1.0
         with:
-          version: pnpm run version
-          publish: pnpm run release
-          commit: 'chore(release): publish to npm'
-          title: 'chore(release): publish to npm'
+          version-script: pnpm run version
+          publish-script: pnpm run release
+          commit-message: 'chore(release): publish to npm'
+          pr-title: 'chore(release): publish to npm'
+          github-token: ${{ steps.app-token.outputs.token }}
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           NPM_CONFIG_PROVENANCE: true
