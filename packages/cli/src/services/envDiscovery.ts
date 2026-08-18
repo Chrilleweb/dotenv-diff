@@ -29,7 +29,7 @@ export function discoverEnvFiles({
   exampleFlag,
 }: DiscoverEnvFilesArgs): Discovery {
   // Find all .env* files in the current directory except .env.example*
-  const envFiles = fs
+  let envFiles = fs
     .readdirSync(cwd)
     .filter(
       (f) =>
@@ -50,9 +50,7 @@ export function discoverEnvFiles({
 
     // If the specified --env actually exists, make sure it's in the list (first) without duplicates
     if (fs.existsSync(envFlag)) {
-      const set = new Set([envFlag, ...envFiles]);
-      envFiles.length = 0;
-      envFiles.push(...Array.from(set));
+      envFiles = [...new Set([envFlag, ...envFiles])];
     }
 
     // try to find a matching example name based on the suffix (basename only for suffix derivation)
@@ -71,7 +69,7 @@ export function discoverEnvFiles({
     primaryExample = exampleFlag;
 
     if (exampleNameFromFlag.startsWith(DEFAULT_EXAMPLE_FILE)) {
-      const suffix = exampleNameFromFlag.slice(DEFAULT_EXAMPLE_FILE.length);
+      const suffix = getSuffix(exampleNameFromFlag, DEFAULT_EXAMPLE_FILE);
       const matchedEnv = `${DEFAULT_ENV_FILE}${suffix}`;
 
       if (fs.existsSync(path.resolve(cwd, matchedEnv))) {
