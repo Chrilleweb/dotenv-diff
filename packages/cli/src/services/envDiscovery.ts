@@ -56,10 +56,7 @@ export function discoverEnvFiles({
     }
 
     // try to find a matching example name based on the suffix (basename only for suffix derivation)
-    const suffix =
-      envBaseName === DEFAULT_ENV_FILE
-        ? ''
-        : envBaseName.replace(DEFAULT_ENV_FILE, '');
+    const suffix = getSuffix(envBaseName, DEFAULT_ENV_FILE);
     const potentialExample = suffix
       ? `${DEFAULT_EXAMPLE_FILE}${suffix}`
       : DEFAULT_EXAMPLE_FILE;
@@ -106,4 +103,14 @@ export function discoverEnvFiles({
     exampleFlag,
     alreadyWarnedMissingEnv,
   };
+}
+
+/**
+ * Returns the suffix of the filename after the specified prefix.
+ * @param filename - The filename to extract the suffix from.
+ * @param prefix - The prefix to remove from the filename.
+ * @returns The suffix of the filename after the prefix, or an empty string.
+ */
+export function getSuffix(filename: string, prefix: string): string {
+  return filename.startsWith(prefix) ? filename.slice(prefix.length) : '';
 }
