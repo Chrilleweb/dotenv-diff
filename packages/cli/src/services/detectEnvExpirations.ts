@@ -1,12 +1,6 @@
 import fs from 'fs';
 import type { ExpireWarning } from '../config/types.js';
-import { ENV_KEY_LINE } from '../config/constants.js';
-
-/**
- * Matches an `@expire` annotation line in any of its accepted forms:
- * `# @expire YYYY-MM-DD`, `// @expire YYYY-MM-DD`, `# expire YYYY-MM-DD`, or a bare `@expire YYYY-MM-DD`.
- */
-const EXPIRE_ANNOTATION = /^(?:\/\/|#)?\s*@?expire\s+(\d{4}-\d{2}-\d{2})/i;
+import { ENV_KEY_LINE, EXPIRE_ANNOTATION } from '../config/constants.js';
 
 // Number of milliseconds in a day
 const MS_PER_DAY = 1000 * 60 * 60 * 24;

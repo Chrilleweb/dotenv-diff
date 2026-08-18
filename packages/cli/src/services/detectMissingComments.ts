@@ -1,16 +1,7 @@
 import fs from 'fs';
 import type { CommentWarning } from '../config/types.js';
 import { splitEnvLines, parseEnvLine } from '../core/envLine.js';
-
-/**
- * A line that is *only* an `@expire` annotation, in any of its accepted forms:
- * `# @expire 2025-12-12`, `// @expire 2025-12-12`, `# expire 2025-12-12`, or a
- * bare `@expire 2025-12-12`. This is a machine annotation, not human
- * documentation, so it never satisfies the "documented" rule on its own — but
- * it is transparent: a real comment sitting above it still documents the key.
- */
-const BARE_EXPIRE_ANNOTATION =
-  /^(?:\/\/|#)?\s*@?expire\s+\d{4}-\d{2}-\d{2}\s*$/i;
+import { EXPIRE_ANNOTATION } from '../config/constants.js';
 
 /**
  * Detects `.env.example` keys that lack a documenting comment.
@@ -58,7 +49,7 @@ export function detectMissingComments(filePath: string): CommentWarning[] {
     for (let j = i - 1; j >= 0; j--) {
       const above = lines[j]!.trim();
       if (above === '') break; // blank line ends the block
-      if (BARE_EXPIRE_ANNOTATION.test(above)) continue; // transparent annotation
+      if (EXPIRE_ANNOTATION.test(above)) continue; // transparent annotation
       if (above.startsWith('#')) {
         hasCommentAbove = true; // a real, prose comment
       }

@@ -56,6 +56,13 @@ export const DEFAULT_ENV_CANDIDATES = [
 export const ENV_KEY_LINE = /^[A-Za-z0-9_.-]+=/;
 
 /**
+ * Matches an `@expire` annotation line in any of its accepted forms, capturing the date:
+ * `# @expire YYYY-MM-DD`, `// @expire YYYY-MM-DD`, `# expire YYYY-MM-DD`, or a bare `@expire YYYY-MM-DD`.
+ */
+export const EXPIRE_ANNOTATION =
+  /^(?:\/\/|#)?\s*@?expire\s+(\d{4}-\d{2}-\d{2})\s*$/i;
+
+/**
  * Patterns to check for in .gitignore when validating env file safety.
  * These files should always be git-ignored to prevent committing secrets.
  */
