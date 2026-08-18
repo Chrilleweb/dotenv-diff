@@ -1,5 +1,6 @@
 import fs from 'fs';
 import type { ExpireWarning } from '../config/types.js';
+import { ENV_KEY_LINE } from '../config/constants.js';
 
 // Number of milliseconds in a day
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -43,7 +44,7 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
       continue;
     }
 
-    const isEnvKey = /^[A-Za-z0-9_.-]+=/.test(line);
+    const isEnvKey = ENV_KEY_LINE.test(line);
 
     if (isEnvKey) {
       const key = line.split('=')[0];

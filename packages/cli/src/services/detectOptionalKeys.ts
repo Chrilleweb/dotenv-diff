@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { splitEnvLines } from '../core/envLine.js';
+import { ENV_KEY_LINE } from '../config/constants.js';
 
 /**
  * Matches an `@optional` annotation line in any of its accepted forms:
@@ -7,9 +8,6 @@ import { splitEnvLines } from '../core/envLine.js';
  * Mirrors the `@expire` annotation styles so there is only one convention to learn.
  */
 const OPTIONAL_ANNOTATION = /^(?:\/\/|#)?\s*@?optional\s*$/i;
-
-/** Matches a dotenv key line (`KEY=` / `KEY=value`). */
-const ENV_KEY_LINE = /^[A-Za-z0-9_.-]+=/;
 
 /**
  * Detects keys marked `@optional` in a dotenv file.
@@ -34,7 +32,7 @@ const ENV_KEY_LINE = /^[A-Za-z0-9_.-]+=/;
  * annotations every key stays required, so a read error can only make reporting
  * stricter, never let a real problem through.
  * @param filePath - Path to the dotenv file (normally `.env.example`)
- * @returns The keys marked optional
+ * @returns Array<string> of the keys marked optional
  */
 export function detectOptionalKeys(filePath: string): string[] {
   let content: string;

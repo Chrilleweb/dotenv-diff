@@ -51,6 +51,11 @@ export const DEFAULT_ENV_CANDIDATES = [
 ] as const;
 
 /**
+ * Matches a dotenv key line (`KEY=` / `KEY=value`).
+ */
+export const ENV_KEY_LINE = /^[A-Za-z0-9_.-]+=/;
+
+/**
  * Patterns to check for in .gitignore when validating env file safety.
  * These files should always be git-ignored to prevent committing secrets.
  */
