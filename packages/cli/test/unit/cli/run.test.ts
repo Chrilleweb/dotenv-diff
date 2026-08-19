@@ -98,6 +98,7 @@ function createBaseOptions(overrides: Partial<Options> = {}): Options {
     expireWarnings: true,
     inconsistentNamingWarnings: true,
     commentWarnings: false,
+    driftWarnings: true,
     listAll: false,
     explain: undefined,
     baseline: false,

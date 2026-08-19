@@ -95,6 +95,7 @@ export interface RawOptions {
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
   commentWarnings?: boolean;
+  driftWarnings?: boolean;
   listAll?: boolean;
   explain?: string;
   matrix?: boolean | string[];
@@ -143,6 +144,7 @@ export interface Options {
   expireWarnings: boolean;
   inconsistentNamingWarnings: boolean;
   commentWarnings: boolean;
+  driftWarnings: boolean;
   listAll: boolean;
   explain: string | undefined;
   matrix: boolean;
@@ -243,6 +245,7 @@ export interface ScanUsageOptions extends ScanOptions {
   expireWarnings?: boolean;
   inconsistentNamingWarnings?: boolean;
   commentWarnings?: boolean;
+  driftWarnings?: boolean;
   listAll?: boolean;
   baseline?: boolean;
   suggest?: boolean;
@@ -289,6 +292,7 @@ export interface ScanResult {
   expireWarnings?: ExpireWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
   commentWarnings?: CommentWarning[];
+  driftWarnings?: DriftWarning[];
   /** Typo suggestions for variables used in code but not defined in the env file */
   suggestions?: TypoSuggestion[];
   fileContentMap?: Map<string, string>;
@@ -470,6 +474,21 @@ export interface CommentWarning {
 }
 
 /**
+ * Warning about a key that is set in the scanned env file but absent from the
+ * example file next to it — the two files have drifted apart.
+ * fx: `.env` gained `STRIPE_SECRET=sk_live_...` but `.env.example` was never updated,
+ * so a new contributor cloning the repo has no way to know the key exists.
+ */
+export interface DriftWarning {
+  /** The key present in the env file but missing from the example file */
+  key: string;
+  /** The env file the key is set in (e.g. `.env.local`) */
+  envFile: string;
+  /** The example file it is missing from (e.g. `.env.example`) */
+  exampleFile: string;
+}
+
+/**
  * A "did you mean" suggestion produced when a reported key looks like a typo
  * of an existing key.
  * fx: DATABASE_URL is missing while DATABAS_URL exists → suggest DATABASE_URL.
@@ -511,7 +530,8 @@ export type BaselineRule =
   | 'uppercase'
   | 'expire'
   | 'inconsistent-naming'
-  | 'comment';
+  | 'comment'
+  | 'drift';
 
 /**
  * A single suppressed warning in the baseline file.

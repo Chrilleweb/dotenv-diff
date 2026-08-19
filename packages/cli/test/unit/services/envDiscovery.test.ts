@@ -2,7 +2,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { discoverEnvFiles } from '../../../src/services/envDiscovery.js';
+import {
+  discoverEnvFiles,
+  getSuffix,
+} from '../../../src/services/envDiscovery.js';
 
 describe('discoverEnvFiles', () => {
   let cwd: string;
@@ -242,5 +245,19 @@ describe('discoverEnvFiles', () => {
 
     expect(result.primaryEnv).toBe(envPath);
     expect(result.envFiles[0]).toBe(envPath);
+  });
+
+  it('Should return the correct suffix for a filename with a prefix', () => {
+    const filename = '.env.prod';
+    const prefix = '.env';
+    const suffix = getSuffix(filename, prefix);
+    expect(suffix).toBe('.prod');
+  });
+
+  it('Should return an empty string for a filename without the prefix', () => {
+    const filename = 'config.env';
+    const prefix = '.env';
+    const suffix = getSuffix(filename, prefix);
+    expect(suffix).toBe('');
   });
 });

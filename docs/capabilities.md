@@ -133,6 +133,10 @@ Only close matches are suggested (small edit distance, scaled to key length), an
 
 With `--comment-warnings`, flags `.env.example` keys that have no documenting comment — either a `#` comment on the line directly above or an inline `#` comment after the value. Off by default. See [`--comment-warnings`](./configuration_and_flags.md#--comment-warnings).
 
-### 14 Health Score
+### 14 Env / Example Drift
+
+Flags keys that are set in an env file but missing from the example that documents it — the app runs on your machine, but a new contributor cloning the repo has no way to know the key exists. A scan compares code against a single file, so this is the only check that holds env files and example files up against each other. The env file checked is the one the scan compared against, paired with the example documenting it. On by default; the reverse direction is what [`--compare`](./compare.md) is for. See [Drift Warnings](./drift_warnings.md).
+
+### 15 Health Score
 
 A final score based on scan findings (missing, unused, duplicates, security warnings, and more).

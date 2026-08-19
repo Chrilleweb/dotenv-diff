@@ -1,5 +1,6 @@
 import fs from 'fs';
 import type { ExpireWarning } from '../config/types.js';
+import { ENV_KEY_LINE, EXPIRE_ANNOTATION } from '../config/constants.js';
 
 // Number of milliseconds in a day
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -20,8 +21,6 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
 
   const warnings: ExpireWarning[] = [];
 
-  const reg = /(\/\/|#)?\s*@?expire\s+(\d{4}-\d{2}-\d{2})/i;
-
   let pendingExpire: string | null = null;
 
   for (const raw of lines) {
@@ -36,14 +35,14 @@ export function detectEnvExpirations(filePath: string): ExpireWarning[] {
       continue;
     }
 
-    const expireMatch = line.match(reg);
+    const expireMatch = line.match(EXPIRE_ANNOTATION);
 
     if (expireMatch) {
-      pendingExpire = expireMatch[2]!; // capture date
+      pendingExpire = expireMatch[1]!; // capture date
       continue;
     }
 
-    const isEnvKey = /^[A-Za-z0-9_.-]+=/.test(line);
+    const isEnvKey = ENV_KEY_LINE.test(line);
 
     if (isEnvKey) {
       const key = line.split('=')[0];

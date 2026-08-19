@@ -11,6 +11,7 @@ import { detectEnvExpirations } from './detectEnvExpirations.js';
 import { detectInconsistentNaming } from '../core/detectInconsistentNaming.js';
 import { detectMissingComments } from './detectMissingComments.js';
 import { detectOptionalKeys } from './detectOptionalKeys.js';
+import { detectExampleDrift } from './detectExampleDrift.js';
 import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import type {
   ScanUsageOptions,
@@ -22,6 +23,7 @@ import type {
   ExpireWarning,
   InconsistentNamingWarning,
   CommentWarning,
+  DriftWarning,
   FixContext,
 } from '../config/types.js';
 
@@ -41,6 +43,7 @@ export interface ProcessComparisonResult {
   expireWarnings?: ExpireWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
   commentWarnings?: CommentWarning[];
+  driftWarnings?: DriftWarning[];
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -66,6 +69,7 @@ export function processComparisonFile(
   let expireWarnings: ExpireWarning[] = [];
   let inconsistentNamingWarnings: InconsistentNamingWarning[] = [];
   let commentWarnings: CommentWarning[] = [];
+  let driftWarnings: DriftWarning[] = [];
 
   const fix: FixContext = {
     fixApplied: false,
@@ -172,6 +176,17 @@ export function processComparisonFile(
       }
     }
 
+    // Warn when the env file this run is about has drifted from the example
+    // documenting it. The scan only ever reads one file, so without this the
+    // example is never checked against the values actually in use.
+    if (opts.driftWarnings) {
+      driftWarnings = detectExampleDrift({
+        comparisonPath: compareFile.path,
+        ignore: opts.ignore,
+        ignoreRegex: opts.ignoreRegex,
+      });
+    }
+
     // Apply fixes (both duplicates + missing keys + gitignore)
     if (opts.fix) {
       const { changed, result } = applyFixes({
@@ -217,6 +232,7 @@ export function processComparisonFile(
       expireWarnings,
       inconsistentNamingWarnings,
       commentWarnings,
+      driftWarnings,
       error: {
         message: errorMessage,
         shouldExit: opts.isCiMode ?? false,
@@ -237,6 +253,7 @@ export function processComparisonFile(
     expireWarnings,
     inconsistentNamingWarnings,
     commentWarnings,
+    driftWarnings,
   };
 }
 

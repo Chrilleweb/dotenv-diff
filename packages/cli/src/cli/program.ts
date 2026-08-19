@@ -98,6 +98,10 @@ export function createProgram() {
         'Warn about .env.example keys that lack a documenting # comment',
       )
       .option(
+        '--no-drift-warnings',
+        'Disable drift warnings for keys that are in .env but not in .env.example',
+      )
+      .option(
         '--suggest',
         'Suggest the closest existing key for likely typos (enabled by default)',
       )

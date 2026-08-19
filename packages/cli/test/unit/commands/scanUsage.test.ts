@@ -376,6 +376,40 @@ describe('scanUsage', () => {
     );
   });
 
+  it('attaches driftWarnings from processComparisonFile onto the scan result', async () => {
+    const drift = [
+      { key: 'DRIFTED', envFile: '.env', exampleFile: '.env.example' },
+    ];
+    vi.mocked(determineComparisonFile).mockResolvedValue({
+      type: 'found',
+      file: { path: '/env/.env', name: '.env' },
+    });
+    vi.mocked(processComparisonFile).mockReturnValue({
+      scanResult: { ...baseScanResult },
+      comparedAgainst: '.env',
+      envVariables: {},
+      duplicatesFound: false,
+      dupsEnv: [],
+      dupsEx: [],
+      fix: {
+        fixApplied: false,
+        removedDuplicates: [],
+        addedEnv: [],
+        gitignoreUpdated: false,
+      },
+      driftWarnings: drift,
+    } as ProcessComparisonResult);
+
+    await scanUsage({ ...baseOpts, json: false });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({ driftWarnings: drift }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
   it('sets frameworkWarnings on scanResult when frameworkValidator returns results', async () => {
     const { frameworkValidator } =
       await import('../../../src/core/frameworks/frameworkValidator.js');

@@ -6,12 +6,7 @@ import { shouldExclude } from './fileWalker.js';
 import { filterIgnoredKeys } from '../core/helpers/filterIgnoredKeys.js';
 import { normalizePath } from '../core/helpers/normalizePath.js';
 import { DEFAULT_EXCLUDE_PATTERNS } from '../core/scan/patterns.js';
-
-/**
- * Matches example/template env files that document required keys:
- * `.env.example`, `.env-example`, `.env.sample`, `.env.template` (case-insensitive).
- */
-const EXAMPLE_FILE_PATTERN = /^\.env[.-](example|sample|template)$/i;
+import { isExampleFile } from '../core/helpers/isExampleFile.js';
 
 /**
  * Options for discovering example scopes.
@@ -68,7 +63,7 @@ export function discoverExampleScopes(
         continue;
       }
 
-      if (!entry.isFile() || !EXAMPLE_FILE_PATTERN.test(entry.name)) continue;
+      if (!entry.isFile() || !isExampleFile(entry.name)) continue;
 
       const relDir = normalizePath(path.relative(cwd, absDir));
       // Root example files are already handled by the primary comparison file.

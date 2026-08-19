@@ -13,6 +13,17 @@ export const DEFAULT_ENV_FILE = '.env';
 export const DEFAULT_EXAMPLE_FILE = '.env.example';
 
 /**
+ * Example/template file names that document required keys, in priority order.
+ * Earlier entries win when a directory contains more than one.
+ */
+export const EXAMPLE_FILE_CANDIDATES = [
+  DEFAULT_EXAMPLE_FILE,
+  '.env-example',
+  '.env.sample',
+  '.env.template',
+] as const;
+
+/**
  * Name of the git directory used to detect repository root.
  */
 export const GIT_DIR = '.git';
@@ -49,6 +60,18 @@ export const DEFAULT_ENV_CANDIDATES = [
   '.env.development',
   '.env.schema',
 ] as const;
+
+/**
+ * Matches a dotenv key line (`KEY=` / `KEY=value`).
+ */
+export const ENV_KEY_LINE = /^[A-Za-z0-9_.-]+=/;
+
+/**
+ * Matches an `@expire` annotation line in any of its accepted forms, capturing the date:
+ * `# @expire YYYY-MM-DD`, `// @expire YYYY-MM-DD`, `# expire YYYY-MM-DD`, or a bare `@expire YYYY-MM-DD`.
+ */
+export const EXPIRE_ANNOTATION =
+  /^(?:\/\/|#)?\s*@?expire\s+(\d{4}-\d{2}-\d{2})\s*$/i;
 
 /**
  * Patterns to check for in .gitignore when validating env file safety.

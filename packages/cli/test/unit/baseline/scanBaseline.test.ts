@@ -278,6 +278,24 @@ describe('collectBaselineEntries', () => {
     expect(result).toContainEqual({ rule: 'comment', key: 'UNDOCUMENTED' });
   });
 
+  it('collects drift warnings keyed by env file', () => {
+    const result = collectBaselineEntries({
+      ...emptyScanResult,
+      driftWarnings: [
+        {
+          key: 'STRIPE_SECRET',
+          envFile: '.env.local',
+          exampleFile: '.env.example',
+        },
+      ],
+    });
+    expect(result).toContainEqual({
+      rule: 'drift',
+      key: 'STRIPE_SECRET',
+      file: '.env.local',
+    });
+  });
+
   it('collects inconsistent-naming warnings as sorted key pair', () => {
     const result = collectBaselineEntries({
       ...emptyScanResult,
@@ -595,6 +613,40 @@ describe('applyBaselineEntries', () => {
     const result: ScanResult = { ...emptyScanResult };
     const after = applyBaselineEntries(result, [{ rule: 'comment', key: 'x' }]);
     expect(after.commentWarnings).toBeUndefined();
+  });
+
+  it('suppresses drift warning', () => {
+    const result: ScanResult = {
+      ...emptyScanResult,
+      driftWarnings: [
+        { key: 'DRIFTED', envFile: '.env', exampleFile: '.env.example' },
+      ],
+    };
+    const entries: BaselineEntry[] = [
+      { rule: 'drift', key: 'DRIFTED', file: '.env' },
+    ];
+    const after = applyBaselineEntries(result, entries);
+    expect(after.driftWarnings).toHaveLength(0);
+  });
+
+  it('keeps a drift warning baselined against a different env file', () => {
+    const result: ScanResult = {
+      ...emptyScanResult,
+      driftWarnings: [
+        { key: 'DRIFTED', envFile: '.env.local', exampleFile: '.env.example' },
+      ],
+    };
+    const entries: BaselineEntry[] = [
+      { rule: 'drift', key: 'DRIFTED', file: '.env' },
+    ];
+    const after = applyBaselineEntries(result, entries);
+    expect(after.driftWarnings).toHaveLength(1);
+  });
+
+  it('does not touch driftWarnings when field is absent', () => {
+    const result: ScanResult = { ...emptyScanResult };
+    const after = applyBaselineEntries(result, [{ rule: 'drift', key: 'x' }]);
+    expect(after.driftWarnings).toBeUndefined();
   });
 
   it('suppresses inconsistent-naming warning (sorted pair)', () => {

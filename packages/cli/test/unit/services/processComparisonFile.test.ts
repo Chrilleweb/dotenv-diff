@@ -64,6 +64,12 @@ vi.mock('../../../src/services/detectOptionalKeys.js', () => ({
   detectOptionalKeys: vi.fn(() => []),
 }));
 
+vi.mock('../../../src/services/detectExampleDrift.js', () => ({
+  detectExampleDrift: vi.fn(() => [
+    { key: 'DRIFTED', envFile: '.env', exampleFile: '.env.example' },
+  ]),
+}));
+
 import fs from 'fs';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { applyFixes } from '../../../src/services/fixEnv.js';
@@ -71,6 +77,7 @@ import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
 import { findDuplicateKeys } from '../../../src/services/duplicates.js';
 import { resolveFromCwd } from '../../../src/core/helpers/resolveFromCwd.js';
 import { detectOptionalKeys } from '../../../src/services/detectOptionalKeys.js';
+import { detectExampleDrift } from '../../../src/services/detectExampleDrift.js';
 
 describe('processComparisonFile', () => {
   const baseScanResult: ScanResult = {
@@ -133,6 +140,30 @@ describe('processComparisonFile', () => {
     });
 
     expect(result.commentWarnings).toEqual([{ key: 'UNDOC', line: 2 }]);
+  });
+
+  it('detects drift against the comparison file when enabled', () => {
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      driftWarnings: true,
+    });
+
+    expect(detectExampleDrift).toHaveBeenCalledWith(
+      expect.objectContaining({ comparisonPath: compareFile.path }),
+    );
+    expect(result.driftWarnings).toEqual([
+      { key: 'DRIFTED', envFile: '.env', exampleFile: '.env.example' },
+    ]);
+  });
+
+  it('skips drift detection when disabled', () => {
+    const result = processComparisonFile(baseScanResult, compareFile, {
+      ...baseOpts,
+      driftWarnings: false,
+    });
+
+    expect(detectExampleDrift).not.toHaveBeenCalled();
+    expect(result.driftWarnings).toEqual([]);
   });
 
   it('falls back to the default example file and skips when it does not exist', () => {

@@ -29,7 +29,7 @@ export function discoverEnvFiles({
   exampleFlag,
 }: DiscoverEnvFilesArgs): Discovery {
   // Find all .env* files in the current directory except .env.example*
-  const envFiles = fs
+  let envFiles = fs
     .readdirSync(cwd)
     .filter(
       (f) =>
@@ -50,16 +50,11 @@ export function discoverEnvFiles({
 
     // If the specified --env actually exists, make sure it's in the list (first) without duplicates
     if (fs.existsSync(envFlag)) {
-      const set = new Set([envFlag, ...envFiles]);
-      envFiles.length = 0;
-      envFiles.push(...Array.from(set));
+      envFiles = [...new Set([envFlag, ...envFiles])];
     }
 
     // try to find a matching example name based on the suffix (basename only for suffix derivation)
-    const suffix =
-      envBaseName === DEFAULT_ENV_FILE
-        ? ''
-        : envBaseName.replace(DEFAULT_ENV_FILE, '');
+    const suffix = getSuffix(envBaseName, DEFAULT_ENV_FILE);
     const potentialExample = suffix
       ? `${DEFAULT_EXAMPLE_FILE}${suffix}`
       : DEFAULT_EXAMPLE_FILE;
@@ -74,7 +69,7 @@ export function discoverEnvFiles({
     primaryExample = exampleFlag;
 
     if (exampleNameFromFlag.startsWith(DEFAULT_EXAMPLE_FILE)) {
-      const suffix = exampleNameFromFlag.slice(DEFAULT_EXAMPLE_FILE.length);
+      const suffix = getSuffix(exampleNameFromFlag, DEFAULT_EXAMPLE_FILE);
       const matchedEnv = `${DEFAULT_ENV_FILE}${suffix}`;
 
       if (fs.existsSync(path.resolve(cwd, matchedEnv))) {
@@ -106,4 +101,14 @@ export function discoverEnvFiles({
     exampleFlag,
     alreadyWarnedMissingEnv,
   };
+}
+
+/**
+ * Returns the suffix of the filename after the specified prefix.
+ * @param filename - The filename to extract the suffix from.
+ * @param prefix - The prefix to remove from the filename.
+ * @returns The suffix of the filename after the prefix, or an empty string.
+ */
+export function getSuffix(filename: string, prefix: string): string {
+  return filename.startsWith(prefix) ? filename.slice(prefix.length) : '';
 }

@@ -91,6 +91,23 @@ PARTNER_API_TOKEN=
 
 ---
 
+## Drift Warnings
+
+A scan compares your code against a single file — so any key you add to `.env` and forget in `.env.example` is invisible until a new contributor clones the repo. Drift warnings catch exactly that:
+
+```text
+▸ Drift between .env and .env.example
+──────────────────────────────────────────────────────────────────────
+STRIPE_SECRET               not documented in .env.example
+──────────────────────────────────────────────────────────────────────
+```
+
+On by default; opt out with `--no-drift-warnings`.
+
+→ See [Drift Warnings](https://github.com/Chrilleweb/dotenv-diff/blob/main/docs/drift_warnings.md) for more details.
+
+---
+
 ## Expiration Warnings
 
 Add expiration metadata to your environment variables to get warnings when they are about to expire. For example, in your `.env` file:

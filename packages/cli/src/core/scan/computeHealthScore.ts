@@ -42,6 +42,9 @@ export function computeHealthScore(scan: ScanResult): number {
   // === 9b. Undocumented example keys (advisory) ===
   score -= (scan.commentWarnings?.length ?? 0) * 2;
 
+  // === 9c. Keys missing from the example file (advisory) ===
+  score -= (scan.driftWarnings?.length ?? 0) * 2;
+
   // === 10. Duplicate definitions ===
   score -= (scan.duplicates?.env?.length ?? 0) * 10;
   score -= (scan.duplicates?.example?.length ?? 0) * 10;

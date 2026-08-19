@@ -64,6 +64,10 @@ vi.mock('../../../src/ui/scan/printCommentWarnings.js', () => ({
   printCommentWarnings: vi.fn(),
 }));
 
+vi.mock('../../../src/ui/scan/printDriftWarnings.js', () => ({
+  printDriftWarnings: vi.fn(),
+}));
+
 vi.mock('../../../src/ui/scan/printExpireWarnings.js', () => ({
   printExpireWarnings: vi.fn(),
 }));
@@ -108,6 +112,7 @@ import { printExampleWarnings } from '../../../src/ui/scan/printExampleWarnings.
 import { printSecrets } from '../../../src/ui/scan/printSecrets.js';
 import { printExpireWarnings } from '../../../src/ui/scan/printExpireWarnings.js';
 import { printCommentWarnings } from '../../../src/ui/scan/printCommentWarnings.js';
+import { printDriftWarnings } from '../../../src/ui/scan/printDriftWarnings.js';
 import { printConsolelogWarning } from '../../../src/ui/scan/printConsolelogWarning.js';
 import type { SecretFinding } from '../../../src/core/security/secretDetectors.js';
 import type {
@@ -363,6 +368,21 @@ describe('printScanResult', () => {
     );
 
     expect(printCommentWarnings).toHaveBeenCalled();
+  });
+
+  it('prints drift warnings when present', () => {
+    printScanResult(
+      {
+        ...baseScanResult,
+        driftWarnings: [
+          { key: 'DRIFTED', envFile: '.env', exampleFile: '.env.example' },
+        ],
+      },
+      baseOpts,
+      '.env',
+    );
+
+    expect(printDriftWarnings).toHaveBeenCalled();
   });
 
   it('returns exitWithError true when high severity example warning exists', () => {

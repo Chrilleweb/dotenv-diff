@@ -6,6 +6,7 @@ import type {
   ExpireWarning,
   InconsistentNamingWarning,
   CommentWarning,
+  DriftWarning,
   UppercaseWarning,
   FrameworkWarning,
   ExampleSecretWarning,
@@ -55,6 +56,7 @@ interface ScanJsonOutput {
   logged?: EnvUsage[];
   expireWarnings?: ExpireWarning[];
   commentWarnings?: CommentWarning[];
+  driftWarnings?: DriftWarning[];
   uppercaseWarnings?: UppercaseWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
   frameworkWarnings?: FrameworkWarning[];
@@ -205,6 +207,15 @@ export function scanJsonOutput(
     output.commentWarnings = scanResult.commentWarnings.map((w) => ({
       key: w.key,
       line: w.line,
+    }));
+  }
+
+  // Keys in an env file that are missing from the example documenting it
+  if (scanResult.driftWarnings?.length) {
+    output.driftWarnings = scanResult.driftWarnings.map((w) => ({
+      key: w.key,
+      envFile: w.envFile,
+      exampleFile: w.exampleFile,
     }));
   }
 

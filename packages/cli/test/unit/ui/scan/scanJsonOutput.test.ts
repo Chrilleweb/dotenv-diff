@@ -354,6 +354,34 @@ describe('scanJsonOutput', () => {
     expect(result.commentWarnings?.[1]).toEqual({ key: 'SECRET', line: 5 });
   });
 
+  it('includes drift warnings with their file pair', () => {
+    const scanResult = makeScanResult({
+      driftWarnings: [
+        {
+          key: 'STRIPE_SECRET',
+          envFile: '.env.local',
+          exampleFile: '.env.sample',
+        },
+      ],
+    });
+
+    const result = scanJsonOutput(scanResult, '');
+
+    expect(result.driftWarnings).toEqual([
+      {
+        key: 'STRIPE_SECRET',
+        envFile: '.env.local',
+        exampleFile: '.env.sample',
+      },
+    ]);
+  });
+
+  it('omits drift warnings when there are none', () => {
+    const result = scanJsonOutput(makeScanResult({ driftWarnings: [] }), '');
+
+    expect(result.driftWarnings).toBeUndefined();
+  });
+
   it('includes healthScore', () => {
     const scanResult = makeScanResult();
 
