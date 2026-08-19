@@ -58,6 +58,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const expireWarnings = raw.expireWarnings !== false;
   const inconsistentNamingWarnings = raw.inconsistentNamingWarnings !== false;
   const commentWarnings = toBool(raw.commentWarnings);
+  const driftWarnings = raw.driftWarnings !== false;
   const suggest = raw.suggest !== false;
   const listAll = toBool(raw.listAll);
   const explain =
@@ -107,6 +108,7 @@ export function normalizeOptions(raw: RawOptions): Options {
     expireWarnings,
     inconsistentNamingWarnings,
     commentWarnings,
+    driftWarnings,
     listAll,
     explain,
     matrix,

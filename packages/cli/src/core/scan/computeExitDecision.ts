@@ -82,6 +82,7 @@ function hasStrictViolation(
     ) ||
     (scan.inconsistentNamingWarnings?.length ?? 0) > 0 ||
     (scan.commentWarnings?.length ?? 0) > 0 ||
+    (scan.driftWarnings?.length ?? 0) > 0 ||
     !!hasGitignoreIssue
   );
 }

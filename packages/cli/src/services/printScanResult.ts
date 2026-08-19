@@ -24,6 +24,7 @@ import { computeExitDecision } from '../core/scan/computeExitDecision.js';
 import { printHealthScore } from '../ui/scan/printHealthScore.js';
 import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
 import { printCommentWarnings } from '../ui/scan/printCommentWarnings.js';
+import { printDriftWarnings } from '../ui/scan/printDriftWarnings.js';
 import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
 import { printListAll } from '../ui/scan/printListAll.js';
 
@@ -117,6 +118,10 @@ export function printScanResult(
   // Undocumented example keys
   if (scanResult.commentWarnings) {
     printCommentWarnings(scanResult.commentWarnings, opts.strict);
+  }
+  // Keys in an env file that never made it into the example documenting it
+  if (scanResult.driftWarnings) {
+    printDriftWarnings(scanResult.driftWarnings, opts.strict);
   }
   // Gitignore check
   const gitignoreIssue = checkGitignoreStatus({

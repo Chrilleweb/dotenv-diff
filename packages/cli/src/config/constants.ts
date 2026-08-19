@@ -13,6 +13,17 @@ export const DEFAULT_ENV_FILE = '.env';
 export const DEFAULT_EXAMPLE_FILE = '.env.example';
 
 /**
+ * Example/template file names that document required keys, in priority order.
+ * Earlier entries win when a directory contains more than one.
+ */
+export const EXAMPLE_FILE_CANDIDATES = [
+  DEFAULT_EXAMPLE_FILE,
+  '.env-example',
+  '.env.sample',
+  '.env.template',
+] as const;
+
+/**
  * Name of the git directory used to detect repository root.
  */
 export const GIT_DIR = '.git';

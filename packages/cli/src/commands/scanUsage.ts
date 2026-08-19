@@ -128,6 +128,9 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
       if (result.commentWarnings) {
         scanResult.commentWarnings = result.commentWarnings;
       }
+      if (result.driftWarnings) {
+        scanResult.driftWarnings = result.driftWarnings;
+      }
       if (
         result.exampleFull &&
         result.comparedAgainst === DEFAULT_EXAMPLE_FILE
@@ -208,6 +211,7 @@ function calculateStats(scanResult: ScanResult): void {
     (scanResult.expireWarnings?.length ?? 0) +
     (scanResult.inconsistentNamingWarnings?.length ?? 0) +
     (scanResult.commentWarnings?.length ?? 0) +
+    (scanResult.driftWarnings?.length ?? 0) +
     (scanResult.secrets?.length ?? 0) +
     scanResult.missing.length +
     scanResult.unused.length +

@@ -122,6 +122,7 @@ async function runScanMode(opts: Options): Promise<boolean> {
     expireWarnings: opts.expireWarnings,
     inconsistentNamingWarnings: opts.inconsistentNamingWarnings,
     commentWarnings: opts.commentWarnings,
+    driftWarnings: opts.driftWarnings,
     listAll: opts.listAll,
     baseline: opts.baseline,
     suggest: opts.suggest,

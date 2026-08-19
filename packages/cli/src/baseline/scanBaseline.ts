@@ -133,6 +133,11 @@ export function collectBaselineEntries(
     entries.push({ rule: 'comment', key: warning.key });
   }
 
+  // key + env file: the same key can drift in more than one env file
+  for (const warning of scanResult.driftWarnings ?? []) {
+    entries.push({ rule: 'drift', key: warning.key, file: warning.envFile });
+  }
+
   // Sort the key pair so the entry is identical regardless of scanner order
   for (const warning of scanResult.inconsistentNamingWarnings ?? []) {
     const pair = [warning.key1, warning.key2].sort().join('|');
@@ -212,6 +217,11 @@ export function applyBaselineEntries(
     ...(scanResult.commentWarnings != null && {
       commentWarnings: scanResult.commentWarnings.filter(
         (w) => !has('comment', w.key),
+      ),
+    }),
+    ...(scanResult.driftWarnings != null && {
+      driftWarnings: scanResult.driftWarnings.filter(
+        (w) => !has('drift', w.key, w.envFile),
       ),
     }),
   };

@@ -49,6 +49,7 @@ CLI flags always take precedence over configuration file values.
 - [--inconsistent-naming-warnings](#--inconsistent-naming-warnings)
 - [--no-inconsistent-naming-warnings](#--no-inconsistent-naming-warnings)
 - [--comment-warnings](#--comment-warnings)
+- [--no-drift-warnings](#--no-drift-warnings)
 - [--suggest](#--suggest)
 - [--no-suggest](#--no-suggest)
 
@@ -862,6 +863,45 @@ Usage in the configuration file:
 ```
 
 See [Comment Warnings](./comment_warnings.md) for more details.
+
+### `--no-drift-warnings`
+
+Disable drift warnings between your `.env` and `.env.example` (enabled by default).
+
+A scan compares your code against a single file — so without this check the example file is never held up against the values you actually run with. Drift warnings close that gap: any key set in an env file but **missing from the example that documents it** is reported.
+
+```dotenv
+# .env
+DATABASE_URL=postgres://localhost
+STRIPE_SECRET=sk_test_123     # ✗ reported (not in .env.example)
+
+# .env.example
+DATABASE_URL=
+```
+
+The check is one-directional on purpose: keys documented in the example but not set locally are normal during development, and [`--compare`](#--compare) already reports them. Keys marked [`@optional`](./optional_keys.md) in the env file are skipped.
+
+The env file checked is the one the scan compared against, so use [`--env`](#--env-file) to target another. The exception is a scan that fell through to comparing against `.env.example` itself (no `.env` present): the env file beside it is used, so `.env.local` is still checked.
+
+The pair is resolved with the same suffix convention as `--compare` (`.env.production` → `.env.example.production`, falling back to `.env.example`). Any accepted example name works, so `.env.local` against `.env.sample` pairs up too.
+
+Drift keys are listed in the console output and in JSON (`driftWarnings`, each carrying `envFile` and `exampleFile`). They count toward the [health score](./capabilities.md), can be suppressed with a [baseline](./baseline.md) (`drift` rule), respect [`--ignore`](#--ignore-keys), and cause a non-zero exit under [`--strict`](#--strict).
+
+Example usage:
+
+```bash
+dotenv-diff --no-drift-warnings
+```
+
+Usage in the configuration file:
+
+```json
+{
+  "driftWarnings": false
+}
+```
+
+See [Drift Warnings](./drift_warnings.md) for more details.
 
 ### `--suggest`
 
