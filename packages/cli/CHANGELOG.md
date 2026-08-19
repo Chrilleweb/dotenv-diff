@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.3.0
+
+### Minor Changes
+
+- 676fbae: add drift warnings
+
+### Patch Changes
+
+- bbee137: add gitignore issues to --json
+- bbee137: fixed gitignore warning bug
+
 ## 3.2.1
 
 ### Patch Changes
