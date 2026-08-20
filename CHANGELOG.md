@@ -1,5 +1,23 @@
 # Changelog
 
+<!-- changesets: drift-warnings.md,five-mirrors-marry.md,goofy-stamps-cross.md -->
+## 2026-08-19
+
+### Highlights
+- add drift warnings
+- add gitignore issues to --json
+- fixed gitignore warning bug
+
+### Package Releases
+- dotenv-diff: minor
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | minor
+dotenv-diff | patch
+
 <!-- changesets: thick-results-repair.md -->
 ## 2026-08-11
 
