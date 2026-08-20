@@ -4,27 +4,19 @@ import {
 } from './secretDetectors.js';
 import { shannonEntropyNormalized } from './entropy.js';
 import type { ExampleSecretWarning } from '../../config/types.js';
-import { DEFAULT_EXAMPLE_FILE } from '../../config/constants.js';
-
-/**
- * Minimum value length before the entropy check is worth running.
- * Deliberately lower than the code scanner's 32: an example file should hold
- * placeholders, so a shorter real-looking value is already suspicious there.
- */
-const MIN_ENTROPY_LENGTH = 24;
-
-/**
- * Normalized entropy above which a value is treated as a real secret.
- * Also stricter than the code scanner's 0.85, for the same reason.
- */
-const ENTROPY_THRESHOLD = 0.8;
+import {
+  DEFAULT_EXAMPLE_FILE,
+  MIN_ENTROPY_LENGTH,
+  ENTROPY_THRESHOLD,
+} from '../../config/constants.js';
 
 /**
  * Detects potential secrets in an example file.
  *
- * Messages and severity come from the same rules as the code secret scanner, so
- * a value reads and ranks the same whether it was found in source or in an
- * example file. Only the thresholds for flagging at all are stricter here.
+ * Thresholds, messages and severity all come from the same rules as the code
+ * secret scanner, so a value is flagged, worded and ranked identically whether
+ * it was found in source or in an example file. Only the shape of the input
+ * differs: parsed key-value pairs here, raw source lines there.
  * @param env - An object representing the example file (key-value pairs).
  * @param file - Basename of the example file, for the report.
  * @returns An array of warnings about potential secrets.

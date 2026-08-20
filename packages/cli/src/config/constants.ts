@@ -116,3 +116,26 @@ export const MAX_TYPO_DISTANCE = 2;
  * (e.g. a 3-character key is not matched against a completely different 3-character key).
  */
 export const MAX_TYPO_RATIO = 0.34;
+
+/**
+ * Minimum length before a value is long enough to run the entropy check on.
+ *
+ * Shared by the source scanner and the example file scanner so the same value
+ * is judged identically wherever it appears.
+ */
+export const MIN_ENTROPY_LENGTH = 24;
+
+/**
+ * Normalized Shannon entropy above which a value is treated as a real secret
+ * rather than a placeholder. Shared by both scanners, as above.
+ *
+ * Files that look like tests use a higher bar instead — fixtures are full of
+ * random-looking strings that are not secrets.
+ */
+export const ENTROPY_THRESHOLD = 0.85;
+
+/**
+ * Length at or above which an entropy finding is high severity rather than
+ * medium. High-severity secrets fail the run on their own.
+ */
+export const HIGH_ENTROPY_LENGTH = 48;

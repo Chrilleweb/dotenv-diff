@@ -1,5 +1,10 @@
 import { shannonEntropyNormalized } from './entropy.js';
 import { isLikelyMinified } from '../helpers/isLikelyMinified.js';
+import {
+  MIN_ENTROPY_LENGTH,
+  ENTROPY_THRESHOLD,
+  HIGH_ENTROPY_LENGTH,
+} from '../../config/constants.js';
 
 /**
  * Severity levels for detected secrets
@@ -41,8 +46,12 @@ export const PROVIDER_PATTERNS: RegExp[] = [
   /\bAC[0-9a-fA-F]{32}\b/, // Twilio Account SID
 ];
 
-// Regex for detecting long literals — only 32+ chars are worth scrutinizing,
-const LONG_LITERAL = /["'`]([A-Za-z0-9+/_\-]{32,})["'`]/g;
+// Regex for detecting long literals worth scrutinizing. Built from the shared
+// MIN_ENTROPY_LENGTH so source and example files agree on what counts as long.
+const LONG_LITERAL = new RegExp(
+  `["'\`]([A-Za-z0-9+/_\\-]{${MIN_ENTROPY_LENGTH},})["'\`]`,
+  'g',
+);
 
 // Regex for detecting HTTPS URLs
 const HTTPS_PATTERN = /["'`](https:\/\/(?!localhost)[^"'`]*)["'`]/g;
@@ -93,18 +102,19 @@ function isHtmlTextNode(line: string): boolean {
  *
  * Shared with the example file scanner so the same value is never ranked
  * differently depending on which file it was found in.
+ * Assumes the caller already filtered on {@link MIN_ENTROPY_LENGTH}.
  * @param literalLength The length of the literal string
  * @returns The severity level of the secret finding
  */
 export function determineEntropySeverity(
   literalLength: number,
 ): SecretSeverity {
-  // HIGH: Very high-entropy long strings (48+ chars)
-  if (literalLength >= 48) {
+  // HIGH: long enough that a real key is the likeliest explanation
+  if (literalLength >= HIGH_ENTROPY_LENGTH) {
     return 'high';
   }
 
-  // MEDIUM: Medium high-entropy strings (32-47 chars)
+  // MEDIUM: MIN_ENTROPY_LENGTH up to HIGH_ENTROPY_LENGTH - 1
   return 'medium';
 }
 
@@ -344,9 +354,6 @@ function looksLikeSecretValue(v: string): boolean {
   );
 }
 
-// Threshold is the value between 0 and 1 that determines the sensitivity of the detection.
-const DEFAULT_SECRET_THRESHOLD = 0.85 as const;
-
 // Maximum length of the source line stored on each finding's `snippet`.
 const SNIPPET_MAX_LENGTH = 180 as const;
 
@@ -372,7 +379,7 @@ export function detectSecretsInSource(
   source: string,
   opts?: { ignoreUrls?: string[] },
 ): SecretFinding[] {
-  const threshold = isProbablyTestPath(file) ? 0.95 : DEFAULT_SECRET_THRESHOLD;
+  const threshold = isProbablyTestPath(file) ? 0.95 : ENTROPY_THRESHOLD;
 
   const findings: SecretFinding[] = [];
   const lines = source.split(/\r?\n/);

@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { detectSecretsInExample } from '../../../../src/core/security/exampleSecretDetector.js';
 import { detectSecretsInSource } from '../../../../src/core/security/secretDetectors.js';
+import {
+  MIN_ENTROPY_LENGTH,
+  HIGH_ENTROPY_LENGTH,
+} from '../../../../src/config/constants.js';
 
 describe('detectSecretsInExample', () => {
   it('skips empty and placeholder values', () => {
@@ -33,8 +37,11 @@ describe('detectSecretsInExample', () => {
   });
 
   it('ranks a value shorter than 48 chars as medium severity', () => {
+    // 43 distinct characters. Entropy is normalized by log2(72), so a value has
+    // to be both long and near-fully distinct to clear ENTROPY_THRESHOLD while
+    // staying under HIGH_ENTROPY_LENGTH — the medium band is a narrow window.
     const env = {
-      RANDOM_VALUE: 'xA9fQ2LmZ7R8KpT3EwC0yD6nH1S5UOq4VJb', // 35 chars, entropy > 0.8
+      RANDOM_VALUE: 'q7Zm2Kx9Bv4Nc8Ld1Rt6Yw3Hs0Jp5Fg+Ae/Uk_Mi-Co',
     };
 
     const warnings = detectSecretsInExample(env);
@@ -97,9 +104,32 @@ describe('detectSecretsInExample', () => {
   });
 
   describe('parity with the code secret scanner', () => {
-    // The same value must read and rank the same in both reports. These ran on
-    // separate severity rules once — length in source, entropy in the example —
-    // so an identical string was a red error in code and a yellow warning here.
+    /** A value long enough to check, at each side of the severity boundary. */
+    const atLength = (len: number): string =>
+      'Xy9Pq2Wz8Rt4Lm6Ks0Hv3Jn7Bp1Df5Cg9Ea2Ub6Tx4Sy8Rw3Qu7Pv0Nz5My1Lx9Kw'.slice(
+        0,
+        len,
+      );
+
+    // Both scanners read MIN_ENTROPY_LENGTH / ENTROPY_THRESHOLD from constants,
+    // so a value must be flagged — or not — the same way on both sides. They
+    // ran on separate thresholds and separate severity rules once.
+    it.each([
+      [MIN_ENTROPY_LENGTH - 1, 'below the minimum length'],
+      [MIN_ENTROPY_LENGTH, 'at the minimum length'],
+      [HIGH_ENTROPY_LENGTH - 1, 'just below the high-severity length'],
+      [HIGH_ENTROPY_LENGTH, 'at the high-severity length'],
+    ])('agrees at length %i (%s)', (len) => {
+      const value = atLength(len);
+
+      const inExample = detectSecretsInExample({ KEY: value });
+      const inCode = detectSecretsInSource('app.ts', `const key = "${value}";`);
+
+      expect(inExample).toHaveLength(inCode.length);
+      expect(inExample[0]?.severity).toBe(inCode[0]?.severity);
+      expect(inExample[0]?.message).toBe(inCode[0]?.message);
+    });
+
     it.each([
       [
         'Xy9Pq2Wz8Rt4Lm6Ks0Hv3Jn7Bp1Df5Cg9Ea2Ub6Tx4Sy8Rw3Qu7Pv0Nz5My1Lx9Kw2Jv6Iu4Ht0Gs8Fr3Eq7Dp1Co5Bn9Am',
