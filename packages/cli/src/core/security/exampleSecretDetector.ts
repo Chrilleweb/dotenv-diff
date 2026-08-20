@@ -1,14 +1,29 @@
-import { PROVIDER_PATTERNS } from './secretDetectors.js';
+import {
+  PROVIDER_PATTERNS,
+  determineEntropySeverity,
+} from './secretDetectors.js';
 import { shannonEntropyNormalized } from './entropy.js';
 import type { ExampleSecretWarning } from '../../config/types.js';
+import {
+  DEFAULT_EXAMPLE_FILE,
+  MIN_ENTROPY_LENGTH,
+  ENTROPY_THRESHOLD,
+} from '../../config/constants.js';
 
 /**
- * Detects potential secrets in a .env.example file.
- * @param env - An object representing the `.env.example` file (key-value pairs).
+ * Detects potential secrets in an example file.
+ *
+ * Thresholds, messages and severity all come from the same rules as the code
+ * secret scanner, so a value is flagged, worded and ranked identically whether
+ * it was found in source or in an example file. Only the shape of the input
+ * differs: parsed key-value pairs here, raw source lines there.
+ * @param env - An object representing the example file (key-value pairs).
+ * @param file - Basename of the example file, for the report.
  * @returns An array of warnings about potential secrets.
  */
 export function detectSecretsInExample(
   env: Record<string, string>,
+  file: string = DEFAULT_EXAMPLE_FILE,
 ): ExampleSecretWarning[] {
   const warnings: ExampleSecretWarning[] = [];
 
@@ -39,7 +54,8 @@ export function detectSecretsInExample(
         warnings.push({
           key,
           value,
-          reason: 'Pattern',
+          file,
+          message: 'matches known provider key pattern',
           severity: 'high',
         });
         matchedPattern = true;
@@ -49,14 +65,15 @@ export function detectSecretsInExample(
     if (matchedPattern) continue;
 
     // 3 — Check entropy (high randomness → real secret)
-    if (value.length >= 24) {
+    if (value.length >= MIN_ENTROPY_LENGTH) {
       const entropy = shannonEntropyNormalized(value);
-      if (entropy > 0.8) {
+      if (entropy > ENTROPY_THRESHOLD) {
         warnings.push({
           key,
           value,
-          reason: 'Entropy',
-          severity: entropy > 0.92 ? 'high' : 'medium',
+          file,
+          message: `found high-entropy string (len ${value.length}, H≈${entropy.toFixed(2)})`,
+          severity: determineEntropySeverity(value.length),
         });
       }
     }

@@ -88,7 +88,6 @@ describe('scanJsonOutput', () => {
           message: 'secret',
           snippet: 'ABC',
           severity: 'high',
-          kind: 'pattern',
         },
       ],
     });
@@ -291,7 +290,8 @@ describe('scanJsonOutput', () => {
         {
           key: 'DB_PASSWORD',
           value: 'password123',
-          reason: 'Contains common password pattern',
+          file: '.env.example',
+          message: 'Contains common password pattern',
           severity: 'high',
         },
       ],
@@ -303,7 +303,8 @@ describe('scanJsonOutput', () => {
     expect(result.exampleWarnings?.[0]).toEqual({
       key: 'DB_PASSWORD',
       value: 'password123',
-      reason: 'Contains common password pattern',
+      file: '.env.example',
+      message: 'Contains common password pattern',
       severity: 'high',
     });
   });

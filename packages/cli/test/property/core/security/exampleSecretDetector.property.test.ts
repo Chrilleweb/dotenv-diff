@@ -47,7 +47,10 @@ describe('detectSecretsInExample (property-based)', () => {
         const keys = new Set(Object.keys(input));
         for (const w of warnings) {
           expect(keys.has(w.key)).toBe(true);
-          expect(['Pattern', 'Entropy']).toContain(w.reason);
+          // Messages mirror the code secret scanner's wording.
+          expect(w.message).toMatch(
+            /^(matches known provider key pattern|found high-entropy string \(len \d+, H≈\d\.\d{2}\))$/,
+          );
           expect(['high', 'medium']).toContain(w.severity);
           // The stored value is the trimmed raw value.
           expect(w.value).toBe(String(input[w.key]).trim());

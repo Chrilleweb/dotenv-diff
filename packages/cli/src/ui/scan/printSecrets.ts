@@ -45,7 +45,12 @@ export function printSecrets(
     (a, b) => severityOrder[a.severity] - severityOrder[b.severity],
   );
 
-  const indicator = strict ? error('▸') : warning('▸');
+  // A high-severity secret fails the run on its own, so the heading is an error
+  // even without --strict. Matches how the example secret report escalates.
+  const indicator =
+    strict || secrets.some((s) => s.severity === 'high')
+      ? error('▸')
+      : warning('▸');
 
   console.log();
   console.log(`${indicator} ${header('Potential secrets detected')}`);

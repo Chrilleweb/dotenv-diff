@@ -47,7 +47,6 @@ describe('printSecrets', () => {
       {
         file: '/a.ts',
         line: 5,
-        kind: 'pattern',
         message: 'Low issue',
         snippet: 'low snippet',
         severity: 'low',
@@ -55,7 +54,6 @@ describe('printSecrets', () => {
       {
         file: '/a.ts',
         line: 1,
-        kind: 'entropy',
         message: 'High issue',
         snippet: 'high snippet',
         severity: 'high',
@@ -63,7 +61,6 @@ describe('printSecrets', () => {
       {
         file: '/b.ts',
         line: 2,
-        kind: 'pattern',
         message: 'Medium issue',
         snippet: 'medium snippet',
         severity: 'medium',
@@ -91,7 +88,6 @@ describe('printSecrets', () => {
       {
         file: '/x.ts',
         line: 1,
-        kind: 'pattern',
         message: 'Weird issue',
         snippet: 'weird snippet',
         severity: 'strange' as SecretSeverity, // force default branch
@@ -112,7 +108,6 @@ describe('printSecrets', () => {
       {
         file: '/reason.ts',
         line: 11,
-        kind: 'pattern',
         message: 'matches known provider key pattern',
         snippet: 'const key = "..."',
         severity: 'high',
@@ -133,7 +128,6 @@ describe('printSecrets', () => {
       {
         file: '/strict.ts',
         line: 3,
-        kind: 'pattern',
         message: 'Strict issue',
         snippet: 'strict snippet',
         severity: 'high',

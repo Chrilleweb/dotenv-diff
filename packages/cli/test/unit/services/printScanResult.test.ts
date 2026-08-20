@@ -171,7 +171,6 @@ describe('printScanResult', () => {
     const secret: SecretFinding = {
       file: 'test.ts',
       line: 1,
-      kind: 'pattern',
       message: 'test',
       snippet: 'test',
       severity: 'high',
@@ -303,7 +302,8 @@ describe('printScanResult', () => {
     const warning: ExampleSecretWarning = {
       key: 'SECRET_VAR',
       value: 'suspicious_value',
-      reason: 'Entropy',
+      message: 'Entropy',
+      file: '.env.example',
       severity: 'low',
     };
     printScanResult(
@@ -322,7 +322,6 @@ describe('printScanResult', () => {
     const secret: SecretFinding = {
       file: 'test.ts',
       line: 1,
-      kind: 'pattern',
       message: 'test',
       snippet: 'test',
       severity: 'low',
@@ -389,7 +388,8 @@ describe('printScanResult', () => {
     const warning: ExampleSecretWarning = {
       key: 'DB_PASSWORD',
       value: 'password123',
-      reason: 'Pattern',
+      message: 'Pattern',
+      file: '.env.example',
       severity: 'high',
     };
     const result = printScanResult(

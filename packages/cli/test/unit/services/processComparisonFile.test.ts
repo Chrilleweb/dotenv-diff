@@ -115,6 +115,9 @@ describe('processComparisonFile', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(resolveFromCwd).mockImplementation((_, p) => p);
+    // clearAllMocks keeps implementations, so restore the default explicitly —
+    // a test that stubs existsSync would otherwise leak into the next one.
+    vi.mocked(fs.existsSync).mockReturnValue(true);
   });
 
   it('processes normally without fix', () => {
@@ -167,8 +170,8 @@ describe('processComparisonFile', () => {
   });
 
   it('falls back to the default example file and skips when it does not exist', () => {
-    // examplePath undefined → resolves DEFAULT_EXAMPLE_FILE; existsSync false → no detection.
-    vi.mocked(fs.existsSync).mockReturnValueOnce(false);
+    // examplePath undefined → resolves DEFAULT_EXAMPLE_FILE; nothing on disk → no detection.
+    vi.mocked(fs.existsSync).mockReturnValue(false);
     const result = processComparisonFile(baseScanResult, compareFile, {
       ...baseOpts,
       examplePath: undefined,
@@ -176,6 +179,7 @@ describe('processComparisonFile', () => {
     });
 
     expect(result.commentWarnings).toEqual([]);
+    expect(result.exampleFull).toBeUndefined();
   });
 
   it('does not report a key marked @optional in the example file as missing', () => {
@@ -305,13 +309,15 @@ describe('processComparisonFile', () => {
     expect(result.error?.shouldExit).toBe(true);
   });
 
-  it('works without examplePath option', () => {
+  it('resolves the example file even without the examplePath option', () => {
+    // The example beside the comparison file is loaded regardless of --example,
+    // so the checks that read it are not silently off without the flag.
     const opts: ScanUsageOptions = { ...baseOpts, examplePath: undefined };
 
     const result = processComparisonFile(baseScanResult, compareFile, opts);
 
     expect(result.error).toBeUndefined();
-    expect(result.exampleFull).toBeUndefined();
+    expect(result.exampleFull).toEqual({ A: '1', bKey: '2' });
   });
 
   it('skips example duplicate check when examplePath equals compareFile path', async () => {

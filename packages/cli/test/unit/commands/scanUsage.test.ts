@@ -57,7 +57,8 @@ vi.mock('../../../src/core/security/exampleSecretDetector.js', () => ({
     {
       key: 'SECRET',
       value: '123',
-      reason: 'hardcoded',
+      file: '.env.example',
+      message: 'hardcoded',
       severity: 'high',
     },
   ]),
@@ -100,7 +101,6 @@ describe('scanUsage', () => {
   const dummySecret: SecretFinding = {
     file: 'file.ts',
     line: 1,
-    kind: 'pattern',
     message: 'secret found',
     snippet: 'SECRET=123',
     severity: 'high',
@@ -264,7 +264,8 @@ describe('scanUsage', () => {
         {
           key: 'EXAMPLE_KEY',
           value: 'placeholder-but-flagged',
-          reason: 'Entropy',
+          message: 'Entropy',
+          file: '.env.example',
           severity: 'medium',
         },
       ],
@@ -524,10 +525,15 @@ describe('scanUsage', () => {
 
     const { detectSecretsInExample } =
       await import('../../../src/core/security/exampleSecretDetector.js');
-    expect(detectSecretsInExample).toHaveBeenCalledWith({ SECRET: 'abc123' });
+    expect(detectSecretsInExample).toHaveBeenCalledWith(
+      { SECRET: 'abc123' },
+      undefined,
+    );
   });
 
-  it('does not set exampleWarnings when comparedAgainst is not the default example file', async () => {
+  it('scans the example for secrets even when comparing against .env', async () => {
+    // An example committed with a real secret is dangerous whether or not the
+    // scan happens to compare against it.
     vi.mocked(determineComparisonFile).mockResolvedValue({
       type: 'found',
       file: { path: '/env/.env', name: '.env' },
@@ -540,6 +546,37 @@ describe('scanUsage', () => {
       dupsEnv: [],
       dupsEx: [],
       exampleFull: { SECRET: 'abc123' },
+      fix: {
+        fixApplied: false,
+        removedDuplicates: [],
+        addedEnv: [],
+        gitignoreUpdated: false,
+      },
+    } as ProcessComparisonResult);
+
+    await scanUsage(baseOpts);
+
+    const { detectSecretsInExample } =
+      await import('../../../src/core/security/exampleSecretDetector.js');
+    expect(detectSecretsInExample).toHaveBeenCalledWith(
+      { SECRET: 'abc123' },
+      undefined,
+    );
+  });
+
+  it('does not set exampleWarnings when no example file was found', async () => {
+    vi.mocked(determineComparisonFile).mockResolvedValue({
+      type: 'found',
+      file: { path: '/env/.env', name: '.env' },
+    });
+    vi.mocked(processComparisonFile).mockReturnValue({
+      scanResult: { ...baseScanResult },
+      comparedAgainst: '.env',
+      envVariables: {},
+      duplicatesFound: false,
+      dupsEnv: [],
+      dupsEx: [],
+      exampleFull: undefined,
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -653,7 +690,6 @@ describe('scanUsage', () => {
           {
             file: 'f.ts',
             line: 1,
-            kind: 'pattern',
             message: 'x',
             snippet: 'y',
             severity: 'low',
@@ -832,7 +868,13 @@ describe('scanUsage', () => {
     vi.mocked(scanCodebase).mockResolvedValue({
       ...baseScanResult,
       exampleWarnings: [
-        { key: 'SECRET', value: 'abc', reason: 'Entropy', severity: 'low' },
+        {
+          key: 'SECRET',
+          value: 'abc',
+          file: '.env.example',
+          message: 'Entropy',
+          severity: 'low',
+        },
       ],
     } as ScanResult);
 

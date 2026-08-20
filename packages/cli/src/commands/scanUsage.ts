@@ -16,7 +16,6 @@ import { printComparisonError } from '../ui/scan/printComparisonError.js';
 import { skipCommentedUsages } from '../core/scan/skipCommentedUsages.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
-import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import { checkGitignoreStatus } from '../services/git.js';
 import { promptNoEnvScenario } from './prompts/promptNoEnvScenario.js';
 import {
@@ -131,11 +130,11 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
       if (result.driftWarnings) {
         scanResult.driftWarnings = result.driftWarnings;
       }
-      if (
-        result.exampleFull &&
-        result.comparedAgainst === DEFAULT_EXAMPLE_FILE
-      ) {
-        scanResult.exampleWarnings = detectSecretsInExample(result.exampleFull);
+      if (result.exampleFull) {
+        scanResult.exampleWarnings = detectSecretsInExample(
+          result.exampleFull,
+          result.exampleFile,
+        );
       }
     }
   }

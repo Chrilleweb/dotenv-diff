@@ -42,7 +42,6 @@ describe('secretDetectors (property-based)', () => {
         for (const f of findings) {
           expect(f.line).toBeGreaterThanOrEqual(1);
           expect(f.line).toBeLessThanOrEqual(lineCount);
-          expect(['pattern', 'entropy']).toContain(f.kind);
           expect(['low', 'medium', 'high']).toContain(f.severity);
           expect(f.snippet.length).toBeLessThanOrEqual(180);
         }

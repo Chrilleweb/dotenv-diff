@@ -92,7 +92,7 @@ Potential secrets and sensitive values, including high-risk patterns. See [Secur
 
 ### 5 Example File Secret Warnings
 
-Potential secrets found in `.env.example` content. See the [Example File Scanning](./security_scanner.md#example-file-scanning) section of the Security Scanner docs.
+Potential secrets in your example file — the one place a credential is visible to everyone who clones the repo. Runs on every scan, against whichever example file documents the file being scanned (`.env.example`, `.env.sample`, `.env.template`, …), and reports with the same wording and severity as the source scan. See the [Example File Scanning](./security_scanner.md#example-file-scanning) section of the Security Scanner docs.
 
 ### 6 Framework-Specific Misuse
 

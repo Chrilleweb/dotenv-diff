@@ -350,7 +350,6 @@ describe('scanCodebase', () => {
           line: 1,
           severity: 'low',
           message: 'Low severity secret',
-          kind: 'pattern',
           snippet: 'const key = "secret123";',
         },
         {
@@ -358,7 +357,6 @@ describe('scanCodebase', () => {
           line: 2,
           severity: 'high',
           message: 'High severity secret',
-          kind: 'pattern',
           snippet: 'const key = "secret456";',
         },
       ]);

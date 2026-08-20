@@ -3,7 +3,15 @@ import {
   detectSecretsInSource,
   hasIgnoreComment,
 } from '../../../../src/core/security/secretDetectors.js';
+import type { SecretFinding } from '../../../../src/core/security/secretDetectors.js';
 import { shannonEntropyNormalized } from '../../../../src/core/security/entropy.js';
+
+/**
+ * Findings no longer carry a kind, so the entropy rule is identified by the
+ * message it produces — the only thing that distinguishes it in the output.
+ */
+const isEntropyFinding = (finding: SecretFinding): boolean =>
+  finding.message.includes('found high-entropy string');
 
 describe('secretDetectors', () => {
   describe('hasIgnoreComment', () => {
@@ -43,7 +51,6 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0]!.kind).toBe('pattern');
       expect(findings[0]!.severity).toBe('high');
       expect(findings[0]!.message).toContain('known provider key pattern');
     });
@@ -115,7 +122,6 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings).toHaveLength(1);
-      expect(findings[0]!.kind).toBe('pattern');
       expect(findings[0]!.severity).toBe('medium');
       expect(findings[0]!.message).toContain('password/secret/token-like');
     });
@@ -134,7 +140,7 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
 
       expect(findings.length).toBeGreaterThan(0);
-      const entropyFinding = findings.find((f) => f.kind === 'entropy');
+      const entropyFinding = findings.find(isEntropyFinding);
       if (entropyFinding) {
         expect(entropyFinding.severity).toBe('high');
       }
@@ -151,7 +157,7 @@ describe('secretDetectors', () => {
       const findings = detectSecretsInSource('test.ts', source);
       console.log('Findings:', findings);
 
-      const entropyFinding = findings.find((f) => f.kind === 'entropy');
+      const entropyFinding = findings.find(isEntropyFinding);
       expect(entropyFinding).toBeDefined();
       expect(entropyFinding?.severity).toBe('medium');
       expect(entropyFinding?.message).toContain('found high-entropy string');
@@ -451,7 +457,7 @@ const token = "AKIAIOSFODNN7EXAMPLE";
     it('upgrades severity from medium to high when same line matches both suspicious key and provider pattern', () => {
       // "token" triggers SUSPICIOUS_KEYS (medium) first, JWT value triggers PROVIDER_PATTERNS (high) second.
       // JWT is not caught by looksHarmlessLiteral (contains dots, too long for short-base64, no sequential runs).
-      // Both produce kind:'pattern' with the same snippet → dedup upgrade path (lines 418-419) is exercised.
+      // Both land on the same line with the same snippet → dedup upgrade path is exercised.
       const source =
         'const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";';
       const findings = detectSecretsInSource('src/auth.ts', source);
@@ -471,7 +477,7 @@ const token = "AKIAIOSFODNN7EXAMPLE";
     });
 
     it('does not upgrade when two provider patterns fire on the same line (equal severity, line 418 false branch)', () => {
-      // Two PROVIDER_PATTERNS both produce kind:'pattern', severity:'high' on the same line.
+      // Two PROVIDER_PATTERNS both produce severity:'high' on the same line.
       // Dedup key is identical for both → second finding: severityRank[high] > severityRank[high] = false → no upgrade.
       const source =
         "const x = 'AKIAJLDFBMHXJKQYRSLP', y = 'ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZabcde';";
@@ -779,13 +785,16 @@ const email = "user@example.com";
       });
 
       it('should still detect a real high-entropy secret that is not a charset', () => {
-        // Looks like a real token — no sequential runs, no large unique set structure
+        // Looks like a real token — no sequential runs, no large unique set
+        // structure. The variable is deliberately named `value`: a suspicious
+        // name would raise a pattern finding on the same line, which dedup
+        // keeps in place of the entropy one and would hide what is under test.
         const source =
-          'const token = "xK9mQwP2zLsR8tYu5nV7cJ4hFgD6eS1iO0pA3bC";';
+          'const value = "xK9mQwP2zLsR8tYu5nV7cJ4hFgD6eS1iO0pA3bC";';
         const findings = detectSecretsInSource('test.ts', source);
         // Should still be flagged as entropy finding
         expect(findings.length).toBeGreaterThan(0);
-        expect(findings.some((f) => f.kind === 'entropy')).toBe(true);
+        expect(findings.some(isEntropyFinding)).toBe(true);
       });
 
       it('should still detect AWS key even if it superficially resembles an alphabet', () => {

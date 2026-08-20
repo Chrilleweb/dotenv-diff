@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import { parseEnvFile } from './parseEnvFile.js';
 import { filterIgnoredKeys } from '../core/helpers/filterIgnoredKeys.js';
 import { compareWithEnvFiles } from '../core/scan/compareScan.js';
@@ -12,6 +13,7 @@ import { detectInconsistentNaming } from '../core/detectInconsistentNaming.js';
 import { detectMissingComments } from './detectMissingComments.js';
 import { detectOptionalKeys } from './detectOptionalKeys.js';
 import { detectExampleDrift } from './detectExampleDrift.js';
+import { resolveExampleFile } from './resolveExampleFile.js';
 import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import type {
   ScanUsageOptions,
@@ -39,6 +41,8 @@ export interface ProcessComparisonResult {
   dupsEx: Duplicate[];
   fix: FixContext;
   exampleFull?: Record<string, string> | undefined;
+  /** Basename of the example file `exampleFull` was read from. */
+  exampleFile?: string | undefined;
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
@@ -65,6 +69,7 @@ export function processComparisonFile(
   let dupsEnv: Duplicate[] = [];
   let dupsEx: Duplicate[] = [];
   let exampleFull: Record<string, string> | undefined = undefined;
+  let exampleFile: string | undefined = undefined;
   let uppercaseWarnings: UppercaseWarning[] = [];
   let expireWarnings: ExpireWarning[] = [];
   let inconsistentNamingWarnings: InconsistentNamingWarning[] = [];
@@ -79,12 +84,17 @@ export function processComparisonFile(
   };
 
   try {
-    // Load .env.example (if exists)
-    if (opts.examplePath) {
-      const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
-      if (fs.existsSync(examplePath)) {
-        exampleFull = parseEnvFile(examplePath);
-      }
+    // Load the example file that documents the comparison file. Resolved from
+    // the file itself rather than gated on `--example`, so the checks that read
+    // it (secret detection, naming consistency) are not silently off whenever
+    // the flag is omitted — which is the common case.
+    const exampleFilePath = opts.examplePath
+      ? resolveFromCwd(opts.cwd, opts.examplePath)
+      : resolveExampleFile(compareFile.path);
+
+    if (exampleFilePath && fs.existsSync(exampleFilePath)) {
+      exampleFull = parseEnvFile(exampleFilePath);
+      exampleFile = path.basename(exampleFilePath);
     }
 
     // Parse and filter env file
@@ -228,6 +238,7 @@ export function processComparisonFile(
       dupsEx,
       fix,
       exampleFull,
+      exampleFile,
       uppercaseWarnings,
       expireWarnings,
       inconsistentNamingWarnings,
@@ -249,6 +260,7 @@ export function processComparisonFile(
     dupsEx,
     fix,
     exampleFull,
+    exampleFile,
     uppercaseWarnings,
     expireWarnings,
     inconsistentNamingWarnings,
