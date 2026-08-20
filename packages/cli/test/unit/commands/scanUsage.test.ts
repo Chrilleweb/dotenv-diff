@@ -100,7 +100,6 @@ describe('scanUsage', () => {
   const dummySecret: SecretFinding = {
     file: 'file.ts',
     line: 1,
-    kind: 'pattern',
     message: 'secret found',
     snippet: 'SECRET=123',
     severity: 'high',
@@ -653,7 +652,6 @@ describe('scanUsage', () => {
           {
             file: 'f.ts',
             line: 1,
-            kind: 'pattern',
             message: 'x',
             snippet: 'y',
             severity: 'low',

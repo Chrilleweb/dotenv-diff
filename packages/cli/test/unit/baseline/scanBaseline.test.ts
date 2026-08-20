@@ -26,7 +26,6 @@ function makeSecret(file: string, snippet: string): SecretFinding {
     file,
     snippet,
     line: 1,
-    kind: 'pattern',
     message: 'secret',
     severity: 'high',
   };

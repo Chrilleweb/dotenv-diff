@@ -50,7 +50,6 @@ describe('computeExitDecision', () => {
             {
               file: 'a.ts',
               line: 1,
-              kind: 'pattern' as const,
               message: 'm',
               snippet: 's',
               severity,
@@ -100,7 +99,6 @@ describe('computeExitDecision', () => {
             {
               file: 'a.ts',
               line: 1,
-              kind: 'pattern',
               message: 'm',
               snippet: 's',
               severity: 'medium',

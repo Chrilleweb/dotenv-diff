@@ -9,14 +9,18 @@ export type SecretSeverity = 'high' | 'medium' | 'low';
 /**
  * Represents a secret finding in the source code.
  */
-export type SecretFinding = {
+export interface SecretFinding {
+  /** The file in which the secret was found */
   file: string;
+  /** The line number where the secret was found */
   line: number;
-  kind: 'pattern' | 'entropy';
+  /** The message describing the finding */
   message: string;
+  /** The snippet of code where the secret was found */
   snippet: string;
+  /** The severity of the secret finding */
   severity: SecretSeverity;
-};
+}
 
 // Regular expressions for detecting suspicious keys and provider patterns
 export const SUSPICIOUS_KEYS =
@@ -410,7 +414,6 @@ export function detectSecretsInSource(
         findings.push({
           file,
           line: lineNo,
-          kind: 'pattern',
           message:
             'HTTPS URL detected – consider moving to an environment variable',
           snippet: line.trim().slice(0, SNIPPET_MAX_LENGTH),
@@ -454,7 +457,6 @@ export function detectSecretsInSource(
         findings.push({
           file,
           line: lineNo,
-          kind: 'pattern',
           message: 'matches password/secret/token-like literal assignment',
           snippet: line.trim().slice(0, SNIPPET_MAX_LENGTH),
           severity: 'medium',
@@ -468,7 +470,6 @@ export function detectSecretsInSource(
         findings.push({
           file,
           line: lineNo,
-          kind: 'pattern',
           message: 'matches known provider key pattern',
           snippet: line.trim().slice(0, SNIPPET_MAX_LENGTH),
           severity: 'high',
@@ -488,7 +489,6 @@ export function detectSecretsInSource(
         findings.push({
           file,
           line: lineNo,
-          kind: 'entropy',
           message,
           snippet: line.trim().slice(0, SNIPPET_MAX_LENGTH),
           severity: determineEntropySeverity(literal.length),
@@ -505,7 +505,7 @@ export function detectSecretsInSource(
   const deduped = new Map<string, SecretFinding>();
 
   for (const finding of findings) {
-    const key = `${finding.file}|${finding.line}|${finding.snippet}|${finding.kind}`;
+    const key = `${finding.file}|${finding.line}|${finding.snippet}`;
     const existing = deduped.get(key);
 
     if (!existing) {

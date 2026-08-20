@@ -171,7 +171,6 @@ describe('printScanResult', () => {
     const secret: SecretFinding = {
       file: 'test.ts',
       line: 1,
-      kind: 'pattern',
       message: 'test',
       snippet: 'test',
       severity: 'high',
@@ -322,7 +321,6 @@ describe('printScanResult', () => {
     const secret: SecretFinding = {
       file: 'test.ts',
       line: 1,
-      kind: 'pattern',
       message: 'test',
       snippet: 'test',
       severity: 'low',

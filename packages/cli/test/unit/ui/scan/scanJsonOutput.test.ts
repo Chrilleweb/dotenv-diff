@@ -88,7 +88,6 @@ describe('scanJsonOutput', () => {
           message: 'secret',
           snippet: 'ABC',
           severity: 'high',
-          kind: 'pattern',
         },
       ],
     });
