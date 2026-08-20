@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { detectSecretsInExample } from '../../../../src/core/security/exampleSecretDetector.js';
+import { detectSecretsInSource } from '../../../../src/core/security/secretDetectors.js';
 
 describe('detectSecretsInExample', () => {
   it('skips empty and placeholder values', () => {
@@ -27,23 +28,23 @@ describe('detectSecretsInExample', () => {
     expect(warnings).toHaveLength(3);
     for (const warning of warnings) {
       expect(warning.severity).toBe('high');
-      expect(warning.reason).toContain('Pattern');
+      expect(warning.message).toBe('matches known provider key pattern');
     }
   });
 
-  it('detects medium entropy values as medium severity', () => {
+  it('ranks a value shorter than 48 chars as medium severity', () => {
     const env = {
-      RANDOM_VALUE: 'xA9fQ2LmZ7R8KpT3EwC0yD6nH1S5UOq4VJb', // ~36 chars, entropy > 0.8
+      RANDOM_VALUE: 'xA9fQ2LmZ7R8KpT3EwC0yD6nH1S5UOq4VJb', // 35 chars, entropy > 0.8
     };
 
     const warnings = detectSecretsInExample(env);
 
     expect(warnings).toHaveLength(1);
     expect(warnings[0]!.severity).toBe('medium');
-    expect(warnings[0]!.reason).toContain('Entropy');
+    expect(warnings[0]!.message).toContain('found high-entropy string');
   });
 
-  it('detects very high entropy values as high severity', () => {
+  it('ranks a value of 48 chars or more as high severity', () => {
     const env = {
       RANDOM_VALUE:
         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/',
@@ -53,7 +54,23 @@ describe('detectSecretsInExample', () => {
 
     expect(warnings).toHaveLength(1);
     expect(warnings[0]!.severity).toBe('high');
-    expect(warnings[0]!.reason).toContain('Entropy');
+    expect(warnings[0]!.message).toContain('found high-entropy string');
+  });
+
+  it('ranks severity by length, not by how high the entropy is', () => {
+    // Regression: severity used to key off entropy here and off length in the
+    // code scanner, so this value was medium in an example file and high in
+    // source — same string, same message, two different colours.
+    const env = {
+      LONG_BUT_NOT_EXTREME:
+        'Xy9Pq2Wz8Rt4Lm6Ks0Hv3Jn7Bp1Df5Cg9Ea2Ub6Tx4Sy8Rw3Qu7Pv0Nz5My1Lx9Kw2Jv6Iu4Ht0Gs8Fr3Eq7Dp1Co5Bn9Am',
+    };
+
+    const warnings = detectSecretsInExample(env);
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]!.message).toContain('H≈0.89');
+    expect(warnings[0]!.severity).toBe('high');
   });
 
   it('does not flag long low-entropy values', () => {
@@ -77,5 +94,29 @@ describe('detectSecretsInExample', () => {
 
     const warnings = detectSecretsInExample(env);
     expect(warnings).toHaveLength(0);
+  });
+
+  describe('parity with the code secret scanner', () => {
+    // The same value must read and rank the same in both reports. These ran on
+    // separate severity rules once — length in source, entropy in the example —
+    // so an identical string was a red error in code and a yellow warning here.
+    it.each([
+      [
+        'Xy9Pq2Wz8Rt4Lm6Ks0Hv3Jn7Bp1Df5Cg9Ea2Ub6Tx4Sy8Rw3Qu7Pv0Nz5My1Lx9Kw2Jv6Iu4Ht0Gs8Fr3Eq7Dp1Co5Bn9Am',
+        'a long high-entropy value',
+      ],
+      ['sk_live_abcdefghijklmnopqrstuvwx', 'a provider key'],
+    ])('agrees on %#: %s', (value) => {
+      const [inExample] = detectSecretsInExample({ KEY: value });
+      const [inCode] = detectSecretsInSource(
+        'app.ts',
+        `const key = "${value}";`,
+      );
+
+      expect(inExample).toBeDefined();
+      expect(inCode).toBeDefined();
+      expect(inExample!.message).toBe(inCode!.message);
+      expect(inExample!.severity).toBe(inCode!.severity);
+    });
   });
 });

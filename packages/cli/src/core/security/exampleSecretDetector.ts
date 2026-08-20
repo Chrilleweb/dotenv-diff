@@ -1,14 +1,37 @@
-import { PROVIDER_PATTERNS } from './secretDetectors.js';
+import {
+  PROVIDER_PATTERNS,
+  determineEntropySeverity,
+} from './secretDetectors.js';
 import { shannonEntropyNormalized } from './entropy.js';
 import type { ExampleSecretWarning } from '../../config/types.js';
+import { DEFAULT_EXAMPLE_FILE } from '../../config/constants.js';
 
 /**
- * Detects potential secrets in a .env.example file.
- * @param env - An object representing the `.env.example` file (key-value pairs).
+ * Minimum value length before the entropy check is worth running.
+ * Deliberately lower than the code scanner's 32: an example file should hold
+ * placeholders, so a shorter real-looking value is already suspicious there.
+ */
+const MIN_ENTROPY_LENGTH = 24;
+
+/**
+ * Normalized entropy above which a value is treated as a real secret.
+ * Also stricter than the code scanner's 0.85, for the same reason.
+ */
+const ENTROPY_THRESHOLD = 0.8;
+
+/**
+ * Detects potential secrets in an example file.
+ *
+ * Messages and severity come from the same rules as the code secret scanner, so
+ * a value reads and ranks the same whether it was found in source or in an
+ * example file. Only the thresholds for flagging at all are stricter here.
+ * @param env - An object representing the example file (key-value pairs).
+ * @param file - Basename of the example file, for the report.
  * @returns An array of warnings about potential secrets.
  */
 export function detectSecretsInExample(
   env: Record<string, string>,
+  file: string = DEFAULT_EXAMPLE_FILE,
 ): ExampleSecretWarning[] {
   const warnings: ExampleSecretWarning[] = [];
 
@@ -39,7 +62,8 @@ export function detectSecretsInExample(
         warnings.push({
           key,
           value,
-          reason: 'Pattern',
+          file,
+          message: 'matches known provider key pattern',
           severity: 'high',
         });
         matchedPattern = true;
@@ -49,14 +73,15 @@ export function detectSecretsInExample(
     if (matchedPattern) continue;
 
     // 3 — Check entropy (high randomness → real secret)
-    if (value.length >= 24) {
+    if (value.length >= MIN_ENTROPY_LENGTH) {
       const entropy = shannonEntropyNormalized(value);
-      if (entropy > 0.8) {
+      if (entropy > ENTROPY_THRESHOLD) {
         warnings.push({
           key,
           value,
-          reason: 'Entropy',
-          severity: entropy > 0.92 ? 'high' : 'medium',
+          file,
+          message: `found high-entropy string (len ${value.length}, H≈${entropy.toFixed(2)})`,
+          severity: determineEntropySeverity(value.length),
         });
       }
     }

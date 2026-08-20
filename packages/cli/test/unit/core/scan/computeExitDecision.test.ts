@@ -64,7 +64,15 @@ describe('computeExitDecision', () => {
     it('fails on a high severity example secret but not a low one', () => {
       const warning = (severity: 'high' | 'low') =>
         scan({
-          exampleWarnings: [{ key: 'K', value: 'v', reason: 'r', severity }],
+          exampleWarnings: [
+            {
+              key: 'K',
+              value: 'v',
+              file: '.env.example',
+              message: 'r',
+              severity,
+            },
+          ],
         });
 
       expect(computeExitDecision(warning('high')).exitWithError).toBe(true);

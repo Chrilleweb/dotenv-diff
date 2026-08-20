@@ -209,7 +209,8 @@ describe('collectBaselineEntries', () => {
         {
           key: 'DB_PASS',
           value: 'secret',
-          reason: 'pattern',
+          message: 'pattern',
+          file: '.env.example',
           severity: 'high',
         },
       ],
@@ -498,7 +499,13 @@ describe('applyBaselineEntries', () => {
     const result: ScanResult = {
       ...emptyScanResult,
       exampleWarnings: [
-        { key: 'DB_PASS', value: 'x', reason: 'pattern', severity: 'high' },
+        {
+          key: 'DB_PASS',
+          value: 'x',
+          file: '.env.example',
+          message: 'pattern',
+          severity: 'high',
+        },
       ],
     };
     const entries: BaselineEntry[] = [
@@ -698,7 +705,13 @@ describe('applyBaselineEntries', () => {
       ],
       secrets: [makeSecret('f.ts', 'S=x')],
       exampleWarnings: [
-        { key: 'K', value: 'v', reason: 'r', severity: 'medium' },
+        {
+          key: 'K',
+          value: 'v',
+          file: '.env.example',
+          message: 'r',
+          severity: 'medium',
+        },
       ],
       duplicates: {
         env: [{ key: 'D', count: 2 }],

@@ -3,14 +3,11 @@ import path from 'path';
 import type { DriftWarning } from '../config/types.js';
 import { parseEnvFile } from './parseEnvFile.js';
 import { detectOptionalKeys } from './detectOptionalKeys.js';
-import { getSuffix } from './envDiscovery.js';
+import { resolveExampleFile } from './resolveExampleFile.js';
 import { filterIgnoredKeys } from '../core/helpers/filterIgnoredKeys.js';
 import { isExampleFile } from '../core/helpers/isExampleFile.js';
 import { compareCodePoint } from '../core/helpers/compareCodePoint.js';
-import {
-  DEFAULT_ENV_FILE,
-  EXAMPLE_FILE_CANDIDATES,
-} from '../config/constants.js';
+import { DEFAULT_ENV_FILE } from '../config/constants.js';
 
 /**
  * Arguments for {@link detectExampleDrift}.
@@ -65,10 +62,10 @@ export function detectExampleDrift({
   const envFile = resolveEnvFile(dir, path.basename(comparisonPath));
   if (!envFile) return [];
 
-  const examplePath = resolveExampleFile(dir, envFile);
+  const envPath = path.join(dir, envFile);
+  const examplePath = resolveExampleFile(envPath);
   if (!examplePath) return [];
 
-  const envPath = path.join(dir, envFile);
   const optionalKeys = new Set(detectOptionalKeys(envPath));
   const envKeys = filterIgnoredKeys(
     Object.keys(parseEnvFile(envPath)),
@@ -140,32 +137,5 @@ function isEnvFileName(name: string): boolean {
     name === DEFAULT_ENV_FILE ||
     name.startsWith(`${DEFAULT_ENV_FILE}.`) ||
     name.startsWith(`${DEFAULT_ENV_FILE}-`)
-  );
-}
-
-/**
- * Finds the example file that documents a given env file.
- *
- * An environment-suffixed env file prefers the matching suffixed example
- * (`.env.production` → `.env.example.production`), mirroring how `--compare`
- * pairs files, and falls back to the unsuffixed names. Within each group the
- * {@link EXAMPLE_FILE_CANDIDATES} order decides.
- * @param dir - The directory both files live in.
- * @param envFile - Basename of the env file.
- * @returns Absolute path of the first example file that exists, or null.
- */
-function resolveExampleFile(dir: string, envFile: string): string | null {
-  const suffix = getSuffix(envFile, DEFAULT_ENV_FILE);
-
-  const names = suffix
-    ? [
-        ...EXAMPLE_FILE_CANDIDATES.map((name) => `${name}${suffix}`),
-        ...EXAMPLE_FILE_CANDIDATES,
-      ]
-    : EXAMPLE_FILE_CANDIDATES;
-
-  return (
-    names.map((name) => path.join(dir, name)).find((p) => fs.existsSync(p)) ??
-    null
   );
 }

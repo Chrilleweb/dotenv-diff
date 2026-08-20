@@ -302,7 +302,8 @@ describe('printScanResult', () => {
     const warning: ExampleSecretWarning = {
       key: 'SECRET_VAR',
       value: 'suspicious_value',
-      reason: 'Entropy',
+      message: 'Entropy',
+      file: '.env.example',
       severity: 'low',
     };
     printScanResult(
@@ -387,7 +388,8 @@ describe('printScanResult', () => {
     const warning: ExampleSecretWarning = {
       key: 'DB_PASSWORD',
       value: 'password123',
-      reason: 'Pattern',
+      message: 'Pattern',
+      file: '.env.example',
       severity: 'high',
     };
     const result = printScanResult(

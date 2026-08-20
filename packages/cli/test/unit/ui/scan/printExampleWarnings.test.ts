@@ -39,13 +39,15 @@ describe('printExampleWarnings', () => {
       {
         key: 'API_KEY',
         value: '123',
-        reason: 'Looks like a real API key',
+        message: 'Looks like a real API key',
+        file: '.env.example',
         severity: 'high',
       },
       {
         key: 'TOKEN',
         value: 'abc',
-        reason: 'Suspicious token pattern',
+        message: 'Suspicious token pattern',
+        file: '.env.example',
         severity: 'medium',
       },
     ];
@@ -84,7 +86,8 @@ describe('printExampleWarnings', () => {
       {
         key: 'TOKEN',
         value: 'abc',
-        reason: 'Suspicious token pattern',
+        file: '.env.example',
+        message: 'Suspicious token pattern',
         severity: 'medium',
       },
     ];

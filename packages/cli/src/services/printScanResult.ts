@@ -82,10 +82,6 @@ export function printScanResult(
     );
   }
 
-  if (scanResult.exampleWarnings) {
-    printExampleWarnings(scanResult.exampleWarnings, opts.strict);
-  }
-
   // Unused
   if (opts.showUnused ?? true) {
     printUnused(scanResult.unused, comparedAgainst, opts.strict);
@@ -106,6 +102,10 @@ export function printScanResult(
   if (opts.secrets) {
     printSecrets(scanResult.secrets, opts.strict);
   }
+  if (scanResult.exampleWarnings) {
+    printExampleWarnings(scanResult.exampleWarnings, opts.strict);
+  }
+
   // Console log usage warning
   if (scanResult.logged?.length) {
     printConsolelogWarning(scanResult.logged, opts.strict);

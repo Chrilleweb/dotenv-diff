@@ -102,6 +102,16 @@ export function scanJsonOutput(
     }));
   }
 
+  if (scanResult.exampleWarnings?.length) {
+    output.exampleWarnings = scanResult.exampleWarnings.map((w) => ({
+      key: w.key,
+      value: w.value,
+      file: w.file,
+      message: w.message,
+      severity: w.severity,
+    }));
+  }
+
   if (scanResult.missing?.length) {
     const missingSet = new Set(scanResult.missing);
     const usagesByVariable = new Map<string, EnvUsage[]>();
@@ -180,16 +190,6 @@ export function scanJsonOutput(
       column: l.column,
       pattern: l.pattern,
       context: l.context.trim(),
-    }));
-  }
-
-  // Example warnings
-  if (scanResult.exampleWarnings?.length) {
-    output.exampleWarnings = scanResult.exampleWarnings.map((w) => ({
-      key: w.key,
-      value: w.value,
-      reason: w.reason,
-      severity: w.severity,
     }));
   }
 

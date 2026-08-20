@@ -58,6 +58,49 @@ describe('secrets detection (default scan mode)', () => {
     expect(ci.stdout).toContain('▸ Potential secrets detected');
   });
 
+  it('warns about a secret in .env.example without needing --example', () => {
+    // Regression: the example scan used to require an explicit --example, so a
+    // real secret committed in .env.example went unreported in a normal run.
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.gitignore'), '.env\n');
+    fs.writeFileSync(path.join(cwd, '.env'), 'STRIPE_KEY=local\n');
+    fs.writeFileSync(
+      path.join(cwd, '.env.example'),
+      'STRIPE_KEY=sk_live_abcdefghijklmnopqrstuvwx\n',
+    );
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.js'),
+      'export const key = process.env.STRIPE_KEY;\n',
+    );
+
+    const res = runCli(cwd, ['--no-color']);
+    expect(res.stdout).toContain('Potential secrets in .env.example');
+    expect(res.stdout).toContain('STRIPE_KEY');
+  });
+
+  it('finds the example secret under a non-default example name', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.gitignore'), '.env\n');
+    fs.writeFileSync(path.join(cwd, '.env'), 'STRIPE_KEY=local\n');
+    fs.writeFileSync(
+      path.join(cwd, '.env.sample'),
+      'STRIPE_KEY=sk_live_abcdefghijklmnopqrstuvwx\n',
+    );
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.js'),
+      'export const key = process.env.STRIPE_KEY;\n',
+    );
+
+    const res = runCli(cwd, ['--no-color']);
+    // The heading names the file that was actually scanned.
+    expect(res.stdout).toContain('Potential secrets in .env.sample');
+    expect(res.stdout).toContain('STRIPE_KEY');
+  });
+
   it('does not warn when no secrets are present', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=\n');

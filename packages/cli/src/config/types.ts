@@ -190,8 +190,10 @@ export interface ExampleSecretWarning {
   key: string;
   /** The environment variable value */
   value: string;
-  /** The reason for the warning */
-  reason: string;
+  /** What was detected, phrased as in the code secret scanner */
+  message: string;
+  /** Basename of the example file the key was found in */
+  file: string;
   /** The severity of the warning */
   severity: 'high' | 'medium' | 'low';
 }

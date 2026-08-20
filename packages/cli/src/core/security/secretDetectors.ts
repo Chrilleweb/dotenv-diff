@@ -90,11 +90,15 @@ function isHtmlTextNode(line: string): boolean {
 
 /**
  * Determines the severity of an entropy-based secret finding.
- * Note: This function assumes literalLength >= 32 (filtered before calling).
+ *
+ * Shared with the example file scanner so the same value is never ranked
+ * differently depending on which file it was found in.
  * @param literalLength The length of the literal string
  * @returns The severity level of the secret finding
  */
-function determineEntropySeverity(literalLength: number): SecretSeverity {
+export function determineEntropySeverity(
+  literalLength: number,
+): SecretSeverity {
   // HIGH: Very high-entropy long strings (48+ chars)
   if (literalLength >= 48) {
     return 'high';
