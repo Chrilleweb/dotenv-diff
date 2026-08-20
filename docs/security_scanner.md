@@ -1,6 +1,6 @@
 # Security Scanner
 
-`dotenv-diff` scans your source files and `.env.example` for hardcoded secrets using three complementary techniques.
+`dotenv-diff` scans your source files and your example file for hardcoded secrets using three complementary techniques.
 
 ## Table of Contents
 
@@ -57,23 +57,37 @@ Uses [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory
 
 | String length | Entropy threshold | Severity |
 |---|---|---|
-| 32–47 chars | ≥ 0.85 (normalized) | medium |
+| 24–47 chars | ≥ 0.85 (normalized) | medium |
 | 48+ chars | ≥ 0.85 (normalized) | high |
 
 > In test files (`*.spec.ts`, `*.test.ts`, `__tests__/`, `fixtures/`, etc.) the threshold is raised to **0.95** to reduce false positives.
+
+Entropy is normalized against a 72-character alphabet, so the ceiling for a value of length *n* is `log2(n) / log2(72)`. A value shorter than **38 characters** therefore cannot reach 0.85 however random it looks, and one has to be close to fully distinct in its characters to land in the medium band at all. In practice almost every entropy finding is high severity.
+
+The same three thresholds drive source files and example files, so a value is judged identically wherever it appears.
 
 ---
 
 ## Example File Scanning
 
-`.env.example` files are scanned separately with relaxed rules, since example files are expected to contain placeholder values. Entries are skipped when the value:
+The example file that documents your env file is scanned too — a real credential committed there is public to everyone who clones the repo. This runs on every scan; no flag is needed.
+
+The file is found next to the one being scanned, using the same pairing as [`--compare`](./compare.md): `.env.example`, `.env-example`, `.env.sample` and `.env.template` all count, and a suffixed env file prefers its suffixed example (`.env.production` → `.env.example.production`).
+
+Example files are expected to hold placeholders, so entries are skipped when the value:
 
 - Is empty
 - Equals `example` or `placeholder` (case-insensitive)
 - Contains `your_` or `CHANGE_ME`
 - Contains `<` (typical for `<your-value-here>` style templates)
 
-Remaining values are still checked against [provider patterns](#1-provider-pattern-matching-high-severity) and entropy (threshold ≥ 0.8 for values ≥ 24 characters).
+Remaining values go through the same [provider patterns](#1-provider-pattern-matching-high-severity) and [entropy rules](#3-high-entropy-string-detection-medium--high-severity) as source files, and are reported with the same wording and severity — only the locator differs, naming the key rather than a line:
+
+```text
+▸ Potential secrets in .env.example
+──────────────────────────────────────────────────────────────────────
+found high-entropy string (len 95, H≈0.89)  STRIPE_KEY
+```
 
 ---
 
