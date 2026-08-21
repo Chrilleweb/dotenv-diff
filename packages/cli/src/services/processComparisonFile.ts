@@ -77,7 +77,6 @@ export function processComparisonFile(
 ): ProcessComparisonResult {
   let envVariables: Record<string, string | undefined> = {};
   let comparedAgainst = '';
-  let duplicatesFound = false;
   let dupsEnv: Duplicate[] = [];
   let dupsEx: Duplicate[] = [];
   let exampleFull: Record<string, string> | undefined = undefined;
@@ -167,7 +166,6 @@ export function processComparisonFile(
       const duplicateResults = checkDuplicates(compareFile, opts);
       dupsEnv = duplicateResults.dupsEnv;
       dupsEx = duplicateResults.dupsEx;
-      duplicatesFound = dupsEnv.length > 0 || dupsEx.length > 0;
     }
 
     if (opts.expireWarnings) {
@@ -229,12 +227,14 @@ export function processComparisonFile(
         scanResult.missing = [];
         dupsEnv = [];
         dupsEx = [];
-        duplicatesFound = false;
       }
     }
 
     // Keep duplicates for output if not fixed
-    if (duplicatesFound && (!opts.fix || !fix.fixApplied)) {
+    if (
+      (dupsEnv.length > 0 || dupsEx.length > 0) &&
+      (!opts.fix || !fix.fixApplied)
+    ) {
       if (!scanResult.duplicates) scanResult.duplicates = {};
       if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
       if (dupsEx.length > 0) scanResult.duplicates.example = dupsEx;
