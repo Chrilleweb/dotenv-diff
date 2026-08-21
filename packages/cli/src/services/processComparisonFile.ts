@@ -33,21 +33,33 @@ import type {
  * Result of processing comparison file
  */
 export interface ProcessComparisonResult {
+  /** The scan result after processing the comparison file */
   scanResult: ScanResult;
+  /** The environment variables from the comparison file */
   envVariables: Record<string, string | undefined>;
+  /** The file the comparison was made against */
   comparedAgainst: string;
-  duplicatesFound: boolean;
+  /** The duplicate environment variables found in the comparison file */
   dupsEnv: Duplicate[];
+  /** The duplicate example variables found in the comparison file */
   dupsEx: Duplicate[];
+  /** The context of any fixes applied to the comparison file */
   fix: FixContext;
+  /** The full contents of the example file, if it was found and read */
   exampleFull?: Record<string, string> | undefined;
   /** Basename of the example file `exampleFull` was read from. */
   exampleFile?: string | undefined;
+  /** Uppercase keys found in the comparison file */
   uppercaseWarnings?: UppercaseWarning[];
+  /** Expiration warnings found in the comparison file */
   expireWarnings?: ExpireWarning[];
+  /** Inconsistent naming warnings found in the comparison file */
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
+  /** Comment warnings found in the comparison file */
   commentWarnings?: CommentWarning[];
+  /** Drift warnings found in the comparison file */
   driftWarnings?: DriftWarning[];
+  /** Any error encountered while processing the comparison file */
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -233,7 +245,6 @@ export function processComparisonFile(
       scanResult,
       envVariables,
       comparedAgainst,
-      duplicatesFound,
       dupsEnv,
       dupsEx,
       fix,
@@ -255,7 +266,6 @@ export function processComparisonFile(
     scanResult,
     envVariables,
     comparedAgainst,
-    duplicatesFound,
     dupsEnv,
     dupsEx,
     fix,

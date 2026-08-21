@@ -385,7 +385,6 @@ describe('processComparisonFile', () => {
 
     expect(result.dupsEnv).toHaveLength(0);
     expect(result.dupsEx).toHaveLength(0);
-    expect(result.duplicatesFound).toBe(false);
   });
 
   it('sets duplicatesFound via dupsEx when only example file has duplicates (lines 109, 154)', () => {
@@ -401,7 +400,6 @@ describe('processComparisonFile', () => {
       { ...baseOpts, allowDuplicates: false },
     );
 
-    expect(result.duplicatesFound).toBe(true);
     expect(result.dupsEnv).toHaveLength(0);
     expect(result.dupsEx).toHaveLength(1);
     // dupsEnv is empty → scanResult.duplicates.env NOT set (line 154 false branch)
