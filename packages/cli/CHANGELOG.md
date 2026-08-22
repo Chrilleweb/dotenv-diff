@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.4.0
+
+### Minor Changes
+
+- 3e19e9d: fix: scan the example file for committed secrets on every run.
+
+### Patch Changes
+
+- 3e19e9d: fix: drop the unused `kind` field from `SecretFinding`, never used and caused a bug where a secret finding could be duplicated
+- 3e19e9d: fix: colour the "Potential secrets detected" heading as an error when a high-severity secret was found.
+- 3e19e9d: fix: rank entropy findings in example files by the same rule as in code.
+
 ## 3.3.0
 
 ### Minor Changes
