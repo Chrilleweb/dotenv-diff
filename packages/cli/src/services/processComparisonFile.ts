@@ -33,21 +33,33 @@ import type {
  * Result of processing comparison file
  */
 export interface ProcessComparisonResult {
+  /** The scan result after processing the comparison file */
   scanResult: ScanResult;
+  /** The environment variables from the comparison file */
   envVariables: Record<string, string | undefined>;
+  /** The file the comparison was made against */
   comparedAgainst: string;
-  duplicatesFound: boolean;
+  /** The duplicate environment variables found in the comparison file */
   dupsEnv: Duplicate[];
+  /** The duplicate example variables found in the comparison file */
   dupsEx: Duplicate[];
+  /** The context of any fixes applied to the comparison file */
   fix: FixContext;
+  /** The full contents of the example file, if it was found and read */
   exampleFull?: Record<string, string> | undefined;
   /** Basename of the example file `exampleFull` was read from. */
   exampleFile?: string | undefined;
+  /** Uppercase keys found in the comparison file */
   uppercaseWarnings?: UppercaseWarning[];
+  /** Expiration warnings found in the comparison file */
   expireWarnings?: ExpireWarning[];
+  /** Inconsistent naming warnings found in the comparison file */
   inconsistentNamingWarnings?: InconsistentNamingWarning[];
+  /** Comment warnings found in the comparison file */
   commentWarnings?: CommentWarning[];
+  /** Drift warnings found in the comparison file */
   driftWarnings?: DriftWarning[];
+  /** Any error encountered while processing the comparison file */
   error?: { message: string; shouldExit: boolean };
 }
 
@@ -65,7 +77,6 @@ export function processComparisonFile(
 ): ProcessComparisonResult {
   let envVariables: Record<string, string | undefined> = {};
   let comparedAgainst = '';
-  let duplicatesFound = false;
   let dupsEnv: Duplicate[] = [];
   let dupsEx: Duplicate[] = [];
   let exampleFull: Record<string, string> | undefined = undefined;
@@ -155,7 +166,6 @@ export function processComparisonFile(
       const duplicateResults = checkDuplicates(compareFile, opts);
       dupsEnv = duplicateResults.dupsEnv;
       dupsEx = duplicateResults.dupsEx;
-      duplicatesFound = dupsEnv.length > 0 || dupsEx.length > 0;
     }
 
     if (opts.expireWarnings) {
@@ -217,12 +227,14 @@ export function processComparisonFile(
         scanResult.missing = [];
         dupsEnv = [];
         dupsEx = [];
-        duplicatesFound = false;
       }
     }
 
     // Keep duplicates for output if not fixed
-    if (duplicatesFound && (!opts.fix || !fix.fixApplied)) {
+    if (
+      (dupsEnv.length > 0 || dupsEx.length > 0) &&
+      (!opts.fix || !fix.fixApplied)
+    ) {
       if (!scanResult.duplicates) scanResult.duplicates = {};
       if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
       if (dupsEx.length > 0) scanResult.duplicates.example = dupsEx;
@@ -233,7 +245,6 @@ export function processComparisonFile(
       scanResult,
       envVariables,
       comparedAgainst,
-      duplicatesFound,
       dupsEnv,
       dupsEx,
       fix,
@@ -255,7 +266,6 @@ export function processComparisonFile(
     scanResult,
     envVariables,
     comparedAgainst,
-    duplicatesFound,
     dupsEnv,
     dupsEx,
     fix,
