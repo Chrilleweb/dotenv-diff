@@ -1,5 +1,24 @@
 # Changelog
 
+<!-- changesets: example-secret-scan.md,secret-finding-kind.md,secret-heading-severity.md,secret-severity-parity.md -->
+## 2026-08-22
+
+### Highlights
+- fix: scan the example file for committed secrets on every run.
+- fix: drop the unused `kind` field from `SecretFinding`, never used and caused a bug where a secret finding could be duplicated
+- fix: colour the "Potential secrets detected" heading as an error when a high-severity secret was found.
+- fix: rank entropy findings in example files by the same rule as in code.
+
+### Package Releases
+- dotenv-diff: minor
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | minor
+dotenv-diff | patch
+
 <!-- changesets: drift-warnings.md,five-mirrors-marry.md,goofy-stamps-cross.md -->
 ## 2026-08-19
 
