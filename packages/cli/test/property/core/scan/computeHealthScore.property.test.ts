@@ -27,8 +27,7 @@ interface Counts {
   example: number;
   expire: number;
   inconsistent: number;
-  dupEnv: number;
-  dupExample: number;
+  dup: number;
 }
 
 const fill = (n: number) => Array.from({ length: n }, () => ({}));
@@ -49,7 +48,7 @@ function buildScan(c: Counts): ScanResult {
       ...Array.from({ length: c.medSecrets }, () => ({ severity: 'medium' })),
       ...Array.from({ length: c.lowSecrets }, () => ({ severity: 'low' })),
     ],
-    duplicates: { env: fill(c.dupEnv), example: fill(c.dupExample) },
+    duplicates: { file: '.env', keys: fill(c.dup) },
   } as unknown as ScanResult;
 }
 
@@ -67,8 +66,7 @@ function expectedScore(c: Counts): number {
     c.example * 10 -
     c.expire * 5 -
     c.inconsistent * 3 -
-    c.dupEnv * 10 -
-    c.dupExample * 10;
+    c.dup * 10;
   return Math.max(0, Math.min(100, raw));
 }
 
@@ -84,8 +82,7 @@ const countsArb: fc.Arbitrary<Counts> = fc.record({
   example: fc.nat({ max: 8 }),
   expire: fc.nat({ max: 8 }),
   inconsistent: fc.nat({ max: 8 }),
-  dupEnv: fc.nat({ max: 8 }),
-  dupExample: fc.nat({ max: 8 }),
+  dup: fc.nat({ max: 8 }),
 });
 
 describe('computeHealthScore (property-based)', () => {
@@ -123,8 +120,7 @@ describe('computeHealthScore (property-based)', () => {
       example: 0,
       expire: 0,
       inconsistent: 0,
-      dupEnv: 0,
-      dupExample: 0,
+      dup: 0,
     };
     expect(computeHealthScore(buildScan(clean))).toBe(100);
   });
@@ -142,8 +138,7 @@ describe('computeHealthScore (property-based)', () => {
       example: fc.nat({ max: 5 }),
       expire: fc.nat({ max: 5 }),
       inconsistent: fc.nat({ max: 5 }),
-      dupEnv: fc.nat({ max: 5 }),
-      dupExample: fc.nat({ max: 5 }),
+      dup: fc.nat({ max: 5 }),
     });
     fc.assert(
       fc.property(countsArb, nonNeg, (base, extra) => {

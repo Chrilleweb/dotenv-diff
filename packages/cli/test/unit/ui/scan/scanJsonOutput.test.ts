@@ -238,24 +238,37 @@ describe('scanJsonOutput', () => {
     expect(result.frameworkWarnings?.[0]?.framework).toBe('sveltekit');
   });
 
-  it('includes duplicates when present', () => {
+  it('includes duplicates when present, named after the file they came from', () => {
     const scanResult = makeScanResult({
       duplicates: {
-        env: [{ key: 'API_KEY', count: 2 }],
-        example: [{ key: 'DB_URL', count: 3 }],
+        file: '.env.example',
+        keys: [
+          { key: 'API_KEY', count: 2 },
+          { key: 'DB_URL', count: 3 },
+        ],
       },
     });
 
-    const result = scanJsonOutput(scanResult, '');
+    const result = scanJsonOutput(scanResult, '.env.example');
 
     expect(result.duplicates).toBeDefined();
-    expect(result.duplicates?.env).toHaveLength(1);
-    expect(result.duplicates?.example).toHaveLength(1);
+    expect(result.duplicates?.file).toBe('.env.example');
+    expect(result.duplicates?.keys).toHaveLength(2);
+  });
+
+  it('falls back to comparedAgainst when the duplicates file is unset', () => {
+    const scanResult = makeScanResult({
+      duplicates: { keys: [{ key: 'API_KEY', count: 2 }] },
+    });
+
+    const result = scanJsonOutput(scanResult, '.env.local');
+
+    expect(result.duplicates?.file).toBe('.env.local');
   });
 
   it('omits duplicates when none exist', () => {
     const scanResult = makeScanResult({
-      duplicates: { env: [], example: [] },
+      duplicates: { keys: [] },
     });
 
     const result = scanJsonOutput(scanResult, '');

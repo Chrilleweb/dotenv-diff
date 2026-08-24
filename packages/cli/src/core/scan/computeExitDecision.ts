@@ -70,8 +70,7 @@ function hasStrictViolation(
 ): boolean {
   return (
     scan.unused.length > 0 ||
-    (scan.duplicates?.env?.length ?? 0) > 0 ||
-    (scan.duplicates?.example?.length ?? 0) > 0 ||
+    (scan.duplicates?.keys?.length ?? 0) > 0 ||
     (scan.secrets?.length ?? 0) > 0 ||
     (scan.exampleWarnings?.length ?? 0) > 0 ||
     (scan.frameworkWarnings?.length ?? 0) > 0 ||

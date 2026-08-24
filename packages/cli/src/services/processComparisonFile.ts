@@ -18,7 +18,6 @@ import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import type {
   ScanUsageOptions,
   ScanResult,
-  DuplicateResult,
   UppercaseWarning,
   Duplicate,
   ComparisonFile,
@@ -39,10 +38,8 @@ export interface ProcessComparisonResult {
   envVariables: Record<string, string | undefined>;
   /** The file the comparison was made against */
   comparedAgainst: string;
-  /** The duplicate environment variables found in the comparison file */
-  dupsEnv: Duplicate[];
-  /** The duplicate example variables found in the comparison file */
-  dupsEx: Duplicate[];
+  /** The duplicate keys found in the comparison file */
+  duplicates: Duplicate[];
   /** The context of any fixes applied to the comparison file */
   fix: FixContext;
   /** The full contents of the example file, if it was found and read */
@@ -77,8 +74,7 @@ export function processComparisonFile(
 ): ProcessComparisonResult {
   let envVariables: Record<string, string | undefined> = {};
   let comparedAgainst = '';
-  let dupsEnv: Duplicate[] = [];
-  let dupsEx: Duplicate[] = [];
+  let duplicates: Duplicate[] = [];
   let exampleFull: Record<string, string> | undefined = undefined;
   let exampleFile: string | undefined = undefined;
   let uppercaseWarnings: UppercaseWarning[] = [];
@@ -163,9 +159,7 @@ export function processComparisonFile(
 
     // Find duplicates
     if (!opts.allowDuplicates) {
-      const duplicateResults = checkDuplicates(compareFile, opts);
-      dupsEnv = duplicateResults.dupsEnv;
-      dupsEx = duplicateResults.dupsEx;
+      duplicates = checkDuplicates(compareFile, opts);
     }
 
     if (opts.expireWarnings) {
@@ -212,7 +206,7 @@ export function processComparisonFile(
       const { changed, result } = applyFixes({
         envPath: compareFile.path,
         missingKeys: scanResult.missing,
-        duplicateKeys: dupsEnv.map((d) => d.key),
+        duplicateKeys: duplicates.map((d) => d.key),
         ensureGitignore: true,
       });
 
@@ -225,19 +219,15 @@ export function processComparisonFile(
 
         // clear the issues that were fixed
         scanResult.missing = [];
-        dupsEnv = [];
-        dupsEx = [];
+        duplicates = [];
       }
     }
 
-    // Keep duplicates for output if not fixed
-    if (
-      (dupsEnv.length > 0 || dupsEx.length > 0) &&
-      (!opts.fix || !fix.fixApplied)
-    ) {
-      if (!scanResult.duplicates) scanResult.duplicates = {};
-      if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
-      if (dupsEx.length > 0) scanResult.duplicates.example = dupsEx;
+    // Keep duplicates for output if not fixed. They are always reported against
+    // the file the scan actually read, which is not necessarily `.env` — with
+    // `--example` it is the example file itself.
+    if (duplicates.length > 0 && (!opts.fix || !fix.fixApplied)) {
+      scanResult.duplicates = { file: compareFile.name, keys: duplicates };
     }
   } catch (error) {
     const errorMessage = `Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
@@ -245,8 +235,7 @@ export function processComparisonFile(
       scanResult,
       envVariables,
       comparedAgainst,
-      dupsEnv,
-      dupsEx,
+      duplicates,
       fix,
       exampleFull,
       exampleFile,
@@ -266,8 +255,7 @@ export function processComparisonFile(
     scanResult,
     envVariables,
     comparedAgainst,
-    dupsEnv,
-    dupsEx,
+    duplicates,
     fix,
     exampleFull,
     exampleFile,
@@ -280,38 +268,23 @@ export function processComparisonFile(
 }
 
 /**
- * Check for duplicate keys in env and example files
+ * Check for duplicate keys in the file the scan is comparing against.
+ *
+ * A scan reads exactly one file, so there is only one place duplicates can come
+ * from. Attributing them to an env/example pair — the way `--compare` does — is
+ * what made the same finding show up under two different names.
  * @param compareFile - The file to compare against
  * @param opts - Scan options
- * @returns Object containing duplicate keys in env and example files
+ * @returns Duplicate keys found in the comparison file
  */
 function checkDuplicates(
   compareFile: ComparisonFile,
   opts: ScanUsageOptions,
-): DuplicateResult {
+): Duplicate[] {
   const isIgnored = (key: string) =>
     !opts.ignore.includes(key) && !opts.ignoreRegex.some((rx) => rx.test(key));
 
-  // Duplicates in main env file
-  const dupsEnv = findDuplicateKeys(compareFile.path).filter(({ key }) =>
+  return findDuplicateKeys(compareFile.path).filter(({ key }) =>
     isIgnored(key),
   );
-
-  // Duplicates in example file
-  let dupsEx: Duplicate[] = [];
-
-  if (opts.examplePath) {
-    const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
-
-    const exampleIsDifferentFile =
-      fs.existsSync(examplePath) && examplePath !== compareFile.path;
-
-    if (exampleIsDifferentFile) {
-      dupsEx = findDuplicateKeys(examplePath).filter(({ key }) =>
-        isIgnored(key),
-      );
-    }
-  }
-
-  return { dupsEnv, dupsEx } satisfies DuplicateResult;
 }

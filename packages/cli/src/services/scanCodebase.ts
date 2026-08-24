@@ -90,10 +90,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       warningsCount: 0,
       duration: 0,
     },
-    duplicates: {
-      env: [],
-      example: [],
-    },
+    duplicates: { keys: [] },
     logged: loggedVariables,
     fileContentMap,
   };

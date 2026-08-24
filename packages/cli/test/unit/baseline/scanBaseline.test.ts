@@ -96,6 +96,48 @@ describe('loadBaselineFile', () => {
     fs.writeFileSync(path.join(tmpDir, BASELINE_FILE), '"just a string"');
     expect(loadBaselineFile(tmpDir)).toBeNull();
   });
+
+  it('migrates duplicate rules written by older versions', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, BASELINE_FILE),
+      JSON.stringify({
+        version: 1,
+        createdAt: '2024-01-01',
+        entries: [
+          { rule: 'duplicate-env', key: 'A' },
+          { rule: 'duplicate-example', key: 'B' },
+          { rule: 'missing', key: 'C' },
+        ],
+      }),
+    );
+
+    expect(loadBaselineFile(tmpDir)!.entries).toEqual([
+      { rule: 'duplicate', key: 'A' },
+      { rule: 'duplicate', key: 'B' },
+      { rule: 'missing', key: 'C' },
+    ]);
+  });
+
+  it('keeps suppressing a duplicate recorded under the old rule name', () => {
+    fs.writeFileSync(
+      path.join(tmpDir, BASELINE_FILE),
+      JSON.stringify({
+        version: 1,
+        createdAt: '2024-01-01',
+        entries: [{ rule: 'duplicate-env', key: 'DUP' }],
+      }),
+    );
+
+    const after = applyBaselineEntries(
+      {
+        ...emptyScanResult,
+        duplicates: { file: '.env.example', keys: [{ key: 'DUP', count: 2 }] },
+      },
+      loadBaselineFile(tmpDir)!.entries,
+    );
+
+    expect(after.duplicates.keys).toHaveLength(0);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -218,20 +260,12 @@ describe('collectBaselineEntries', () => {
     expect(result).toContainEqual({ rule: 'example-secret', key: 'DB_PASS' });
   });
 
-  it('collects env duplicate keys', () => {
+  it('collects duplicate keys', () => {
     const result = collectBaselineEntries({
       ...emptyScanResult,
-      duplicates: { env: [{ key: 'DUP', count: 2 }] },
+      duplicates: { file: '.env', keys: [{ key: 'DUP', count: 2 }] },
     });
-    expect(result).toContainEqual({ rule: 'duplicate-env', key: 'DUP' });
-  });
-
-  it('collects example duplicate keys', () => {
-    const result = collectBaselineEntries({
-      ...emptyScanResult,
-      duplicates: { example: [{ key: 'EX_DUP', count: 2 }] },
-    });
-    expect(result).toContainEqual({ rule: 'duplicate-example', key: 'EX_DUP' });
+    expect(result).toContainEqual({ rule: 'duplicate', key: 'DUP' });
   });
 
   it('collects framework warnings with file', () => {
@@ -468,31 +502,21 @@ describe('applyBaselineEntries', () => {
     expect(after.secrets).toHaveLength(1);
   });
 
-  it('suppresses duplicate-env key', () => {
+  it('suppresses duplicate key', () => {
     const result: ScanResult = {
       ...emptyScanResult,
-      duplicates: { env: [{ key: 'DUP', count: 2 }] },
+      duplicates: { file: '.env', keys: [{ key: 'DUP', count: 2 }] },
     };
-    const entries: BaselineEntry[] = [{ rule: 'duplicate-env', key: 'DUP' }];
+    const entries: BaselineEntry[] = [{ rule: 'duplicate', key: 'DUP' }];
     const after = applyBaselineEntries(result, entries);
-    expect(after.duplicates.env).toHaveLength(0);
-  });
-
-  it('suppresses duplicate-example key', () => {
-    const result: ScanResult = {
-      ...emptyScanResult,
-      duplicates: { example: [{ key: 'EX', count: 2 }] },
-    };
-    const entries: BaselineEntry[] = [{ rule: 'duplicate-example', key: 'EX' }];
-    const after = applyBaselineEntries(result, entries);
-    expect(after.duplicates.example).toHaveLength(0);
+    expect(after.duplicates.keys).toHaveLength(0);
   });
 
   it('leaves duplicates undefined when scanResult has no duplicates', () => {
     const result: ScanResult = { ...emptyScanResult, duplicates: {} };
     const after = applyBaselineEntries(result, []);
-    expect(after.duplicates.env).toBeUndefined();
-    expect(after.duplicates.example).toBeUndefined();
+    expect(after.duplicates.keys).toBeUndefined();
+    expect(after.duplicates.file).toBeUndefined();
   });
 
   it('suppresses example-secret warning', () => {
@@ -714,8 +738,8 @@ describe('applyBaselineEntries', () => {
         },
       ],
       duplicates: {
-        env: [{ key: 'D', count: 2 }],
-        example: [{ key: 'E', count: 2 }],
+        file: '.env',
+        keys: [{ key: 'D', count: 2 }],
       },
       frameworkWarnings: [
         {
@@ -741,8 +765,7 @@ describe('applyBaselineEntries', () => {
     expect(after.logged).toHaveLength(0);
     expect(after.secrets).toHaveLength(0);
     expect(after.exampleWarnings).toHaveLength(0);
-    expect(after.duplicates.env).toHaveLength(0);
-    expect(after.duplicates.example).toHaveLength(0);
+    expect(after.duplicates.keys).toHaveLength(0);
     expect(after.frameworkWarnings).toHaveLength(0);
     expect(after.uppercaseWarnings).toHaveLength(0);
     expect(after.expireWarnings).toHaveLength(0);

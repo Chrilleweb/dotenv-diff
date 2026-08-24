@@ -11,7 +11,7 @@ import { printHeader } from '../ui/scan/printHeader.js';
 import { printStats } from '../ui/scan/printStats.js';
 import { printMissing } from '../ui/scan/printMissing.js';
 import { printUnused } from '../ui/scan/printUnused.js';
-import { printDuplicates } from '../ui/shared/printDuplicates.js';
+import { printScanDuplicates } from '../ui/scan/printScanDuplicates.js';
 import { printSecrets } from '../ui/scan/printSecrets.js';
 import { printFixTips } from '../ui/shared/printFixTips.js';
 import { printAutoFix } from '../ui/shared/printAutoFix.js';
@@ -87,12 +87,10 @@ export function printScanResult(
     printUnused(scanResult.unused, comparedAgainst, opts.strict);
   }
 
-  // Duplicates
-  printDuplicates(
-    comparedAgainst || DEFAULT_ENV_FILE,
-    'example file',
-    scanResult.duplicates?.env ?? [],
-    scanResult.duplicates?.example ?? [],
+  // Duplicates — always attributed to the one file the scan read
+  printScanDuplicates(
+    scanResult.duplicates?.file || comparedAgainst || DEFAULT_ENV_FILE,
+    scanResult.duplicates?.keys ?? [],
     isJson,
     opts.fix ?? false,
     opts.strict,
@@ -156,8 +154,8 @@ export function printScanResult(
   printFixTips(
     {
       missing: scanResult.missing,
-      duplicatesEnv: scanResult.duplicates?.env ?? [],
-      duplicatesEx: scanResult.duplicates?.example ?? [],
+      duplicatesEnv: scanResult.duplicates?.keys ?? [],
+      duplicatesEx: [],
       gitignoreIssue: hasGitignoreIssue ? { reason: 'not-ignored' } : null,
     },
     hasGitignoreIssue,

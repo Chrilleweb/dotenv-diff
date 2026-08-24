@@ -3,6 +3,7 @@ import fs from 'fs';
 import type {
   BaselineEntry,
   BaselineFile,
+  BaselineRule,
   ScanResult,
 } from '../config/types.js';
 import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
@@ -28,12 +29,36 @@ export function loadBaselineFile(cwd: string): BaselineFile | null {
       'version' in parsed &&
       Array.isArray((parsed as { entries?: unknown }).entries)
     ) {
-      return parsed as BaselineFile;
+      const file = parsed as BaselineFile;
+      return { ...file, entries: file.entries.map(migrateEntry) };
     }
     return null;
   } catch {
     return null;
   }
+}
+
+/**
+ * Rule names that older versions wrote for warnings that have since been
+ * renamed. Migrating them here — at the single point where a baseline file
+ * enters the program — keeps the rest of the codebase on one name per rule,
+ * and means an upgrade never silently un-suppresses a warning.
+ */
+const RENAMED_RULES: Record<string, BaselineRule> = {
+  // <=3.4 attributed scan duplicates to an env/example pair that does not
+  // exist: a scan only ever reads one file.
+  'duplicate-env': 'duplicate',
+  'duplicate-example': 'duplicate',
+};
+
+/**
+ * Rewrites a baseline entry written by an older version to its current rule name.
+ * @param entry - The entry as read from disk
+ * @returns The entry with an up-to-date rule name
+ */
+function migrateEntry(entry: BaselineEntry): BaselineEntry {
+  const renamed = RENAMED_RULES[entry.rule];
+  return renamed ? { ...entry, rule: renamed } : entry;
 }
 
 /**
@@ -104,12 +129,8 @@ export function collectBaselineEntries(
     entries.push({ rule: 'example-secret', key: warning.key });
   }
 
-  for (const dup of scanResult.duplicates.env ?? []) {
-    entries.push({ rule: 'duplicate-env', key: dup.key });
-  }
-
-  for (const dup of scanResult.duplicates.example ?? []) {
-    entries.push({ rule: 'duplicate-example', key: dup.key });
+  for (const dup of scanResult.duplicates.keys ?? []) {
+    entries.push({ rule: 'duplicate', key: dup.key });
   }
 
   // variable + file uniquely identifies a framework warning without line numbers
@@ -175,14 +196,10 @@ export function applyBaselineEntries(
       (s) => !has('secret', fingerprint(`${s.file}:${s.snippet}`)),
     ),
     duplicates: {
-      ...(scanResult.duplicates.env != null && {
-        env: scanResult.duplicates.env.filter(
-          (d) => !has('duplicate-env', d.key),
-        ),
-      }),
-      ...(scanResult.duplicates.example != null && {
-        example: scanResult.duplicates.example.filter(
-          (d) => !has('duplicate-example', d.key),
+      ...scanResult.duplicates,
+      ...(scanResult.duplicates.keys != null && {
+        keys: scanResult.duplicates.keys.filter(
+          (d) => !has('duplicate', d.key),
         ),
       }),
     },

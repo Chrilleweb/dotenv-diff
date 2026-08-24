@@ -273,6 +273,24 @@ Usage in the configuration file:
 }
 ```
 
+#### Duplicate keys in the output
+
+A scan reads a single file — the one named by `comparedAgainst` — so duplicates
+are reported against that file by name:
+
+```json
+{
+  "comparedAgainst": ".env.example",
+  "duplicates": {
+    "file": ".env.example",
+    "keys": [{ "key": "API_KEY", "count": 2 }]
+  }
+}
+```
+
+`--compare` works on a real env/example pair, so it keeps reporting duplicates
+per side under `duplicates.env` and `duplicates.example`.
+
 ### `--baseline`
 
 Save the current warning state as a baseline file and exit cleanly.

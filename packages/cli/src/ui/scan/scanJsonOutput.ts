@@ -49,8 +49,10 @@ interface ScanJsonOutput {
     snippet: string;
   }>;
   duplicates?: {
-    env?: Duplicate[];
-    example?: Duplicate[];
+    /** The file the duplicate keys were found in. */
+    file: string;
+    /** The duplicated keys with their occurrence counts. */
+    keys: Duplicate[];
   };
   gitignoreIssue?: { reason: GitignoreIssue };
   logged?: EnvUsage[];
@@ -169,12 +171,13 @@ export function scanJsonOutput(
     output.unused = scanResult.unused;
   }
 
-  const hasDuplicates =
-    (scanResult.duplicates.env?.length ?? 0) > 0 ||
-    (scanResult.duplicates.example?.length ?? 0) > 0;
+  const duplicateKeys = scanResult.duplicates.keys ?? [];
 
-  if (hasDuplicates) {
-    output.duplicates = scanResult.duplicates;
+  if (duplicateKeys.length > 0) {
+    output.duplicates = {
+      file: scanResult.duplicates.file ?? comparedAgainst,
+      keys: duplicateKeys,
+    };
   }
 
   if (gitignoreIssue) {
