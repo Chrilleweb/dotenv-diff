@@ -46,8 +46,7 @@ export function computeHealthScore(scan: ScanResult): number {
   score -= (scan.driftWarnings?.length ?? 0) * 2;
 
   // === 10. Duplicate definitions ===
-  score -= (scan.duplicates?.env?.length ?? 0) * 10;
-  score -= (scan.duplicates?.example?.length ?? 0) * 10;
+  score -= (scan.duplicates?.keys?.length ?? 0) * 10;
 
   // Never go below 0 or above 100
   return Math.max(0, Math.min(100, score));

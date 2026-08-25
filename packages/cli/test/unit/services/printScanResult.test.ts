@@ -20,8 +20,8 @@ vi.mock('../../../src/ui/scan/printUnused.js', () => ({
   printUnused: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/shared/printDuplicates.js', () => ({
-  printDuplicates: vi.fn(),
+vi.mock('../../../src/ui/scan/printScanDuplicates.js', () => ({
+  printScanDuplicates: vi.fn(),
 }));
 
 vi.mock('../../../src/ui/scan/printSecrets.js', () => ({
@@ -102,7 +102,7 @@ import { printAutoFix } from '../../../src/ui/shared/printAutoFix.js';
 import { checkGitignoreStatus } from '../../../src/services/git.js';
 import { printGitignoreWarning } from '../../../src/ui/shared/printGitignore.js';
 import { printStats } from '../../../src/ui/scan/printStats.js';
-import { printDuplicates } from '../../../src/ui/shared/printDuplicates.js';
+import { printScanDuplicates } from '../../../src/ui/scan/printScanDuplicates.js';
 import { printUnused } from '../../../src/ui/scan/printUnused.js';
 import { printFrameworkWarnings } from '../../../src/ui/scan/printFrameworkWarnings.js';
 import { printUppercaseWarning } from '../../../src/ui/scan/printUppercaseWarning.js';
@@ -447,11 +447,31 @@ describe('printScanResult', () => {
       '',
     );
 
-    expect(printDuplicates).toHaveBeenCalledWith(
+    expect(printScanDuplicates).toHaveBeenCalledWith(
       '.env',
-      'example file',
       [],
-      [],
+      false,
+      false,
+      undefined,
+    );
+  });
+
+  it('names the file the duplicates were actually found in', () => {
+    printScanResult(
+      {
+        ...baseScanResult,
+        duplicates: {
+          file: '.env.example',
+          keys: [{ key: 'FEFOEOF', count: 2 }],
+        },
+      },
+      baseOpts,
+      '.env.example',
+    );
+
+    expect(printScanDuplicates).toHaveBeenCalledWith(
+      '.env.example',
+      [{ key: 'FEFOEOF', count: 2 }],
       false,
       false,
       undefined,

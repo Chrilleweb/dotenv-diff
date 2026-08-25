@@ -95,10 +95,9 @@ describe('computeExitDecision', () => {
   describe('strict violations', () => {
     const cases: Array<[string, Partial<ScanResult>]> = [
       ['unused keys', { unused: ['OLD_KEY'] }],
-      ['duplicate env keys', { duplicates: { env: [{ key: 'K', count: 2 }] } }],
       [
-        'duplicate example keys',
-        { duplicates: { example: [{ key: 'K', count: 2 }] } },
+        'duplicate keys',
+        { duplicates: { file: '.env', keys: [{ key: 'K', count: 2 }] } },
       ],
       [
         'medium severity secrets',

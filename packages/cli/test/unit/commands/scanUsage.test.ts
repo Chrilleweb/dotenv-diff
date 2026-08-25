@@ -330,8 +330,7 @@ describe('scanUsage', () => {
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
+      duplicates: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -356,8 +355,7 @@ describe('scanUsage', () => {
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
+      duplicates: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -390,8 +388,7 @@ describe('scanUsage', () => {
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
+      duplicates: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -464,8 +461,7 @@ describe('scanUsage', () => {
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
+      duplicates: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -510,8 +506,7 @@ describe('scanUsage', () => {
       comparedAgainst: DEFAULT_EXAMPLE_FILE,
       envVariables: {},
       duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
+      duplicates: [],
       exampleFull: { SECRET: 'abc123' },
       fix: {
         fixApplied: false,
@@ -543,8 +538,7 @@ describe('scanUsage', () => {
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
+      duplicates: [],
       exampleFull: { SECRET: 'abc123' },
       fix: {
         fixApplied: false,
@@ -574,8 +568,7 @@ describe('scanUsage', () => {
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
+      duplicates: [],
       exampleFull: undefined,
       fix: {
         fixApplied: false,
@@ -683,8 +676,7 @@ describe('scanUsage', () => {
 
   it('returns exitWithError true in JSON strict mode for each warning type', async () => {
     const cases: Partial<ScanResult>[] = [
-      { duplicates: { env: [{ key: 'A', count: 2 }] } },
-      { duplicates: { example: [{ key: 'B', count: 2 }] } },
+      { duplicates: { file: '.env', keys: [{ key: 'A', count: 2 }] } },
       {
         secrets: [
           {

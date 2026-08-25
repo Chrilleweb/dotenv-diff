@@ -37,7 +37,7 @@ Baseline suppression supports the same categories produced by scan usage checks,
 
 - missing variables
 - unused variables
-- duplicate keys (`.env` / `.env.example`)
+- duplicate keys (in the file the scan compared against)
 - framework warnings
 - uppercase key warnings
 - inconsistent naming warnings

@@ -221,7 +221,7 @@ describe('processComparisonFile', () => {
       allowDuplicates: false,
     });
 
-    expect(result.dupsEnv.length).toBeGreaterThan(0);
+    expect(result.duplicates.length).toBeGreaterThan(0);
   });
 
   it('detects expire warnings', () => {
@@ -268,7 +268,7 @@ describe('processComparisonFile', () => {
       allowDuplicates: false,
     });
 
-    expect(result.scanResult.duplicates?.env).toBeDefined();
+    expect(result.scanResult.duplicates?.keys).toBeDefined();
   });
 
   it('Will Load .env.example trough examplePath', () => {
@@ -320,20 +320,23 @@ describe('processComparisonFile', () => {
     expect(result.exampleFull).toEqual({ A: '1', bKey: '2' });
   });
 
-  it('skips example duplicate check when examplePath equals compareFile path', async () => {
-    // resolveFromCwd returns the compareFile path → same file → skip
-    const { resolveFromCwd } =
-      await import('../../../src/core/helpers/resolveFromCwd.js');
-    vi.mocked(resolveFromCwd).mockReturnValue(compareFile.path);
+  it('reports duplicates once, against the file the scan actually read', () => {
+    const exampleFile: ComparisonFile = {
+      path: '/env/.env.example',
+      name: '.env.example',
+    };
 
-    const result = processComparisonFile(baseScanResult, compareFile, {
-      ...baseOpts,
-      allowDuplicates: false,
-      examplePath: '.env.example',
-    });
+    const result = processComparisonFile(
+      { ...baseScanResult, duplicates: {} },
+      exampleFile,
+      { ...baseOpts, allowDuplicates: false, examplePath: '.env.example' },
+    );
 
-    // dupsEnv still found, but dupsEx should be empty because same file
-    expect(result.dupsEx).toHaveLength(0);
+    // The example file IS the comparison file here, so its duplicates must be
+    // reported under that name — not counted a second time as "env" duplicates.
+    expect(findDuplicateKeys).toHaveBeenCalledTimes(1);
+    expect(result.scanResult.duplicates.file).toBe('.env.example');
+    expect(result.scanResult.duplicates.keys).toHaveLength(1);
   });
 
   it('does not clear state when fix returns changed=false', () => {
@@ -354,7 +357,7 @@ describe('processComparisonFile', () => {
 
     expect(result.fix.fixApplied).toBe(false);
     // duplicates should still be present on scanResult
-    expect(result.scanResult.duplicates?.env).toBeDefined();
+    expect(result.scanResult.duplicates?.keys).toBeDefined();
   });
 
   it('does not set exampleFull when example file does not exist on disk (line 74)', () => {
@@ -374,7 +377,7 @@ describe('processComparisonFile', () => {
     });
 
     // The duplicate key ('A') doesn't match the regex, so it's kept.
-    expect(result.dupsEnv.length).toBeGreaterThan(0);
+    expect(result.duplicates.length).toBeGreaterThan(0);
   });
 
   it('skips duplicate check when allowDuplicates is true (lines 105-109)', () => {
@@ -383,15 +386,11 @@ describe('processComparisonFile', () => {
       allowDuplicates: true,
     });
 
-    expect(result.dupsEnv).toHaveLength(0);
-    expect(result.dupsEx).toHaveLength(0);
+    expect(result.duplicates).toHaveLength(0);
   });
 
-  it('sets duplicatesFound via dupsEx when only example file has duplicates (lines 109, 154)', () => {
-    // First call: env file → no duplicates. Second call: example file → has duplicate.
-    vi.mocked(findDuplicateKeys)
-      .mockReturnValueOnce([])
-      .mockReturnValueOnce([{ key: 'EX_KEY', count: 2 }]);
+  it('leaves duplicates unset when the comparison file has none', () => {
+    vi.mocked(findDuplicateKeys).mockReturnValueOnce([]);
 
     // Use a fresh duplicates object to avoid mutation from previous tests
     const result = processComparisonFile(
@@ -400,12 +399,9 @@ describe('processComparisonFile', () => {
       { ...baseOpts, allowDuplicates: false },
     );
 
-    expect(result.dupsEnv).toHaveLength(0);
-    expect(result.dupsEx).toHaveLength(1);
-    // dupsEnv is empty → scanResult.duplicates.env NOT set (line 154 false branch)
-    expect(result.scanResult.duplicates?.env).toBeUndefined();
-    // dupsEx has items → scanResult.duplicates.example IS set
-    expect(result.scanResult.duplicates?.example).toBeDefined();
+    expect(result.duplicates).toHaveLength(0);
+    expect(result.scanResult.duplicates?.keys).toBeUndefined();
+    expect(result.scanResult.duplicates?.file).toBeUndefined();
   });
 
   it('uses empty exampleKeysList when exampleFull is undefined in inconsistent naming check (line 119)', () => {
@@ -435,6 +431,6 @@ describe('processComparisonFile', () => {
     });
 
     expect(result.scanResult.duplicates).toBeDefined();
-    expect(result.scanResult.duplicates?.env).toBeDefined();
+    expect(result.scanResult.duplicates?.keys).toBeDefined();
   });
 });

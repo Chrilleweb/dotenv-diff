@@ -214,8 +214,7 @@ function calculateStats(scanResult: ScanResult): void {
     (scanResult.secrets?.length ?? 0) +
     scanResult.missing.length +
     scanResult.unused.length +
-    (scanResult.duplicates?.env?.length ?? 0) +
-    (scanResult.duplicates?.example?.length ?? 0);
+    (scanResult.duplicates?.keys?.length ?? 0);
 
   scanResult.stats = {
     filesScanned: scanResult.stats.filesScanned,

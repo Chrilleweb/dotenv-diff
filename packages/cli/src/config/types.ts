@@ -49,6 +49,21 @@ export interface DuplicateResult {
 }
 
 /**
+ * Duplicate keys found by a scan.
+ *
+ * A scan only ever reads a single file, so — unlike `--compare`, which works on
+ * a real env/example pair — there is no second file to attribute duplicates to.
+ * `file` names the file the keys were actually read from, so the console header
+ * and the JSON output can never disagree about which file is meant.
+ */
+export interface ScanDuplicates {
+  /** Basename of the file the duplicates were found in. */
+  file?: string;
+  /** The duplicated keys in that file, with their occurrence counts. */
+  keys?: Duplicate[];
+}
+
+/**
  * Type representing a single category for comparison
  */
 export type Category = (typeof ALLOWED_CATEGORIES)[number];
@@ -283,10 +298,7 @@ export interface ScanResult {
   declaredKeys?: string[];
   stats: ScanStats;
   secrets: SecretFinding[];
-  duplicates: {
-    env?: Duplicate[];
-    example?: Duplicate[];
-  };
+  duplicates: ScanDuplicates;
   frameworkWarnings?: FrameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
   logged: EnvUsage[];
@@ -526,8 +538,7 @@ export type BaselineRule =
   | 'logged'
   | 'secret'
   | 'example-secret'
-  | 'duplicate-env'
-  | 'duplicate-example'
+  | 'duplicate'
   | 'framework'
   | 'uppercase'
   | 'expire'
