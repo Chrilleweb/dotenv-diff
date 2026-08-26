@@ -119,11 +119,12 @@ function processPair(
 
   printDuplicates(
     envName,
-    exampleName,
     dupsEnv,
     dupsEx,
     opts.json ?? false,
     opts.fix ?? false,
+    opts.strict ?? false,
+    exampleName,
   );
 
   const entry = compareJsonOutput({
