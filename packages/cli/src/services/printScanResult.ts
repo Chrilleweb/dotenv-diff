@@ -33,6 +33,7 @@ import { printListAll } from '../ui/scan/printListAll.js';
  * @param scanResult - The result of the scan.
  * @param opts - The scan options.
  * @param comparedAgainst - The file being compared against.
+ * @param fixContext - What `--fix` changed, when it ran.
  * @returns An object indicating whether to exit with an error.
  */
 export function printScanResult(
@@ -90,12 +91,12 @@ export function printScanResult(
   // Duplicates
   printDuplicates(
     comparedAgainst || DEFAULT_ENV_FILE,
-    'example file',
     scanResult.duplicates?.env ?? [],
     scanResult.duplicates?.example ?? [],
     isJson,
     opts.fix ?? false,
     opts.strict,
+    scanResult.exampleFile,
   );
 
   // Print potential secrets found

@@ -22,12 +22,12 @@ import type { Duplicate } from '../../config/types.js';
  */
 export function printDuplicates(
   envName: string,
-  exampleName: string,
   dEnv: Duplicate[],
   dEx: Duplicate[],
   json: boolean,
   fix: boolean = false,
   strict: boolean = false,
+  exampleName?: string,
 ): void {
   if (json) return;
 
@@ -45,7 +45,7 @@ export function printDuplicates(
     console.log(`${divider}`);
   }
 
-  if (dEx.length) {
+  if (dEx.length && exampleName) {
     console.log();
     console.log(`${indicator} ${header(`Duplicate keys in ${exampleName}`)}`);
     console.log(`${divider}`);
