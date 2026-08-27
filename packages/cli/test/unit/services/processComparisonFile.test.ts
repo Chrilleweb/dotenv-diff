@@ -71,6 +71,7 @@ vi.mock('../../../src/services/detectExampleDrift.js', () => ({
 }));
 
 import fs from 'fs';
+import path from 'path';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { applyFixes } from '../../../src/services/fixEnv.js';
 import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
@@ -254,15 +255,8 @@ describe('processComparisonFile', () => {
   });
 
   it('keeps duplicates when fix does not change anything', () => {
-    vi.mocked(applyFixes).mockReturnValueOnce({
-      changed: false,
-      result: {
-        removedDuplicates: [],
-        addedEnv: [],
-        gitignoreUpdated: false,
-      },
-    });
-
+    // `fix` is off, so applyFixes never runs — queueing a return value here
+    // would only leak into the next test that does enable it.
     const result = processComparisonFile(baseScanResult, compareFile, {
       ...baseOpts,
       allowDuplicates: false,
@@ -318,6 +312,48 @@ describe('processComparisonFile', () => {
 
     expect(result.error).toBeUndefined();
     expect(result.exampleFull).toEqual({ A: '1', bKey: '2' });
+  });
+
+  it('checks the example file for duplicates without the examplePath option', () => {
+    // Same reasoning as the drift check: the example beside the comparison file
+    // is checked whether or not --example was passed, so a duplicate there is
+    // not silently missed on a plain scan.
+    vi.mocked(findDuplicateKeys)
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([{ key: 'EX_KEY', count: 2 }]);
+
+    const result = processComparisonFile(
+      { ...baseScanResult, duplicates: {} },
+      compareFile,
+      { ...baseOpts, examplePath: undefined, allowDuplicates: false },
+    );
+
+    // `path.join` in resolveExampleFile, so the separator is platform-specific.
+    expect(findDuplicateKeys).toHaveBeenNthCalledWith(
+      2,
+      path.join('/env', '.env.example'),
+    );
+    expect(result.dupsEx).toEqual([{ key: 'EX_KEY', count: 2 }]);
+  });
+
+  it('keeps example duplicates after a fix, which only rewrites the env file', () => {
+    vi.mocked(findDuplicateKeys)
+      .mockReturnValueOnce([{ key: 'A', count: 2 }])
+      .mockReturnValueOnce([{ key: 'EX_KEY', count: 2 }]);
+
+    const result = processComparisonFile(
+      { ...baseScanResult, duplicates: {} },
+      compareFile,
+      { ...baseOpts, fix: true, allowDuplicates: false },
+    );
+
+    expect(result.fix.fixApplied).toBe(true);
+    // The env file was deduplicated, the example file was never touched.
+    expect(result.dupsEnv).toHaveLength(0);
+    expect(result.scanResult.duplicates?.env).toBeUndefined();
+    expect(result.scanResult.duplicates?.example).toEqual([
+      { key: 'EX_KEY', count: 2 },
+    ]);
   });
 
   it('skips example duplicate check when examplePath equals compareFile path', async () => {

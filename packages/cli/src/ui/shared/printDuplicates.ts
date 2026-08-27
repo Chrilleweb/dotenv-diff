@@ -45,7 +45,7 @@ export function printDuplicates(
     console.log(`${divider}`);
   }
 
-  if (dEx.length) {
+  if (dEx.length && exampleName) {
     console.log();
     console.log(`${indicator} ${header(`Duplicate keys in ${exampleName}`)}`);
     console.log(`${divider}`);

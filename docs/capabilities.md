@@ -84,7 +84,9 @@ Variables that are **defined in env files** but **never used** in the scanned co
 
 ### 3 Duplicate Keys
 
-Duplicate variable definitions inside env files (both main env and example env, when available).
+Duplicate variable definitions inside env files. Both the file being scanned and the example file documenting it are checked — the latter on every scan, against whichever example name applies (`.env.example`, `.env.sample`, `.env.template`, …), without needing `--example`.
+
+`--fix` only rewrites the env file, so duplicates reported in the example file stay reported after a fix.
 
 ### 4 Secret Detection
 

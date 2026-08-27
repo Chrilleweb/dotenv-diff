@@ -163,7 +163,11 @@ export function processComparisonFile(
 
     // Find duplicates
     if (!opts.allowDuplicates) {
-      const duplicateResults = checkDuplicates(compareFile, opts);
+      const duplicateResults = checkDuplicates(
+        compareFile,
+        exampleFilePath,
+        opts,
+      );
       dupsEnv = duplicateResults.dupsEnv;
       dupsEx = duplicateResults.dupsEx;
     }
@@ -223,18 +227,16 @@ export function processComparisonFile(
         fix.addedEnv = result.addedEnv;
         fix.gitignoreUpdated = result.gitignoreUpdated;
 
-        // clear the issues that were fixed
+        // clear the issues that were fixed. `dupsEx` is not among them: the fix
+        // only rewrites the env file, so duplicates in the example file survive
+        // it and must still be reported.
         scanResult.missing = [];
         dupsEnv = [];
-        dupsEx = [];
       }
     }
 
-    // Keep duplicates for output if not fixed
-    if (
-      (dupsEnv.length > 0 || dupsEx.length > 0) &&
-      (!opts.fix || !fix.fixApplied)
-    ) {
+    // Keep the duplicates that were not fixed for output
+    if (dupsEnv.length > 0 || dupsEx.length > 0) {
       if (!scanResult.duplicates) scanResult.duplicates = {};
       if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
       if (dupsEx.length > 0) scanResult.duplicates.example = dupsEx;
@@ -280,13 +282,22 @@ export function processComparisonFile(
 }
 
 /**
- * Check for duplicate keys in env and example files
+ * Check for duplicate keys in env and example files.
+ *
+ * The example file is taken from the caller rather than re-derived from
+ * `--example`, so it is checked whenever one exists beside the comparison file
+ * — the same reasoning as the drift check. Gating it on the flag meant the
+ * example was silently never checked in the common case of a plain
+ * `dotenv-diff scan`, even though a duplicated key there is exactly the kind of
+ * thing that misleads whoever copies the file.
  * @param compareFile - The file to compare against
+ * @param examplePath - Absolute path of the example file, or null when none was found
  * @param opts - Scan options
  * @returns Object containing duplicate keys in env and example files
  */
 function checkDuplicates(
   compareFile: ComparisonFile,
+  examplePath: string | null,
   opts: ScanUsageOptions,
 ): DuplicateResult {
   const isIgnored = (key: string) =>
@@ -297,21 +308,14 @@ function checkDuplicates(
     isIgnored(key),
   );
 
-  // Duplicates in example file
-  let dupsEx: Duplicate[] = [];
-
-  if (opts.examplePath) {
-    const examplePath = resolveFromCwd(opts.cwd, opts.examplePath);
-
-    const exampleIsDifferentFile =
-      fs.existsSync(examplePath) && examplePath !== compareFile.path;
-
-    if (exampleIsDifferentFile) {
-      dupsEx = findDuplicateKeys(examplePath).filter(({ key }) =>
-        isIgnored(key),
-      );
-    }
-  }
+  // Duplicates in example file. Skipped when it *is* the comparison file — a
+  // scan with no `.env` falls through to `.env.example`, and its duplicates are
+  // already reported as `dupsEnv`. `findDuplicateKeys` handles a path that does
+  // not exist, which an explicit `--example` may still point at.
+  const dupsEx: Duplicate[] =
+    examplePath && examplePath !== compareFile.path
+      ? findDuplicateKeys(examplePath).filter(({ key }) => isIgnored(key))
+      : [];
 
   return { dupsEnv, dupsEx } satisfies DuplicateResult;
 }

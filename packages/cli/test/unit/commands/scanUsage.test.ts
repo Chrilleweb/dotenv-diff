@@ -411,6 +411,67 @@ describe('scanUsage', () => {
     );
   });
 
+  it('attaches the resolved example file name onto the scan result', async () => {
+    // Carried through so findings about the example file can name it — a
+    // project may document itself with .env.sample rather than .env.example.
+    vi.mocked(determineComparisonFile).mockResolvedValue({
+      type: 'found',
+      file: { path: '/env/.env', name: '.env' },
+    });
+    vi.mocked(processComparisonFile).mockReturnValue({
+      scanResult: { ...baseScanResult },
+      comparedAgainst: '.env',
+      envVariables: {},
+      duplicatesFound: false,
+      dupsEnv: [],
+      dupsEx: [],
+      fix: {
+        fixApplied: false,
+        removedDuplicates: [],
+        addedEnv: [],
+        gitignoreUpdated: false,
+      },
+      exampleFile: '.env.sample',
+    } as ProcessComparisonResult);
+
+    await scanUsage({ ...baseOpts, json: false });
+
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.objectContaining({ exampleFile: '.env.sample' }),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('leaves the example file name unset when no example file was resolved', async () => {
+    vi.mocked(determineComparisonFile).mockResolvedValue({
+      type: 'found',
+      file: { path: '/env/.env', name: '.env' },
+    });
+    vi.mocked(processComparisonFile).mockReturnValue({
+      scanResult: { ...baseScanResult },
+      comparedAgainst: '.env',
+      envVariables: {},
+      duplicatesFound: false,
+      dupsEnv: [],
+      dupsEx: [],
+      fix: {
+        fixApplied: false,
+        removedDuplicates: [],
+        addedEnv: [],
+        gitignoreUpdated: false,
+      },
+      exampleFile: undefined,
+    } as ProcessComparisonResult);
+
+    await scanUsage({ ...baseOpts, json: false });
+
+    expect(vi.mocked(printScanResult).mock.calls[0]?.[0]).not.toHaveProperty(
+      'exampleFile',
+    );
+  });
+
   it('sets frameworkWarnings on scanResult when frameworkValidator returns results', async () => {
     const { frameworkValidator } =
       await import('../../../src/core/frameworks/frameworkValidator.js');

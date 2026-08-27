@@ -458,6 +458,28 @@ describe('printScanResult', () => {
     );
   });
 
+  it('names the example file in duplicates when the scan resolved one', () => {
+    printScanResult(
+      {
+        ...baseScanResult,
+        duplicates: { example: [{ key: 'EX_KEY', count: 2 }] },
+        exampleFile: '.env.sample',
+      },
+      baseOpts,
+      '.env',
+    );
+
+    expect(printDuplicates).toHaveBeenCalledWith(
+      '.env',
+      '.env.sample',
+      [],
+      [{ key: 'EX_KEY', count: 2 }],
+      false,
+      false,
+      undefined,
+    );
+  });
+
   it('does not print console log warning when logged is undefined', () => {
     printScanResult(
       {

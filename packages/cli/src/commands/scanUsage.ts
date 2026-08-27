@@ -110,6 +110,9 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
     } else {
       scanResult = result.scanResult;
       comparedAgainst = result.comparedAgainst;
+      if (result.exampleFile) {
+        scanResult.exampleFile = result.exampleFile;
+      }
       fixApplied = result.fix.fixApplied;
       removedDuplicates = result.fix.removedDuplicates;
       fixedKeys = result.fix.addedEnv;

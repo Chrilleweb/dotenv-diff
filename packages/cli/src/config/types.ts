@@ -289,6 +289,7 @@ export interface ScanResult {
   };
   frameworkWarnings?: FrameworkWarning[];
   exampleWarnings?: ExampleSecretWarning[];
+  exampleFile?: string;
   logged: EnvUsage[];
   uppercaseWarnings?: UppercaseWarning[];
   expireWarnings?: ExpireWarning[];
