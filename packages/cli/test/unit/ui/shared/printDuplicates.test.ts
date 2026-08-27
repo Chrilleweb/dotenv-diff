@@ -24,19 +24,19 @@ describe('printDuplicates', () => {
   });
 
   it('does nothing when json is true', () => {
-    printDuplicates('.env', [], [], true, false, false, '.env.example');
+    printDuplicates('.env', '.env.example', [], [], true, false, false);
     expect(logSpy).not.toHaveBeenCalled();
   });
 
   it('does not print env duplicates when fix=true', () => {
     printDuplicates(
       '.env',
+      '.env.example',
       [{ key: 'A', count: 2 }],
       [],
       false,
       true,
       false,
-      '.env.example',
     );
 
     expect(
@@ -47,7 +47,7 @@ describe('printDuplicates', () => {
   });
 
   it('does not print env duplicates when none exist', () => {
-    printDuplicates('.env', [], [], false, false, false, '.env.example');
+    printDuplicates('.env', '.env.example', [], [], false, false, false);
 
     expect(logSpy).not.toHaveBeenCalled();
   });
@@ -55,12 +55,12 @@ describe('printDuplicates', () => {
   it('prints both env and example duplicates together', () => {
     printDuplicates(
       '.env',
+      '.env.example',
       [{ key: 'A', count: 2 }],
       [{ key: 'B', count: 3 }],
       false,
       false,
       false,
-      '.env.example',
     );
 
     expect(logSpy).toHaveBeenCalled();
@@ -69,12 +69,12 @@ describe('printDuplicates', () => {
   it('names the example file that duplicates were found in', () => {
     printDuplicates(
       '.env',
+      '.env.sample',
       [],
       [{ key: 'B', count: 3 }],
       false,
       false,
       false,
-      '.env.sample',
     );
 
     expect(logSpy).toHaveBeenCalledWith(
@@ -83,7 +83,15 @@ describe('printDuplicates', () => {
   });
 
   it('skips example duplicates when no example file was resolved', () => {
-    printDuplicates('.env', [], [{ key: 'B', count: 3 }], false);
+    printDuplicates(
+      '.env',
+      '',
+      [],
+      [{ key: 'B', count: 3 }],
+      false,
+      false,
+      false,
+    );
 
     expect(logSpy).not.toHaveBeenCalled();
   });
@@ -91,12 +99,12 @@ describe('printDuplicates', () => {
   it('uses strict formatting when strict mode is enabled', () => {
     printDuplicates(
       '.env',
+      '.env.example',
       [{ key: 'A', count: 2 }],
       [{ key: 'B', count: 3 }],
       false,
       false,
       true,
-      '.env.example',
     );
 
     expect(logSpy).toHaveBeenCalledWith(

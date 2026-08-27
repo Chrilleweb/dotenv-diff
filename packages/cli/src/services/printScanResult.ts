@@ -91,12 +91,12 @@ export function printScanResult(
   // Duplicates
   printDuplicates(
     comparedAgainst || DEFAULT_ENV_FILE,
+    scanResult.exampleFile || 'example file',
     scanResult.duplicates?.env ?? [],
     scanResult.duplicates?.example ?? [],
     isJson,
     opts.fix ?? false,
     opts.strict,
-    scanResult.exampleFile,
   );
 
   // Print potential secrets found

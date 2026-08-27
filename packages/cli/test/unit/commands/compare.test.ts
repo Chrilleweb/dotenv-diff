@@ -885,12 +885,11 @@ describe('compareMany', () => {
     // printDuplicates receives false for both ?? args (lines 123-124)
     expect(mockPrintDuplicates).toHaveBeenCalledWith(
       '.env',
-      [],
-      [],
-      false,
-      false,
-      false,
       '.env.example',
+      [],
+      [],
+      false,
+      false,
     );
     // printIssues receives false for both ?? args (line 266)
     expect(mockPrintIssues).toHaveBeenCalledWith(
