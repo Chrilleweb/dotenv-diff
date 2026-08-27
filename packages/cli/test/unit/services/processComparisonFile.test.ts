@@ -71,6 +71,7 @@ vi.mock('../../../src/services/detectExampleDrift.js', () => ({
 }));
 
 import fs from 'fs';
+import path from 'path';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
 import { applyFixes } from '../../../src/services/fixEnv.js';
 import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
@@ -327,7 +328,11 @@ describe('processComparisonFile', () => {
       { ...baseOpts, examplePath: undefined, allowDuplicates: false },
     );
 
-    expect(findDuplicateKeys).toHaveBeenNthCalledWith(2, '/env/.env.example');
+    // `path.join` in resolveExampleFile, so the separator is platform-specific.
+    expect(findDuplicateKeys).toHaveBeenNthCalledWith(
+      2,
+      path.join('/env', '.env.example'),
+    );
     expect(result.dupsEx).toEqual([{ key: 'EX_KEY', count: 2 }]);
   });
 
