@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.1
+
+### Patch Changes
+
+- f7b7be4: check the example file for duplicate keys on scan
+
 ## 3.4.0
 
 ### Minor Changes

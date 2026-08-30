@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: example-duplicates.md -->
+## 2026-08-30
+
+### Highlights
+- check the example file for duplicate keys on scan
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: example-secret-scan.md,secret-finding-kind.md,secret-heading-severity.md,secret-severity-parity.md -->
 ## 2026-08-22
 
