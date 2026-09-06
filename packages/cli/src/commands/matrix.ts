@@ -18,7 +18,9 @@ import type {
 
 /** Resolved file ready to be parsed: its display name and absolute path. */
 interface ResolvedFile {
+  /** The display name of the file. */
   name: string;
+  /** The absolute path to the file. */
   path: string;
 }
 

@@ -6,7 +6,7 @@
  * Run with: pnpm vitest bench
  */
 
-import { bench, describe } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 // --- Representative env-detection patterns ---
 // Approximates ENV_PATTERNS: a mix of patterns, most of which do NOT match a
@@ -77,27 +77,40 @@ const files = Array.from({ length: FILE_COUNT }, (_, i) => makeFile(i));
 // Each iteration scans every file with every pattern, mirroring how scanFile
 // is called once per file across a codebase scan.
 describe('scanFile pattern matching: new RegExp vs reuse', () => {
-  bench('old: new RegExp per pattern per file', () => {
-    for (const content of files) {
-      for (const p of PATTERN_SOURCES) {
-        const regex = new RegExp(p.source, p.flags);
-        let m: RegExpExecArray | null;
-        while ((m = regex.exec(content)) !== null) {
-          void m[1];
-        }
-      }
-    }
-  });
+  test('recompiling vs reusing the pattern regexes', async ({ bench }) => {
+    // `sink` consumes each captured name so the engine cannot drop the exec
+    // loops as dead code — see https://vitest.dev/guide/benchmarking#stability
+    let sink = 0;
 
-  bench('new: reuse precompiled regex, reset lastIndex', () => {
-    for (const content of files) {
-      for (const regex of COMPILED) {
-        regex.lastIndex = 0;
-        let m: RegExpExecArray | null;
-        while ((m = regex.exec(content)) !== null) {
-          void m[1];
+    const result = await bench.compare(
+      bench('old: new RegExp per pattern per file', () => {
+        for (const content of files) {
+          for (const p of PATTERN_SOURCES) {
+            const regex = new RegExp(p.source, p.flags);
+            let m: RegExpExecArray | null;
+            while ((m = regex.exec(content)) !== null) {
+              sink += m[1]?.length ?? 0;
+            }
+          }
         }
-      }
-    }
+      }),
+      bench('new: reuse precompiled regex, reset lastIndex', () => {
+        for (const content of files) {
+          for (const regex of COMPILED) {
+            regex.lastIndex = 0;
+            let m: RegExpExecArray | null;
+            while ((m = regex.exec(content)) !== null) {
+              sink += m[1]?.length ?? 0;
+            }
+          }
+        }
+      }),
+    );
+
+    if (Number.isNaN(sink)) throw new Error('unreachable');
+
+    expect(
+      result.get('new: reuse precompiled regex, reset lastIndex'),
+    ).toBeFasterThan(result.get('old: new RegExp per pattern per file'));
   });
 });

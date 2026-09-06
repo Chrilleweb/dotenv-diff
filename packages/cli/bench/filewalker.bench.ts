@@ -5,7 +5,7 @@
  * Run with: pnpm vitest bench
  */
 
-import { bench, describe } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import path from 'path';
 
 // --- Setup: realistic corpus ---
@@ -93,19 +93,32 @@ function matchesGlobPatternCached(filePath: string, pattern: string): boolean {
 // Each iteration runs every file path against every pattern, which mirrors
 // how shouldInclude / shouldExclude are called during a directory walk.
 describe('matchesGlobPattern: uncached vs cached', () => {
-  bench('uncached (old) — compiles RegExp per call', () => {
-    for (const filePath of filePaths) {
-      for (const pattern of PATTERNS) {
-        matchesGlobPatternUncached(filePath, pattern);
-      }
-    }
-  });
+  test('recompiling vs caching the glob regex', async ({ bench }) => {
+    // `sink` keeps the match results live so the engine cannot drop the calls
+    // as dead code — see https://vitest.dev/guide/benchmarking#stability
+    let sink = 0;
 
-  bench('cached (new) — compiles each RegExp once', () => {
-    for (const filePath of filePaths) {
-      for (const pattern of PATTERNS) {
-        matchesGlobPatternCached(filePath, pattern);
-      }
-    }
+    const result = await bench.compare(
+      bench('uncached (old) — compiles RegExp per call', () => {
+        for (const filePath of filePaths) {
+          for (const pattern of PATTERNS) {
+            if (matchesGlobPatternUncached(filePath, pattern)) sink++;
+          }
+        }
+      }),
+      bench('cached (new) — compiles each RegExp once', () => {
+        for (const filePath of filePaths) {
+          for (const pattern of PATTERNS) {
+            if (matchesGlobPatternCached(filePath, pattern)) sink++;
+          }
+        }
+      }),
+    );
+
+    if (Number.isNaN(sink)) throw new Error('unreachable');
+
+    expect(
+      result.get('cached (new) — compiles each RegExp once'),
+    ).toBeFasterThan(result.get('uncached (old) — compiles RegExp per call'));
   });
 });

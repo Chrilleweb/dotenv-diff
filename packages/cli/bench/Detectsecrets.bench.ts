@@ -6,7 +6,7 @@
  * Run with: pnpm vitest bench
  */
 
-import { bench, describe } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 // --- Synthetic source: realistic mix of literal lengths ---
 // The point of this bench is to show how much work is wasted when the regex
@@ -81,28 +81,44 @@ const lines = source.split('\n');
 // would: per line, run the regex, then the harmless check, then (in the old
 // version) the length filter.
 describe('LONG_LITERAL: {24,} (old) vs {32,} (new)', () => {
-  bench('old: regex {24,} + JS-side length filter', () => {
-    for (const line of lines) {
-      OLD_LONG_LITERAL.lastIndex = 0;
-      let m: RegExpExecArray | null;
-      while ((m = OLD_LONG_LITERAL.exec(line)) !== null) {
-        const literal = m[1]!;
-        if (looksHarmless(literal)) continue;
-        if (literal.length < 32) continue;
-        // entropy calc would go here in production
-      }
-    }
-  });
+  test('regex-side vs JS-side length filtering', async ({ bench }) => {
+    // `sink` consumes every surviving literal so the engine cannot eliminate
+    // the scan as dead code — see the "Dead Code Elimination" note in
+    // https://vitest.dev/guide/benchmarking#stability
+    let sink = 0;
 
-  bench('new: regex {32,} — engine does the filtering', () => {
-    for (const line of lines) {
-      NEW_LONG_LITERAL.lastIndex = 0;
-      let m: RegExpExecArray | null;
-      while ((m = NEW_LONG_LITERAL.exec(line)) !== null) {
-        const literal = m[1]!;
-        if (looksHarmless(literal)) continue;
-        // no length check needed
-      }
-    }
+    const result = await bench.compare(
+      bench('old: regex {24,} + JS-side length filter', () => {
+        for (const line of lines) {
+          OLD_LONG_LITERAL.lastIndex = 0;
+          let m: RegExpExecArray | null;
+          while ((m = OLD_LONG_LITERAL.exec(line)) !== null) {
+            const literal = m[1]!;
+            if (looksHarmless(literal)) continue;
+            if (literal.length < 32) continue;
+            // entropy calc would go here in production
+            sink += literal.length;
+          }
+        }
+      }),
+      bench('new: regex {32,} — engine does the filtering', () => {
+        for (const line of lines) {
+          NEW_LONG_LITERAL.lastIndex = 0;
+          let m: RegExpExecArray | null;
+          while ((m = NEW_LONG_LITERAL.exec(line)) !== null) {
+            const literal = m[1]!;
+            if (looksHarmless(literal)) continue;
+            // no length check needed
+            sink += literal.length;
+          }
+        }
+      }),
+    );
+
+    if (Number.isNaN(sink)) throw new Error('unreachable');
+
+    expect(
+      result.get('new: regex {32,} — engine does the filtering'),
+    ).toBeFasterThan(result.get('old: regex {24,} + JS-side length filter'));
   });
 });

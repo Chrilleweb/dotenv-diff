@@ -237,6 +237,11 @@ function fingerprint(input: string): string {
   return crypto.createHash('sha256').update(input).digest('hex').slice(0, 12);
 }
 
+/**
+ * Sorts an array of baseline entries by rule, file, and key.
+ * @param entries The array of baseline entries to sort
+ * @returns A new array of baseline entries sorted by rule, file, and key
+ */
 function sortEntries(entries: BaselineEntry[]): BaselineEntry[] {
   return [...entries].sort((a, b) => {
     if (a.rule !== b.rule) return a.rule.localeCompare(b.rule);
