@@ -3,14 +3,15 @@
  * line offsets once and binary-searching beats slicing the file from the
  * start for every match (which is O(matches × file size)).
  *
- * Both benchmarks accumulate their results into `sink`, which is read in
- * afterAll. This prevents the optimizer from eliminating the lookups as dead
- * code, which would otherwise make the binary-search numbers untrustworthy.
+ * Both benchmarks accumulate their results into `sink`, which is read after
+ * bench.compare resolves. This prevents the optimizer from eliminating the
+ * lookups as dead code, which would otherwise make the binary-search numbers
+ * untrustworthy. See https://vitest.dev/guide/benchmarking#stability
  *
  * Run with: pnpm vitest bench
  */
 
-import { bench, describe, afterAll } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 // --- Build one large synthetic file ---
 // The quadratic behavior is within a single file: each match in the OLD path
@@ -94,34 +95,39 @@ function newLineCol(
   }
 }
 
-// Accumulator the optimizer cannot prove is unused — see afterAll below.
-let sink = 0;
-
-afterAll(() => {
-  // Reading sink forces every `sink +=` in the benchmarks to be "live",
-  // so the lookup work cannot be eliminated as dead code.
-  if (Number.isNaN(sink)) {
-    throw new Error('unreachable — sink should never be NaN');
-  }
-});
-
 // --- Benchmarks ---
 // Each iteration = one scanFile-equivalent pass over a single large file:
 // resolve line/column for every match in it, consuming each result.
 describe('scanFile line/column lookup: substring vs binary search', () => {
-  bench('old: substring(0, idx).split per match', () => {
-    for (const idx of matchIndices) {
-      const r = oldLineCol(content, idx);
-      sink += r.line + r.column;
-    }
-  });
+  test('substring scan vs precomputed line offsets', async ({ bench }) => {
+    // Accumulator the optimizer cannot prove is unused — read after compare.
+    let sink = 0;
 
-  bench('new: precompute line offsets + binary search', () => {
-    // buildLineStarts runs once per file, exactly as in scanFile.
-    const lineStarts = buildLineStarts(sourceLines);
-    for (const idx of matchIndices) {
-      const r = newLineCol(lineStarts, idx);
-      sink += r.line + r.column;
+    const result = await bench.compare(
+      bench('old: substring(0, idx).split per match', () => {
+        for (const idx of matchIndices) {
+          const r = oldLineCol(content, idx);
+          sink += r.line + r.column;
+        }
+      }),
+      bench('new: precompute line offsets + binary search', () => {
+        // buildLineStarts runs once per file, exactly as in scanFile.
+        const lineStarts = buildLineStarts(sourceLines);
+        for (const idx of matchIndices) {
+          const r = newLineCol(lineStarts, idx);
+          sink += r.line + r.column;
+        }
+      }),
+    );
+
+    // Reading sink forces every `sink +=` in the benchmarks to be "live",
+    // so the lookup work cannot be eliminated as dead code.
+    if (Number.isNaN(sink)) {
+      throw new Error('unreachable — sink should never be NaN');
     }
+
+    expect(
+      result.get('new: precompute line offsets + binary search'),
+    ).toBeFasterThan(result.get('old: substring(0, idx).split per match'));
   });
 });

@@ -5,6 +5,10 @@ export default defineConfig({
     exclude: ['dist', 'node_modules'],
     testTimeout: 50000,
     hookTimeout: 50000,
+    benchmark: {
+      include: ['./bench/**/*.bench.ts'],
+      exclude: ['dist', 'node_modules'],
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'json-summary'],
