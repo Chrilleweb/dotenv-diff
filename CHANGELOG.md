@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: bumpy-ants-lose.md -->
+## 2026-10-06
+
+### Highlights
+- updated chalk dependency
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: example-duplicates.md -->
 ## 2026-09-06
 
