@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.4.2
+
+### Patch Changes
+
+- 890cea6: updated chalk dependency
+
 ## 3.4.1
 
 ### Patch Changes
