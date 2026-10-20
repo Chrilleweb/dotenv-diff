@@ -19,12 +19,14 @@ type Pattern = {
 const ENV_VAR_NAME_PATTERN = /^[A-Z_][A-Z0-9_]*$/;
 
 /**
- * Matches SvelteKit $env imports to collect import sources per file.
+ * Matches SvelteKit env imports to collect import sources per file.
+ * Covers the legacy `$env/*` modules and the SvelteKit 3 `$app/env/*` modules.
  * Example: import { env } from '$env/dynamic/private'
  * Example: import { PUBLIC_URL } from '$env/static/public'
+ * Example: import { API_KEY } from '$app/env/private'
  */
 export const SVELTEKIT_IMPORT_REGEX =
-  /import\s+(?:\{[^}]*\}|\w+)\s+from\s+['"](?<module>\$env\/(?:static|dynamic)\/(?:private|public))['"]/g;
+  /import\s+(?:\{[^}]*\}|\w+)\s+from\s+['"](?<module>\$env\/(?:static|dynamic)\/(?:private|public)|\$app\/env\/(?:private|public))['"]/g;
 
 /**
  * Matches aliased SvelteKit env imports.
@@ -69,6 +71,92 @@ export function buildSveltekitAliasPatterns(
       },
     },
   ];
+}
+
+/**
+ * Extracts the imported names from a named import list, ignoring local aliases.
+ * Example: "A, B as b, type C" → ["A", "B", "C"]
+ */
+function parseNamedImports(content: string | undefined): string[] {
+  if (!content) return [];
+  return content
+    .split(',')
+    .map((part) => part.trim().replace(/^type\s+/, ''))
+    .map((part) => part.split(/\s+as\s+/)[0]!.trim())
+    .filter((key) => ENV_VAR_NAME_PATTERN.test(key));
+}
+
+/**
+ * Extracts the top-level keys of the object literal passed to
+ * `defineEnvVars({ ... })` (SvelteKit 3 `src/env.ts`). Nested config objects
+ * (`{ public: true, schema: ... }`), strings and comments are skipped.
+ * @param source - The full file content.
+ * @param start - Offset of the opening `{` of the object literal.
+ */
+function parseDefineEnvVarsKeys(source: string, start: number): string[] {
+  const keys: string[] = [];
+  let depth = 0;
+  // True when the next token at depth 1 is in key position.
+  let expectKey = false;
+
+  for (let i = start; i < source.length; i++) {
+    const ch = source[i]!;
+
+    // Skip comments
+    if (ch === '/' && source[i + 1] === '/') {
+      const end = source.indexOf('\n', i);
+      i = end === -1 ? source.length : end;
+      continue;
+    }
+    if (ch === '/' && source[i + 1] === '*') {
+      const end = source.indexOf('*/', i + 2);
+      i = end === -1 ? source.length : end + 1;
+      continue;
+    }
+
+    // Strings (quoted keys at depth 1 are captured, everything else skipped)
+    if (ch === '"' || ch === "'" || ch === '`') {
+      let j = i + 1;
+      while (j < source.length && source[j] !== ch) {
+        if (source[j] === '\\') j++;
+        j++;
+      }
+      if (depth === 1 && expectKey) {
+        const key = source.slice(i + 1, j);
+        if (ENV_VAR_NAME_PATTERN.test(key)) keys.push(key);
+        expectKey = false;
+      }
+      i = j;
+      continue;
+    }
+
+    if (ch === '{' || ch === '[' || ch === '(') {
+      depth++;
+      if (depth === 1) expectKey = true;
+      continue;
+    }
+    if (ch === '}' || ch === ']' || ch === ')') {
+      depth--;
+      if (depth === 0) break;
+      continue;
+    }
+
+    if (depth !== 1) continue;
+
+    if (ch === ',') {
+      expectKey = true;
+      continue;
+    }
+
+    if (expectKey && /[A-Za-z_$]/.test(ch)) {
+      const ident = /^[A-Za-z_$][\w$]*/.exec(source.slice(i))![0];
+      if (ENV_VAR_NAME_PATTERN.test(ident)) keys.push(ident);
+      expectKey = false;
+      i += ident.length - 1;
+    }
+  }
+
+  return keys;
 }
 
 /**
@@ -154,6 +242,31 @@ export const ENV_PATTERNS: Pattern[] = [
     name: 'sveltekit' as const,
     regex:
       /import\s*\{\s*([A-Z_][A-Z0-9_]*)\s*\}\s*from\s*['"]\$env\/static\/(?:private|public)['"]/g,
+  },
+
+  // SvelteKit 3 named imports (single, multiple, aliased, multiline)
+  // import { PUBLIC_SENTRY_DSN } from '$app/env/public';
+  // import { API_KEY, OTHER_KEY as other } from '$app/env/private';
+  {
+    name: 'sveltekit' as const,
+    regex: /import\s*\{([^}]*)\}\s*from\s*['"]\$app\/env\/private['"]/g,
+    sourceModule: '$app/env/private',
+    processor: (match) => parseNamedImports(match[1]),
+  },
+  {
+    name: 'sveltekit' as const,
+    regex: /import\s*\{([^}]*)\}\s*from\s*['"]\$app\/env\/public['"]/g,
+    sourceModule: '$app/env/public',
+    processor: (match) => parseNamedImports(match[1]),
+  },
+
+  // SvelteKit 3 env declarations in src/env.ts
+  // export const variables = defineEnvVars({ API_KEY: {}, PUBLIC_URL: { public: true } });
+  {
+    name: 'sveltekit' as const,
+    regex: /\bdefineEnvVars\s*\(\s*(?=\{)/g,
+    processor: (match) =>
+      parseDefineEnvVarsKeys(match.input, match.index + match[0].length),
   },
 
   // Bare env object accessor (framework resolved from file context at scan time)

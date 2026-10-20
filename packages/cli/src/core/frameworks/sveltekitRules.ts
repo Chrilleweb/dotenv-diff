@@ -158,6 +158,22 @@ export function applySvelteKitRules(
     return;
   }
 
+  // $app/env/private (SvelteKit 3)
+  if (
+    u.pattern === 'sveltekit' &&
+    u.imports?.includes('$app/env/private') &&
+    (isSvelteFile || isClientFile)
+  ) {
+    warnings.push({
+      variable: u.variable,
+      reason: '$app/env/private cannot be used in client-side code',
+      file: normalizedFile,
+      line: u.line,
+      framework: 'sveltekit',
+    });
+    return;
+  }
+
   // Warn if PUBLIC_ or VITE_ contains sensitive keywords
   if (
     (u.variable.startsWith('PUBLIC_') || u.variable.startsWith('VITE_')) &&

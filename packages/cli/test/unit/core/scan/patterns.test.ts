@@ -428,6 +428,99 @@ describe('scanFile - Pattern Detection', () => {
     });
   });
 
+  describe('SvelteKit 3 $app/env imports', () => {
+    it('detects import from $app/env/public', () => {
+      const code = `import * as Sentry from '@sentry/sveltekit';
+import { PUBLIC_SENTRY_DSN } from '$app/env/public';
+
+Sentry.init({ dsn: PUBLIC_SENTRY_DSN });`;
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'PUBLIC_SENTRY_DSN',
+        pattern: 'sveltekit',
+        imports: ['$app/env/public'],
+      });
+    });
+
+    it('detects import from $app/env/private', () => {
+      const code = "import { ADRESSEVAELGER_TOKEN } from '$app/env/private';";
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        variable: 'ADRESSEVAELGER_TOKEN',
+        imports: ['$app/env/private'],
+      });
+    });
+
+    it('detects multiple, aliased and multiline imports', () => {
+      const code = `import {
+  API_KEY,
+  DB_URL as dbUrl,
+} from "$app/env/private";`;
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result.map((u) => u.variable)).toEqual(['API_KEY', 'DB_URL']);
+    });
+
+    it('does not match $app/env (non-variable module)', () => {
+      const code = "import { building } from '$app/env';";
+      const result = scanFile('test.ts', code, baseOpts);
+
+      expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('SvelteKit 3 defineEnvVars', () => {
+    it('detects top-level keys declared in src/env.ts', () => {
+      const code = `import { defineEnvVars } from '@sveltejs/kit/env';
+import * as v from 'valibot';
+
+export const variables = defineEnvVars({
+  // Sentry
+  PUBLIC_SENTRY_DSN: { public: true, schema: v.pipe(v.string(), v.url()) },
+  'ADRESSEVAELGER_TOKEN': {},
+  NESTED: { description: 'not { a: KEY }', schema: (value) => ({ OTHER: value }) },
+  /* COMMENTED_OUT: {}, */
+});`;
+      const result = scanFile('src/env.ts', code, baseOpts);
+
+      expect(result.map((u) => u.variable)).toEqual([
+        'PUBLIC_SENTRY_DSN',
+        'ADRESSEVAELGER_TOKEN',
+        'NESTED',
+      ]);
+      expect(result[0]).toMatchObject({ pattern: 'sveltekit', line: 4 });
+    });
+
+    it('ignores non env-var keys, escaped quotes and lowercase string keys', () => {
+      const code = `defineEnvVars({
+  lowerCase: {},
+  'not-valid': {},
+  API_KEY: { description: 'it\\'s { tricky }' },
+});`;
+      const result = scanFile('src/env.ts', code, baseOpts);
+
+      expect(result.map((u) => u.variable)).toEqual(['API_KEY']);
+    });
+
+    it('handles a trailing line comment without a newline', () => {
+      const code = 'defineEnvVars({ API_KEY: {} // trailing';
+      const result = scanFile('src/env.ts', code, baseOpts);
+
+      expect(result.map((u) => u.variable)).toEqual(['API_KEY']);
+    });
+
+    it('handles an unterminated block comment', () => {
+      const code = 'defineEnvVars({ API_KEY: {}, /* OTHER_KEY: {}';
+      const result = scanFile('src/env.ts', code, baseOpts);
+
+      expect(result.map((u) => u.variable)).toEqual(['API_KEY']);
+    });
+  });
+
   describe('SvelteKit Invalid Dynamic Named Imports', () => {
     it('detects invalid named import from $env/dynamic/private', () => {
       const code = "import { SECRET_KEY } from '$env/dynamic/private';";
