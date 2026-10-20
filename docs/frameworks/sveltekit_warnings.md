@@ -105,7 +105,23 @@ Warning:
 
 `$env/static/public variables must start with "PUBLIC_"`
 
-## 9 Sensitive-looking `PUBLIC_` / `VITE_` names trigger exposure warnings
+## 9 `$app/env/private` cannot be used in client-side code
+
+SvelteKit 3 replaces the `$env/*` modules with `$app/env/private` and `$app/env/public`.
+
+```svelte
+<script lang="ts">
+  import { SECRET_KEY } from '$app/env/private';
+</script>
+```
+
+Warning:
+
+`$app/env/private cannot be used in client-side code`
+
+**Note:** `$app/env/public` has no `PUBLIC_` prefix rule. In SvelteKit 3 a variable is exposed to the browser via `public: true` in `defineEnvVars`, not via its name.
+
+## 10 Sensitive-looking `PUBLIC_` / `VITE_` names trigger exposure warnings
 
 If a client-exposed name contains `SECRET`, `PRIVATE`, or `PASSWORD`, a warning is produced.
 
@@ -128,6 +144,7 @@ Warning:
 - `$env/dynamic/public` → must use `PUBLIC_*`
 - `$env/static/private` → server-only, never `PUBLIC_*`
 - `$env/static/public` → must use `PUBLIC_*`
+- `$app/env/private` → server-only
 - Sensitive client-exposed names (`PUBLIC_*`/`VITE_*`) → warning
 
 ## Best practices

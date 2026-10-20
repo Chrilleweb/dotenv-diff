@@ -175,6 +175,17 @@ describe('computeExitDecision', () => {
       });
     }
 
+    it('passes under --strict when secrets and logged are undefined', () => {
+      const result = computeExitDecision(
+        scan({
+          secrets: undefined,
+          logged: undefined,
+        } as unknown as Partial<ScanResult>),
+        { strict: true },
+      );
+      expect(result.exitWithError).toBe(false);
+    });
+
     it('does not fail on expire warnings beyond the strict threshold', () => {
       const result = computeExitDecision(
         scan({

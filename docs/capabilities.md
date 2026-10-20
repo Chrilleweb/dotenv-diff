@@ -43,6 +43,16 @@ const { MY_KEY } = privateEnv
 import { MY_KEY } from '$env/static/private';
 import { MY_KEY } from '$env/static/public';
 MY_KEY
+
+// SvelteKit 3 – named imports from $app/env
+import { MY_KEY } from '$app/env/private';
+import { MY_KEY, OTHER_KEY as alias } from '$app/env/public';
+
+// SvelteKit 3 – declarations in src/env.ts (top-level keys count as used)
+export const variables = defineEnvVars({
+  MY_KEY: {},
+  OTHER_KEY: { public: true },
+});
 ```
 
 Docker Compose files are also scanned for shell-style interpolation, so

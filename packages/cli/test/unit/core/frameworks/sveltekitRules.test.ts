@@ -27,6 +27,46 @@ describe('applySvelteKitRules', () => {
     vi.clearAllMocks();
   });
 
+  // $app/env/private (SvelteKit 3)
+  it('warns when $app/env/private is used in client code', () => {
+    applySvelteKitRules(
+      {
+        ...baseUsage,
+        pattern: 'sveltekit',
+        variable: 'API_KEY',
+        file: 'src/routes/+page.svelte',
+        imports: ['$app/env/private'],
+      },
+      warnings,
+    );
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]!.reason).toContain('$app/env/private');
+  });
+
+  it('allows $app/env/private in server files and $app/env/public anywhere', () => {
+    applySvelteKitRules(
+      {
+        ...baseUsage,
+        pattern: 'sveltekit',
+        variable: 'API_KEY',
+        file: 'src/routes/+page.server.ts',
+        imports: ['$app/env/private'],
+      },
+      warnings,
+    );
+    applySvelteKitRules(
+      {
+        ...baseUsage,
+        pattern: 'sveltekit',
+        variable: 'SENTRY_DSN',
+        file: 'src/routes/+page.svelte',
+        imports: ['$app/env/public'],
+      },
+      warnings,
+    );
+    expect(warnings).toHaveLength(0);
+  });
+
   it('ignores node_modules', () => {
     applySvelteKitRules(
       { ...baseUsage, file: 'src/node_modules/pkg/index.js' },
