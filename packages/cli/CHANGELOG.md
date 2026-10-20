@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.4.2
+
+### Patch Changes
+
+- 890cea6: updated chalk dependency
+- 861d131: regex to catch svelte v3 env variables
+
 ## 3.4.1
 
 ### Patch Changes
