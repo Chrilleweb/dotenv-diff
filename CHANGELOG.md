@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- changesets: bumpy-ants-lose.md,slow-times-sink.md -->
+## 2026-10-20
+
+### Highlights
+- updated chalk dependency
+- regex to catch svelte v3 env variables
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: example-duplicates.md -->
 ## 2026-09-06
 
