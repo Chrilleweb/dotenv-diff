@@ -28,7 +28,7 @@ function tmpDir() {
 }
 
 /**
- * Minimal Next.js project so detectFramework() → "next"
+ * Minimal Next.js project so detectFramework() → "nextjs"
  */
 function makeNextProject(cwd: string) {
   fs.writeFileSync(

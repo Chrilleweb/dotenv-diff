@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { applyNuxtRules } from '../../../../src/core/frameworks/nuxtRules.js';
+import { validateUsages } from '../../../../src/core/frameworks/frameworkValidator.js';
+import { nuxt } from '../../../../src/core/frameworks/nuxt.js';
 import type {
   EnvUsage,
   FrameworkWarning,
@@ -9,7 +10,11 @@ vi.mock('../../../../src/core/helpers/normalizePath.js', () => ({
   normalizePath: vi.fn((p: string) => p.replace(/\\/g, '/')),
 }));
 
-describe('applyNuxtRules', () => {
+/** Runs the Nuxt rules on a single usage */
+const validate = (usage: EnvUsage, fileContentMap?: Map<string, string>) =>
+  validateUsages([usage], nuxt, fileContentMap);
+
+describe('Nuxt rules', () => {
   let warnings: FrameworkWarning[];
 
   const baseUsage: EnvUsage = {
@@ -29,16 +34,16 @@ describe('applyNuxtRules', () => {
   });
 
   it('ignores files inside node_modules', () => {
-    applyNuxtRules(
-      { ...baseUsage, file: 'src/node_modules/pkg/index.js' },
-      warnings,
-    );
+    warnings = validate({
+      ...baseUsage,
+      file: 'src/node_modules/pkg/index.js',
+    });
 
     expect(warnings).toHaveLength(0);
   });
 
   it('warns about process.env in client/universal code', () => {
-    applyNuxtRules(baseUsage, warnings);
+    warnings = validate(baseUsage);
 
     expect(warnings).toHaveLength(1);
     expect(warnings[0]!.framework).toBe('nuxt');
@@ -46,64 +51,60 @@ describe('applyNuxtRules', () => {
   });
 
   it('allows process.env inside the server directory', () => {
-    applyNuxtRules({ ...baseUsage, file: 'server/api/data.ts' }, warnings);
+    warnings = validate({ ...baseUsage, file: 'server/api/data.ts' });
 
     expect(warnings).toHaveLength(0);
   });
 
   it('allows process.env in .server. suffixed files', () => {
-    applyNuxtRules({ ...baseUsage, file: 'plugins/auth.server.ts' }, warnings);
+    warnings = validate({ ...baseUsage, file: 'plugins/auth.server.ts' });
 
     expect(warnings).toHaveLength(0);
   });
 
   it('allows process.env inside nuxt.config', () => {
-    applyNuxtRules({ ...baseUsage, file: 'nuxt.config.ts' }, warnings);
+    warnings = validate({ ...baseUsage, file: 'nuxt.config.ts' });
 
     expect(warnings).toHaveLength(0);
   });
 
   it('warns about sensitive NUXT_PUBLIC_ variable', () => {
-    applyNuxtRules(
-      {
-        ...baseUsage,
-        variable: 'NUXT_PUBLIC_API_SECRET',
-        file: 'server/api/data.ts',
-      },
-      warnings,
-    );
+    warnings = validate({
+      ...baseUsage,
+      variable: 'NUXT_PUBLIC_API_SECRET',
+      file: 'server/api/data.ts',
+    });
 
     expect(warnings).toHaveLength(1);
     expect(warnings[0]!.reason).toMatch(/sensitive/);
   });
 
   it('does not warn for a safe NUXT_PUBLIC_ variable', () => {
-    applyNuxtRules(
-      {
-        ...baseUsage,
-        variable: 'NUXT_PUBLIC_API_BASE',
-        file: 'server/api/data.ts',
-      },
-      warnings,
-    );
+    warnings = validate({
+      ...baseUsage,
+      variable: 'NUXT_PUBLIC_API_BASE',
+      file: 'server/api/data.ts',
+    });
 
     expect(warnings).toHaveLength(0);
   });
 
   it('does nothing when no rule matches', () => {
-    applyNuxtRules(
-      { ...baseUsage, variable: 'API_SECRET', file: 'server/api/data.ts' },
-      warnings,
-    );
+    warnings = validate({
+      ...baseUsage,
+      variable: 'API_SECRET',
+      file: 'server/api/data.ts',
+    });
 
     expect(warnings).toHaveLength(0);
   });
 
   it('does not warn for import.meta.env usage (supported by Nuxt/Vite)', () => {
-    applyNuxtRules(
-      { ...baseUsage, pattern: 'import.meta.env', variable: 'API_BASE' },
-      warnings,
-    );
+    warnings = validate({
+      ...baseUsage,
+      pattern: 'import.meta.env',
+      variable: 'API_BASE',
+    });
 
     expect(warnings).toHaveLength(0);
   });

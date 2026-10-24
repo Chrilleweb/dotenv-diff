@@ -15,16 +15,16 @@ describe('detectFramework', () => {
 
     const result = detectFramework('/project');
 
-    expect(result.framework).toBe('sveltekit');
-    expect(result.version).toBe('2.0.0');
+    expect(result?.framework.name).toBe('sveltekit');
+    expect(result?.version).toBe('2.0.0');
   });
 
-  it('returns unknown if no package.json', () => {
+  it('returns undefined if no package.json', () => {
     vi.spyOn(fs, 'existsSync').mockReturnValue(false);
 
     const result = detectFramework('/project');
 
-    expect(result.framework).toBe('unknown');
+    expect(result).toBeUndefined();
   });
 
   it('detects nextjs', () => {
@@ -37,8 +37,8 @@ describe('detectFramework', () => {
 
     const result = detectFramework('/project');
 
-    expect(result.framework).toBe('nextjs');
-    expect(result.version).toBe('12.0.0');
+    expect(result?.framework.name).toBe('nextjs');
+    expect(result?.version).toBe('12.0.0');
   });
 
   it('detects nuxt', () => {
@@ -51,11 +51,11 @@ describe('detectFramework', () => {
 
     const result = detectFramework('/project');
 
-    expect(result.framework).toBe('nuxt');
-    expect(result.version).toBe('3.10.0');
+    expect(result?.framework.name).toBe('nuxt');
+    expect(result?.version).toBe('3.10.0');
   });
 
-  it('returns unknown for unrecognized frameworks', () => {
+  it('returns undefined for unrecognized frameworks', () => {
     vi.spyOn(fs, 'existsSync').mockReturnValue(true);
     vi.spyOn(fs, 'readFileSync').mockReturnValue(
       JSON.stringify({
@@ -65,15 +65,15 @@ describe('detectFramework', () => {
 
     const result = detectFramework('/project');
 
-    expect(result.framework).toBe('unknown');
+    expect(result).toBeUndefined();
   });
 
-  it('returns unknown when package.json contains invalid JSON', () => {
+  it('returns undefined when package.json contains invalid JSON', () => {
     vi.spyOn(fs, 'existsSync').mockReturnValue(true);
     vi.spyOn(fs, 'readFileSync').mockReturnValue('{ invalid json }');
 
     const result = detectFramework('/project');
 
-    expect(result).toEqual({ framework: 'unknown' });
+    expect(result).toBeUndefined();
   });
 });

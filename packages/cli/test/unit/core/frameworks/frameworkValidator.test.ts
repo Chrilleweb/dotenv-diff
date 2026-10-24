@@ -1,23 +1,15 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import type { EnvUsage } from '../../../../src/config/types.js';
+import type { EnvUsage, Framework } from '../../../../src/config/types.js';
 
 vi.mock('../../../../src/core/frameworks/frameworkDetector.js', () => ({
   detectFramework: vi.fn(),
 }));
 
-vi.mock('../../../../src/core/frameworks/index.js', () => ({
-  applySvelteKitRules: vi.fn(),
-  applyNextJsRules: vi.fn(),
-  applyNuxtRules: vi.fn(),
-}));
-
-import { frameworkValidator } from '../../../../src/core/frameworks/frameworkValidator.js';
-import { detectFramework } from '../../../../src/core/frameworks/frameworkDetector.js';
 import {
-  applySvelteKitRules,
-  applyNextJsRules,
-  applyNuxtRules,
-} from '../../../../src/core/frameworks/index.js';
+  frameworkValidator,
+  validateUsages,
+} from '../../../../src/core/frameworks/frameworkValidator.js';
+import { detectFramework } from '../../../../src/core/frameworks/frameworkDetector.js';
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -32,64 +24,76 @@ const mockUsage: EnvUsage = {
   context: '',
 };
 
+/** Creates a fake framework whose check always returns the given reason */
+function fakeFramework(reason?: string): Framework {
+  return {
+    name: 'nextjs',
+    packageName: 'next',
+    check: vi.fn(() => reason),
+  };
+}
+
 describe('frameworkValidator', () => {
-  it('applies SvelteKit rules when framework is sveltekit', () => {
-    vi.mocked(detectFramework).mockReturnValue({ framework: 'sveltekit' });
+  it('applies the rules of the detected framework', () => {
+    const framework = fakeFramework('Something is wrong');
+    vi.mocked(detectFramework).mockReturnValue({ framework, version: '1.0.0' });
 
     const warnings = frameworkValidator([mockUsage], '/project');
 
-    expect(applySvelteKitRules).toHaveBeenCalledOnce();
-    expect(applySvelteKitRules).toHaveBeenCalledWith(
-      mockUsage,
-      expect.any(Array),
-    );
-    expect(applyNextJsRules).not.toHaveBeenCalled();
-    expect(warnings).toEqual([]);
+    expect(framework.check).toHaveBeenCalledOnce();
+    expect(warnings).toHaveLength(1);
   });
 
-  it('applies Next.js rules when framework is nextjs', () => {
-    vi.mocked(detectFramework).mockReturnValue({ framework: 'nextjs' });
+  it('returns empty warnings when no framework is detected', () => {
+    vi.mocked(detectFramework).mockReturnValue(undefined);
 
-    const fileContentMap = new Map<string, string>([
-      ['src/index.ts', 'use client'],
+    const warnings = frameworkValidator([mockUsage], '/project');
+
+    expect(warnings).toEqual([]);
+  });
+});
+
+describe('validateUsages', () => {
+  it('builds a warning from the reason returned by the framework', () => {
+    const warnings = validateUsages([mockUsage], fakeFramework('Bad usage'));
+
+    expect(warnings).toEqual([
+      {
+        variable: 'API_KEY',
+        reason: 'Bad usage',
+        file: 'src/index.ts',
+        line: 1,
+        framework: 'nextjs',
+      },
     ]);
+  });
 
-    const warnings = frameworkValidator(
-      [mockUsage],
-      '/project',
-      fileContentMap,
-    );
+  it('returns no warnings when the framework returns no reason', () => {
+    const warnings = validateUsages([mockUsage], fakeFramework(undefined));
 
-    expect(applyNextJsRules).toHaveBeenCalledOnce();
-    expect(applyNextJsRules).toHaveBeenCalledWith(
-      mockUsage,
-      expect.any(Array),
-      fileContentMap,
-    );
-    expect(applySvelteKitRules).not.toHaveBeenCalled();
     expect(warnings).toEqual([]);
   });
 
-  it('applies Nuxt rules when framework is nuxt', () => {
-    vi.mocked(detectFramework).mockReturnValue({ framework: 'nuxt' });
+  it('passes the normalized file path and file content to the framework', () => {
+    const framework = fakeFramework(undefined);
+    const usage = { ...mockUsage, file: 'src\\app\\page.tsx' };
+    const fileContentMap = new Map([[usage.file, '"use client"']]);
 
-    const warnings = frameworkValidator([mockUsage], '/project');
+    validateUsages([usage], framework, fileContentMap);
 
-    expect(applyNuxtRules).toHaveBeenCalledOnce();
-    expect(applyNuxtRules).toHaveBeenCalledWith(mockUsage, expect.any(Array));
-    expect(applySvelteKitRules).not.toHaveBeenCalled();
-    expect(applyNextJsRules).not.toHaveBeenCalled();
-    expect(warnings).toEqual([]);
+    expect(framework.check).toHaveBeenCalledWith(usage, {
+      file: 'src/app/page.tsx',
+      content: '"use client"',
+    });
   });
 
-  it('returns empty warnings when framework is unknown', () => {
-    vi.mocked(detectFramework).mockReturnValue({ framework: 'unknown' });
+  it('skips files inside node_modules', () => {
+    const framework = fakeFramework('Bad usage');
+    const usage = { ...mockUsage, file: 'src/node_modules/pkg/index.js' };
 
-    const warnings = frameworkValidator([mockUsage], '/project');
+    const warnings = validateUsages([usage], framework);
 
-    expect(applySvelteKitRules).not.toHaveBeenCalled();
-    expect(applyNextJsRules).not.toHaveBeenCalled();
-    expect(applyNuxtRules).not.toHaveBeenCalled();
+    expect(framework.check).not.toHaveBeenCalled();
     expect(warnings).toEqual([]);
   });
 });
