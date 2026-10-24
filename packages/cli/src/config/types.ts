@@ -29,6 +29,31 @@ export interface FrameworkWarning {
 }
 
 /**
+ * Information about the file an environment variable usage was found in
+ */
+export interface FrameworkRuleContext {
+  /** The file path, normalized to forward slashes */
+  file: string;
+  /** The full content of the file (if available) */
+  content?: string | undefined;
+}
+
+/**
+ * A supported framework: how to detect it and which rules apply to it
+ */
+export interface Framework {
+  /** Unique name of the framework */
+  name: SupportedFramework;
+  /** npm package whose presence in package.json identifies the framework */
+  packageName: string;
+  /**
+   * Checks a single environment variable usage against the framework rules
+   * @returns The reason for a warning, or undefined if the usage is fine
+   */
+  check(usage: EnvUsage, context: FrameworkRuleContext): string | undefined;
+}
+
+/**
  * Type representing a duplicate entry
  */
 export interface Duplicate {

@@ -1,63 +1,55 @@
 import fs from 'fs';
 import path from 'path';
-import type { DetectedFramework } from '../../config/types.js';
+import type { Framework } from '../../config/types.js';
+import { FRAMEWORKS } from './registry.js';
 
 /**
- * Interface representing the detected framework and its version (if applicable)
+ * Interface representing the detected framework and its version
  */
 interface FrameworkDetection {
-  /** The detected framework (e.g., 'sveltekit', 'nextjs', or 'unknown') */
-  framework: DetectedFramework;
-  /** The version of the detected framework (if available) */
-  version?: string;
+  /** The detected framework */
+  framework: Framework;
+  /** The version range of the framework from package.json */
+  version: string;
 }
 
 /**
- * Detects the framework being used in the project
- * by checking package.json and file structure
+ * Detects the framework being used in the project by checking package.json
  * @param cwd The current working directory of the project
- * @returns Detected framework and its version (if applicable)
+ * @returns The detected framework and its version, or undefined if none is supported
  */
-export function detectFramework(cwd: string): FrameworkDetection {
+export function detectFramework(cwd: string): FrameworkDetection | undefined {
+  const deps = readDependencies(cwd);
+
+  for (const framework of FRAMEWORKS) {
+    const version = deps[framework.packageName];
+    if (version) {
+      return { framework, version };
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Reads dependencies and devDependencies from package.json
+ * @param cwd The current working directory of the project
+ * @returns Map of package names to version ranges (empty if package.json is missing or invalid)
+ */
+function readDependencies(cwd: string): Record<string, string> {
   try {
     const packageJsonPath = path.join(cwd, 'package.json');
 
     if (!fs.existsSync(packageJsonPath)) {
-      return { framework: 'unknown' };
+      return {};
     }
 
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-    const deps = {
+    return {
       ...packageJson.dependencies,
       ...packageJson.devDependencies,
     };
-
-    // Check for SvelteKit
-    if (deps['@sveltejs/kit']) {
-      return {
-        framework: 'sveltekit',
-        version: deps['@sveltejs/kit'],
-      };
-    }
-
-    // Check for Next.js
-    if (deps['next']) {
-      return {
-        framework: 'nextjs',
-        version: deps['next'],
-      };
-    }
-
-    // Check for Nuxt
-    if (deps['nuxt']) {
-      return {
-        framework: 'nuxt',
-        version: deps['nuxt'],
-      };
-    }
-
-    return { framework: 'unknown' };
   } catch {
-    return { framework: 'unknown' };
+    return {};
   }
 }

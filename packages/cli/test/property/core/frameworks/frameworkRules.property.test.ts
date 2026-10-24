@@ -1,18 +1,16 @@
 import { describe, test, expect } from 'vitest';
 import fc from 'fast-check';
-import type {
-  EnvUsage,
-  FrameworkWarning,
-} from '../../../../src/config/types.js';
-import { applyNextJsRules } from '../../../../src/core/frameworks/nextJsRules.js';
-import { applyNuxtRules } from '../../../../src/core/frameworks/nuxtRules.js';
-import { applySvelteKitRules } from '../../../../src/core/frameworks/sveltekitRules.js';
+import type { EnvUsage, Framework } from '../../../../src/config/types.js';
+import { validateUsages } from '../../../../src/core/frameworks/frameworkValidator.js';
+import { FRAMEWORKS } from '../../../../src/core/frameworks/registry.js';
+import { nextjs } from '../../../../src/core/frameworks/nextjs.js';
+import { sveltekit } from '../../../../src/core/frameworks/sveltekit.js';
 import { normalizePath } from '../../../../src/core/helpers/normalizePath.js';
 
 /**
  * Property-based ("fuzz") tests for the per-framework validation rules.
  *
- * Each `apply*Rules` function inspects one env-var usage and pushes at most one
+ * Each framework `check` inspects one env-var usage and yields at most one
  * warning. They are branchy (path regexes, prefix checks, a sensitive-keyword
  * matcher), so these throw thousands of random usages — odd file paths, unicode
  * variables, every access pattern, arbitrary `$env` imports — at all three to
@@ -100,33 +98,17 @@ const usageArb: fc.Arbitrary<EnvUsage> = fc.record({
   isLogged: fc.option(fc.boolean(), { nil: undefined }),
 }) as fc.Arbitrary<EnvUsage>;
 
-type Rule = (
+const run = (
+  framework: Framework,
   u: EnvUsage,
-  warnings: FrameworkWarning[],
   fileContentMap?: Map<string, string>,
-) => void;
+) => validateUsages([u], framework, fileContentMap);
 
-const RULES: Array<{ name: string; fn: Rule; framework: string }> = [
-  { name: 'nextjs', fn: applyNextJsRules, framework: 'nextjs' },
-  { name: 'nuxt', fn: applyNuxtRules as Rule, framework: 'nuxt' },
-  {
-    name: 'sveltekit',
-    fn: applySvelteKitRules as Rule,
-    framework: 'sveltekit',
-  },
-];
-
-const run = (fn: Rule, u: EnvUsage): FrameworkWarning[] => {
-  const w: FrameworkWarning[] = [];
-  fn(u, w);
-  return w;
-};
-
-describe.each(RULES)('$name rules (property-based)', ({ fn, framework }) => {
+describe.each(FRAMEWORKS)('$name rules (property-based)', (framework) => {
   test('never throws on arbitrary usages', () => {
     fc.assert(
       fc.property(usageArb, (u) => {
-        run(fn, u);
+        run(framework, u);
       }),
       { numRuns: 4000 },
     );
@@ -135,7 +117,7 @@ describe.each(RULES)('$name rules (property-based)', ({ fn, framework }) => {
   test('emits at most one warning per usage', () => {
     fc.assert(
       fc.property(usageArb, (u) => {
-        expect(run(fn, u).length).toBeLessThanOrEqual(1);
+        expect(run(framework, u).length).toBeLessThanOrEqual(1);
       }),
       { numRuns: 4000 },
     );
@@ -144,11 +126,11 @@ describe.each(RULES)('$name rules (property-based)', ({ fn, framework }) => {
   test('every emitted warning is well-formed', () => {
     fc.assert(
       fc.property(usageArb, (u) => {
-        for (const w of run(fn, u)) {
+        for (const w of run(framework, u)) {
           expect(w.variable).toBe(u.variable);
           expect(w.line).toBe(u.line);
           expect(w.file).toBe(normalizePath(u.file));
-          expect(w.framework).toBe(framework);
+          expect(w.framework).toBe(framework.name);
           expect(typeof w.reason).toBe('string');
           expect(w.reason.length).toBeGreaterThan(0);
         }
@@ -161,7 +143,7 @@ describe.each(RULES)('$name rules (property-based)', ({ fn, framework }) => {
     fc.assert(
       fc.property(usageArb, (u) => {
         if (normalizePath(u.file).includes('/node_modules/')) {
-          expect(run(fn, u)).toEqual([]);
+          expect(run(framework, u)).toEqual([]);
         }
       }),
       { numRuns: 4000 },
@@ -171,7 +153,7 @@ describe.each(RULES)('$name rules (property-based)', ({ fn, framework }) => {
   test('is deterministic', () => {
     fc.assert(
       fc.property(usageArb, (u) => {
-        expect(run(fn, u)).toEqual(run(fn, u));
+        expect(run(framework, u)).toEqual(run(framework, u));
       }),
       { numRuns: 3000 },
     );
@@ -181,7 +163,7 @@ describe.each(RULES)('$name rules (property-based)', ({ fn, framework }) => {
     fc.assert(
       fc.property(usageArb, (u) => {
         const snapshot = JSON.stringify(u);
-        run(fn, u);
+        run(framework, u);
         expect(JSON.stringify(u)).toBe(snapshot);
       }),
       { numRuns: 2000 },
@@ -189,7 +171,7 @@ describe.each(RULES)('$name rules (property-based)', ({ fn, framework }) => {
   });
 });
 
-describe('applySvelteKitRules — $lib/server is server context (property-based)', () => {
+describe('sveltekit — $lib/server is server context (property-based)', () => {
   test('process.env in a $lib/server file never triggers the client-usage warning', () => {
     const serverPath = fc
       .array(fc.stringMatching(/^[a-z]{1,8}$/), { minLength: 0, maxLength: 3 })
@@ -204,8 +186,7 @@ describe('applySvelteKitRules — $lib/server is server context (property-based)
           pattern: 'process.env',
           context: '',
         } as EnvUsage;
-        const w: FrameworkWarning[] = [];
-        applySvelteKitRules(u, w);
+        const w = run(sveltekit, u);
         expect(
           w.some(
             (x) =>
@@ -218,7 +199,7 @@ describe('applySvelteKitRules — $lib/server is server context (property-based)
   });
 });
 
-describe('applyNextJsRules — fileContentMap handling (property-based)', () => {
+describe('nextjs — fileContentMap handling (property-based)', () => {
   test('a "use client" file forces the NEXT_PUBLIC_ requirement', () => {
     const nonPublicVar = fc
       .tuple(fc.constantFrom('', 'FOO_', 'API_'), fc.constantFrom('KEY', 'URL'))
@@ -239,8 +220,7 @@ describe('applyNextJsRules — fileContentMap handling (property-based)', () => 
             context: '',
           } as EnvUsage;
           const map = new Map([[file, '"use client"\nconst x = 1']]);
-          const w: FrameworkWarning[] = [];
-          applyNextJsRules(u, w, map);
+          const w = run(nextjs, u, map);
           expect(w).toHaveLength(1);
           expect(w[0]!.reason).toBe(
             'Server-only variable accessed from client code',
@@ -254,8 +234,7 @@ describe('applyNextJsRules — fileContentMap handling (property-based)', () => 
   test('never throws with arbitrary file-content maps', () => {
     fc.assert(
       fc.property(usageArb, fc.string({ unit: 'binary' }), (u, content) => {
-        const w: FrameworkWarning[] = [];
-        applyNextJsRules(u, w, new Map([[u.file, content]]));
+        run(nextjs, u, new Map([[u.file, content]]));
       }),
       { numRuns: 2000 },
     );
