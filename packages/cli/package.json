@@ -6,25 +6,25 @@
   "bin": {
     "dotenv-diff": "dist/bin/dotenv-diff.js"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
     },
     "./package.json": "./package.json"
   },
   "files": [
     "dist/",
-    "docs/",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc",
+    "build": "node -e \"fs.rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
     "dev": "npx dotenv-diff",
     "test": "vitest run",
     "coverage": "vitest run --coverage",

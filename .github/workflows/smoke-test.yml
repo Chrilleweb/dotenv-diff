@@ -1,0 +1,138 @@
+name: Package smoke test
+
+# Packs the CLI exactly as it would be published to npm, installs the tarball
+# into an empty project and verifies the bin, the ESM entry and the types.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    # Use bash on Windows too, so every step works the same on all runners
+    shell: bash
+
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        # Lowest version allowed by "engines" in packages/cli/package.json
+        node-version: [22]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 12.15.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v 7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package
+        run: pnpm --filter dotenv-diff run build
+
+      - name: Pack tarball
+        run: |
+          mkdir -p "$RUNNER_TEMP/smoke"
+          cd packages/cli
+          pnpm pack --pack-destination "$RUNNER_TEMP/smoke"
+
+      - name: Verify tarball contents
+        working-directory: ${{ runner.temp }}/smoke
+        run: |
+          tar -tzf dotenv-diff-*.tgz > contents.txt
+          echo "Tarball contains $(wc -l < contents.txt) files"
+
+          for required in package/LICENSE package/README.md package/dist/bin/dotenv-diff.js package/dist/src/index.js package/dist/src/index.d.ts; do
+            grep -qx "$required" contents.txt || { echo "::error::Missing $required in tarball"; exit 1; }
+          done
+
+          if grep -E '^package/dist/(test|bench)/' contents.txt; then
+            echo "::error::Tests or benchmarks leaked into the tarball"
+            exit 1
+          fi
+
+      - name: Install tarball into empty project
+        working-directory: ${{ runner.temp }}/smoke
+        run: |
+          npm init -y > /dev/null
+          npm pkg set type=module
+          npm install --no-audit --no-fund ./dotenv-diff-*.tgz typescript
+
+      - name: Run CLI
+        working-directory: ${{ runner.temp }}/smoke
+        run: |
+          npx --no-install dotenv-diff --help
+
+          printf 'A=1\nB=2\n' > .env
+          printf 'A=\nB=\nC=\n' > .env.example
+
+          # Missing key must fail
+          if npx --no-install dotenv-diff --compare --ci; then
+            echo "::error::Expected --compare to fail when a key is missing"
+            exit 1
+          fi
+
+          # Matching files must pass
+          printf 'C=3\n' >> .env
+          npx --no-install dotenv-diff --compare --ci
+
+      - name: Import ESM entry
+        working-directory: ${{ runner.temp }}/smoke
+        run: |
+          node --input-type=module -e "
+            import assert from 'node:assert/strict';
+            import { diffEnv, parseEnvContent, parseEnvFile } from 'dotenv-diff';
+            assert.equal(typeof parseEnvFile, 'function');
+            const result = diffEnv(parseEnvContent('A=1'), parseEnvContent('A=\nB='));
+            assert.deepEqual(result.missing, ['B']);
+            console.log('ESM import OK');
+          "
+
+      - name: Resolve types
+        working-directory: ${{ runner.temp }}/smoke
+        run: |
+          cat > tsconfig.json <<'EOF'
+          {
+            "compilerOptions": {
+              "module": "nodenext",
+              "moduleResolution": "nodenext",
+              "strict": true,
+              "noEmit": true,
+              "types": []
+            },
+            "include": ["check.ts"]
+          }
+          EOF
+          cat > check.ts <<'EOF'
+          import { diffEnv, parseEnvContent, type DiffResult } from 'dotenv-diff';
+          const result: DiffResult = diffEnv(parseEnvContent('A=1'), {});
+          export const missing: string[] = result.missing;
+          EOF
+          npx --no-install tsc -p tsconfig.json
+          echo "Types OK"
