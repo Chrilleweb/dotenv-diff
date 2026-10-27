@@ -108,7 +108,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
       if (exit) return { exitWithError: true };
     } else {
       scanResult = result.scanResult;
-      comparedAgainst = result.comparedAgainst;
+      comparedAgainst = compareFile.name;
       fixApplied = result.fix.fixApplied;
       removedDuplicates = result.fix.removedDuplicates;
       fixedKeys = result.fix.addedEnv;

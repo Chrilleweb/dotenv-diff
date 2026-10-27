@@ -315,11 +315,6 @@ describe('scanUsage', () => {
     vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
     vi.mocked(processComparisonFile).mockReturnValue({
       scanResult: { ...baseScanResult },
-      comparedAgainst: '.env',
-      envVariables: {},
-      duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -332,6 +327,13 @@ describe('scanUsage', () => {
 
     expect(promptNoEnvScenario).toHaveBeenCalled();
     expect(processComparisonFile).toHaveBeenCalled();
+    // The name of the file picked in the prompt is what the output reports
+    expect(printScanResult).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      '.env',
+      expect.anything(),
+    );
   });
 
   it('passes commentWarnings from processComparisonFile through to output', async () => {
@@ -344,11 +346,6 @@ describe('scanUsage', () => {
         ...baseScanResult,
         commentWarnings: [{ key: 'UNDOC', line: 2 }],
       },
-      comparedAgainst: '.env',
-      envVariables: {},
-      duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -377,11 +374,6 @@ describe('scanUsage', () => {
     });
     vi.mocked(processComparisonFile).mockReturnValue({
       scanResult: { ...baseScanResult, driftWarnings: drift },
-      comparedAgainst: '.env',
-      envVariables: {},
-      duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -409,11 +401,6 @@ describe('scanUsage', () => {
     });
     vi.mocked(processComparisonFile).mockReturnValue({
       scanResult: { ...baseScanResult, exampleFile: '.env.sample' },
-      comparedAgainst: '.env',
-      envVariables: {},
-      duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],
@@ -489,11 +476,6 @@ describe('scanUsage', () => {
           { key1: 'A', key2: 'B', suggestion: 'A_B' },
         ],
       },
-      comparedAgainst: '.env',
-      envVariables: {},
-      duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
       fix: {
         fixApplied: false,
         removedDuplicates: [],

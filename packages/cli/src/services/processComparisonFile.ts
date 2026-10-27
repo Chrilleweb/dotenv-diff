@@ -31,14 +31,6 @@ import type {
 export interface ProcessComparisonResult {
   /** The scan result after processing the comparison file */
   scanResult: ScanResult;
-  /** The environment variables from the comparison file */
-  envVariables: Record<string, string | undefined>;
-  /** The file the comparison was made against */
-  comparedAgainst: string;
-  /** The duplicate environment variables found in the comparison file */
-  dupsEnv: Duplicate[];
-  /** The duplicate example variables found in the comparison file */
-  dupsEx: Duplicate[];
   /** The context of any fixes applied to the comparison file */
   fix: FixContext;
   /** Any error encountered while processing the comparison file */
@@ -57,10 +49,6 @@ export function processComparisonFile(
   compareFile: ComparisonFile,
   opts: ScanUsageOptions,
 ): ProcessComparisonResult {
-  let envVariables: Record<string, string | undefined> = {};
-  let comparedAgainst = '';
-  let dupsEnv: Duplicate[] = [];
-  let dupsEx: Duplicate[] = [];
   let error: ProcessComparisonResult['error'];
 
   let fix: FixContext = {
@@ -91,7 +79,9 @@ export function processComparisonFile(
       opts.ignore,
       opts.ignoreRegex,
     );
-    envVariables = Object.fromEntries(envKeys.map((k) => [k, envFull[k]]));
+    const envVariables = Object.fromEntries(
+      envKeys.map((k) => [k, envFull[k]]),
+    );
 
     // Monorepo support: also honor `.env.example` files in subdirectories, so a
     // variable documented next to where it is used is not reported as missing.
@@ -107,7 +97,6 @@ export function processComparisonFile(
       opts.ignoreRegex,
       scopes,
     );
-    comparedAgainst = compareFile.name;
 
     // Keys marked `@optional` in the example file are not reported as missing
     const optionalKeys = new Set(
@@ -131,15 +120,9 @@ export function processComparisonFile(
       : [];
 
     // Find duplicates
-    if (!opts.allowDuplicates) {
-      const duplicateResults = checkDuplicates(
-        compareFile,
-        exampleFilePath,
-        opts,
-      );
-      dupsEnv = duplicateResults.dupsEnv;
-      dupsEx = duplicateResults.dupsEx;
-    }
+    let { dupsEnv, dupsEx }: DuplicateResult = opts.allowDuplicates
+      ? { dupsEnv: [], dupsEx: [] }
+      : checkDuplicates(compareFile, exampleFilePath, opts);
 
     scanResult.expireWarnings = opts.expireWarnings
       ? detectEnvExpirations(compareFile.path)
@@ -194,9 +177,11 @@ export function processComparisonFile(
 
     // Keep the duplicates that were not fixed for output
     if (dupsEnv.length > 0 || dupsEx.length > 0) {
-      if (!scanResult.duplicates) scanResult.duplicates = {};
-      if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
-      if (dupsEx.length > 0) scanResult.duplicates.example = dupsEx;
+      scanResult.duplicates = {
+        ...scanResult.duplicates,
+        ...(dupsEnv.length > 0 ? { env: dupsEnv } : {}),
+        ...(dupsEx.length > 0 ? { example: dupsEx } : {}),
+      };
     }
   } catch (err) {
     error = {
@@ -207,10 +192,6 @@ export function processComparisonFile(
 
   return {
     scanResult,
-    envVariables,
-    comparedAgainst,
-    dupsEnv,
-    dupsEx,
     fix,
     ...(error ? { error } : {}),
   };
@@ -235,12 +216,12 @@ function checkDuplicates(
   examplePath: string | null,
   opts: ScanUsageOptions,
 ): DuplicateResult {
-  const isIgnored = (key: string) =>
+  const isNotIgnored = (key: string) =>
     !opts.ignore.includes(key) && !opts.ignoreRegex.some((rx) => rx.test(key));
 
   // Duplicates in main env file
   const dupsEnv = findDuplicateKeys(compareFile.path).filter(({ key }) =>
-    isIgnored(key),
+    isNotIgnored(key),
   );
 
   // Duplicates in example file. Skipped when it *is* the comparison file — a
@@ -249,7 +230,7 @@ function checkDuplicates(
   // not exist, which an explicit `--example` may still point at.
   const dupsEx: Duplicate[] =
     examplePath && examplePath !== compareFile.path
-      ? findDuplicateKeys(examplePath).filter(({ key }) => isIgnored(key))
+      ? findDuplicateKeys(examplePath).filter(({ key }) => isNotIgnored(key))
       : [];
 
   return { dupsEnv, dupsEx } satisfies DuplicateResult;
