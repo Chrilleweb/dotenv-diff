@@ -3,10 +3,11 @@ import path from 'path';
 import { parseEnvFile } from './parseEnvFile.js';
 import { filterIgnoredKeys } from '../core/helpers/filterIgnoredKeys.js';
 import { compareWithEnvFiles } from '../core/scan/compareScan.js';
+import { excludeOptionalKeys } from '../core/scan/excludeOptionalKeys.js';
 import { discoverExampleScopes } from './exampleDiscovery.js';
 import { findDuplicateKeys } from './duplicates.js';
 import { applyFixes } from './fixEnv.js';
-import { toUpperSnakeCase } from '../core/helpers/toUpperSnakeCase.js';
+import { detectUppercaseKeys } from '../core/detectUppercaseKeys.js';
 import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 import { detectEnvExpirations } from './detectEnvExpirations.js';
 import { detectInconsistentNaming } from '../core/detectInconsistentNaming.js';
@@ -14,7 +15,6 @@ import { detectMissingComments } from './detectMissingComments.js';
 import { detectOptionalKeys } from './detectOptionalKeys.js';
 import { detectExampleDrift } from './detectExampleDrift.js';
 import { resolveExampleFile } from './resolveExampleFile.js';
-import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import type {
   ScanUsageOptions,
   ScanResult,
@@ -86,6 +86,7 @@ export function processComparisonFile(
   let inconsistentNamingWarnings: InconsistentNamingWarning[] = [];
   let commentWarnings: CommentWarning[] = [];
   let driftWarnings: DriftWarning[] = [];
+  let error: ProcessComparisonResult['error'];
 
   const fix: FixContext = {
     fixApplied: false,
@@ -133,32 +134,15 @@ export function processComparisonFile(
     );
     comparedAgainst = compareFile.name;
 
-    // Keys marked `@optional` in the example file may be left out of the env
-    // file entirely — that is what the annotation means — so they must not be
-    // reported as missing. The typo suggestions derived from them go too.
+    // Keys marked `@optional` in the example file are not reported as missing
     const optionalKeys = new Set(
-      detectOptionalKeys(
-        resolveFromCwd(opts.cwd, opts.examplePath ?? DEFAULT_EXAMPLE_FILE),
-      ),
+      exampleFilePath ? detectOptionalKeys(exampleFilePath) : [],
     );
-    if (optionalKeys.size > 0) {
-      scanResult.missing = scanResult.missing.filter(
-        (key) => !optionalKeys.has(key),
-      );
-      if (scanResult.suggestions) {
-        scanResult.suggestions = scanResult.suggestions.filter(
-          (suggestion) => !optionalKeys.has(suggestion.key),
-        );
-      }
-    }
+    scanResult = excludeOptionalKeys(scanResult, optionalKeys);
 
     // Detect uppercase keys
     if (opts.uppercaseKeys) {
-      for (const key of envKeys) {
-        if (!/^[A-Z0-9_]+$/.test(key)) {
-          uppercaseWarnings.push({ key, suggestion: toUpperSnakeCase(key) });
-        }
-      }
+      uppercaseWarnings = detectUppercaseKeys(envKeys);
     }
 
     // Find duplicates
@@ -188,16 +172,10 @@ export function processComparisonFile(
     }
 
     // Warn about .env.example keys without a documenting comment. Runs on the
-    // example file (documentation lives there), not the env file — using the
-    // explicit --example path when given, else the default `.env.example`.
-    if (opts.commentWarnings) {
-      const examplePath = resolveFromCwd(
-        opts.cwd,
-        opts.examplePath ?? DEFAULT_EXAMPLE_FILE,
-      );
-      if (fs.existsSync(examplePath)) {
-        commentWarnings = detectMissingComments(examplePath);
-      }
+    // example file (documentation lives there), not the env file — the same
+    // example the other checks read.
+    if (opts.commentWarnings && exampleFilePath && exampleFull) {
+      commentWarnings = detectMissingComments(exampleFilePath);
     }
 
     // Warn when the env file this run is about has drifted from the example
@@ -241,26 +219,10 @@ export function processComparisonFile(
       if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
       if (dupsEx.length > 0) scanResult.duplicates.example = dupsEx;
     }
-  } catch (error) {
-    const errorMessage = `Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
-    return {
-      scanResult,
-      envVariables,
-      comparedAgainst,
-      dupsEnv,
-      dupsEx,
-      fix,
-      exampleFull,
-      exampleFile,
-      uppercaseWarnings,
-      expireWarnings,
-      inconsistentNamingWarnings,
-      commentWarnings,
-      driftWarnings,
-      error: {
-        message: errorMessage,
-        shouldExit: opts.isCiMode ?? false,
-      },
+  } catch (err) {
+    error = {
+      message: `Could not read ${compareFile.name}: ${compareFile.path} - ${err}`,
+      shouldExit: opts.isCiMode ?? false,
     };
   }
 
@@ -278,6 +240,7 @@ export function processComparisonFile(
     inconsistentNamingWarnings,
     commentWarnings,
     driftWarnings,
+    ...(error ? { error } : {}),
   };
 }
 
