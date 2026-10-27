@@ -20,7 +20,8 @@ vi.mock('../../../src/core/filterIgnoredKeys.js', () => ({
 }));
 
 vi.mock('../../../src/core/scan/compareScan.js', () => ({
-  compareWithEnvFiles: vi.fn((scan) => scan),
+  // Returns a copy like the real function, so the shared base result is not mutated
+  compareWithEnvFiles: vi.fn((scan) => ({ ...scan })),
 }));
 
 vi.mock('../../../src/services/duplicates.js', () => ({
@@ -64,6 +65,18 @@ vi.mock('../../../src/services/detectOptionalKeys.js', () => ({
   detectOptionalKeys: vi.fn(() => []),
 }));
 
+vi.mock('../../../src/core/security/exampleSecretDetector.js', () => ({
+  detectSecretsInExample: vi.fn(() => [
+    {
+      key: 'SECRET',
+      value: 'abc123',
+      message: 'looks real',
+      file: '.env.example',
+      severity: 'high',
+    },
+  ]),
+}));
+
 vi.mock('../../../src/services/detectExampleDrift.js', () => ({
   detectExampleDrift: vi.fn(() => [
     { key: 'DRIFTED', envFile: '.env', exampleFile: '.env.example' },
@@ -79,6 +92,7 @@ import { findDuplicateKeys } from '../../../src/services/duplicates.js';
 import { resolveFromCwd } from '../../../src/core/helpers/resolveFromCwd.js';
 import { detectOptionalKeys } from '../../../src/services/detectOptionalKeys.js';
 import { detectExampleDrift } from '../../../src/services/detectExampleDrift.js';
+import { detectSecretsInExample } from '../../../src/core/security/exampleSecretDetector.js';
 
 describe('processComparisonFile', () => {
   const baseScanResult: ScanResult = {
@@ -182,7 +196,7 @@ describe('processComparisonFile', () => {
     });
 
     expect(result.scanResult.commentWarnings).toEqual([]);
-    expect(result.exampleFull).toBeUndefined();
+    expect(result.scanResult.exampleFile).toBeUndefined();
   });
 
   it('does not report a key marked @optional in the example file as missing', () => {
@@ -315,7 +329,7 @@ describe('processComparisonFile', () => {
     const result = processComparisonFile(baseScanResult, compareFile, opts);
 
     expect(result.error).toBeUndefined();
-    expect(result.exampleFull).toEqual({ A: '1', bKey: '2' });
+    expect(result.scanResult.exampleFile).toBe('.env.example');
   });
 
   it('checks the example file for duplicates without the examplePath option', () => {
@@ -397,13 +411,36 @@ describe('processComparisonFile', () => {
     expect(result.scanResult.duplicates?.env).toBeDefined();
   });
 
-  it('does not set exampleFull when example file does not exist on disk (line 74)', () => {
+  it('does not scan the example when it does not exist on disk', () => {
     vi.mocked(fs.existsSync).mockReturnValueOnce(false);
 
     const result = processComparisonFile(baseScanResult, compareFile, baseOpts);
 
-    expect(result.exampleFull).toBeUndefined();
+    expect(result.scanResult).not.toHaveProperty('exampleFile');
+    expect(result.scanResult).not.toHaveProperty('exampleWarnings');
+    expect(detectSecretsInExample).not.toHaveBeenCalled();
     expect(result.error).toBeUndefined();
+  });
+
+  it('scans the example for secrets even when comparing against .env', () => {
+    // An example committed with a real secret is dangerous whether or not the
+    // scan happens to compare against it.
+    const result = processComparisonFile(baseScanResult, compareFile, baseOpts);
+
+    expect(detectSecretsInExample).toHaveBeenCalledWith(
+      { A: '1', bKey: '2' },
+      '.env.example',
+    );
+    expect(result.scanResult.exampleFile).toBe('.env.example');
+    expect(result.scanResult.exampleWarnings).toEqual([
+      {
+        key: 'SECRET',
+        value: 'abc123',
+        message: 'looks real',
+        file: '.env.example',
+        severity: 'high',
+      },
+    ]);
   });
 
   it('tests duplicate keys against ignoreRegex patterns', () => {
@@ -457,7 +494,7 @@ describe('processComparisonFile', () => {
       inconsistentNamingWarnings: true,
     });
 
-    expect(result.exampleFull).toBeUndefined();
+    expect(result.scanResult.exampleFile).toBeUndefined();
     expect(
       result.scanResult.inconsistentNamingWarnings?.length,
     ).toBeGreaterThan(0);

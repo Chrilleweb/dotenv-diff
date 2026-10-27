@@ -15,6 +15,7 @@ import { detectMissingComments } from './detectMissingComments.js';
 import { detectOptionalKeys } from './detectOptionalKeys.js';
 import { detectExampleDrift } from './detectExampleDrift.js';
 import { resolveExampleFile } from './resolveExampleFile.js';
+import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
 import type {
   ScanUsageOptions,
   ScanResult,
@@ -40,10 +41,6 @@ export interface ProcessComparisonResult {
   dupsEx: Duplicate[];
   /** The context of any fixes applied to the comparison file */
   fix: FixContext;
-  /** The full contents of the example file, if it was found and read */
-  exampleFull?: Record<string, string> | undefined;
-  /** Basename of the example file `exampleFull` was read from. */
-  exampleFile?: string | undefined;
   /** Any error encountered while processing the comparison file */
   error?: { message: string; shouldExit: boolean };
 }
@@ -64,8 +61,6 @@ export function processComparisonFile(
   let comparedAgainst = '';
   let dupsEnv: Duplicate[] = [];
   let dupsEx: Duplicate[] = [];
-  let exampleFull: Record<string, string> | undefined = undefined;
-  let exampleFile: string | undefined = undefined;
   let error: ProcessComparisonResult['error'];
 
   let fix: FixContext = {
@@ -84,10 +79,10 @@ export function processComparisonFile(
       ? resolveFromCwd(opts.cwd, opts.examplePath)
       : resolveExampleFile(compareFile.path);
 
-    if (exampleFilePath && fs.existsSync(exampleFilePath)) {
-      exampleFull = parseEnvFile(exampleFilePath);
-      exampleFile = path.basename(exampleFilePath);
-    }
+    const exampleFull =
+      exampleFilePath && fs.existsSync(exampleFilePath)
+        ? parseEnvFile(exampleFilePath)
+        : undefined;
 
     // Parse and filter env file
     const envFull = parseEnvFile(compareFile.path);
@@ -119,6 +114,16 @@ export function processComparisonFile(
       exampleFilePath ? detectOptionalKeys(exampleFilePath) : [],
     );
     scanResult = excludeOptionalKeys(scanResult, optionalKeys);
+
+    // Scan the example for secrets even when it is not the comparison file —
+    // an example committed with a real secret is dangerous either way.
+    if (exampleFilePath && exampleFull) {
+      scanResult.exampleFile = path.basename(exampleFilePath);
+      scanResult.exampleWarnings = detectSecretsInExample(
+        exampleFull,
+        scanResult.exampleFile,
+      );
+    }
 
     // Detect uppercase keys
     scanResult.uppercaseWarnings = opts.uppercaseKeys
@@ -207,8 +212,6 @@ export function processComparisonFile(
     dupsEnv,
     dupsEx,
     fix,
-    exampleFull,
-    exampleFile,
     ...(error ? { error } : {}),
   };
 }

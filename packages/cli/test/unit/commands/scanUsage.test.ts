@@ -52,18 +52,6 @@ vi.mock('../../../src/core/frameworks/frameworkValidator.js', () => ({
   frameworkValidator: vi.fn(() => []),
 }));
 
-vi.mock('../../../src/core/security/exampleSecretDetector.js', () => ({
-  detectSecretsInExample: vi.fn(() => [
-    {
-      key: 'SECRET',
-      value: '123',
-      file: '.env.example',
-      message: 'hardcoded',
-      severity: 'high',
-    },
-  ]),
-}));
-
 vi.mock('../../../src/commands/prompts/promptNoEnvScenario.js', () => ({
   promptNoEnvScenario: vi.fn(),
 }));
@@ -412,7 +400,7 @@ describe('scanUsage', () => {
     );
   });
 
-  it('attaches the resolved example file name onto the scan result', async () => {
+  it('passes the example file name from processComparisonFile through to output', async () => {
     // Carried through so findings about the example file can name it — a
     // project may document itself with .env.sample rather than .env.example.
     vi.mocked(determineComparisonFile).mockResolvedValue({
@@ -420,7 +408,7 @@ describe('scanUsage', () => {
       file: { path: '/env/.env', name: '.env' },
     });
     vi.mocked(processComparisonFile).mockReturnValue({
-      scanResult: { ...baseScanResult },
+      scanResult: { ...baseScanResult, exampleFile: '.env.sample' },
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
@@ -432,7 +420,6 @@ describe('scanUsage', () => {
         addedEnv: [],
         gitignoreUpdated: false,
       },
-      exampleFile: '.env.sample',
     } as ProcessComparisonResult);
 
     await scanUsage({ ...baseOpts, json: false });
@@ -442,34 +429,6 @@ describe('scanUsage', () => {
       expect.anything(),
       expect.anything(),
       expect.anything(),
-    );
-  });
-
-  it('leaves the example file name unset when no example file was resolved', async () => {
-    vi.mocked(determineComparisonFile).mockResolvedValue({
-      type: 'found',
-      file: { path: '/env/.env', name: '.env' },
-    });
-    vi.mocked(processComparisonFile).mockReturnValue({
-      scanResult: { ...baseScanResult },
-      comparedAgainst: '.env',
-      envVariables: {},
-      duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
-      fix: {
-        fixApplied: false,
-        removedDuplicates: [],
-        addedEnv: [],
-        gitignoreUpdated: false,
-      },
-      exampleFile: undefined,
-    } as ProcessComparisonResult);
-
-    await scanUsage({ ...baseOpts, json: false });
-
-    expect(vi.mocked(printScanResult).mock.calls[0]?.[0]).not.toHaveProperty(
-      'exampleFile',
     );
   });
 
@@ -561,101 +520,6 @@ describe('scanUsage', () => {
       expect.anything(),
       expect.anything(),
     );
-  });
-
-  it('sets exampleWarnings when comparedAgainst matches DEFAULT_EXAMPLE_FILE', async () => {
-    const { DEFAULT_EXAMPLE_FILE } =
-      await import('../../../src/config/constants.js');
-
-    vi.mocked(determineComparisonFile).mockResolvedValue({
-      type: 'found',
-      file: { path: '/env/.env.example', name: DEFAULT_EXAMPLE_FILE },
-    });
-    vi.mocked(processComparisonFile).mockReturnValue({
-      scanResult: { ...baseScanResult },
-      comparedAgainst: DEFAULT_EXAMPLE_FILE,
-      envVariables: {},
-      duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
-      exampleFull: { SECRET: 'abc123' },
-      fix: {
-        fixApplied: false,
-        removedDuplicates: [],
-        addedEnv: [],
-        gitignoreUpdated: false,
-      },
-    } as ProcessComparisonResult);
-
-    await scanUsage(baseOpts);
-
-    const { detectSecretsInExample } =
-      await import('../../../src/core/security/exampleSecretDetector.js');
-    expect(detectSecretsInExample).toHaveBeenCalledWith(
-      { SECRET: 'abc123' },
-      undefined,
-    );
-  });
-
-  it('scans the example for secrets even when comparing against .env', async () => {
-    // An example committed with a real secret is dangerous whether or not the
-    // scan happens to compare against it.
-    vi.mocked(determineComparisonFile).mockResolvedValue({
-      type: 'found',
-      file: { path: '/env/.env', name: '.env' },
-    });
-    vi.mocked(processComparisonFile).mockReturnValue({
-      scanResult: { ...baseScanResult },
-      comparedAgainst: '.env',
-      envVariables: {},
-      duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
-      exampleFull: { SECRET: 'abc123' },
-      fix: {
-        fixApplied: false,
-        removedDuplicates: [],
-        addedEnv: [],
-        gitignoreUpdated: false,
-      },
-    } as ProcessComparisonResult);
-
-    await scanUsage(baseOpts);
-
-    const { detectSecretsInExample } =
-      await import('../../../src/core/security/exampleSecretDetector.js');
-    expect(detectSecretsInExample).toHaveBeenCalledWith(
-      { SECRET: 'abc123' },
-      undefined,
-    );
-  });
-
-  it('does not set exampleWarnings when no example file was found', async () => {
-    vi.mocked(determineComparisonFile).mockResolvedValue({
-      type: 'found',
-      file: { path: '/env/.env', name: '.env' },
-    });
-    vi.mocked(processComparisonFile).mockReturnValue({
-      scanResult: { ...baseScanResult },
-      comparedAgainst: '.env',
-      envVariables: {},
-      duplicatesFound: false,
-      dupsEnv: [],
-      dupsEx: [],
-      exampleFull: undefined,
-      fix: {
-        fixApplied: false,
-        removedDuplicates: [],
-        addedEnv: [],
-        gitignoreUpdated: false,
-      },
-    } as ProcessComparisonResult);
-
-    await scanUsage(baseOpts);
-
-    const { detectSecretsInExample } =
-      await import('../../../src/core/security/exampleSecretDetector.js');
-    expect(detectSecretsInExample).not.toHaveBeenCalled();
   });
 
   it('filters out commented usages before processing', async () => {
