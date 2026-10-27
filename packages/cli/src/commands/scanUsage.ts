@@ -117,22 +117,6 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
       removedDuplicates = result.fix.removedDuplicates;
       fixedKeys = result.fix.addedEnv;
       gitignoreUpdated = result.fix.gitignoreUpdated;
-      if (result.uppercaseWarnings) {
-        scanResult.uppercaseWarnings = result.uppercaseWarnings;
-      }
-      if (result.expireWarnings) {
-        scanResult.expireWarnings = result.expireWarnings;
-      }
-      if (result.inconsistentNamingWarnings) {
-        scanResult.inconsistentNamingWarnings =
-          result.inconsistentNamingWarnings;
-      }
-      if (result.commentWarnings) {
-        scanResult.commentWarnings = result.commentWarnings;
-      }
-      if (result.driftWarnings) {
-        scanResult.driftWarnings = result.driftWarnings;
-      }
       if (result.exampleFull) {
         scanResult.exampleWarnings = detectSecretsInExample(
           result.exampleFull,

@@ -134,7 +134,7 @@ describe('processComparisonFile', () => {
       uppercaseKeys: true,
     });
 
-    expect(result.uppercaseWarnings?.length).toBeGreaterThan(0);
+    expect(result.scanResult.uppercaseWarnings?.length).toBeGreaterThan(0);
   });
 
   it('detects comment warnings on the example file when enabled', () => {
@@ -143,7 +143,9 @@ describe('processComparisonFile', () => {
       commentWarnings: true,
     });
 
-    expect(result.commentWarnings).toEqual([{ key: 'UNDOC', line: 2 }]);
+    expect(result.scanResult.commentWarnings).toEqual([
+      { key: 'UNDOC', line: 2 },
+    ]);
   });
 
   it('detects drift against the comparison file when enabled', () => {
@@ -155,7 +157,7 @@ describe('processComparisonFile', () => {
     expect(detectExampleDrift).toHaveBeenCalledWith(
       expect.objectContaining({ comparisonPath: compareFile.path }),
     );
-    expect(result.driftWarnings).toEqual([
+    expect(result.scanResult.driftWarnings).toEqual([
       { key: 'DRIFTED', envFile: '.env', exampleFile: '.env.example' },
     ]);
   });
@@ -167,7 +169,7 @@ describe('processComparisonFile', () => {
     });
 
     expect(detectExampleDrift).not.toHaveBeenCalled();
-    expect(result.driftWarnings).toEqual([]);
+    expect(result.scanResult.driftWarnings).toEqual([]);
   });
 
   it('falls back to the default example file and skips when it does not exist', () => {
@@ -179,7 +181,7 @@ describe('processComparisonFile', () => {
       commentWarnings: true,
     });
 
-    expect(result.commentWarnings).toEqual([]);
+    expect(result.scanResult.commentWarnings).toEqual([]);
     expect(result.exampleFull).toBeUndefined();
   });
 
@@ -231,7 +233,7 @@ describe('processComparisonFile', () => {
       expireWarnings: true,
     });
 
-    expect(result.expireWarnings?.length).toBeGreaterThan(0);
+    expect(result.scanResult.expireWarnings?.length).toBeGreaterThan(0);
   });
 
   it('detects inconsistent naming', () => {
@@ -240,7 +242,9 @@ describe('processComparisonFile', () => {
       inconsistentNamingWarnings: true,
     });
 
-    expect(result.inconsistentNamingWarnings?.length).toBeGreaterThan(0);
+    expect(
+      result.scanResult.inconsistentNamingWarnings?.length,
+    ).toBeGreaterThan(0);
   });
 
   it('applies fixes when fix enabled', () => {
@@ -454,7 +458,9 @@ describe('processComparisonFile', () => {
     });
 
     expect(result.exampleFull).toBeUndefined();
-    expect(result.inconsistentNamingWarnings?.length).toBeGreaterThan(0);
+    expect(
+      result.scanResult.inconsistentNamingWarnings?.length,
+    ).toBeGreaterThan(0);
     expect(result.error).toBeUndefined();
   });
 

@@ -346,13 +346,16 @@ describe('scanUsage', () => {
     expect(processComparisonFile).toHaveBeenCalled();
   });
 
-  it('attaches commentWarnings from processComparisonFile onto the scan result', async () => {
+  it('passes commentWarnings from processComparisonFile through to output', async () => {
     vi.mocked(determineComparisonFile).mockResolvedValue({
       type: 'found',
       file: { path: '/env/.env', name: '.env' },
     });
     vi.mocked(processComparisonFile).mockReturnValue({
-      scanResult: { ...baseScanResult },
+      scanResult: {
+        ...baseScanResult,
+        commentWarnings: [{ key: 'UNDOC', line: 2 }],
+      },
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
@@ -364,7 +367,6 @@ describe('scanUsage', () => {
         addedEnv: [],
         gitignoreUpdated: false,
       },
-      commentWarnings: [{ key: 'UNDOC', line: 2 }],
     } as ProcessComparisonResult);
 
     await scanUsage({ ...baseOpts, json: false });
@@ -377,7 +379,7 @@ describe('scanUsage', () => {
     );
   });
 
-  it('attaches driftWarnings from processComparisonFile onto the scan result', async () => {
+  it('passes driftWarnings from processComparisonFile through to output', async () => {
     const drift = [
       { key: 'DRIFTED', envFile: '.env', exampleFile: '.env.example' },
     ];
@@ -386,7 +388,7 @@ describe('scanUsage', () => {
       file: { path: '/env/.env', name: '.env' },
     });
     vi.mocked(processComparisonFile).mockReturnValue({
-      scanResult: { ...baseScanResult },
+      scanResult: { ...baseScanResult, driftWarnings: drift },
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
@@ -398,7 +400,6 @@ describe('scanUsage', () => {
         addedEnv: [],
         gitignoreUpdated: false,
       },
-      driftWarnings: drift,
     } as ProcessComparisonResult);
 
     await scanUsage({ ...baseOpts, json: false });
@@ -515,13 +516,20 @@ describe('scanUsage', () => {
     expect(result.exitWithError).toBe(false);
   });
 
-  it('transfers uppercaseWarnings, expireWarnings and inconsistentNamingWarnings to scanResult', async () => {
+  it('passes uppercaseWarnings, expireWarnings and inconsistentNamingWarnings through to output', async () => {
     vi.mocked(determineComparisonFile).mockResolvedValue({
       type: 'found',
       file: { path: '/env/.env', name: '.env' },
     });
     vi.mocked(processComparisonFile).mockReturnValue({
-      scanResult: { ...baseScanResult },
+      scanResult: {
+        ...baseScanResult,
+        uppercaseWarnings: [{ key: 'myKey', suggestion: 'MY_KEY' }],
+        expireWarnings: [{ key: 'OLD_KEY', date: '2024-01-01', daysLeft: -10 }],
+        inconsistentNamingWarnings: [
+          { key1: 'A', key2: 'B', suggestion: 'A_B' },
+        ],
+      },
       comparedAgainst: '.env',
       envVariables: {},
       duplicatesFound: false,
@@ -533,9 +541,6 @@ describe('scanUsage', () => {
         addedEnv: [],
         gitignoreUpdated: false,
       },
-      uppercaseWarnings: [{ key: 'myKey', suggestion: 'MY_KEY' }],
-      expireWarnings: [{ key: 'OLD_KEY', date: '2024-01-01', daysLeft: -10 }],
-      inconsistentNamingWarnings: [{ key1: 'A', key2: 'B', suggestion: 'A_B' }],
     } as ProcessComparisonResult);
 
     await scanUsage(baseOpts);

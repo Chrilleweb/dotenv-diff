@@ -19,13 +19,8 @@ import type {
   ScanUsageOptions,
   ScanResult,
   DuplicateResult,
-  UppercaseWarning,
   Duplicate,
   ComparisonFile,
-  ExpireWarning,
-  InconsistentNamingWarning,
-  CommentWarning,
-  DriftWarning,
   FixContext,
 } from '../config/types.js';
 
@@ -49,16 +44,6 @@ export interface ProcessComparisonResult {
   exampleFull?: Record<string, string> | undefined;
   /** Basename of the example file `exampleFull` was read from. */
   exampleFile?: string | undefined;
-  /** Uppercase keys found in the comparison file */
-  uppercaseWarnings?: UppercaseWarning[];
-  /** Expiration warnings found in the comparison file */
-  expireWarnings?: ExpireWarning[];
-  /** Inconsistent naming warnings found in the comparison file */
-  inconsistentNamingWarnings?: InconsistentNamingWarning[];
-  /** Comment warnings found in the comparison file */
-  commentWarnings?: CommentWarning[];
-  /** Drift warnings found in the comparison file */
-  driftWarnings?: DriftWarning[];
   /** Any error encountered while processing the comparison file */
   error?: { message: string; shouldExit: boolean };
 }
@@ -81,14 +66,9 @@ export function processComparisonFile(
   let dupsEx: Duplicate[] = [];
   let exampleFull: Record<string, string> | undefined = undefined;
   let exampleFile: string | undefined = undefined;
-  let uppercaseWarnings: UppercaseWarning[] = [];
-  let expireWarnings: ExpireWarning[] = [];
-  let inconsistentNamingWarnings: InconsistentNamingWarning[] = [];
-  let commentWarnings: CommentWarning[] = [];
-  let driftWarnings: DriftWarning[] = [];
   let error: ProcessComparisonResult['error'];
 
-  const fix: FixContext = {
+  let fix: FixContext = {
     fixApplied: false,
     removedDuplicates: [],
     addedEnv: [],
@@ -141,9 +121,9 @@ export function processComparisonFile(
     scanResult = excludeOptionalKeys(scanResult, optionalKeys);
 
     // Detect uppercase keys
-    if (opts.uppercaseKeys) {
-      uppercaseWarnings = detectUppercaseKeys(envKeys);
-    }
+    scanResult.uppercaseWarnings = opts.uppercaseKeys
+      ? detectUppercaseKeys(envKeys)
+      : [];
 
     // Find duplicates
     if (!opts.allowDuplicates) {
@@ -156,38 +136,36 @@ export function processComparisonFile(
       dupsEx = duplicateResults.dupsEx;
     }
 
-    if (opts.expireWarnings) {
-      expireWarnings = detectEnvExpirations(compareFile.path);
-    }
+    scanResult.expireWarnings = opts.expireWarnings
+      ? detectEnvExpirations(compareFile.path)
+      : [];
 
     // Check for inconsistent naming across env + example keys
-    if (opts.inconsistentNamingWarnings) {
-      const envKeysList = Object.keys(envFull);
-      const exampleKeysList = exampleFull ? Object.keys(exampleFull) : [];
-
-      // Combine all keys for naming analysis
-      const allKeys = [...envKeysList, ...exampleKeysList];
-
-      inconsistentNamingWarnings = detectInconsistentNaming(allKeys);
-    }
+    scanResult.inconsistentNamingWarnings = opts.inconsistentNamingWarnings
+      ? detectInconsistentNaming([
+          ...Object.keys(envFull),
+          ...Object.keys(exampleFull ?? {}),
+        ])
+      : [];
 
     // Warn about .env.example keys without a documenting comment. Runs on the
     // example file (documentation lives there), not the env file — the same
     // example the other checks read.
-    if (opts.commentWarnings && exampleFilePath && exampleFull) {
-      commentWarnings = detectMissingComments(exampleFilePath);
-    }
+    scanResult.commentWarnings =
+      opts.commentWarnings && exampleFilePath && exampleFull
+        ? detectMissingComments(exampleFilePath)
+        : [];
 
     // Warn when the env file this run is about has drifted from the example
     // documenting it. The scan only ever reads one file, so without this the
     // example is never checked against the values actually in use.
-    if (opts.driftWarnings) {
-      driftWarnings = detectExampleDrift({
-        comparisonPath: compareFile.path,
-        ignore: opts.ignore,
-        ignoreRegex: opts.ignoreRegex,
-      });
-    }
+    scanResult.driftWarnings = opts.driftWarnings
+      ? detectExampleDrift({
+          comparisonPath: compareFile.path,
+          ignore: opts.ignore,
+          ignoreRegex: opts.ignoreRegex,
+        })
+      : [];
 
     // Apply fixes (both duplicates + missing keys + gitignore)
     if (opts.fix) {
@@ -198,13 +176,9 @@ export function processComparisonFile(
         ensureGitignore: true,
       });
 
-      if (changed) {
-        // Update state based on what was actually fixed
-        fix.fixApplied = true;
-        fix.removedDuplicates = result.removedDuplicates;
-        fix.addedEnv = result.addedEnv;
-        fix.gitignoreUpdated = result.gitignoreUpdated;
+      fix = { ...result, fixApplied: changed };
 
+      if (changed) {
         // clear the issues that were fixed. `dupsEx` is not among them: the fix
         // only rewrites the env file, so duplicates in the example file survive
         // it and must still be reported.
@@ -235,11 +209,6 @@ export function processComparisonFile(
     fix,
     exampleFull,
     exampleFile,
-    uppercaseWarnings,
-    expireWarnings,
-    inconsistentNamingWarnings,
-    commentWarnings,
-    driftWarnings,
     ...(error ? { error } : {}),
   };
 }
