@@ -3,10 +3,11 @@ import path from 'path';
 import { parseEnvFile } from './parseEnvFile.js';
 import { filterIgnoredKeys } from '../core/helpers/filterIgnoredKeys.js';
 import { compareWithEnvFiles } from '../core/scan/compareScan.js';
+import { excludeOptionalKeys } from '../core/scan/excludeOptionalKeys.js';
 import { discoverExampleScopes } from './exampleDiscovery.js';
 import { findDuplicateKeys } from './duplicates.js';
 import { applyFixes } from './fixEnv.js';
-import { toUpperSnakeCase } from '../core/helpers/toUpperSnakeCase.js';
+import { detectUppercaseKeys } from '../core/detectUppercaseKeys.js';
 import { resolveFromCwd } from '../core/helpers/resolveFromCwd.js';
 import { detectEnvExpirations } from './detectEnvExpirations.js';
 import { detectInconsistentNaming } from '../core/detectInconsistentNaming.js';
@@ -14,18 +15,13 @@ import { detectMissingComments } from './detectMissingComments.js';
 import { detectOptionalKeys } from './detectOptionalKeys.js';
 import { detectExampleDrift } from './detectExampleDrift.js';
 import { resolveExampleFile } from './resolveExampleFile.js';
-import { DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
+import { detectSecretsInExample } from '../core/security/exampleSecretDetector.js';
 import type {
   ScanUsageOptions,
   ScanResult,
   DuplicateResult,
-  UppercaseWarning,
   Duplicate,
   ComparisonFile,
-  ExpireWarning,
-  InconsistentNamingWarning,
-  CommentWarning,
-  DriftWarning,
   FixContext,
 } from '../config/types.js';
 
@@ -35,30 +31,8 @@ import type {
 export interface ProcessComparisonResult {
   /** The scan result after processing the comparison file */
   scanResult: ScanResult;
-  /** The environment variables from the comparison file */
-  envVariables: Record<string, string | undefined>;
-  /** The file the comparison was made against */
-  comparedAgainst: string;
-  /** The duplicate environment variables found in the comparison file */
-  dupsEnv: Duplicate[];
-  /** The duplicate example variables found in the comparison file */
-  dupsEx: Duplicate[];
   /** The context of any fixes applied to the comparison file */
   fix: FixContext;
-  /** The full contents of the example file, if it was found and read */
-  exampleFull?: Record<string, string> | undefined;
-  /** Basename of the example file `exampleFull` was read from. */
-  exampleFile?: string | undefined;
-  /** Uppercase keys found in the comparison file */
-  uppercaseWarnings?: UppercaseWarning[];
-  /** Expiration warnings found in the comparison file */
-  expireWarnings?: ExpireWarning[];
-  /** Inconsistent naming warnings found in the comparison file */
-  inconsistentNamingWarnings?: InconsistentNamingWarning[];
-  /** Comment warnings found in the comparison file */
-  commentWarnings?: CommentWarning[];
-  /** Drift warnings found in the comparison file */
-  driftWarnings?: DriftWarning[];
   /** Any error encountered while processing the comparison file */
   error?: { message: string; shouldExit: boolean };
 }
@@ -75,19 +49,9 @@ export function processComparisonFile(
   compareFile: ComparisonFile,
   opts: ScanUsageOptions,
 ): ProcessComparisonResult {
-  let envVariables: Record<string, string | undefined> = {};
-  let comparedAgainst = '';
-  let dupsEnv: Duplicate[] = [];
-  let dupsEx: Duplicate[] = [];
-  let exampleFull: Record<string, string> | undefined = undefined;
-  let exampleFile: string | undefined = undefined;
-  let uppercaseWarnings: UppercaseWarning[] = [];
-  let expireWarnings: ExpireWarning[] = [];
-  let inconsistentNamingWarnings: InconsistentNamingWarning[] = [];
-  let commentWarnings: CommentWarning[] = [];
-  let driftWarnings: DriftWarning[] = [];
+  let error: ProcessComparisonResult['error'];
 
-  const fix: FixContext = {
+  let fix: FixContext = {
     fixApplied: false,
     removedDuplicates: [],
     addedEnv: [],
@@ -103,10 +67,10 @@ export function processComparisonFile(
       ? resolveFromCwd(opts.cwd, opts.examplePath)
       : resolveExampleFile(compareFile.path);
 
-    if (exampleFilePath && fs.existsSync(exampleFilePath)) {
-      exampleFull = parseEnvFile(exampleFilePath);
-      exampleFile = path.basename(exampleFilePath);
-    }
+    const exampleFull =
+      exampleFilePath && fs.existsSync(exampleFilePath)
+        ? parseEnvFile(exampleFilePath)
+        : undefined;
 
     // Parse and filter env file
     const envFull = parseEnvFile(compareFile.path);
@@ -115,7 +79,9 @@ export function processComparisonFile(
       opts.ignore,
       opts.ignoreRegex,
     );
-    envVariables = Object.fromEntries(envKeys.map((k) => [k, envFull[k]]));
+    const envVariables = Object.fromEntries(
+      envKeys.map((k) => [k, envFull[k]]),
+    );
 
     // Monorepo support: also honor `.env.example` files in subdirectories, so a
     // variable documented next to where it is used is not reported as missing.
@@ -131,85 +97,63 @@ export function processComparisonFile(
       opts.ignoreRegex,
       scopes,
     );
-    comparedAgainst = compareFile.name;
 
-    // Keys marked `@optional` in the example file may be left out of the env
-    // file entirely — that is what the annotation means — so they must not be
-    // reported as missing. The typo suggestions derived from them go too.
+    // Keys marked `@optional` in the example file are not reported as missing
     const optionalKeys = new Set(
-      detectOptionalKeys(
-        resolveFromCwd(opts.cwd, opts.examplePath ?? DEFAULT_EXAMPLE_FILE),
-      ),
+      exampleFilePath ? detectOptionalKeys(exampleFilePath) : [],
     );
-    if (optionalKeys.size > 0) {
-      scanResult.missing = scanResult.missing.filter(
-        (key) => !optionalKeys.has(key),
+    scanResult = excludeOptionalKeys(scanResult, optionalKeys);
+
+    // Scan the example for secrets even when it is not the comparison file —
+    // an example committed with a real secret is dangerous either way.
+    if (exampleFilePath && exampleFull) {
+      scanResult.exampleFile = path.basename(exampleFilePath);
+      scanResult.exampleWarnings = detectSecretsInExample(
+        exampleFull,
+        scanResult.exampleFile,
       );
-      if (scanResult.suggestions) {
-        scanResult.suggestions = scanResult.suggestions.filter(
-          (suggestion) => !optionalKeys.has(suggestion.key),
-        );
-      }
     }
 
     // Detect uppercase keys
-    if (opts.uppercaseKeys) {
-      for (const key of envKeys) {
-        if (!/^[A-Z0-9_]+$/.test(key)) {
-          uppercaseWarnings.push({ key, suggestion: toUpperSnakeCase(key) });
-        }
-      }
-    }
+    scanResult.uppercaseWarnings = opts.uppercaseKeys
+      ? detectUppercaseKeys(envKeys)
+      : [];
 
     // Find duplicates
-    if (!opts.allowDuplicates) {
-      const duplicateResults = checkDuplicates(
-        compareFile,
-        exampleFilePath,
-        opts,
-      );
-      dupsEnv = duplicateResults.dupsEnv;
-      dupsEx = duplicateResults.dupsEx;
-    }
+    let { dupsEnv, dupsEx }: DuplicateResult = opts.allowDuplicates
+      ? { dupsEnv: [], dupsEx: [] }
+      : checkDuplicates(compareFile, exampleFilePath, opts);
 
-    if (opts.expireWarnings) {
-      expireWarnings = detectEnvExpirations(compareFile.path);
-    }
+    scanResult.expireWarnings = opts.expireWarnings
+      ? detectEnvExpirations(compareFile.path)
+      : [];
 
     // Check for inconsistent naming across env + example keys
-    if (opts.inconsistentNamingWarnings) {
-      const envKeysList = Object.keys(envFull);
-      const exampleKeysList = exampleFull ? Object.keys(exampleFull) : [];
-
-      // Combine all keys for naming analysis
-      const allKeys = [...envKeysList, ...exampleKeysList];
-
-      inconsistentNamingWarnings = detectInconsistentNaming(allKeys);
-    }
+    scanResult.inconsistentNamingWarnings = opts.inconsistentNamingWarnings
+      ? detectInconsistentNaming([
+          ...Object.keys(envFull),
+          ...Object.keys(exampleFull ?? {}),
+        ])
+      : [];
 
     // Warn about .env.example keys without a documenting comment. Runs on the
-    // example file (documentation lives there), not the env file — using the
-    // explicit --example path when given, else the default `.env.example`.
-    if (opts.commentWarnings) {
-      const examplePath = resolveFromCwd(
-        opts.cwd,
-        opts.examplePath ?? DEFAULT_EXAMPLE_FILE,
-      );
-      if (fs.existsSync(examplePath)) {
-        commentWarnings = detectMissingComments(examplePath);
-      }
-    }
+    // example file (documentation lives there), not the env file — the same
+    // example the other checks read.
+    scanResult.commentWarnings =
+      opts.commentWarnings && exampleFilePath && exampleFull
+        ? detectMissingComments(exampleFilePath)
+        : [];
 
     // Warn when the env file this run is about has drifted from the example
     // documenting it. The scan only ever reads one file, so without this the
     // example is never checked against the values actually in use.
-    if (opts.driftWarnings) {
-      driftWarnings = detectExampleDrift({
-        comparisonPath: compareFile.path,
-        ignore: opts.ignore,
-        ignoreRegex: opts.ignoreRegex,
-      });
-    }
+    scanResult.driftWarnings = opts.driftWarnings
+      ? detectExampleDrift({
+          comparisonPath: compareFile.path,
+          ignore: opts.ignore,
+          ignoreRegex: opts.ignoreRegex,
+        })
+      : [];
 
     // Apply fixes (both duplicates + missing keys + gitignore)
     if (opts.fix) {
@@ -220,13 +164,9 @@ export function processComparisonFile(
         ensureGitignore: true,
       });
 
-      if (changed) {
-        // Update state based on what was actually fixed
-        fix.fixApplied = true;
-        fix.removedDuplicates = result.removedDuplicates;
-        fix.addedEnv = result.addedEnv;
-        fix.gitignoreUpdated = result.gitignoreUpdated;
+      fix = { ...result, fixApplied: changed };
 
+      if (changed) {
         // clear the issues that were fixed. `dupsEx` is not among them: the fix
         // only rewrites the env file, so duplicates in the example file survive
         // it and must still be reported.
@@ -237,47 +177,23 @@ export function processComparisonFile(
 
     // Keep the duplicates that were not fixed for output
     if (dupsEnv.length > 0 || dupsEx.length > 0) {
-      if (!scanResult.duplicates) scanResult.duplicates = {};
-      if (dupsEnv.length > 0) scanResult.duplicates.env = dupsEnv;
-      if (dupsEx.length > 0) scanResult.duplicates.example = dupsEx;
+      scanResult.duplicates = {
+        ...scanResult.duplicates,
+        ...(dupsEnv.length > 0 ? { env: dupsEnv } : {}),
+        ...(dupsEx.length > 0 ? { example: dupsEx } : {}),
+      };
     }
-  } catch (error) {
-    const errorMessage = `Could not read ${compareFile.name}: ${compareFile.path} - ${error}`;
-    return {
-      scanResult,
-      envVariables,
-      comparedAgainst,
-      dupsEnv,
-      dupsEx,
-      fix,
-      exampleFull,
-      exampleFile,
-      uppercaseWarnings,
-      expireWarnings,
-      inconsistentNamingWarnings,
-      commentWarnings,
-      driftWarnings,
-      error: {
-        message: errorMessage,
-        shouldExit: opts.isCiMode ?? false,
-      },
+  } catch (err) {
+    error = {
+      message: `Could not read ${compareFile.name}: ${compareFile.path} - ${err}`,
+      shouldExit: opts.isCiMode ?? false,
     };
   }
 
   return {
     scanResult,
-    envVariables,
-    comparedAgainst,
-    dupsEnv,
-    dupsEx,
     fix,
-    exampleFull,
-    exampleFile,
-    uppercaseWarnings,
-    expireWarnings,
-    inconsistentNamingWarnings,
-    commentWarnings,
-    driftWarnings,
+    ...(error ? { error } : {}),
   };
 }
 
@@ -300,12 +216,12 @@ function checkDuplicates(
   examplePath: string | null,
   opts: ScanUsageOptions,
 ): DuplicateResult {
-  const isIgnored = (key: string) =>
+  const isNotIgnored = (key: string) =>
     !opts.ignore.includes(key) && !opts.ignoreRegex.some((rx) => rx.test(key));
 
   // Duplicates in main env file
   const dupsEnv = findDuplicateKeys(compareFile.path).filter(({ key }) =>
-    isIgnored(key),
+    isNotIgnored(key),
   );
 
   // Duplicates in example file. Skipped when it *is* the comparison file — a
@@ -314,7 +230,7 @@ function checkDuplicates(
   // not exist, which an explicit `--example` may still point at.
   const dupsEx: Duplicate[] =
     examplePath && examplePath !== compareFile.path
-      ? findDuplicateKeys(examplePath).filter(({ key }) => isIgnored(key))
+      ? findDuplicateKeys(examplePath).filter(({ key }) => isNotIgnored(key))
       : [];
 
   return { dupsEnv, dupsEx } satisfies DuplicateResult;

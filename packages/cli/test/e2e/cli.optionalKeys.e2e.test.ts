@@ -65,6 +65,17 @@ describe('Optional keys (@optional)', () => {
       expect(res.status).toBe(0);
     });
 
+    it('reads the annotation from the example file that documents .env', () => {
+      const cwd = setup(WITH_ANNOTATION);
+      fs.renameSync(
+        path.join(cwd, '.env.example'),
+        path.join(cwd, '.env.sample'),
+      );
+      const res = runCli(cwd, []);
+      expect(res.stdout).not.toContain('REDIS_URL');
+      expect(res.status).toBe(0);
+    });
+
     it('still reports other keys as missing', () => {
       const cwd = setup('# @optional\nREDIS_URL=\n\nDATABASE_URL=\n', '\n');
       const res = runCli(cwd, []);
