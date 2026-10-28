@@ -77,12 +77,16 @@ jobs:
             exit 1
           fi
 
+      # Plain `npm install` on purpose: this checks the tarball installs the way
+      # it does for a user, so it cannot be locked with `npm ci`. TypeScript is
+      # not installed here: the type check uses the repo's tsc, pinned by
+      # pnpm-lock.yaml, to keep unpinned downloads to the package's own deps.
       - name: Install tarball into empty project
         working-directory: ${{ runner.temp }}/smoke
         run: |
           npm init -y > /dev/null
           npm pkg set type=module
-          npm install --no-audit --no-fund ./dotenv-diff-*.tgz typescript
+          npm install --no-audit --no-fund ./dotenv-diff-*.tgz
 
       - name: Run CLI
         working-directory: ${{ runner.temp }}/smoke
@@ -134,5 +138,5 @@ jobs:
           const result: DiffResult = diffEnv(parseEnvContent('A=1'), {});
           export const missing: string[] = result.missing;
           EOF
-          npx --no-install tsc -p tsconfig.json
+          node "$GITHUB_WORKSPACE/node_modules/typescript/bin/tsc" -p tsconfig.json
           echo "Types OK"
