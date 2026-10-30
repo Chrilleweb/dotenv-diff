@@ -2,7 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { promptEnsureFiles } from '../../../../src/commands/prompts/promptEnsureFiles.js';
+import {
+  promptEnsureFiles,
+  toExampleContent,
+} from '../../../../src/commands/prompts/promptEnsureFiles.js';
 
 // ---- mocks ----
 vi.mock('../../../../src/commands/prompts/prompts.js', () => ({
@@ -41,7 +44,7 @@ describe('promptEnsureFiles', () => {
   it('includes Do you want to create message in the confirmYesNo prompt text', async () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
 
-    (confirmYesNo as any).mockResolvedValue(true);
+    vi.mocked(confirmYesNo).mockResolvedValue(true);
 
     await promptEnsureFiles({
       cwd,
@@ -78,7 +81,7 @@ describe('promptEnsureFiles', () => {
   it('does not create .env when user declines', async () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
 
-    (confirmYesNo as any).mockResolvedValue(false);
+    vi.mocked(confirmYesNo).mockResolvedValue(false);
 
     const result = await promptEnsureFiles({
       cwd,
@@ -96,7 +99,7 @@ describe('promptEnsureFiles', () => {
   it('creates .env when user confirms via interactive prompt', async () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'FOO=bar');
 
-    (confirmYesNo as any).mockResolvedValue(true);
+    vi.mocked(confirmYesNo).mockResolvedValue(true);
 
     const result = await promptEnsureFiles({
       cwd,
@@ -136,7 +139,7 @@ describe('promptEnsureFiles', () => {
   it('skips creating .env.example when user declines', async () => {
     fs.writeFileSync(path.join(cwd, '.env'), 'FOO=bar');
 
-    (confirmYesNo as any).mockResolvedValue(false);
+    vi.mocked(confirmYesNo).mockResolvedValue(false);
 
     const result = await promptEnsureFiles({
       cwd,
@@ -275,5 +278,48 @@ BAZ=123
     expect(content).toContain('BAZ=');
     expect(content).not.toContain('bar');
     expect(result.shouldExit).toBe(false);
+  });
+});
+
+describe('toExampleContent', () => {
+  it('keeps comments and blank lines and strips values', () => {
+    expect(toExampleContent('# db\nFOO=bar\n\nBAZ=123\n')).toBe(
+      '# db\nFOO=\n\nBAZ=\n',
+    );
+  });
+
+  it('never copies the body of a multi-line quoted value', () => {
+    const env = [
+      'API=1',
+      'PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----',
+      'MIIEsecretBODYline',
+      'abcd==',
+      '-----END RSA PRIVATE KEY-----"',
+      'AFTER=2',
+    ].join('\n');
+
+    expect(toExampleContent(env)).toBe('API=\nPRIVATE_KEY=\nAFTER=');
+  });
+
+  it('handles single quotes and a trailing comment after the closing quote', () => {
+    const env = "CERT='line1\nline2' # cert\nNEXT=1";
+
+    expect(toExampleContent(env)).toBe('CERT=\nNEXT=');
+  });
+
+  it('treats a value that opens and closes its quote on one line as complete', () => {
+    expect(toExampleContent('A="x"\nB=\'y\' # c\nC=`z`\nD=1')).toBe(
+      'A=\nB=\nC=\nD=',
+    );
+  });
+
+  it('drops lines that are not KEY=value', () => {
+    expect(toExampleContent('FOO=1\njust some text\n=nokey\nBAR=2')).toBe(
+      'FOO=\nBAR=',
+    );
+  });
+
+  it('handles CRLF line endings and a BOM', () => {
+    expect(toExampleContent('\uFEFFFOO=1\r\nBAR=2\r\n')).toBe('FOO=\nBAR=\n');
   });
 });
