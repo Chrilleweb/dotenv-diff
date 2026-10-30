@@ -105,6 +105,7 @@ export interface RawOptions {
   ignoreRegex?: string | string[];
   only?: string | string[];
   compare?: boolean;
+  color?: boolean;
   noColor?: boolean;
   scanUsage?: boolean;
   includeFiles?: string | string[];

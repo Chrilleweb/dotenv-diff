@@ -547,3 +547,42 @@ describe('duplicate detection', () => {
     expect(res.stdout).not.toContain('NOT_DETECTED_VAR');
   });
 });
+
+describe('--color flag', () => {
+  // Strip colour env vars so only the flag decides; stdout is a pipe, not a TTY
+  const { FORCE_COLOR: _force, NO_COLOR: _no, ...env } = process.env;
+  const ANSI = /\x1b\[/;
+
+  function setup() {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+    fs.writeFileSync(path.join(cwd, '.env.example'), 'A=\nB=\n');
+    return cwd;
+  }
+
+  it('prints no colours when piped without --color', () => {
+    const res = runCli(setup(), ['--compare', '--ci'], env);
+    expect(res.stdout).not.toMatch(ANSI);
+  });
+
+  it('forces colours when piped with --color', () => {
+    const res = runCli(setup(), ['--compare', '--ci', '--color'], env);
+    expect(res.stdout).toMatch(ANSI);
+  });
+
+  it('lets --color override noColor in the config file', () => {
+    const cwd = setup();
+    fs.writeFileSync(
+      path.join(cwd, 'dotenv-diff.config.json'),
+      JSON.stringify({ noColor: true }),
+    );
+
+    // Without --color the config disables colours on the main output
+    const off = runCli(cwd, ['--compare', '--ci'], env);
+    expect(off.stdout).toContain('▸ Missing keys');
+    expect(off.stdout).not.toMatch(/\x1b\[[0-9;]*m▸\S* \S*Missing keys/);
+
+    const on = runCli(cwd, ['--compare', '--ci', '--color'], env);
+    expect(on.stdout).toMatch(/\x1b\[[0-9;]*m▸\S* \S*Missing keys/);
+  });
+});

@@ -23,7 +23,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "node -e \"fs.rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
+    "build": "node -e \"fs.rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json && node -e \"fs.chmodSync('dist/bin/dotenv-diff.js',0o755)\"",
     "typecheck": "tsc --noEmit",
     "dev": "npx dotenv-diff",
     "test": "vitest run",
