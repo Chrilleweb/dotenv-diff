@@ -342,8 +342,8 @@ Usage in the configuration file:
 
 ### `--ci`
 
-Run in CI mode: non-interactive and read-only.
-Prevents all file creation and modification, including prompts for missing files.
+Run in CI mode: non-interactive.
+Disables prompts and never creates missing files. Files are only modified if you also pass [`--fix`](#--fix) explicitly.
 Always exits with an error if issues are found. Recommended for CI/CD pipelines.
 
 Example usage:

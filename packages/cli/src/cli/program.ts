@@ -124,7 +124,10 @@ export function createProgram() {
         '--baseline',
         'Set current codebase state as baseline for future comparisons',
       )
-      .option('--ci', 'Run non-interactively and never create files')
+      .option(
+        '--ci',
+        'Run non-interactively and never create missing files (--fix still applies)',
+      )
       .option('-y, --yes', 'Run non-interactively and answer Yes to prompts')
 
       // Output
