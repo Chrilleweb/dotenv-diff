@@ -289,6 +289,7 @@ function buildCompareOptions(
     ignoreRegex: opts.ignoreRegex,
     showStats: opts.showStats,
     uppercaseKeys: opts.uppercaseKeys,
+    strict: opts.strict,
     suggest: opts.suggest,
     collect: (e: CompareJsonEntry) => report.push(e),
     ...(opts.only ? { only: opts.only } : {}),

@@ -218,6 +218,7 @@ describe('compareMany', () => {
       }),
       false,
       false,
+      false,
     );
   });
 
@@ -237,6 +238,7 @@ describe('compareMany', () => {
       expect.objectContaining({
         extra: ['EXTRA_KEY'],
       }),
+      false,
       false,
       false,
     );
@@ -259,6 +261,7 @@ describe('compareMany', () => {
       expect.objectContaining({
         empty: ['KEY1'],
       }),
+      false,
       false,
       false,
     );
@@ -287,6 +290,7 @@ describe('compareMany', () => {
       [{ key: 'DUP_EX', count: 3 }],
       false,
       false,
+      false,
     );
   });
 
@@ -305,6 +309,7 @@ describe('compareMany', () => {
       [],
       false,
       false,
+      false,
     );
   });
 
@@ -321,7 +326,40 @@ describe('compareMany', () => {
     expect(mockPrintGitignoreWarning).toHaveBeenCalledWith({
       envFile: '.env',
       reason: 'not-ignored',
+      strict: false,
     });
+  });
+
+  it('passes strict to the issue, gitignore and duplicate printers', async () => {
+    mockCheckGitignoreStatus.mockReturnValue({
+      reason: 'not-ignored',
+    });
+
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+    const opts = createOptions({ strict: true });
+
+    await compareMany(pairs, opts);
+
+    expect(mockPrintIssues).toHaveBeenCalledWith(
+      expect.any(Object),
+      false,
+      false,
+      true,
+    );
+    expect(mockPrintGitignoreWarning).toHaveBeenCalledWith({
+      envFile: '.env',
+      reason: 'not-ignored',
+      strict: true,
+    });
+    expect(mockPrintDuplicates).toHaveBeenCalledWith(
+      '.env',
+      '.env.example',
+      expect.any(Array),
+      expect.any(Array),
+      false,
+      false,
+      true,
+    );
   });
 
   it('checks values when checkValues is true', async () => {
@@ -347,6 +385,7 @@ describe('compareMany', () => {
       expect.objectContaining({
         mismatches: [{ key: 'KEY1', expected: 'expected', actual: 'actual' }],
       }),
+      false,
       false,
       false,
     );
@@ -533,6 +572,7 @@ describe('compareMany', () => {
       }),
       false,
       false,
+      false,
     );
   });
 
@@ -699,6 +739,7 @@ describe('compareMany', () => {
       }),
       false,
       false,
+      false,
     );
   });
 
@@ -835,6 +876,7 @@ describe('compareMany', () => {
       }),
       false,
       false,
+      true,
     );
     expect(mockPrintGitignoreWarning).toHaveBeenCalled();
   });
@@ -867,6 +909,39 @@ describe('compareMany', () => {
     );
   });
 
+  it('falls back to strict=false when strict is undefined', async () => {
+    mockCheckGitignoreStatus.mockReturnValue({
+      reason: 'not-ignored',
+    });
+
+    const opts = createOptions();
+    delete opts.strict;
+    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
+
+    await compareMany(pairs, opts);
+
+    expect(mockPrintDuplicates).toHaveBeenCalledWith(
+      '.env',
+      '.env.example',
+      expect.any(Array),
+      expect.any(Array),
+      false,
+      false,
+      false,
+    );
+    expect(mockPrintIssues).toHaveBeenCalledWith(
+      expect.any(Object),
+      false,
+      false,
+      false,
+    );
+    expect(mockPrintGitignoreWarning).toHaveBeenCalledWith({
+      envFile: '.env',
+      reason: 'not-ignored',
+      strict: false,
+    });
+  });
+
   it('falls back ?? false when json and fix are undefined (lines 103, 123-124, 266, 280-281)', async () => {
     // opts.json and opts.fix are undefined → opts.json ?? false and opts.fix ?? false
     // take the right-hand fallback branch for each ?? operator.
@@ -882,7 +957,7 @@ describe('compareMany', () => {
     expect(result.exitWithError).toBe(false);
     // printHeader receives false from opts.json ?? false (line 103)
     expect(mockPrintHeader).toHaveBeenCalledWith('.env', '.env.example', false);
-    // printDuplicates receives false for both ?? args (lines 123-124)
+    // printDuplicates receives false for all ?? args (lines 123-125)
     expect(mockPrintDuplicates).toHaveBeenCalledWith(
       '.env',
       '.env.example',
@@ -890,10 +965,12 @@ describe('compareMany', () => {
       [],
       false,
       false,
+      false,
     );
-    // printIssues receives false for both ?? args (line 266)
+    // printIssues receives false for all ?? args
     expect(mockPrintIssues).toHaveBeenCalledWith(
       expect.any(Object),
+      false,
       false,
       false,
     );
@@ -980,6 +1057,7 @@ describe('compareMany', () => {
       expect.objectContaining({ empty: ['KEY1'] }),
       false,
       false,
+      false,
     );
   });
 
@@ -998,6 +1076,7 @@ describe('compareMany', () => {
 
     expect(mockPrintIssues).toHaveBeenCalledWith(
       expect.objectContaining({ missing: [], extra: ['EXTRA_KEY'] }),
+      false,
       false,
       false,
     );

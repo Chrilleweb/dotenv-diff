@@ -14,14 +14,19 @@ import {
  * @param filtered The filtered comparison results.
  * @param json Whether to output in JSON format.
  * @param fix Whether fix mode is enabled (skips printing missing keys as they will be fixed).
+ * @param strict Whether strict mode is enabled (colours warnings as errors).
  * @returns void
  */
 export function printIssues(
   filtered: Filtered,
   json: boolean,
   fix: boolean = false,
+  strict: boolean = false,
 ): void {
   if (json) return;
+
+  const indicator = strict ? error('▸') : warning('▸');
+  const textColor = strict ? error : warning;
 
   if (filtered.missing.length && !fix) {
     const suggestionByKey = new Map(
@@ -43,31 +48,31 @@ export function printIssues(
 
   if (filtered.extra?.length) {
     console.log();
-    console.log(`${warning('▸')} ${header('Extra keys (not in example)')}`);
+    console.log(`${indicator} ${header('Extra keys (not in example)')}`);
     console.log(`${divider}`);
     for (const key of filtered.extra) {
-      console.log(`${label(padLabel(key))}${warning('extra')}`);
+      console.log(`${label(padLabel(key))}${textColor('extra')}`);
     }
     console.log(`${divider}`);
   }
 
   if (filtered.empty?.length) {
     console.log();
-    console.log(`${warning('▸')} ${header('Empty values')}`);
+    console.log(`${indicator} ${header('Empty values')}`);
     console.log(`${divider}`);
     for (const key of filtered.empty) {
-      console.log(`${label(padLabel(key))}${warning('empty')}`);
+      console.log(`${label(padLabel(key))}${textColor('empty')}`);
     }
     console.log(`${divider}`);
   }
 
   if (filtered.mismatches?.length) {
     console.log();
-    console.log(`${warning('▸')} ${header('Value mismatches')}`);
+    console.log(`${indicator} ${header('Value mismatches')}`);
     console.log(`${divider}`);
     for (const { key, expected, actual } of filtered.mismatches) {
       console.log(
-        `${label(padLabel(key))}${warning(`expected: ${expected}`)}  ${dim(`got: ${actual}`)}`,
+        `${label(padLabel(key))}${textColor(`expected: ${expected}`)}  ${dim(`got: ${actual}`)}`,
       );
     }
     console.log(`${divider}`);
