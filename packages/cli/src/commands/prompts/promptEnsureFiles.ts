@@ -4,6 +4,7 @@ import { confirmYesNo } from './prompts.js';
 import { warnIfEnvNotIgnored } from '../../services/git.js';
 import { printPrompt } from '../../ui/compare/printPrompt.js';
 import { DEFAULT_ENV_FILE } from '../../config/constants.js';
+import { parseEnvLine, splitEnvLines } from '../../core/envLine.js';
 
 /**
  * Result of ensureFilesOrPrompt function
@@ -121,20 +122,59 @@ export async function promptEnsureFiles(
       return EXIT_WITHOUT_CREATING;
     }
 
-    const envContent = fs
-      .readFileSync(envPath, 'utf-8')
-      .split('\n')
-      .map((line) => {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith('#')) return trimmed;
-        const [key] = trimmed.split('=');
-        return `${key}=`;
-      })
-      .join('\n');
+    const exampleContent = toExampleContent(fs.readFileSync(envPath, 'utf-8'));
 
-    fs.writeFileSync(examplePath, envContent);
+    fs.writeFileSync(examplePath, exampleContent);
     printPrompt.exampleCreated(examplePath, envPath);
   }
 
   return { didCreate: true, shouldExit: false, exitCode: 0 };
+}
+
+/**
+ * Builds .env.example content from .env content. Keeps comments and blank
+ * lines, strips every value, and drops anything that is not a `KEY=value`
+ * line, such as the body of a multi-line quoted value (fx a PEM key), so no
+ * secret material ends up in a file meant to be committed.
+ * @param envContent - Raw content of the .env file
+ * @returns Content for the .env.example file
+ */
+export function toExampleContent(envContent: string): string {
+  const lines: string[] = [];
+  let openQuote: string | null = null;
+
+  for (const line of splitEnvLines(envContent)) {
+    const trimmed = line.trim();
+
+    // Inside a multi-line quoted value: skip until the closing quote
+    if (openQuote) {
+      if (trimmed.includes(openQuote)) openQuote = null;
+      continue;
+    }
+
+    if (!trimmed || trimmed.startsWith('#')) {
+      lines.push(trimmed);
+      continue;
+    }
+
+    const parsed = parseEnvLine(line);
+    if (!parsed) continue;
+
+    lines.push(`${parsed.key}=`);
+    openQuote = unclosedQuote(parsed.value);
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Returns the quote character a value opens without closing on the same line.
+ * fx: `"-----BEGIN KEY-----` → `"`, `"closed"` → null, `plain` → null
+ * @param value - The value part of a dotenv line
+ * @returns The unclosed quote character, or null
+ */
+function unclosedQuote(value: string): string | null {
+  const quote = value[0];
+  if (quote !== '"' && quote !== "'" && quote !== '`') return null;
+  return value.indexOf(quote, 1) === -1 ? quote : null;
 }
