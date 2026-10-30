@@ -37,7 +37,7 @@ export function normalizeOptions(raw: RawOptions): Options {
   const allowDuplicates = toBool(raw.allowDuplicates);
   const fix = toBool(raw.fix);
   const json = toBool(raw.json);
-  const noColor = toBool(raw.noColor);
+  const noColor = raw.color !== true && toBool(raw.noColor);
   const compare = toBool(raw.compare);
   const strict = toBool(raw.strict);
   const scanUsage = raw.scanUsage != null ? toBool(raw.scanUsage) : !compare;

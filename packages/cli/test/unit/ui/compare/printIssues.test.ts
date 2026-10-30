@@ -120,6 +120,36 @@ describe('printIssues', () => {
     );
   });
 
+  it('colours extra, empty and mismatches as errors in strict mode', () => {
+    const filtered: Filtered = {
+      ...baseFiltered,
+      extra: ['X'],
+      empty: ['EMPTY_KEY'],
+      mismatches: [{ key: 'API_KEY', expected: '123', actual: '456' }],
+    };
+
+    printIssues(filtered, false, false, true);
+
+    expect(logSpy).toHaveBeenCalledWith(
+      `${error('▸')} ${header('Extra keys (not in example)')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('X'.padEnd(UI_LABEL_WIDTH))}${error('extra')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${error('▸')} ${header('Empty values')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('EMPTY_KEY'.padEnd(UI_LABEL_WIDTH))}${error('empty')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${error('▸')} ${header('Value mismatches')}`,
+    );
+    expect(logSpy).toHaveBeenCalledWith(
+      `${label('API_KEY'.padEnd(UI_LABEL_WIDTH))}${error('expected: 123')}  ${dim('got: 456')}`,
+    );
+  });
+
   it('handles all categories together', () => {
     const filtered: Filtered = {
       missing: ['A'],

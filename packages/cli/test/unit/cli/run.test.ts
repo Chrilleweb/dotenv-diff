@@ -479,6 +479,40 @@ describe('run', () => {
     existsSpy.mockRestore();
   });
 
+  it('forwards strict, only and suggest to compare options', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ compare: true })),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(
+      createBaseOptions({
+        compare: true,
+        envFlag: 'a.env',
+        exampleFlag: 'b.env',
+        strict: true,
+        only: ['duplicate'],
+        suggest: false,
+      }),
+    );
+
+    const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
+    mockCompareMany.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    expect(mockCompareMany).toHaveBeenCalledWith(
+      expect.any(Array),
+      expect.objectContaining({
+        strict: true,
+        only: ['duplicate'],
+        suggest: false,
+      }),
+    );
+
+    existsSpy.mockRestore();
+  });
+
   it('routes to explainKey when opts.explain is set and exits with 0', async () => {
     const program = {
       parse: vi.fn(),

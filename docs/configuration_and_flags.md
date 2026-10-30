@@ -306,7 +306,7 @@ See [Baseline Workflow](./baseline.md) for recommendations on when to create, re
 
 ### `--color`
 
-Enables colored output in the terminal (enabled by default).
+Forces colored output. Colors are on by default in a terminal
 
 Example usage:
 

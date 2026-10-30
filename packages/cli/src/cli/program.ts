@@ -129,7 +129,7 @@ export function createProgram() {
 
       // Output
       .option('--json', 'Output results in JSON format')
-      .option('--color', 'Enable colored output')
+      .option('--color', 'Force colored output')
       .option('--no-color', 'Disable colored output')
       .option('--show-stats', 'Show statistics')
       .option('--no-show-stats', 'Do not show statistics')

@@ -124,6 +124,7 @@ function processPair(
     dupsEx,
     opts.json ?? false,
     opts.fix ?? false,
+    opts.strict ?? false,
   );
 
   const entry = compareJsonOutput({
@@ -281,12 +282,18 @@ function printPairOutputs(
   dupsEnv: ReturnType<typeof findDuplicateKeys>,
   opts: Readonly<ComparisonOptions>,
 ): void {
-  printIssues(filtered, opts.json ?? false, opts.fix ?? false);
+  printIssues(
+    filtered,
+    opts.json ?? false,
+    opts.fix ?? false,
+    opts.strict ?? false,
+  );
 
   if (filtered.gitignoreIssue && !opts.json && !opts.fix) {
     printGitignoreWarning({
       envFile: envName,
       reason: filtered.gitignoreIssue.reason,
+      strict: opts.strict ?? false,
     });
   }
 

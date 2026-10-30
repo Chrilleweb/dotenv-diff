@@ -25,11 +25,16 @@ export function buildOnce(): { distDir: string; cliPath: string } {
  * Runs the CLI with the given arguments in the specified working directory.
  * @params cwd - The current working directory to run the CLI in.
  * @params args - The arguments to pass to the CLI.
+ * @params env - Optional environment for the CLI process (defaults to process.env).
  * @returns The result of the CLI execution.
  */
-export function runCli(cwd: string, args: string[]) {
+export function runCli(cwd: string, args: string[], env?: NodeJS.ProcessEnv) {
   if (!cliPath) buildOnce();
-  return spawnSync('node', [cliPath!, ...args], { cwd, encoding: 'utf8' });
+  return spawnSync('node', [cliPath!, ...args], {
+    cwd,
+    encoding: 'utf8',
+    ...(env ? { env } : {}),
+  });
 }
 
 /**

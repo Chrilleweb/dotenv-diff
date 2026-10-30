@@ -42,6 +42,13 @@ describe('normalizeOptions', () => {
     expect(opts.uppercaseKeys).toBe(true);
   });
 
+  it('lets an explicit color: true override noColor', () => {
+    expect(normalizeOptions({ noColor: true }).noColor).toBe(true);
+    expect(normalizeOptions({ color: true, noColor: true }).noColor).toBe(
+      false,
+    );
+  });
+
   it('parses comma-separated lists', () => {
     const opts = normalizeOptions({
       ignore: 'FOO,BAR , BAZ',
