@@ -130,6 +130,26 @@ describe('no-flag autoscan', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
+  it('does not let an unclosed HTML comment in one file hide usages in other files', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'a.svelte'),
+      '<!-- old: {process.env.OLD_THING}\n',
+    );
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'b.ts'),
+      'const y = process.env.REAL_ONE;\nconst z = process.env.REAL_TWO;\n',
+    );
+
+    const res = runCli(cwd, ['--ci', '--json']);
+    const output = JSON.parse(res.stdout);
+    const missing = output.missing.map((m: { variable: string }) => m.variable);
+
+    expect(missing).toEqual(['REAL_ONE', 'REAL_TWO']);
+  });
   it('will respect ignoreUrls from dotenv-diff.config.json and skip matching HTTPS warnings', () => {
     const cwd = tmpDir();
 
