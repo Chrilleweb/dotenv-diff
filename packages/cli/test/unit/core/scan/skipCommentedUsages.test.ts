@@ -223,4 +223,60 @@ describe('skipCommentedUsages', () => {
       'Q',
     ]);
   });
+
+  // ---- per-file state and line order ----
+
+  const at = (
+    variable: string,
+    file: string,
+    line: number,
+    context: string,
+  ): EnvUsage => ({ variable, file, line, context }) as EnvUsage;
+
+  it('does not let an unclosed HTML comment in one file hide usages in another', () => {
+    const usages = [
+      at('OLD_THING', 'src/a.svelte', 1, '<!-- old: {process.env.OLD_THING}'),
+      at('REAL_ONE', 'src/b.ts', 1, 'const y = process.env.REAL_ONE;'),
+      at('REAL_TWO', 'src/b.ts', 2, 'const z = process.env.REAL_TWO;'),
+    ];
+
+    expect(skipCommentedUsages(usages).map((u) => u.variable)).toEqual([
+      'REAL_ONE',
+      'REAL_TWO',
+    ]);
+  });
+
+  it('does not let an open ignore block in one file hide usages in another', () => {
+    const usages = [
+      at('A', 'src/a.svelte', 1, '<!-- dotenv-diff-ignore-start -->'),
+      at('B', 'src/b.ts', 1, 'const b = process.env.B;'),
+    ];
+
+    expect(skipCommentedUsages(usages).map((u) => u.variable)).toEqual(['B']);
+  });
+
+  it('tracks HTML comments in line order, not in the order usages arrive', () => {
+    // The scanner groups usages by pattern, so a line inside the comment can
+    // arrive before the line that opens it
+    const usages = [
+      at('INSIDE', 'src/a.svelte', 2, '{import.meta.env.INSIDE}'),
+      at('OPEN', 'src/a.svelte', 1, '<!-- {process.env.OPEN}'),
+      at('CLOSE', 'src/a.svelte', 3, '{process.env.CLOSE} -->'),
+      at('AFTER', 'src/a.svelte', 4, '<p>{import.meta.env.AFTER}</p>'),
+    ];
+
+    expect(skipCommentedUsages(usages).map((u) => u.variable)).toEqual([
+      'AFTER',
+    ]);
+  });
+
+  it('keeps the original order of the remaining usages', () => {
+    const usages = [
+      at('B2', 'src/b.ts', 2, 'process.env.B2'),
+      at('A1', 'src/a.ts', 1, 'process.env.A1'),
+      at('B1', 'src/b.ts', 1, 'process.env.B1'),
+    ];
+
+    expect(skipCommentedUsages(usages)).toEqual(usages);
+  });
 });
