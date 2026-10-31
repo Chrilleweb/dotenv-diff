@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.5.0
+
+### Minor Changes
+
+- 666867a: feat: detect Strapi's `env('KEY')` and `env.<cast>('KEY')` helper in config files that receive `env` as a destructured parameter (`({ env }) => ...`)
+
+### Patch Changes
+
+- 5c74793: fix: `--color` now overrides `noColor` from the config file
+- eb57231: fix: an unclosed HTML comment or ignore block in one file no longer hides env usages in other files, and multi-line comments are now tracked in line order
+- 5c74793: fix: `--strict` was ignored in `--compare` mode, so warnings like duplicate keys never failed the run
+- 73c702d: fix: auto-generated `.env.example` no longer copies non-key lines, such as the body of a multi-line quoted value (e.g. a PEM private key)
+- 3d5d828: fix: large `--json` output was cut off at 64 KB
+- 5f61f87: fix: import from 'dotenv-diff' pointed to a file that didn't exist. also stop shipping tests in the npm package and include LICENSE
+
 ## 3.4.2
 
 ### Patch Changes

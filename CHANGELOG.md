@@ -1,5 +1,27 @@
 # Changelog
 
+<!-- changesets: feat-strapi-env-helper.md,fiery-tables-drive.md,fix-comment-state-per-file.md,fix-compare-strict.md,fix-example-monkey.md,fix-json-truncation.md,fix-package-entry.md -->
+## 2026-10-31
+
+### Highlights
+- feat: detect Strapi's `env('KEY')` and `env.<cast>('KEY')` helper in config files that receive `env` as a destructured parameter (`({ env }) => ...`)
+- fix: `--color` now overrides `noColor` from the config file
+- fix: an unclosed HTML comment or ignore block in one file no longer hides env usages in other files, and multi-line comments are now tracked in line order
+- fix: `--strict` was ignored in `--compare` mode, so warnings like duplicate keys never failed the run
+- fix: auto-generated `.env.example` no longer copies non-key lines, such as the body of a multi-line quoted value (e.g. a PEM private key)
+- fix: large `--json` output was cut off at 64 KB
+- fix: import from 'dotenv-diff' pointed to a file that didn't exist. also stop shipping tests in the npm package and include LICENSE
+
+### Package Releases
+- dotenv-diff: minor
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | minor
+dotenv-diff | patch
+
 <!-- changesets: bumpy-ants-lose.md,slow-times-sink.md -->
 ## 2026-10-20
 
