@@ -139,6 +139,7 @@ describe('run', () => {
   afterEach(() => {
     vi.clearAllMocks();
     exitSpy.mockRestore();
+    process.exitCode = undefined;
   });
 
   it('handles --init and exits early without process.exit', async () => {
@@ -167,7 +168,8 @@ describe('run', () => {
 
     expect(mockScanUsage).toHaveBeenCalledOnce();
     expect(mockSetupGlobalConfig).toHaveBeenCalledOnce();
-    expect(exitSpy).toHaveBeenCalledWith(0);
+    expect(process.exitCode).toBe(0);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('runs compare auto-discovery mode and exits with code 1 on error', async () => {
@@ -205,7 +207,8 @@ describe('run', () => {
     expect(mockDiscoverEnvFiles).toHaveBeenCalledOnce();
     expect(mockPromptEnsureFiles).toHaveBeenCalledOnce();
     expect(mockCompareMany).toHaveBeenCalledOnce();
-    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(process.exitCode).toBe(1);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('runs direct file comparison when both flags provided', async () => {
@@ -229,7 +232,8 @@ describe('run', () => {
     await run(program);
 
     expect(mockCompareMany).toHaveBeenCalledOnce();
-    expect(exitSpy).toHaveBeenCalledWith(0);
+    expect(process.exitCode).toBe(0);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('handles missing files in CI mode', async () => {
@@ -251,7 +255,8 @@ describe('run', () => {
 
     await run(program);
 
-    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(process.exitCode).toBe(1);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('handles missing files in interactive mode with shouldExit true', async () => {
@@ -278,7 +283,8 @@ describe('run', () => {
 
     await run(program);
 
-    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(process.exitCode).toBe(1);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('auto-discovery exits early when initResult.shouldExit is true', async () => {
@@ -303,7 +309,8 @@ describe('run', () => {
 
     await run(program);
 
-    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(process.exitCode).toBe(1);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('covers direct comparison guard when flags become missing at runtime', async () => {
@@ -331,7 +338,8 @@ describe('run', () => {
     await run(program);
 
     expect(mockCompareMany).not.toHaveBeenCalled();
-    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(process.exitCode).toBe(1);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('continues interactive missing-file flow when prompt does not request exit', async () => {
@@ -360,7 +368,8 @@ describe('run', () => {
 
     expect(mockPromptEnsureFiles).toHaveBeenCalled();
     expect(mockCompareMany).toHaveBeenCalledOnce();
-    expect(exitSpy).toHaveBeenCalledWith(0);
+    expect(process.exitCode).toBe(0);
+    expect(exitSpy).not.toHaveBeenCalled();
     existsSpy.mockRestore();
   });
 
@@ -446,7 +455,8 @@ describe('run', () => {
     expect(logSpy).toHaveBeenCalledWith(
       JSON.stringify([{ ok: true }], null, 2),
     );
-    expect(exitSpy).toHaveBeenCalledWith(0);
+    expect(process.exitCode).toBe(0);
+    expect(exitSpy).not.toHaveBeenCalled();
 
     logSpy.mockRestore();
     existsSpy.mockRestore();
@@ -523,8 +533,6 @@ describe('run', () => {
       createBaseOptions({ explain: 'MY_KEY' }),
     );
     mockExplainKey.mockResolvedValue(undefined);
-    // process.exit is mocked (doesn't really exit), so scanUsage is reached too
-    mockScanUsage.mockResolvedValue({ exitWithError: false });
 
     await run(program);
 
@@ -532,8 +540,9 @@ describe('run', () => {
     expect(mockExplainKey).toHaveBeenCalledWith(
       expect.objectContaining({ key: 'MY_KEY' }),
     );
-    // First exit(0) is from the explain path
-    expect(exitSpy).toHaveBeenCalledWith(0);
+    expect(mockScanUsage).not.toHaveBeenCalled();
+    expect(process.exitCode).toBe(0);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('passes json flag to explainKey', async () => {
@@ -546,14 +555,14 @@ describe('run', () => {
       createBaseOptions({ explain: 'DB_URL', json: true }),
     );
     mockExplainKey.mockResolvedValue(undefined);
-    mockScanUsage.mockResolvedValue({ exitWithError: false });
 
     await run(program);
 
     expect(mockExplainKey).toHaveBeenCalledWith(
       expect.objectContaining({ key: 'DB_URL', json: true }),
     );
-    expect(exitSpy).toHaveBeenCalledWith(0);
+    expect(process.exitCode).toBe(0);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('routes to runMatrix when opts.matrix is set and exits with 0 on success', async () => {
@@ -573,7 +582,8 @@ describe('run', () => {
     expect(mockRunMatrix).toHaveBeenCalledWith(
       expect.objectContaining({ files: [] }),
     );
-    expect(exitSpy).toHaveBeenCalledWith(0);
+    expect(process.exitCode).toBe(0);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 
   it('routes to runMatrix with explicit files and exits with 1 on differences', async () => {
@@ -597,6 +607,7 @@ describe('run', () => {
         files: ['.env.production', '.env.staging'],
       }),
     );
-    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(process.exitCode).toBe(1);
+    expect(exitSpy).not.toHaveBeenCalled();
   });
 });
