@@ -503,7 +503,7 @@ export default config;`;
       const content = `module.exports = ({ env }) => ({
   a: env(dynamicKey),
   b: env('lowercase_key'),
-  c: env.int(\`PREFIX_\${name}\`),
+  c: env.int(\`PREFIX_${'$'}{name}\`),
 });`;
       const usages = scanFile(
         '/test/project/config/server.js',
