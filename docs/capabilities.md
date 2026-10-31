@@ -53,6 +53,13 @@ export const variables = defineEnvVars({
   MY_KEY: {},
   OTHER_KEY: { public: true },
 });
+
+// Strapi – env() helper in config files (only in files that receive
+// `env` as a destructured parameter, e.g. `({ env }) => ...`)
+module.exports = ({ env }) => ({
+  host: env('MY_KEY', '0.0.0.0'),
+  port: env.int('OTHER_KEY', 1337), // env.bool, env.array, env.json, env.oneOf, ...
+});
 ```
 
 Docker Compose files are also scanned for shell-style interpolation, so

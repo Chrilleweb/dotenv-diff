@@ -7,6 +7,8 @@ import type {
 import {
   ENV_PATTERNS,
   DOCKER_COMPOSE_PATTERNS,
+  STRAPI_CONFIG_REGEX,
+  STRAPI_ENV_PATTERNS,
   buildSveltekitAliasPatterns,
   isDockerComposeFile,
   SVELTEKIT_IMPORT_REGEX,
@@ -74,6 +76,11 @@ export function scanFile(
         : /\bloadEnv\s*\(/.test(content)
           ? 'vite'
           : 'sveltekit';
+
+    // Strapi config files receive an `env()` helper as a destructured param
+    if (STRAPI_CONFIG_REGEX.test(content)) {
+      allPatterns.push(...STRAPI_ENV_PATTERNS);
+    }
 
     // Detect aliased $env imports and build dynamic patterns for them
     SVELTEKIT_ALIAS_IMPORT_REGEX.lastIndex = 0;

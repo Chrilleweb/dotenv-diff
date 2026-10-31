@@ -320,6 +320,34 @@ export const ENV_PATTERNS: Pattern[] = [
 ];
 
 /**
+ * Matches the Strapi config-file signature, where the `env` helper is received
+ * as a destructured parameter: `module.exports = ({ env }) => ({ ... })` or
+ * `export default ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Server => ...`
+ * (an optional return type is allowed). {@link STRAPI_ENV_PATTERNS}
+ * only run in files matching this, since a bare `env('KEY')` call is too
+ * generic to treat as an env reference everywhere.
+ */
+export const STRAPI_CONFIG_REGEX =
+  /\(\s*\{[^}]*(?<![\w$.])env\b[^}]*\}[^)]*\)\s*(?::[^=;{]+)?(?:=>|\{)/;
+
+/**
+ * Patterns for Strapi's `env()` helper in config files.
+ *
+ * Examples:
+ *   env('HOST', '0.0.0.0')
+ *   env.int('PORT', 1337)
+ *   env.array('APP_KEYS')
+ *   env.oneOf('UPLOAD_PROVIDER', ['local', 'aws'], 'local')
+ */
+export const STRAPI_ENV_PATTERNS: Pattern[] = [
+  {
+    name: 'strapi' as const,
+    regex:
+      /(?<![.\w$])env(?:\s*\.\s*[a-zA-Z]+)?\s*\(\s*['"`]([A-Z_][A-Z0-9_]*)['"`]/g,
+  },
+];
+
+/**
  * Patterns for detecting environment variable usage inside Docker Compose files
  * via shell-style interpolation. These run only on compose files (see
  * {@link isDockerComposeFile}), never on JS/TS sources, because a bare `${VAR}`

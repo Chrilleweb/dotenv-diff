@@ -92,6 +92,7 @@ const usageArb: fc.Arbitrary<EnvUsage> = fc.record({
     'sveltekit',
     'vite',
     'docker-compose',
+    'strapi',
   ),
   imports: importsArb,
   context: fc.string(),

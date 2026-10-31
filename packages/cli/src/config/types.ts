@@ -179,7 +179,12 @@ export interface Options {
 }
 
 export type EnvPatternName =
-  'process.env' | 'import.meta.env' | 'sveltekit' | 'vite' | 'docker-compose';
+  | 'process.env'
+  | 'import.meta.env'
+  | 'sveltekit'
+  | 'vite'
+  | 'docker-compose'
+  | 'strapi';
 
 /**
  * Represents a single usage of an environment variable in the codebase.
