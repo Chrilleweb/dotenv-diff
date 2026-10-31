@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.4.3
+
+### Patch Changes
+
+- 5c74793: fix: `--color` now overrides `noColor` from the config file
+- 5c74793: fix: `--strict` was ignored in `--compare` mode, so warnings like duplicate keys never failed the run
+- 73c702d: fix: auto-generated `.env.example` no longer copies non-key lines, such as the body of a multi-line quoted value (e.g. a PEM private key)
+- 5f61f87: fix: import from 'dotenv-diff' pointed to a file that didn't exist. also stop shipping tests in the npm package and include LICENSE
+
 ## 3.4.2
 
 ### Patch Changes
