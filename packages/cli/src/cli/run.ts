@@ -66,7 +66,8 @@ export async function run(program: Command): Promise<void> {
       ignoreUrls: opts.ignoreUrls,
       json: opts.json,
     });
-    process.exit(0);
+    setExitCode(false);
+    return;
   }
 
   // Handle --matrix flag
@@ -80,7 +81,8 @@ export async function run(program: Command): Promise<void> {
       json: opts.json,
       showStats: opts.showStats,
     });
-    process.exit(exitWithError ? 1 : 0);
+    setExitCode(exitWithError);
+    return;
   }
 
   // Route to appropriate command and handle exit
@@ -88,7 +90,19 @@ export async function run(program: Command): Promise<void> {
     ? await runCompareMode(opts)
     : await runScanMode(opts);
 
-  process.exit(exitWithError ? 1 : 0);
+  setExitCode(exitWithError);
+}
+
+/**
+ * Set the process exit code without terminating the process.
+ * Calling process.exit() directly can truncate stdout when it is a pipe,
+ * because pending asynchronous writes (e.g. large --json output) are dropped.
+ * Letting the event loop drain lets Node exit with this code once all output
+ * has been flushed.
+ * @param exitWithError - Whether the process should exit with code 1
+ */
+function setExitCode(exitWithError: boolean): void {
+  process.exitCode = exitWithError ? 1 : 0;
 }
 
 /**
