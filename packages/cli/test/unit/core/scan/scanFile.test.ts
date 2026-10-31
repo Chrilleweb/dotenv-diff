@@ -403,6 +403,158 @@ import.meta.env.VAR2;
     expect(usages[0]?.context).toBeTruthy();
   });
 
+  describe('Strapi env() helper', () => {
+    it('detects env() and env.<cast>() in a Strapi config file', () => {
+      const content = `module.exports = ({ env }) => ({
+  host: env('HOST', '0.0.0.0'),
+  port: env.int('PORT', 1337),
+  app: { keys: env.array('APP_KEYS') },
+  upload: env.oneOf('UPLOAD_PROVIDER', ['local', 'aws'], 'local'),
+});`;
+      const usages = scanFile(
+        '/test/project/config/server.js',
+        content,
+        baseOpts,
+      );
+
+      expect(usages.map((u) => u.variable)).toEqual([
+        'HOST',
+        'PORT',
+        'APP_KEYS',
+        'UPLOAD_PROVIDER',
+      ]);
+      expect(usages.every((u) => u.pattern === 'strapi')).toBe(true);
+      expect(usages[1]).toMatchObject({ line: 3 });
+    });
+
+    it('detects env() in a typed TS Strapi config', () => {
+      const content = `export default ({ env }: { env: any }) => ({
+  connection: { client: env('DATABASE_CLIENT', 'sqlite') },
+});`;
+      const usages = scanFile(
+        '/test/project/config/database.ts',
+        content,
+        baseOpts,
+      );
+
+      expect(usages.map((u) => u.variable)).toEqual(['DATABASE_CLIENT']);
+    });
+
+    it('detects env() in a Strapi 5 TS config with a return type', () => {
+      const content = `import type { Core } from '@strapi/strapi';
+
+const config = ({
+  env,
+}: Core.Config.Shared.ConfigParams): Core.Config.Server => ({
+  host: env('HOST', '0.0.0.0'),
+  app: { keys: env.array('APP_KEYS') },
+});
+
+export default config;`;
+      const usages = scanFile(
+        '/test/project/config/server.ts',
+        content,
+        baseOpts,
+      );
+
+      expect(usages.map((u) => u.variable)).toEqual(['HOST', 'APP_KEYS']);
+    });
+
+    it('detects env() in a function-style config', () => {
+      const content = `module.exports = function ({ env }) {
+  return { url: env("PUBLIC_URL") };
+};`;
+      const usages = scanFile(
+        '/test/project/config/server.js',
+        content,
+        baseOpts,
+      );
+
+      expect(usages.map((u) => u.variable)).toEqual(['PUBLIC_URL']);
+    });
+
+    it('detects multi-line calls, all cast helpers and quote styles', () => {
+      const content = `module.exports = ({ env }) => ({
+  a: env(
+    'MULTI_LINE_KEY',
+    'default',
+  ),
+  b: env.bool("BOOL_KEY", false),
+  c: env.json(\`JSON_KEY\`),
+  d: env.float('FLOAT_KEY'),
+  e: env.date('DATE_KEY'),
+});`;
+      const usages = scanFile(
+        '/test/project/config/env/production/server.js',
+        content,
+        baseOpts,
+      );
+
+      expect(usages.map((u) => u.variable)).toEqual([
+        'MULTI_LINE_KEY',
+        'BOOL_KEY',
+        'JSON_KEY',
+        'FLOAT_KEY',
+        'DATE_KEY',
+      ]);
+    });
+
+    it('ignores non-literal and lowercase keys', () => {
+      const content = `module.exports = ({ env }) => ({
+  a: env(dynamicKey),
+  b: env('lowercase_key'),
+  c: env.int(\`PREFIX_${'$'}{name}\`),
+});`;
+      const usages = scanFile(
+        '/test/project/config/server.js',
+        content,
+        baseOpts,
+      );
+
+      expect(usages).toHaveLength(0);
+    });
+
+    it('still detects process.env alongside env() in Strapi configs', () => {
+      const content = `module.exports = ({ env }) => ({
+  a: env('FROM_HELPER'),
+  b: process.env.FROM_PROCESS,
+});`;
+      const usages = scanFile(
+        '/test/project/config/server.js',
+        content,
+        baseOpts,
+      );
+
+      expect(usages.map((u) => [u.variable, u.pattern])).toEqual([
+        ['FROM_PROCESS', 'process.env'],
+        ['FROM_HELPER', 'strapi'],
+      ]);
+    });
+
+    it('ignores env() calls in files without the Strapi signature', () => {
+      const content = `import { env } from './helpers';
+const host = env('HOST');
+const port = env.int('PORT');`;
+      const usages = scanFile('/test/project/src/app.js', content, baseOpts);
+
+      expect(usages).toHaveLength(0);
+    });
+
+    it('does not match method calls like foo.env("KEY")', () => {
+      const content = `module.exports = ({ env }) => ({
+  a: config.env('NOT_A_KEY'),
+  b: env('REAL_KEY'),
+});`;
+      const usages = scanFile(
+        '/test/project/config/server.js',
+        content,
+        baseOpts,
+      );
+
+      expect(usages.map((u) => u.variable)).toEqual(['REAL_KEY']);
+    });
+  });
+
   describe('bare env object accessor labeling', () => {
     it('labels env.X as "vite" when the file uses loadEnv (issue #4)', () => {
       const content = `import { loadEnv } from 'vite';
