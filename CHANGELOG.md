@@ -1,5 +1,22 @@
 # Changelog
 
+<!-- changesets: fiery-tables-drive.md,fix-compare-strict.md,fix-example-monkey.md,fix-package-entry.md -->
+## 2026-10-31
+
+### Highlights
+- fix: `--color` now overrides `noColor` from the config file
+- fix: `--strict` was ignored in `--compare` mode, so warnings like duplicate keys never failed the run
+- fix: auto-generated `.env.example` no longer copies non-key lines, such as the body of a multi-line quoted value (e.g. a PEM private key)
+- fix: import from 'dotenv-diff' pointed to a file that didn't exist. also stop shipping tests in the npm package and include LICENSE
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: bumpy-ants-lose.md,slow-times-sink.md -->
 ## 2026-10-20
 
