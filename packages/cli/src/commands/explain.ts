@@ -6,7 +6,6 @@ import { findDuplicateKeys } from '../services/duplicates.js';
 import type { ScanOptions } from '../config/types.js';
 import { DEFAULT_ENV_FILE, DEFAULT_EXAMPLE_FILE } from '../config/constants.js';
 import { printExplain, type ExplainResult } from '../ui/scan/printExplain.js';
-import { skipCommentedUsages } from '../core/scan/skipCommentedUsages.js';
 
 /**
  * Options forwarded from the CLI for the --explain command.
@@ -44,9 +43,7 @@ export async function explainKey(opts: ExplainOptions): Promise<void> {
   // Scan codebase for usages
   const scanResult = await scanCodebase(opts);
 
-  // Filter out commented usages
-  const filteredUsages = skipCommentedUsages(scanResult.used);
-  const usages = filteredUsages.filter((u) => u.variable === key);
+  const usages = scanResult.used.filter((u) => u.variable === key);
 
   // Check ignore status
   const isIgnored =

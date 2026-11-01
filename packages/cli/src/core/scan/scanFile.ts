@@ -14,7 +14,7 @@ import {
   SVELTEKIT_IMPORT_REGEX,
   SVELTEKIT_ALIAS_IMPORT_REGEX,
 } from './patterns.js';
-import { hasIgnoreComment } from '../security/secretDetectors.js';
+import { findCommentedLines } from './commentedLines.js';
 import { normalizePath } from '../helpers/normalizePath.js';
 import { isLikelyMinified } from '../helpers/isLikelyMinified.js';
 
@@ -42,6 +42,10 @@ export function scanFile(
     lineStarts[i] = lineOffset;
     lineOffset += lines[i]!.length + 1; // +1 for the '\n' stripped by split
   }
+
+  // Lines that are commented out or ignored. Computed on the first match only,
+  // so files without env usage don't pay for it.
+  let commentedLines: Set<number> | undefined;
 
   // Get relative path from cwd cross-platform compatible
   const relativePath = normalizePath(path.relative(opts.cwd, filePath));
@@ -133,14 +137,9 @@ export function scanFile(
         // Ignore likely minified / bundled lines to avoid scan false positives
         if (isLikelyMinified(contextLine)) continue;
 
-        // Determine previous line for ignore detection
-        const prevLine = lines[lineNumber - 2] ?? '';
-
-        const isIgnored =
-          hasIgnoreComment(contextLine) || hasIgnoreComment(prevLine);
-
-        // If usage is ignored, skip it entirely
-        if (isIgnored) continue;
+        // Skip usages in comments and dotenv-diff-ignore lines/blocks
+        commentedLines ??= findCommentedLines(lines);
+        if (commentedLines.has(lineNumber - 1)) continue;
 
         // Check if console.log
         const isLogged = /\bconsole\.(log|error|warn|info|debug)\s*\(/.test(
