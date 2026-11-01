@@ -13,7 +13,6 @@ import { scanJsonOutput } from '../ui/scan/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../services/processComparisonFile.js';
 import { printComparisonError } from '../ui/scan/printComparisonError.js';
-import { skipCommentedUsages } from '../core/scan/skipCommentedUsages.js';
 import { frameworkValidator } from '../core/frameworks/frameworkValidator.js';
 import { checkGitignoreStatus } from '../services/git.js';
 import { promptNoEnvScenario } from './prompts/promptNoEnvScenario.js';
@@ -29,7 +28,6 @@ import { writeBaseline } from '../baseline/writeBaseline.js';
  *
  * This function performs the following:
  *  - Scans the codebase for used environment variables
- *  - Strips out usages found in commented code
  *  - Detects missing variables, unused variables, duplicates, and secrets
  *  - Determines which file to compare against based on CLI flags and config
  *  - Optionally auto-fixes missing keys, duplicate keys, and .gitignore entries
@@ -46,11 +44,6 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
 
   // Scan the codebase
   let scanResult = await scanCodebase(opts);
-
-  // Filter out commented usages
-  const filteredUsages = skipCommentedUsages(scanResult.used);
-  scanResult.used = filteredUsages;
-  scanResult.logged = filteredUsages.filter((usage) => usage.isLogged);
 
   // Measure duration
   const endTime = performance.now();

@@ -130,6 +130,42 @@ describe('no-flag autoscan', () => {
     expect(res.status).toBe(0);
     expect(res.stdout).not.toContain('Potential secrets detected in codebase:');
   });
+  it('skips usages in multi-line ignore blocks and block comments', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'a.ts'),
+      [
+        '// dotenv-diff-ignore-start',
+        'const one = 1;',
+        'const k = process.env.TS_BLOCK;',
+        '// dotenv-diff-ignore-end',
+        '/*',
+        '  process.env.IN_BLOCK_COMMENT',
+        '*/',
+        'const visible = process.env.VISIBLE;',
+      ].join('\n'),
+    );
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'b.svelte'),
+      [
+        '<!-- dotenv-diff-ignore-start -->',
+        '<div>',
+        '<p>{import.meta.env.HTML_BLOCK}</p>',
+        '</div>',
+        '<!-- dotenv-diff-ignore-end -->',
+      ].join('\n'),
+    );
+
+    const res = runCli(cwd, ['--ci', '--json']);
+    const output = JSON.parse(res.stdout);
+    const missing = output.missing.map((m: { variable: string }) => m.variable);
+
+    expect(missing).toEqual(['VISIBLE']);
+  });
+
   it('does not let an unclosed HTML comment in one file hide usages in other files', () => {
     const cwd = tmpDir();
 

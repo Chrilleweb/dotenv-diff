@@ -504,95 +504,6 @@ describe('scanUsage', () => {
     );
   });
 
-  it('filters out commented usages before processing', async () => {
-    vi.mocked(scanCodebase).mockResolvedValue({
-      ...baseScanResult,
-      used: [
-        {
-          variable: 'A',
-          file: 'f.ts',
-          line: 1,
-          column: 0,
-          pattern: 'process.env',
-          context: '// process.env.A',
-        },
-        {
-          variable: 'B',
-          file: 'f.ts',
-          line: 2,
-          column: 0,
-          pattern: 'process.env',
-          context: 'process.env.B',
-        },
-      ],
-    });
-    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
-
-    await scanUsage({ ...baseOpts, isCiMode: true });
-
-    expect(printScanResult).toHaveBeenCalledWith(
-      expect.objectContaining({
-        used: expect.arrayContaining([
-          expect.objectContaining({ variable: 'B' }),
-        ]),
-      }),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-    );
-    expect(printScanResult).toHaveBeenCalledWith(
-      expect.objectContaining({
-        used: expect.not.arrayContaining([
-          expect.objectContaining({ variable: 'A' }),
-        ]),
-      }),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-    );
-  });
-
-  it('removes logged warning for block-commented console env usage', async () => {
-    vi.mocked(scanCodebase).mockResolvedValue({
-      ...baseScanResult,
-      used: [
-        {
-          variable: 'TEST_KEY',
-          file: 'src/index.ts',
-          line: 4,
-          column: 1,
-          pattern: 'process.env',
-          context: '/* console.log(process.env.TEST_KEY); */',
-          isLogged: true,
-        },
-      ],
-      logged: [
-        {
-          variable: 'TEST_KEY',
-          file: 'src/index.ts',
-          line: 4,
-          column: 1,
-          pattern: 'process.env',
-          context: '/* console.log(process.env.TEST_KEY); */',
-          isLogged: true,
-        },
-      ],
-    });
-    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
-
-    await scanUsage({ ...baseOpts, isCiMode: true });
-
-    expect(printScanResult).toHaveBeenCalledWith(
-      expect.objectContaining({
-        logged: [],
-        used: [],
-      }),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-    );
-  });
-
   it('returns exitWithError true in JSON strict mode for each warning type', async () => {
     const cases: Partial<ScanResult>[] = [
       { duplicates: { env: [{ key: 'A', count: 2 }] } },
@@ -620,7 +531,7 @@ describe('scanUsage', () => {
         ],
       },
       {
-        used: [
+        logged: [
           {
             variable: 'A',
             file: 'f.ts',
@@ -651,92 +562,6 @@ describe('scanUsage', () => {
 
       expect(result.exitWithError).toBe(true);
     }
-  });
-
-  it('filters out usages on HTML comment closing lines (-->)', async () => {
-    vi.mocked(scanCodebase).mockResolvedValue({
-      ...baseScanResult,
-      used: [
-        {
-          variable: 'A',
-          file: 'f.ts',
-          line: 1,
-          column: 0,
-          pattern: 'process.env',
-          context: '--> process.env.A',
-        },
-      ],
-    });
-    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
-
-    await scanUsage({ ...baseOpts, isCiMode: true });
-
-    expect(printScanResult).toHaveBeenCalledWith(
-      expect.objectContaining({ used: [] }),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-    );
-  });
-
-  it('filters out the dotenv-diff-ignore-end line itself', async () => {
-    vi.mocked(scanCodebase).mockResolvedValue({
-      ...baseScanResult,
-      used: [
-        {
-          variable: 'END_LINE',
-          file: 'f.ts',
-          line: 1,
-          column: 0,
-          pattern: 'process.env',
-          context: '<!-- dotenv-diff-ignore-end -->',
-        },
-      ],
-    });
-    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
-
-    await scanUsage({ ...baseOpts, isCiMode: true });
-
-    expect(printScanResult).toHaveBeenCalledWith(
-      expect.objectContaining({ used: [] }),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-    );
-  });
-
-  it('filters out the dotenv-diff-ignore-start line itself and subsequent usages inside block (line 217-218)', async () => {
-    vi.mocked(scanCodebase).mockResolvedValue({
-      ...baseScanResult,
-      used: [
-        {
-          variable: 'START_LINE',
-          file: 'f.ts',
-          line: 1,
-          column: 0,
-          pattern: 'process.env',
-          context: '<!-- dotenv-diff-ignore-start -->',
-        },
-        {
-          variable: 'INSIDE_BLOCK',
-          file: 'f.ts',
-          line: 2,
-          column: 0,
-          pattern: 'process.env',
-          context: 'process.env.INSIDE_BLOCK',
-        },
-      ],
-    });
-    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
-
-    await scanUsage({ ...baseOpts, isCiMode: true });
-
-    expect(printScanResult).toHaveBeenCalledWith(
-      expect.objectContaining({ used: [] }),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-    );
   });
 
   it('passes false to printComparisonError when json is not set (line 105)', async () => {
@@ -823,40 +648,6 @@ describe('scanUsage', () => {
     );
   });
 
-  it('filters usage inside unclosed HTML comment block (line 220)', async () => {
-    vi.mocked(scanCodebase).mockResolvedValue({
-      ...baseScanResult,
-      used: [
-        {
-          variable: 'INSIDE_HTML_COMMENT',
-          file: 'f.ts',
-          line: 1,
-          column: 0,
-          pattern: 'process.env',
-          context: '<!-- unclosed comment process.env.INSIDE_HTML_COMMENT',
-        },
-        {
-          variable: 'AFTER_OPEN',
-          file: 'f.ts',
-          line: 2,
-          column: 0,
-          pattern: 'process.env',
-          context: 'process.env.AFTER_OPEN',
-        },
-      ],
-    });
-    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
-
-    await scanUsage({ ...baseOpts, isCiMode: true });
-
-    expect(printScanResult).toHaveBeenCalledWith(
-      expect.objectContaining({ used: [] }),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-    );
-  });
-
   it('handles undefined logged and secrets in calculateStats (lines 249, 253)', async () => {
     vi.mocked(scanCodebase).mockResolvedValue({
       ...baseScanResult,
@@ -870,58 +661,6 @@ describe('scanUsage', () => {
       scanUsage({ ...baseOpts, isCiMode: true }),
     ).resolves.not.toThrow();
     expect(printScanResult).toHaveBeenCalled();
-  });
-
-  it('resumes keeping usages after dotenv-diff-ignore-end (line 222-223)', async () => {
-    vi.mocked(scanCodebase).mockResolvedValue({
-      ...baseScanResult,
-      used: [
-        {
-          variable: 'START_LINE',
-          file: 'f.ts',
-          line: 1,
-          column: 0,
-          pattern: 'process.env',
-          context: '<!-- dotenv-diff-ignore-start -->',
-        },
-        {
-          variable: 'INSIDE_BLOCK',
-          file: 'f.ts',
-          line: 2,
-          column: 0,
-          pattern: 'process.env',
-          context: 'process.env.INSIDE_BLOCK',
-        },
-        {
-          variable: 'END_MARKER',
-          file: 'f.ts',
-          line: 3,
-          column: 0,
-          pattern: 'process.env',
-          context: '<!-- dotenv-diff-ignore-end -->',
-        },
-        {
-          variable: 'AFTER_BLOCK',
-          file: 'f.ts',
-          line: 4,
-          column: 0,
-          pattern: 'process.env',
-          context: 'process.env.AFTER_BLOCK',
-        },
-      ],
-    });
-    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
-
-    await scanUsage({ ...baseOpts, isCiMode: true });
-
-    expect(printScanResult).toHaveBeenCalledWith(
-      expect.objectContaining({
-        used: [expect.objectContaining({ variable: 'AFTER_BLOCK' })],
-      }),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-    );
   });
 
   it('clears typo suggestions when suggest is false', async () => {

@@ -1,6 +1,12 @@
 import { shannonEntropyNormalized } from './entropy.js';
 import { isLikelyMinified } from '../helpers/isLikelyMinified.js';
 import {
+  findIgnoreBlockLines,
+  hasIgnoreComment,
+} from '../scan/commentedLines.js';
+
+export { hasIgnoreComment };
+import {
   MIN_ENTROPY_LENGTH,
   ENTROPY_THRESHOLD,
   HIGH_ENTROPY_LENGTH,
@@ -116,30 +122,6 @@ export function determineEntropySeverity(
 
   // MEDIUM: MIN_ENTROPY_LENGTH up to HIGH_ENTROPY_LENGTH - 1
   return 'medium';
-}
-
-/**
- * Checks if a line has an ignore comment
- * fx: // dotenv-diff-ignore or /* dotenv-diff-ignore *\/ or <!-- dotenv-diff-ignore -->
- * @param line - The line to check
- * @returns True if the line should be ignored
- */
-export function hasIgnoreComment(line: string): boolean {
-  const normalized = line.trim();
-
-  // Cheap linear pre-check: the directive token must appear at all. This short
-  // circuits pathological lines (e.g. long runs of "/") before they reach the
-  // comment-marker regexes below, whose unbounded `.*` would otherwise rescan
-  // from every marker position and go quadratic (O(n²)) on the line length.
-  if (!/dotenv[\s-]*diff[\s-]*ignore/i.test(normalized)) return false;
-
-  // Allow mixed casing, extra spaces, and optional dashes
-  return (
-    /\/\/.*dotenv[\s-]*diff[\s-]*ignore/i.test(normalized) ||
-    /\/\*.*dotenv[\s-]*diff[\s-]*ignore.*\*\//i.test(normalized) ||
-    /<!--.*dotenv[\s-]*diff[\s-]*ignore.*-->/i.test(normalized) ||
-    /\bdotenv[\s-]*diff[\s-]*ignore\b/i.test(normalized)
-  );
 }
 
 /**
@@ -384,24 +366,14 @@ export function detectSecretsInSource(
   const findings: SecretFinding[] = [];
   const lines = source.split(/\r?\n/);
 
-  let insideIgnoreBlock = false;
+  const ignoreBlockLines = findIgnoreBlockLines(lines);
 
   for (let i = 0; i < lines.length; i++) {
     const lineNo = i + 1;
     const line = lines[i] || '';
 
-    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*start\s*-->/i.test(line)) {
-      insideIgnoreBlock = true;
-      continue;
-    }
-
-    if (/<!--\s*dotenv[\s-]*diff[\s-]*ignore[\s-]*end\s*-->/i.test(line)) {
-      insideIgnoreBlock = false;
-      continue;
-    }
-
-    // Skip if inside ignore block
-    if (insideIgnoreBlock) continue;
+    // Skip lines inside dotenv-diff-ignore-start/end blocks
+    if (ignoreBlockLines.has(i)) continue;
 
     // Ignore likely minified / bundled lines before any secret detection.
     // This runs before the comment/ignore regexes so pathologically long lines

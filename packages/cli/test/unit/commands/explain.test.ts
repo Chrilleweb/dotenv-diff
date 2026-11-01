@@ -16,10 +16,6 @@ vi.mock('../../../src/services/duplicates.js', () => ({
   findDuplicateKeys: vi.fn(),
 }));
 
-vi.mock('../../../src/core/scan/skipCommentedUsages.js', () => ({
-  skipCommentedUsages: vi.fn((usages) => usages),
-}));
-
 vi.mock('../../../src/ui/scan/printExplain.js', () => ({
   printExplain: vi.fn(),
 }));
@@ -27,13 +23,11 @@ vi.mock('../../../src/ui/scan/printExplain.js', () => ({
 import { scanCodebase } from '../../../src/services/scanCodebase.js';
 import { parseEnvFile } from '../../../src/services/parseEnvFile.js';
 import { findDuplicateKeys } from '../../../src/services/duplicates.js';
-import { skipCommentedUsages } from '../../../src/core/scan/skipCommentedUsages.js';
 import { printExplain } from '../../../src/ui/scan/printExplain.js';
 
 const mockScanCodebase = scanCodebase as ReturnType<typeof vi.fn>;
 const mockParseEnvFile = parseEnvFile as ReturnType<typeof vi.fn>;
 const mockFindDuplicateKeys = findDuplicateKeys as ReturnType<typeof vi.fn>;
-const mockSkipCommentedUsages = skipCommentedUsages as ReturnType<typeof vi.fn>;
 const mockPrintExplain = printExplain as ReturnType<typeof vi.fn>;
 
 function baseOpts(overrides: Partial<ExplainOptions> = {}): ExplainOptions {
@@ -61,7 +55,6 @@ describe('explainKey', () => {
 
     mockParseEnvFile.mockReturnValue({});
     mockFindDuplicateKeys.mockReturnValue([]);
-    mockSkipCommentedUsages.mockImplementation((u) => u);
     mockScanCodebase.mockResolvedValue({ used: [] });
 
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});

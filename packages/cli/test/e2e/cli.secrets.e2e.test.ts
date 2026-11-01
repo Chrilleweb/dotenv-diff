@@ -101,6 +101,25 @@ describe('secrets detection (default scan mode)', () => {
     expect(res.stdout).toContain('STRIPE_KEY');
   });
 
+  it('skips secrets inside a // dotenv-diff-ignore-start/end block', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      [
+        '// dotenv-diff-ignore-start',
+        'const gh = "ghp_1234567890ABCDEFGHijklmnopqrstuvwxYZ";',
+        '// dotenv-diff-ignore-end',
+        'console.log(process.env.API_KEY);',
+      ].join('\n'),
+    );
+
+    const res = runCli(cwd, ['--ci']);
+    expect(res.stdout).not.toContain('▸ Potential secrets detected');
+  });
+
   it('does not warn when no secrets are present', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=\n');
