@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.5.1
+
+### Patch Changes
+
+- b9ddb50: fix: multi-line `dotenv-diff-ignore-start` / `-end` blocks now work in any comment syntax (`//`, `/* */`, `#`, `<!-- -->`) for both env usages and secrets, and env usages inside multi-line `/* */` comments are no longer reported
+
 ## 3.5.0
 
 ### Minor Changes

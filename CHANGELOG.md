@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: fix-multiline-comments.md -->
+## 2026-11-01
+
+### Highlights
+- fix: multi-line `dotenv-diff-ignore-start` / `-end` blocks now work in any comment syntax (`//`, `/* */`, `#`, `<!-- -->`) for both env usages and secrets, and env usages inside multi-line `/* */` comments are no longer reported
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: feat-strapi-env-helper.md,fiery-tables-drive.md,fix-comment-state-per-file.md,fix-compare-strict.md,fix-example-monkey.md,fix-json-truncation.md,fix-package-entry.md -->
 ## 2026-10-31
 
