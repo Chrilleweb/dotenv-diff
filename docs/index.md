@@ -18,16 +18,30 @@ The tool is designed to be fast, CI-friendly, and safe to run in large projects 
 
 ## Quick Start
 
-Install:
+Install `dotenv-diff` as a dependency with your package manager:
 
 ```bash
+# npm
 npm install dotenv-diff
+
+# pnpm
+pnpm add dotenv-diff
+
+# yarn
+yarn add dotenv-diff
 ```
 
 Run:
 
 ```bash
+# npm
 npx dotenv-diff
+
+# pnpm
+pnpm exec dotenv-diff
+
+# yarn
+yarn dotenv-diff
 ```
 
 If no `.env` files are found, `dotenv-diff` will prompt you to create one (interactive mode only).
