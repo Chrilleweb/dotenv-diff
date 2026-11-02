@@ -38,7 +38,7 @@ describe('--json output in scan mode', () => {
       }),
     );
     fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
-    fs.writeFileSync(path.join(cwd, 'src/index.ts'), 'console.log(\'Hello\');');
+    fs.writeFileSync(path.join(cwd, 'src/index.ts'), "console.log('Hello');");
 
     const res = runCli(cwd, ['--json']);
 
@@ -46,6 +46,40 @@ describe('--json output in scan mode', () => {
 
     const output = JSON.parse(res.stdout);
     expect(output.loadedConfig).toBeUndefined();
+  });
+
+  it('outputs valid JSON when json is enabled in the config file', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(
+      path.join(cwd, 'dotenv-diff.config.json'),
+      JSON.stringify({ json: true }),
+    );
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src/index.ts'),
+      'const a = process.env.A;',
+    );
+
+    const res = runCli(cwd, []);
+
+    expect(res.stdout).not.toContain('Loaded');
+    expect(() => JSON.parse(res.stdout)).not.toThrow();
+  });
+
+  it('keeps stdout valid JSON when --ci and --yes are both passed', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src/index.ts'),
+      'const a = process.env.A;',
+    );
+
+    const res = runCli(cwd, ['--json', '--ci', '--yes']);
+
+    expect(res.stderr).toContain('Flag conflict');
+    expect(() => JSON.parse(res.stdout)).not.toThrow();
   });
 });
 

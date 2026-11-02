@@ -166,4 +166,29 @@ describe('loadConfig', () => {
 
     loadedSpy.mockRestore();
   });
+
+  it('does not print config loaded message when json is set in the config file', () => {
+    const appDir = path.join(tmpRoot, 'apps', 'frontend');
+    fs.mkdirSync(appDir, { recursive: true });
+
+    fs.writeFileSync(
+      path.join(appDir, 'dotenv-diff.config.json'),
+      JSON.stringify({ json: true }, null, 2),
+    );
+
+    const loadedSpy = vi
+      .spyOn(printStatus, 'printConfigLoaded')
+      .mockImplementation(() => {});
+
+    const oldCwd = process.cwd();
+    process.chdir(appDir);
+
+    loadConfig({});
+
+    process.chdir(oldCwd);
+
+    expect(loadedSpy).not.toHaveBeenCalled();
+
+    loadedSpy.mockRestore();
+  });
 });

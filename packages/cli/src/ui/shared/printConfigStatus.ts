@@ -17,11 +17,11 @@ import {
 export function printConfigLoaded(filePath: string): void {
   const fileName = path.basename(filePath);
 
-  console.log();
-  console.log(`${accent('▸')} ${header('Config')}`);
-  console.log(`${divider}`);
-  console.log(`${label(padLabel('Loaded'))}${value(fileName)}`);
-  console.log(`${divider}`);
+  console.error();
+  console.error(`${accent('▸')} ${header('Config')}`);
+  console.error(`${divider}`);
+  console.error(`${label(padLabel('Loaded'))}${value(fileName)}`);
+  console.error(`${divider}`);
 }
 
 /**
@@ -32,12 +32,12 @@ export function printConfigLoaded(filePath: string): void {
 export function printConfigLoadError(err: unknown): void {
   const message = err instanceof Error ? err.message : String(err);
 
-  console.log();
-  console.log(`${error('▸')} ${header('Config Error')}`);
-  console.log(`${divider}`);
-  console.log(
+  console.error();
+  console.error(`${error('▸')} ${header('Config Error')}`);
+  console.error(`${divider}`);
+  console.error(
     `${label(padLabel('Failed to parse'))}${error('dotenv-diff.config.json')}`,
   );
-  console.log(`${label(padLabel('Reason'))}${error(message)}`);
-  console.log(`${divider}`);
+  console.error(`${label(padLabel('Reason'))}${error(message)}`);
+  console.error(`${divider}`);
 }

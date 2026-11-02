@@ -19,13 +19,13 @@ export function printInvalidCategory(
   bad: string[],
   allowed: readonly string[],
 ): never {
-  console.log();
-  console.log(`${error('▸')} ${header('Invalid flag')}`);
-  console.log(`${divider}`);
-  console.log(`${label(padLabel('Flag'))}${error(flagName)}`);
-  console.log(`${label(padLabel('Invalid values'))}${error(bad.join(', '))}`);
-  console.log(`${label(padLabel('Allowed'))}${value(allowed.join(', '))}`);
-  console.log(`${divider}`);
+  console.error();
+  console.error(`${error('▸')} ${header('Invalid flag')}`);
+  console.error(`${divider}`);
+  console.error(`${label(padLabel('Flag'))}${error(flagName)}`);
+  console.error(`${label(padLabel('Invalid values'))}${error(bad.join(', '))}`);
+  console.error(`${label(padLabel('Allowed'))}${value(allowed.join(', '))}`);
+  console.error(`${divider}`);
   process.exit(1);
 }
 
@@ -34,11 +34,11 @@ export function printInvalidCategory(
  * @param pattern - The invalid regex pattern.
  */
 export function printInvalidRegex(pattern: string): never {
-  console.log();
-  console.log(`${error('▸')} ${header('Invalid regex')}`);
-  console.log(`${divider}`);
-  console.log(`${label(padLabel('Pattern'))}${error(pattern)}`);
-  console.log(`${divider}`);
+  console.error();
+  console.error(`${error('▸')} ${header('Invalid regex')}`);
+  console.error(`${divider}`);
+  console.error(`${label(padLabel('Pattern'))}${error(pattern)}`);
+  console.error(`${divider}`);
   process.exit(1);
 }
 
@@ -47,14 +47,14 @@ export function printInvalidRegex(pattern: string): never {
  * @returns void
  */
 export function printCiYesWarning(): void {
-  console.log();
-  console.log(`${warning('▸')} ${header('Flag conflict')}`);
-  console.log(`${divider}`);
-  console.log(
+  console.error();
+  console.error(`${warning('▸')} ${header('Flag conflict')}`);
+  console.error(`${divider}`);
+  console.error(
     `${label(padLabel('Issue'))}${warning('Both --ci and --yes provided')}`,
   );
-  console.log(
+  console.error(
     `${label(padLabel('Resolution'))}${value('proceeding with --yes')}`,
   );
-  console.log(`${divider}`);
+  console.error(`${divider}`);
 }

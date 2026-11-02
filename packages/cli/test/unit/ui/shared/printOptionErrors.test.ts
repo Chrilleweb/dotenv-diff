@@ -18,7 +18,7 @@ describe('printInvalidCategory', () => {
   let exitSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     exitSpy = vi
       .spyOn(process, 'exit')
       .mockImplementation(() => undefined as never);
@@ -49,7 +49,7 @@ describe('printInvalidRegex', () => {
   let exitSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     exitSpy = vi
       .spyOn(process, 'exit')
       .mockImplementation(() => undefined as never);
@@ -76,7 +76,7 @@ describe('printCiYesWarning', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
