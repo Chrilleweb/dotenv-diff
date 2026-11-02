@@ -25,7 +25,7 @@ export function loadConfig(cliOptions: Partial<RawOptions>): RawOptions {
     try {
       const raw = fs.readFileSync(foundPath, 'utf8');
       fileConfig = JSON.parse(raw) satisfies Partial<RawOptions>;
-      if (!cliOptions.json) {
+      if (!(cliOptions.json ?? fileConfig.json)) {
         printConfigLoaded(foundPath);
       }
     } catch (err) {

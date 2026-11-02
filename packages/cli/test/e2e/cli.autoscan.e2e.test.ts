@@ -295,7 +295,7 @@ describe('no-flag autoscan', () => {
 
     const res = runCli(cwd, []);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Loaded');
+    expect(res.stderr).toContain('Loaded');
     expect(res.stdout).not.toContain('Scan Statistics');
     expect(res.stdout).not.toContain('SECRET_KEY');
   });

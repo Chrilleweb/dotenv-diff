@@ -73,7 +73,7 @@ describe('non-interactive flags', () => {
     fs.writeFileSync(path.join(cwd, '.env.example'), 'A=1\n');
     const res = runCli(cwd, ['--compare', '--ci', '--yes']);
     expect(res.status).toBe(0);
-    expect(res.stdout).toContain('Both --ci and --yes provided');
+    expect(res.stderr).toContain('Both --ci and --yes provided');
     expect(fs.existsSync(path.join(cwd, '.env'))).toBe(true);
   });
 
