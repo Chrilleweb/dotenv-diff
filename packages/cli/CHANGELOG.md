@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.5.1
+
+### Patch Changes
+
+- 7375f1e: fix: `"driftWarnings": false` in `dotenv-diff.config.json` is no longer ignored. CLI flag defaults no longer override config file values, and `--drift-warnings` can now be passed to re-enable drift warnings when the config file disables them
+- dc13d94: fix: `"json": true` in `dotenv-diff.config.json` now produces valid JSON on stdout.
+- b9ddb50: fix: multi-line `dotenv-diff-ignore-start` / `-end` blocks now work in any comment syntax (`//`, `/* */`, `#`, `<!-- -->`) for both env usages and secrets, and env usages inside multi-line `/* */` comments are no longer reported
+- 21e7539: fix: `dotenv-diff.config.json` is now validated. Unknown keys are reported on stderr with a "did you mean" hint for likely typos (e.g. `ignoreRegexp` → `ignoreRegex`) and are ignored. A config file that is not a JSON object is reported as a config error, and an invalid config file now exits with code 1 in `--ci` mode
+- 7a0170d: perf: lower memory usage when scanning large codebases. File contents are now only kept for files that use environment variables, instead of for every scanned file
+- b0b20fc: fix: a missing `--example` file in `--ci` mode now fails immediately instead of scanning the whole codebase first
+
 ## 3.5.0
 
 ### Minor Changes
