@@ -148,6 +148,15 @@ describe('scanUsage', () => {
     const result = await scanUsage(baseOpts);
 
     expect(result.exitWithError).toBe(true);
+    expect(scanCodebase).not.toHaveBeenCalled();
+  });
+
+  it('still scans when the example file is missing outside CI mode', async () => {
+    vi.mocked(printMissingExample).mockReturnValue(false);
+
+    await scanUsage(baseOpts);
+
+    expect(scanCodebase).toHaveBeenCalledOnce();
   });
 
   describe('gitignore in JSON mode', () => {

@@ -39,6 +39,12 @@ import { writeBaseline } from '../baseline/writeBaseline.js';
  * @returns {Promise<ExitResult>} Whether the caller should exit with a non-zero code.
  */
 export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
+  // If user explicitly passed --example flag, but the file doesn't exist.
+  // Checked before scanning so a CI run fails fast instead of scanning first.
+  if (printMissingExample(opts)) {
+    return { exitWithError: true };
+  }
+
   // Start timing the scan
   const startTime = performance.now();
 
@@ -48,11 +54,6 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   // Measure duration
   const endTime = performance.now();
   scanResult.stats.duration = (endTime - startTime) / 1000; // Convert to seconds
-
-  // If user explicitly passed --example flag, but the file doesn't exist:
-  if (printMissingExample(opts)) {
-    return { exitWithError: true };
-  }
 
   const frameworkWarnings = frameworkValidator(
     scanResult.used,
