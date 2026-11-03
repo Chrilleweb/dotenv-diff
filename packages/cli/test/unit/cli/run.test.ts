@@ -145,6 +145,7 @@ describe('run', () => {
   it('handles --init and exits early without process.exit', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ init: true })),
     } as unknown as Command;
 
@@ -158,6 +159,7 @@ describe('run', () => {
   it('runs scan mode and exits with code 0 when no error', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: false })),
     } as unknown as Command;
 
@@ -175,6 +177,7 @@ describe('run', () => {
   it('runs compare auto-discovery mode and exits with code 1 on error', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -214,6 +217,7 @@ describe('run', () => {
   it('runs direct file comparison when both flags provided', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -239,6 +243,7 @@ describe('run', () => {
   it('handles missing files in CI mode', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -262,6 +267,7 @@ describe('run', () => {
   it('handles missing files in interactive mode with shouldExit true', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -290,6 +296,7 @@ describe('run', () => {
   it('auto-discovery exits early when initResult.shouldExit is true', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -316,6 +323,7 @@ describe('run', () => {
   it('covers direct comparison guard when flags become missing at runtime', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -345,6 +353,7 @@ describe('run', () => {
   it('continues interactive missing-file flow when prompt does not request exit', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -376,6 +385,7 @@ describe('run', () => {
   it('passes envFlag string directly to scanUsage envPath', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: false })),
     } as unknown as Command;
 
@@ -394,6 +404,7 @@ describe('run', () => {
   it('uses undefined envPath when no env flag and default env file is missing', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: false })),
     } as unknown as Command;
 
@@ -412,6 +423,7 @@ describe('run', () => {
   it('uses DEFAULT_ENV_FILE envPath when no env flag and default env file exists', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: false })),
     } as unknown as Command;
 
@@ -430,6 +442,7 @@ describe('run', () => {
   it('prints JSON report output and uses collect callback in compare mode', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -465,6 +478,7 @@ describe('run', () => {
   it('does not include only in compare options when opts.only is undefined', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -492,6 +506,7 @@ describe('run', () => {
   it('forwards strict, only and suggest to compare options', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ compare: true })),
     } as unknown as Command;
 
@@ -526,6 +541,7 @@ describe('run', () => {
   it('routes to explainKey when opts.explain is set and exits with 0', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ explain: 'MY_KEY' })),
     } as unknown as Command;
 
@@ -548,6 +564,7 @@ describe('run', () => {
   it('passes json flag to explainKey', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ explain: 'DB_URL' })),
     } as unknown as Command;
 
@@ -568,6 +585,7 @@ describe('run', () => {
   it('routes to runMatrix when opts.matrix is set and exits with 0 on success', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ matrix: true })),
     } as unknown as Command;
 
@@ -589,6 +607,7 @@ describe('run', () => {
   it('routes to runMatrix with explicit files and exits with 1 on differences', async () => {
     const program = {
       parse: vi.fn(),
+      getOptionValueSource: vi.fn(() => 'cli'),
       opts: vi.fn(() => ({ matrix: ['.env.production', '.env.staging'] })),
     } as unknown as Command;
 
@@ -609,5 +628,22 @@ describe('run', () => {
     );
     expect(process.exitCode).toBe(1);
     expect(exitSpy).not.toHaveBeenCalled();
+  });
+
+  it('does not let commander defaults override config file values', async () => {
+    const program = {
+      parse: vi.fn(),
+      opts: vi.fn(() => ({ driftWarnings: true, strict: true })),
+      getOptionValueSource: vi.fn((key: string) =>
+        key === 'driftWarnings' ? 'default' : 'cli',
+      ),
+    } as unknown as Command;
+
+    mockNormalizeOptions.mockReturnValue(createBaseOptions({ compare: false }));
+    mockScanUsage.mockResolvedValue({ exitWithError: false });
+
+    await run(program);
+
+    expect(mockLoadConfig).toHaveBeenCalledWith({ strict: true });
   });
 });
