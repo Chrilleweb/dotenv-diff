@@ -43,7 +43,17 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     const secrets = safeDetectSecrets(relativePath, content, opts);
     const declaredKeys = detectConfigSchemaKeys(content);
 
-    return { fileUsages, relativePath, content, secrets, declaredKeys };
+    // Only framework validation needs file content, and only for files with
+    // env usages. Dropping the rest here keeps memory flat on large repos.
+    const usedContent = fileUsages.length > 0 ? content : undefined;
+
+    return {
+      fileUsages,
+      relativePath,
+      content: usedContent,
+      secrets,
+      declaredKeys,
+    };
   };
 
   const results = await Promise.all(
@@ -60,7 +70,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
     if (!result) continue;
     const { fileUsages, relativePath, content, secrets, declaredKeys } = result;
     allUsages.push(...fileUsages);
-    fileContentMap.set(relativePath, content);
+    if (content !== undefined) fileContentMap.set(relativePath, content);
     if (secrets.length) allSecrets.push(...secrets);
     for (const key of declaredKeys) allDeclaredKeys.add(key);
     filesScanned++;
