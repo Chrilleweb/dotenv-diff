@@ -3,7 +3,7 @@ import path from 'path';
 import os from 'os';
 import fsSync from 'fs';
 import { scanCodebase } from '../../../src/services/scanCodebase.js';
-import type { ScanOptions } from '../../../src/config/types.js';
+import type { EnvUsage, ScanOptions } from '../../../src/config/types.js';
 
 // Mock dependencies
 vi.mock('../../../src/services/fileWalker.js', () => ({
@@ -438,13 +438,23 @@ describe('scanCodebase', () => {
   });
 
   describe('file content map', () => {
-    it('stores file content in map', async () => {
+    const usageIn = (file: string): EnvUsage => ({
+      variable: 'API_KEY',
+      file,
+      line: 1,
+      column: 0,
+      pattern: 'process.env',
+      context: 'process.env.API_KEY',
+      isLogged: false,
+    });
+
+    it('stores content of files with env usages', async () => {
       const testFile = path.join(tmpDir, 'app.js');
       const content = 'const x = process.env.API_KEY;';
       fsSync.writeFileSync(testFile, content);
 
       vi.mocked(findFiles).mockResolvedValue([testFile]);
-      vi.mocked(scanFile).mockReturnValue([]);
+      vi.mocked(scanFile).mockReturnValue([usageIn('app.js')]);
 
       const result = await scanCodebase(defaultOpts);
 
@@ -453,14 +463,32 @@ describe('scanCodebase', () => {
       expect(result.fileContentMap!.get('app.js')).toBe(content);
     });
 
+    it('does not store content of files without env usages', async () => {
+      const usedFile = path.join(tmpDir, 'used.js');
+      const unusedFile = path.join(tmpDir, 'unused.js');
+      fsSync.writeFileSync(usedFile, 'const x = process.env.API_KEY;');
+      fsSync.writeFileSync(unusedFile, 'const y = 1;');
+
+      vi.mocked(findFiles).mockResolvedValue([usedFile, unusedFile]);
+      vi.mocked(scanFile).mockImplementation((filePath) =>
+        filePath === usedFile ? [usageIn('used.js')] : [],
+      );
+
+      const result = await scanCodebase(defaultOpts);
+
+      expect(Array.from(result.fileContentMap!.keys())).toEqual(['used.js']);
+      // Files without usages still count as scanned
+      expect(result.stats.filesScanned).toBe(2);
+    });
+
     it('normalizes file paths in content map', async () => {
       const srcDir = path.join(tmpDir, 'src');
       fsSync.mkdirSync(srcDir);
       const testFile = path.join(srcDir, 'app.js');
-      fsSync.writeFileSync(testFile, 'const x = 1;');
+      fsSync.writeFileSync(testFile, 'const x = process.env.API_KEY;');
 
       vi.mocked(findFiles).mockResolvedValue([testFile]);
-      vi.mocked(scanFile).mockReturnValue([]);
+      vi.mocked(scanFile).mockReturnValue([usageIn('src/app.js')]);
 
       const result = await scanCodebase(defaultOpts);
 
