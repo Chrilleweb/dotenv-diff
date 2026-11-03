@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import { loadConfig } from '../../../src/config/loadConfig.js';
+import type { RawOptions } from '../../../src/config/types.js';
 import { makeTmpDir } from '../../utils/fs-helpers.js';
 import * as printStatus from '../../../src/ui/shared/printConfigStatus.js';
 
@@ -91,7 +92,7 @@ describe('loadConfig', () => {
     errorSpy.mockRestore();
   });
 
-  it('does not print config load error when json flag is set and config is invalid', () => {
+  it('prints config load error to stderr even when json flag is set', () => {
     const appDir = path.join(tmpRoot, 'apps', 'frontend');
     fs.mkdirSync(appDir, { recursive: true });
 
@@ -112,7 +113,7 @@ describe('loadConfig', () => {
 
     process.chdir(oldCwd);
 
-    expect(errorSpy).not.toHaveBeenCalled(); // this should not be called when json flag is set
+    expect(errorSpy).toHaveBeenCalledOnce();
 
     errorSpy.mockRestore();
   });
@@ -190,5 +191,110 @@ describe('loadConfig', () => {
     expect(loadedSpy).not.toHaveBeenCalled();
 
     loadedSpy.mockRestore();
+  });
+
+  describe('validation', () => {
+    function writeConfig(content: string): string {
+      const appDir = path.join(tmpRoot, 'apps', 'frontend');
+      fs.mkdirSync(appDir, { recursive: true });
+      fs.writeFileSync(path.join(appDir, 'dotenv-diff.config.json'), content);
+      return appDir;
+    }
+
+    function loadFrom(appDir: string, cliOptions: Partial<RawOptions> = {}) {
+      const oldCwd = process.cwd();
+      process.chdir(appDir);
+      try {
+        return loadConfig(cliOptions);
+      } finally {
+        process.chdir(oldCwd);
+      }
+    }
+
+    beforeEach(() => {
+      vi.spyOn(printStatus, 'printConfigLoaded').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('warns about unknown keys, suggests typo fixes and drops them', () => {
+      const unknownSpy = vi
+        .spyOn(printStatus, 'printConfigUnknownKeys')
+        .mockImplementation(() => {});
+      const appDir = writeConfig(
+        JSON.stringify({ strict: true, ignoreRegexp: ['^X_'], banana: 1 }),
+      );
+
+      const config = loadFrom(appDir);
+
+      expect(config).toEqual({ strict: true });
+      expect(unknownSpy).toHaveBeenCalledOnce();
+      const [keys, suggestions] = unknownSpy.mock.calls[0]!;
+      expect(keys).toEqual(['ignoreRegexp', 'banana']);
+      expect(suggestions).toEqual([
+        expect.objectContaining({
+          key: 'ignoreRegexp',
+          didYouMean: 'ignoreRegex',
+        }),
+      ]);
+    });
+
+    it('does not warn when all keys are known', () => {
+      const unknownSpy = vi
+        .spyOn(printStatus, 'printConfigUnknownKeys')
+        .mockImplementation(() => {});
+      const appDir = writeConfig(
+        JSON.stringify({ strict: true, ignore: ['A'], driftWarnings: false }),
+      );
+
+      loadFrom(appDir);
+
+      expect(unknownSpy).not.toHaveBeenCalled();
+    });
+
+    it.each([['[]'], ['42'], ['null'], ['"strict"']])(
+      'treats %s as a config error',
+      (content) => {
+        const errorSpy = vi
+          .spyOn(printStatus, 'printConfigLoadError')
+          .mockImplementation(() => {});
+        const appDir = writeConfig(content);
+
+        const config = loadFrom(appDir);
+
+        expect(config).toEqual({});
+        expect(errorSpy).toHaveBeenCalledOnce();
+      },
+    );
+
+    it('exits with code 1 on an invalid config in --ci mode', () => {
+      vi.spyOn(printStatus, 'printConfigLoadError').mockImplementation(
+        () => {},
+      );
+      const exitSpy = vi
+        .spyOn(process, 'exit')
+        .mockImplementation(() => undefined as never);
+      const appDir = writeConfig('{ invalid json ');
+
+      loadFrom(appDir, { ci: true });
+
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('does not exit on an invalid config outside --ci mode', () => {
+      vi.spyOn(printStatus, 'printConfigLoadError').mockImplementation(
+        () => {},
+      );
+      const exitSpy = vi
+        .spyOn(process, 'exit')
+        .mockImplementation(() => undefined as never);
+      const appDir = writeConfig('{ invalid json ');
+
+      loadFrom(appDir);
+
+      expect(exitSpy).not.toHaveBeenCalled();
+    });
   });
 });
