@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   printConfigLoaded,
   printConfigLoadError,
+  printConfigUnknownKeys,
 } from '../../../../src/ui/shared/printConfigStatus.js';
 
 describe('printConfigStatus', () => {
@@ -70,6 +71,27 @@ describe('printConfigStatus', () => {
         expect.stringContaining('Failed to parse'),
       );
       expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('404'));
+    });
+  });
+
+  describe('printConfigUnknownKeys', () => {
+    it('prints each unknown key with a suggestion when available', () => {
+      printConfigUnknownKeys(
+        ['ignoreRegexp', 'banana'],
+        [{ key: 'ignoreRegexp', didYouMean: 'ignoreRegex', distance: 1 }],
+      );
+
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Config Warning'),
+      );
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/ignoreRegexp.*did you mean.*ignoreRegex\?/),
+      );
+      const bananaLine = logSpy.mock.calls
+        .map((args: unknown[]) => String(args[0]))
+        .find((line: string) => line.includes('banana'));
+      expect(bananaLine).toBeDefined();
+      expect(bananaLine).not.toContain('did you mean');
     });
   });
 });

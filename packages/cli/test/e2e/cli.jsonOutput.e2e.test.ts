@@ -67,6 +67,41 @@ describe('--json output in scan mode', () => {
     expect(() => JSON.parse(res.stdout)).not.toThrow();
   });
 
+  it('warns about unknown config keys on stderr and keeps stdout valid JSON', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(
+      path.join(cwd, 'dotenv-diff.config.json'),
+      JSON.stringify({ ignoreRegexp: ['^A$'] }),
+    );
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src/index.ts'),
+      'const a = process.env.A;',
+    );
+
+    const res = runCli(cwd, ['--json', '--no-color']);
+
+    expect(res.stderr).toContain('Unknown key');
+    expect(res.stderr).toContain('did you mean ignoreRegex?');
+    expect(() => JSON.parse(res.stdout)).not.toThrow();
+  });
+
+  it('exits with code 1 when the config file is invalid in --ci mode', () => {
+    const cwd = tmpDir();
+    fs.writeFileSync(
+      path.join(cwd, 'dotenv-diff.config.json'),
+      '{ invalid json ',
+    );
+    fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');
+
+    const res = runCli(cwd, ['--json', '--ci']);
+
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain('Config Error');
+    expect(res.stdout).toBe('');
+  });
+
   it('keeps stdout valid JSON when --ci and --yes are both passed', () => {
     const cwd = tmpDir();
     fs.writeFileSync(path.join(cwd, '.env'), 'A=1\n');

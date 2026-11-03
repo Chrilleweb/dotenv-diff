@@ -1,9 +1,11 @@
 import path from 'path';
+import type { TypoSuggestion } from '../../config/types.js';
 import {
   label,
   value,
   accent,
   error,
+  warning,
   divider,
   header,
   padLabel,
@@ -39,5 +41,26 @@ export function printConfigLoadError(err: unknown): void {
     `${label(padLabel('Failed to parse'))}${error('dotenv-diff.config.json')}`,
   );
   console.error(`${label(padLabel('Reason'))}${error(message)}`);
+  console.error(`${divider}`);
+}
+
+/**
+ * Prints a warning for unknown keys in dotenv-diff.config.json.
+ * @param keys The unknown keys
+ * @param suggestions Closest known key for keys that look like typos
+ * @returns void
+ */
+export function printConfigUnknownKeys(
+  keys: string[],
+  suggestions: TypoSuggestion[],
+): void {
+  console.error();
+  console.error(`${warning('▸')} ${header('Config Warning')}`);
+  console.error(`${divider}`);
+  for (const key of keys) {
+    const match = suggestions.find((s) => s.key === key);
+    const hint = match ? ` (did you mean ${value(match.didYouMean)}?)` : '';
+    console.error(`${label(padLabel('Unknown key'))}${warning(key)}${hint}`);
+  }
   console.error(`${divider}`);
 }
