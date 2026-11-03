@@ -145,6 +145,29 @@ describe('Drift Warnings (--no-drift-warnings)', () => {
     expect(res.stdout).not.toContain('Drift between');
   });
 
+  it('can be turned off with driftWarnings: false in the config file', () => {
+    const cwd = setup(DRIFTED_ENV, PARTIAL_EXAMPLE);
+    fs.writeFileSync(
+      path.join(cwd, 'dotenv-diff.config.json'),
+      JSON.stringify({ driftWarnings: false }),
+    );
+    const res = runCli(cwd, ['--no-color', '--strict']);
+
+    expect(res.stdout).not.toContain('Drift between');
+    expect(res.status).toBe(0);
+  });
+
+  it('lets --drift-warnings override driftWarnings: false in the config file', () => {
+    const cwd = setup(DRIFTED_ENV, PARTIAL_EXAMPLE);
+    fs.writeFileSync(
+      path.join(cwd, 'dotenv-diff.config.json'),
+      JSON.stringify({ driftWarnings: false }),
+    );
+    const res = runCli(cwd, ['--no-color', '--drift-warnings']);
+
+    expect(res.stdout).toContain('Drift between .env and .env.example');
+  });
+
   it('reports drift under driftWarnings in JSON mode', () => {
     const cwd = setup(DRIFTED_ENV, PARTIAL_EXAMPLE);
     const res = runCli(cwd, ['--json']);

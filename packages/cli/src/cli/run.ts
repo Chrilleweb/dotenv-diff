@@ -38,7 +38,7 @@ export async function run(program: Command): Promise<void> {
   program.parse(process.argv);
 
   // Load and normalize options
-  const cliOptions = program.opts();
+  const cliOptions = getExplicitCliOptions(program);
 
   // Handle --init flag
   if (await handleInitFlag(cliOptions)) return;
@@ -91,6 +91,21 @@ export async function run(program: Command): Promise<void> {
     : await runScanMode(opts);
 
   setExitCode(exitWithError);
+}
+
+/**
+ * Get only the options the user actually passed on the command line.
+ * Commander fills in defaults (e.g. a lone `--no-x` flag defaults `x` to true),
+ * and those must not override values from dotenv-diff.config.json.
+ * @param program - The parsed commander program instance
+ * @returns Options whose value did not come from a commander default
+ */
+function getExplicitCliOptions(program: Command): RawOptions {
+  return Object.fromEntries(
+    Object.entries(program.opts()).filter(
+      ([key]) => program.getOptionValueSource(key) !== 'default',
+    ),
+  );
 }
 
 /**
