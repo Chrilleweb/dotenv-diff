@@ -1,5 +1,5 @@
 import path from 'path';
-import type { TypoSuggestion } from '../../config/types.js';
+import type { InvalidConfigValue, TypoSuggestion } from '../../config/types.js';
 import {
   label,
   value,
@@ -61,6 +61,23 @@ export function printConfigUnknownKeys(
     const match = suggestions.find((s) => s.key === key);
     const hint = match ? ` (did you mean ${value(match.didYouMean)}?)` : '';
     console.error(`${label(padLabel('Unknown key'))}${warning(key)}${hint}`);
+  }
+  console.error(`${divider}`);
+}
+
+/**
+ * Prints a warning for config values whose type does not match their key.
+ * @param invalid The invalid values with expected and received types
+ * @returns void
+ */
+export function printConfigInvalidValues(invalid: InvalidConfigValue[]): void {
+  console.error();
+  console.error(`${warning('▸')} ${header('Config Warning')}`);
+  console.error(`${divider}`);
+  for (const { key, expected, received } of invalid) {
+    console.error(
+      `${label(padLabel('Invalid value'))}${warning(key)} (expected ${value(expected)}, got ${warning(received)})`,
+    );
   }
   console.error(`${divider}`);
 }
