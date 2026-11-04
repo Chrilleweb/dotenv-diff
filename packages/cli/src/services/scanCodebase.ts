@@ -15,7 +15,7 @@ import { detectConfigSchemaKeys } from '../core/scan/detectConfigSchemaKeys.js';
 import { createConcurrencyLimit } from '../core/helpers/concurrencyLimit.js';
 import { findFiles } from './fileWalker.js';
 import { normalizePath } from '../core/helpers/normalizePath.js';
-import { isLikelyMinified } from '../core/helpers/isLikelyMinified.js';
+import { isMinifiedFile } from '../core/helpers/isMinifiedFile.js';
 
 /** This limits the number of files processed concurrently */
 const FILE_CONCURRENCY = 50;
@@ -36,7 +36,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
 
   const processFile = async (filePath: string) => {
     const content = await safeReadFile(filePath);
-    if (!content || isLikelyMinified(content)) return;
+    if (!content || isMinifiedFile(filePath, content)) return;
 
     const relativePath = normalizePath(path.relative(opts.cwd, filePath));
     const fileUsages = scanFile(filePath, content, opts);

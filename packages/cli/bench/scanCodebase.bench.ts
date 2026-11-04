@@ -10,13 +10,13 @@ import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
 import { createConcurrencyLimit } from '../src/core/helpers/concurrencyLimit.js';
-import { isLikelyMinified } from '../src/core/helpers/isLikelyMinified.js';
+import { isMinifiedFile } from '../src/core/helpers/isMinifiedFile.js';
 
 // Vite's module runner turns imported bindings into getters, so calling them
 // directly inside a benchmark measures the getter too. Bind them locally once.
 // See https://vitest.dev/guide/benchmarking#stability
 const _createConcurrencyLimit = createConcurrencyLimit;
-const _isLikelyMinified = isLikelyMinified;
+const _isMinifiedFile = isMinifiedFile;
 
 // --- Setup: generate temp files to scan ---
 const FILE_COUNT = 200;
@@ -52,7 +52,7 @@ async function safeReadFile(filePath: string): Promise<string | null> {
 
 async function processFile(filePath: string) {
   const content = await safeReadFile(filePath);
-  if (!content || _isLikelyMinified(content)) return null;
+  if (!content || _isMinifiedFile(filePath, content)) return null;
   return content;
 }
 

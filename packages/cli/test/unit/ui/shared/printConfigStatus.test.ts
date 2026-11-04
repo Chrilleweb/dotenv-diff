@@ -3,6 +3,7 @@ import {
   printConfigLoaded,
   printConfigLoadError,
   printConfigUnknownKeys,
+  printConfigInvalidValues,
 } from '../../../../src/ui/shared/printConfigStatus.js';
 
 describe('printConfigStatus', () => {
@@ -92,6 +93,27 @@ describe('printConfigStatus', () => {
         .find((line: string) => line.includes('banana'));
       expect(bananaLine).toBeDefined();
       expect(bananaLine).not.toContain('did you mean');
+    });
+  });
+
+  describe('printConfigInvalidValues', () => {
+    it('prints each invalid key with expected and received types', () => {
+      printConfigInvalidValues([
+        { key: 'strict', expected: 'boolean', received: 'string' },
+        { key: 'ignore', expected: 'string or string[]', received: 'number' },
+      ]);
+
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Config Warning'),
+      );
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/strict.*expected.*boolean.*got.*string/),
+      );
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(
+          /ignore.*expected.*string or string\[\].*got.*number/,
+        ),
+      );
     });
   });
 });

@@ -254,6 +254,73 @@ describe('loadConfig', () => {
       expect(unknownSpy).not.toHaveBeenCalled();
     });
 
+    it('warns about values of the wrong type and drops them', () => {
+      const invalidSpy = vi
+        .spyOn(printStatus, 'printConfigInvalidValues')
+        .mockImplementation(() => {});
+      const appDir = writeConfig(
+        JSON.stringify({
+          strict: 'yes',
+          ignore: 123,
+          only: ['missing', 1],
+          example: null,
+          ignoreUrls: { url: 'https://example.com' },
+          files: [1, 2],
+          matrix: 'yes',
+          showStats: false,
+        }),
+      );
+
+      const config = loadFrom(appDir);
+
+      expect(config).toEqual({ showStats: false });
+      expect(invalidSpy).toHaveBeenCalledOnce();
+      expect(invalidSpy.mock.calls[0]![0]).toEqual([
+        { key: 'strict', expected: 'boolean', received: 'string' },
+        { key: 'ignore', expected: 'string or string[]', received: 'number' },
+        { key: 'only', expected: 'string or string[]', received: 'array' },
+        { key: 'example', expected: 'string', received: 'null' },
+        {
+          key: 'ignoreUrls',
+          expected: 'string or string[]',
+          received: 'object',
+        },
+        { key: 'files', expected: 'string or string[]', received: 'number[]' },
+        { key: 'matrix', expected: 'boolean or string[]', received: 'string' },
+      ]);
+    });
+
+    it('accepts every value shape the options allow', () => {
+      const invalidSpy = vi
+        .spyOn(printStatus, 'printConfigInvalidValues')
+        .mockImplementation(() => {});
+      const content = {
+        strict: true,
+        env: '.env.local',
+        ignore: 'A,B',
+        ignoreRegex: ['^X_'],
+        ignoreUrls: 'https://example.com',
+        matrix: ['.env', '.env.prod'],
+      };
+      const appDir = writeConfig(JSON.stringify(content));
+
+      const config = loadFrom(appDir);
+
+      expect(config).toEqual(content);
+      expect(invalidSpy).not.toHaveBeenCalled();
+    });
+
+    it('lets a valid CLI flag replace a dropped config value', () => {
+      vi.spyOn(printStatus, 'printConfigInvalidValues').mockImplementation(
+        () => {},
+      );
+      const appDir = writeConfig(JSON.stringify({ strict: 'yes' }));
+
+      const config = loadFrom(appDir, { strict: true });
+
+      expect(config).toEqual({ strict: true });
+    });
+
     it.each([['[]'], ['42'], ['null'], ['"strict"']])(
       'treats %s as a config error',
       (content) => {

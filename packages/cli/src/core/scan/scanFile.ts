@@ -16,7 +16,7 @@ import {
 } from './patterns.js';
 import { findCommentedLines } from './commentedLines.js';
 import { normalizePath } from '../helpers/normalizePath.js';
-import { isLikelyMinified } from '../helpers/isLikelyMinified.js';
+import { isMinifiedLine } from '../helpers/isMinifiedLine.js';
 
 /**
  * Scans a file for environment variable usage.
@@ -135,7 +135,7 @@ export function scanFile(
         const contextLine = lines[lineNumber - 1]!;
 
         // Ignore likely minified / bundled lines to avoid scan false positives
-        if (isLikelyMinified(contextLine)) continue;
+        if (isMinifiedLine(contextLine)) continue;
 
         // Skip usages in comments and dotenv-diff-ignore lines/blocks
         commentedLines ??= findCommentedLines(lines);

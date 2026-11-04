@@ -115,7 +115,7 @@ export interface RawOptions {
   files?: string | string[];
   secrets?: boolean;
   strict?: boolean;
-  ignoreUrls?: string[];
+  ignoreUrls?: string | string[];
   init?: boolean;
   uppercaseKeys?: boolean;
   expireWarnings?: boolean;
@@ -534,6 +534,19 @@ export interface TypoSuggestion {
   didYouMean: string;
   /** The Levenshtein distance between the two keys */
   distance: number;
+}
+
+/**
+ * A dotenv-diff.config.json value whose type does not match its key.
+ * fx: "strict": "yes" → expected boolean, received string.
+ */
+export interface InvalidConfigValue {
+  /** The config key holding the invalid value */
+  key: string;
+  /** Description of the accepted type, e.g. "string or string[]" */
+  expected: string;
+  /** The JSON type of the value that was provided */
+  received: string;
 }
 
 /**

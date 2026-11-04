@@ -1,5 +1,5 @@
 import { shannonEntropyNormalized } from './entropy.js';
-import { isLikelyMinified } from '../helpers/isLikelyMinified.js';
+import { isMinifiedLine } from '../helpers/isMinifiedLine.js';
 import {
   findIgnoreBlockLines,
   hasIgnoreComment,
@@ -378,7 +378,7 @@ export function detectSecretsInSource(
     // Ignore likely minified / bundled lines before any secret detection.
     // This runs before the comment/ignore regexes so pathologically long lines
     // (e.g. bundled code with long runs of "/") never reach them.
-    if (isLikelyMinified(line)) continue;
+    if (isMinifiedLine(line)) continue;
 
     // Skip comments
     if (/^\s*\/\//.test(line)) continue;
