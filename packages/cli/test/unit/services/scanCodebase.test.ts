@@ -539,10 +539,9 @@ describe('scanCodebase', () => {
   });
 
   describe('minified file detection', () => {
-    it('skips files detected as likely minified (line 34)', async () => {
+    it('skips files with a minified file name', async () => {
       const testFile = path.join(tmpDir, 'bundle.min.js');
-      // A single line > 500 chars triggers isLikelyMinified
-      fsSync.writeFileSync(testFile, 'x'.repeat(520) + 'process.env.API_KEY');
+      fsSync.writeFileSync(testFile, 'const x = process.env.API_KEY;');
 
       vi.mocked(findFiles).mockResolvedValue([testFile]);
 
@@ -550,6 +549,38 @@ describe('scanCodebase', () => {
 
       expect(scanFile).not.toHaveBeenCalled();
       expect(result.stats.filesScanned).toBe(0);
+    });
+
+    it('skips large files that look like a bundle', async () => {
+      const testFile = path.join(tmpDir, 'vendor.js');
+      fsSync.writeFileSync(
+        testFile,
+        'var a=1;'.repeat(10_000) + 'process.env.API_KEY',
+      );
+
+      vi.mocked(findFiles).mockResolvedValue([testFile]);
+
+      const result = await scanCodebase(defaultOpts);
+
+      expect(scanFile).not.toHaveBeenCalled();
+      expect(result.stats.filesScanned).toBe(0);
+    });
+
+    it('still scans a normal file that contains one long line', async () => {
+      const testFile = path.join(tmpDir, 'icon.ts');
+      fsSync.writeFileSync(
+        testFile,
+        `const icon = "${'x'.repeat(520)}";
+const x = process.env.API_KEY;`,
+      );
+
+      vi.mocked(findFiles).mockResolvedValue([testFile]);
+      vi.mocked(scanFile).mockReturnValue([]);
+
+      const result = await scanCodebase(defaultOpts);
+
+      expect(scanFile).toHaveBeenCalledOnce();
+      expect(result.stats.filesScanned).toBe(1);
     });
   });
 

@@ -28,6 +28,34 @@ function tmpDir() {
 }
 
 describe('secrets detection (default scan mode)', () => {
+  it('still scans a file that contains a long inline data URL', () => {
+    const cwd = tmpDir();
+
+    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=\n');
+
+    fs.mkdirSync(path.join(cwd, 'src'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, 'src', 'index.ts'),
+      [
+        `const icon = "data:image/png;base64,${'A'.repeat(2_000)}";`,
+        'const gh = "ghp_1234567890ABCDEFGHijklmnopqrstuvwxYZ";',
+        'console.log(icon, gh, process.env.API_KEY, process.env.MISSING_KEY);',
+      ].join('\n'),
+    );
+
+    const res = runCli(cwd, ['--json']);
+    const json = JSON.parse(res.stdout);
+
+    expect(json.missing).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ variable: 'MISSING_KEY' }),
+      ]),
+    );
+    expect(json.secrets).toEqual(
+      expect.arrayContaining([expect.objectContaining({ line: 2 })]),
+    );
+  });
+
   it('warns on provider-like tokens and high-entropy literals (no CI break)', () => {
     const cwd = tmpDir();
 
