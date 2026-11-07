@@ -36,14 +36,14 @@
     "@types/prompts": "^2.4.9",
     "@typescript-eslint/eslint-plugin": "^8.72.1",
     "@typescript-eslint/parser": "^8.72.1",
-    "@vitest/coverage-v8": "5.0.5",
-    "eslint": "^10.13.0",
+    "@vitest/coverage-v8": "5.1.0",
+    "eslint": "^10.14.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
     "turbo": "^2.11.10",
-    "typescript": "^6.0.3",
-    "vitest": "^5.0.5"
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
   },
   "packageManager": "pnpm@12.15.0"
 }
