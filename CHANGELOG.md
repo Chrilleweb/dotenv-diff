@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- changesets: fix-config-value-types.md,fix-minified-file-detection.md -->
+## 2026-11-08
+
+### Highlights
+- fix: values in `dotenv-diff.config.json` are now type checked. A value of the wrong type (e.g. `"strict": "yes"` or `"ignore": 123`) is reported on stderr with the expected and received type and is ignored, instead of silently becoming `false` or `"123"`
+- fix: a source file with a single long line (e.g. an inline SVG or base64 data URL) is no longer skipped as minified. Previously such files were silently excluded from the scan, so their env usages and hardcoded secrets were not reported. Files are now only skipped when they have a minified file name (`*.min.*`, `*.bundle.*`) or are large with a high average line length; long lines inside scanned files are still ignored individually
+
+### Package Releases
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | patch
+
 <!-- changesets: fix-drift-warnings-config.md,fix-json-config-stdout.md,fix-multiline-comments.md,fix-validate-config-file.md,perf-file-content-memory.md,perf-missing-example-before-scan.md -->
 ## 2026-11-03
 
