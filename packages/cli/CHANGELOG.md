@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.5.2
+
+### Patch Changes
+
+- 9a67064: fix: values in `dotenv-diff.config.json` are now type checked. A value of the wrong type (e.g. `"strict": "yes"` or `"ignore": 123`) is reported on stderr with the expected and received type and is ignored, instead of silently becoming `false` or `"123"`
+- 9a67064: fix: a source file with a single long line (e.g. an inline SVG or base64 data URL) is no longer skipped as minified. Previously such files were silently excluded from the scan, so their env usages and hardcoded secrets were not reported. Files are now only skipped when they have a minified file name (`*.min.*`, `*.bundle.*`) or are large with a high average line length; long lines inside scanned files are still ignored individually
+
 ## 3.5.1
 
 ### Patch Changes
