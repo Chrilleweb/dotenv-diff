@@ -8,7 +8,7 @@ import type {
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/scan/determineComparisonFile.js';
 import { computeExitDecision } from '../core/scan/computeExitDecision.js';
-import { printScanResult } from '../services/printScanResult.js';
+import { printScanResult } from '../ui/scan/printScanResult.js';
 import { scanJsonOutput } from '../ui/scan/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../services/processComparisonFile.js';

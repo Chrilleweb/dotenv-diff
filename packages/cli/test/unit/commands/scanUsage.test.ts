@@ -15,7 +15,7 @@ vi.mock('../../../src/core/scan/determineComparisonFile.js', () => ({
   determineComparisonFile: vi.fn(),
 }));
 
-vi.mock('../../../src/services/printScanResult.js', () => ({
+vi.mock('../../../src/ui/scan/printScanResult.js', () => ({
   printScanResult: vi.fn(),
 }));
 
@@ -67,7 +67,7 @@ vi.mock('../../../src/baseline/scanBaseline.js', () => ({
 import { scanUsage } from '../../../src/commands/scanUsage.js';
 import { scanCodebase } from '../../../src/services/scanCodebase.js';
 import { determineComparisonFile } from '../../../src/core/scan/determineComparisonFile.js';
-import { printScanResult } from '../../../src/services/printScanResult.js';
+import { printScanResult } from '../../../src/ui/scan/printScanResult.js';
 import { checkGitignoreStatus } from '../../../src/services/git.js';
 import { scanJsonOutput } from '../../../src/ui/scan/scanJsonOutput.js';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';

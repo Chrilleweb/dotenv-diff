@@ -1,32 +1,32 @@
-import { checkGitignoreStatus } from './git.js';
-import { printGitignoreWarning } from '../ui/shared/printGitignore.js';
+import { checkGitignoreStatus } from '../../services/git.js';
+import { printGitignoreWarning } from '../shared/printGitignore.js';
 import type {
   ScanUsageOptions,
   ScanResult,
   ExitResult,
   FixContext,
-} from '../config/types.js';
-import { DEFAULT_ENV_FILE } from '../config/constants.js';
-import { printHeader } from '../ui/scan/printHeader.js';
-import { printStats } from '../ui/scan/printStats.js';
-import { printMissing } from '../ui/scan/printMissing.js';
-import { printUnused } from '../ui/scan/printUnused.js';
-import { printDuplicates } from '../ui/shared/printDuplicates.js';
-import { printSecrets } from '../ui/scan/printSecrets.js';
-import { printFixTips } from '../ui/shared/printFixTips.js';
-import { printAutoFix } from '../ui/shared/printAutoFix.js';
-import { printFrameworkWarnings } from '../ui/scan/printFrameworkWarnings.js';
-import { printExampleWarnings } from '../ui/scan/printExampleWarnings.js';
-import { printConsolelogWarning } from '../ui/scan/printConsolelogWarning.js';
-import { printUppercaseWarning } from '../ui/scan/printUppercaseWarning.js';
-import { computeHealthScore } from '../core/scan/computeHealthScore.js';
-import { computeExitDecision } from '../core/scan/computeExitDecision.js';
-import { printHealthScore } from '../ui/scan/printHealthScore.js';
-import { printExpireWarnings } from '../ui/scan/printExpireWarnings.js';
-import { printCommentWarnings } from '../ui/scan/printCommentWarnings.js';
-import { printDriftWarnings } from '../ui/scan/printDriftWarnings.js';
-import { printInconsistentNamingWarning } from '../ui/scan/printInconsistentNamingWarning.js';
-import { printListAll } from '../ui/scan/printListAll.js';
+} from '../../config/types.js';
+import { DEFAULT_ENV_FILE } from '../../config/constants.js';
+import { printHeader } from './printHeader.js';
+import { printStats } from './printStats.js';
+import { printMissing } from './printMissing.js';
+import { printUnused } from './printUnused.js';
+import { printDuplicates } from '../shared/printDuplicates.js';
+import { printSecrets } from './printSecrets.js';
+import { printFixTips } from '../shared/printFixTips.js';
+import { printAutoFix } from '../shared/printAutoFix.js';
+import { printFrameworkWarnings } from './printFrameworkWarnings.js';
+import { printExampleWarnings } from './printExampleWarnings.js';
+import { printConsolelogWarning } from './printConsolelogWarning.js';
+import { printUppercaseWarning } from './printUppercaseWarning.js';
+import { computeHealthScore } from '../../core/scan/computeHealthScore.js';
+import { computeExitDecision } from '../../core/scan/computeExitDecision.js';
+import { printHealthScore } from './printHealthScore.js';
+import { printExpireWarnings } from './printExpireWarnings.js';
+import { printCommentWarnings } from './printCommentWarnings.js';
+import { printDriftWarnings } from './printDriftWarnings.js';
+import { printInconsistentNamingWarning } from './printInconsistentNamingWarning.js';
+import { printListAll } from './printListAll.js';
 
 /**
  * Prints the scan result to the console.
