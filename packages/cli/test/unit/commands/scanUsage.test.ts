@@ -657,7 +657,7 @@ describe('scanUsage', () => {
     );
   });
 
-  it('handles undefined logged and secrets in calculateStats (lines 249, 253)', async () => {
+  it('handles undefined logged and secrets when computing stats', async () => {
     vi.mocked(scanCodebase).mockResolvedValue({
       ...baseScanResult,
       logged: undefined as unknown as ScanResult['logged'],
