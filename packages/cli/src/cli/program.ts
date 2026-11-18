@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { getPackageVersion } from '../core/helpers/getPackageVersion.js';
 
 /**
  * Creates the command-line program for dotenv-diff.
@@ -8,7 +9,14 @@ export function createProgram() {
   return (
     new Command()
       .name('dotenv-diff')
-      .description('Compare .env and .env.example files')
+      .description(
+        'Scan your codebase for environment variable usage and compare .env files',
+      )
+      .version(
+        getPackageVersion(),
+        '-v, --version',
+        'Show the installed version',
+      )
       .allowExcessArguments(true)
 
       // Files & input
