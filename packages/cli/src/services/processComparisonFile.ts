@@ -86,7 +86,7 @@ export function processComparisonFile(
     // Monorepo support: also honor `.env.example` files in subdirectories, so a
     // variable documented next to where it is used is not reported as missing.
     const scopes = discoverExampleScopes(opts.cwd, {
-      exclude: opts.exclude,
+      exclude: opts.excludeFiles,
       ignore: opts.ignore,
       ignoreRegex: opts.ignoreRegex,
     });

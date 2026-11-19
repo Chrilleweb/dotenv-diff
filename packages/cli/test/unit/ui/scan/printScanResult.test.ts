@@ -143,8 +143,8 @@ describe('printScanResult', () => {
 
   const baseOpts: ScanUsageOptions = {
     cwd: '/root',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,

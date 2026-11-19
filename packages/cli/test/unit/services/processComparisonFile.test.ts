@@ -119,8 +119,8 @@ describe('processComparisonFile', () => {
   const baseOpts: ScanUsageOptions = {
     cwd: '/root',
     examplePath: '.env.example',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,

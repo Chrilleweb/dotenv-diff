@@ -27,8 +27,8 @@ const FILE_CONCURRENCY = 50;
  */
 export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const files = await findFiles(opts.cwd, {
-    include: opts.include,
-    exclude: [...DEFAULT_EXCLUDE_PATTERNS, ...opts.exclude],
+    include: opts.includeFiles,
+    exclude: [...DEFAULT_EXCLUDE_PATTERNS, ...opts.excludeFiles],
     ...(opts.files?.length && { files: opts.files }),
   });
 

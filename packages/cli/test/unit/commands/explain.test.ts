@@ -34,8 +34,8 @@ function baseOpts(overrides: Partial<ExplainOptions> = {}): ExplainOptions {
   return {
     key: 'API_KEY',
     cwd: '/project',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     files: [],

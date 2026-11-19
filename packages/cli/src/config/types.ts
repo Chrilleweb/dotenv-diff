@@ -250,8 +250,8 @@ export interface ScanStats {
  */
 export interface ScanOptions {
   cwd: string;
-  include: string[];
-  exclude: string[];
+  includeFiles: string[];
+  excludeFiles: string[];
   ignore: string[];
   ignoreRegex: RegExp[];
   files?: string[];
@@ -379,9 +379,6 @@ export interface ComparisonOptions {
   showStats?: boolean;
   strict?: boolean;
   uppercaseKeys?: boolean;
-  expireWarnings?: boolean;
-  inconsistentNamingWarnings?: boolean;
-  commentWarnings?: boolean;
   suggest?: boolean;
 }
 

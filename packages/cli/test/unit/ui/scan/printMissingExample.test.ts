@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
 import fs from 'fs';
 import { printMissingExample } from '../../../../src/ui/scan/printMissingExample.js';
 import type { ScanUsageOptions } from '../../../../src/config/types.js';
@@ -24,8 +23,8 @@ describe('printMissingExample', () => {
 
   const baseOpts: ScanUsageOptions = {
     cwd: '/root',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,

@@ -15,8 +15,8 @@ import type { ScanOptions } from '../../../../src/config/types.js';
 describe('scanFile (property-based)', () => {
   const opts: ScanOptions = {
     cwd: '/project',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,

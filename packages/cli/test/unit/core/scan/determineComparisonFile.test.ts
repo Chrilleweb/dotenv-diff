@@ -12,8 +12,8 @@ describe('determineComparisonFile', () => {
 
   const baseOpts: ScanUsageOptions = {
     cwd: '/project',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,

@@ -35,8 +35,8 @@ describe('scanCodebase', () => {
 
     defaultOpts = {
       cwd: tmpDir,
-      include: [],
-      exclude: [],
+      includeFiles: [],
+      excludeFiles: [],
       ignore: [],
       ignoreRegex: [],
       files: [],

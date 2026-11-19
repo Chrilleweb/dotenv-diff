@@ -4,8 +4,8 @@ import type { ScanOptions } from '../../../../src/config/types.js';
 
 const baseOpts: ScanOptions = {
   cwd: '/test/project',
-  include: [],
-  exclude: [],
+  includeFiles: [],
+  excludeFiles: [],
   ignore: [],
   ignoreRegex: [],
   files: [],
