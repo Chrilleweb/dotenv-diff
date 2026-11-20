@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.6.0
+
+### Minor Changes
+
+- 49492ab: feat: add `-v, --version` to print the installed version. `--help` now describes the default behavior (scanning the codebase) instead of only comparing `.env` files
+
 ## 3.5.2
 
 ### Patch Changes
