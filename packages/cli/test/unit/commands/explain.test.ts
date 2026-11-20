@@ -40,6 +40,7 @@ function baseOpts(overrides: Partial<ExplainOptions> = {}): ExplainOptions {
     ignoreRegex: [],
     files: [],
     secrets: false,
+    ignoreUrls: [],
     json: false,
     ...overrides,
   };

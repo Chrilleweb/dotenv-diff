@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { parseAndFilterEnv } from '../../../../src/core/compare/parseAndFilterEnv.js';
-import type { ComparisonOptions } from '../../../../src/config/types.js';
+import { makeComparisonOptions } from '../../../utils/options-helpers.js';
 
 describe('parseAndFilterEnv', () => {
   let tmpDir: string;
@@ -24,12 +24,12 @@ describe('parseAndFilterEnv', () => {
     fs.writeFileSync(envPath, 'FOO=bar\nBAZ=qux\n');
     fs.writeFileSync(examplePath, 'FOO=\nBAZ=\nQUX=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -43,12 +43,12 @@ describe('parseAndFilterEnv', () => {
     fs.writeFileSync(envPath, 'FOO=bar\nBAZ=qux\nIGNORE_ME=secret\n');
     fs.writeFileSync(examplePath, 'FOO=\nBAZ=\nIGNORE_ME=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: ['IGNORE_ME'],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -62,12 +62,12 @@ describe('parseAndFilterEnv', () => {
     fs.writeFileSync(envPath, 'FOO=bar\nTEST_VAR=qux\nTEST_OTHER=value\n');
     fs.writeFileSync(examplePath, 'FOO=\nTEST_VAR=\nTEST_OTHER=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [/^TEST_/],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -81,12 +81,12 @@ describe('parseAndFilterEnv', () => {
     fs.writeFileSync(envPath, 'FOO=bar\nIGNORED=1\nTEST_VAR=2\nKEEP=3\n');
     fs.writeFileSync(examplePath, 'FOO=\nIGNORED=\nTEST_VAR=\nKEEP=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: ['IGNORED'],
       ignoreRegex: [/^TEST_/],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -100,12 +100,12 @@ describe('parseAndFilterEnv', () => {
     fs.writeFileSync(envPath, '');
     fs.writeFileSync(examplePath, '');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -134,12 +134,12 @@ BAZ=
 `,
     );
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -151,12 +151,12 @@ BAZ=
     fs.writeFileSync(envPath, 'FOO=production\nBAR=123\n');
     fs.writeFileSync(examplePath, 'FOO=development\nBAR=456\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -168,12 +168,12 @@ BAZ=
     fs.writeFileSync(envPath, 'FOO=bar\nEXTRA=value\n');
     fs.writeFileSync(examplePath, 'FOO=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -187,12 +187,12 @@ BAZ=
     fs.writeFileSync(envPath, 'FOO=bar\n');
     fs.writeFileSync(examplePath, 'FOO=\nMISSING=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -206,12 +206,12 @@ BAZ=
     fs.writeFileSync(envPath, 'FOO="line1\nline2"\nBAR=simple\n');
     fs.writeFileSync(examplePath, 'FOO=\nBAR=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -227,12 +227,12 @@ BAZ=
     );
     fs.writeFileSync(examplePath, 'URL=\nDB_PATH=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -244,12 +244,12 @@ BAZ=
     fs.writeFileSync(envPath, 'FOO.BAR=value1\nBAZ-QUX=value2\n');
     fs.writeFileSync(examplePath, 'FOO.BAR=\nBAZ-QUX=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -261,12 +261,12 @@ BAZ=
     fs.writeFileSync(envPath, 'TEST_1=a\nTEST_2=b\n');
     fs.writeFileSync(examplePath, 'TEST_1=\nTEST_2=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: [],
       ignoreRegex: [/^TEST_/],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 
@@ -283,12 +283,12 @@ BAZ=
     );
     fs.writeFileSync(examplePath, 'API_KEY=\nAPI_URL=\nDB_HOST=\nDB_PORT=\n');
 
-    const opts: ComparisonOptions = {
+    const opts = makeComparisonOptions({
       checkValues: false,
       cwd: tmpDir,
       ignore: ['DB_PORT'],
       ignoreRegex: [/^API_KEY/],
-    };
+    });
 
     const result = parseAndFilterEnv(envPath, examplePath, opts);
 

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { promptNoEnvScenario } from '../../../../src/commands/prompts/promptNoEnvScenario.js';
-import type { ScanUsageOptions } from '../../../../src/config/types.js';
 import * as prompts from '../../../../src/commands/prompts/prompts.js';
 import fs from 'fs';
 import path from 'path';
+import { makeScanUsageOptions } from '../../../utils/options-helpers.js';
 
 vi.mock('fs');
 vi.mock('../../../../src/commands/prompts/prompts.js');
@@ -14,7 +14,7 @@ describe('promptNoEnvScenario', () => {
   const mockConfirmYesNo = vi.mocked(prompts.confirmYesNo);
   const mockConsoleLog = vi.spyOn(console, 'log');
 
-  const baseOpts: ScanUsageOptions = {
+  const baseOpts = makeScanUsageOptions({
     cwd: '/project',
     includeFiles: [],
     excludeFiles: [],
@@ -22,7 +22,7 @@ describe('promptNoEnvScenario', () => {
     ignoreRegex: [],
     secrets: false,
     json: false,
-  };
+  });
 
   beforeEach(() => {
     mockWriteFileSync.mockClear();
@@ -35,7 +35,7 @@ describe('promptNoEnvScenario', () => {
   });
 
   it('returns undefined compareFile when in CI mode', async () => {
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       isCiMode: true,
     };
@@ -48,7 +48,7 @@ describe('promptNoEnvScenario', () => {
   });
 
   it('creates .env file automatically when in yes mode', async () => {
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       isYesMode: true,
     };
@@ -70,7 +70,7 @@ describe('promptNoEnvScenario', () => {
   it('prompts user and creates .env file when user confirms', async () => {
     mockConfirmYesNo.mockResolvedValue(true);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       isCiMode: false,
       isYesMode: false,
@@ -96,7 +96,7 @@ describe('promptNoEnvScenario', () => {
   it('returns undefined compareFile when user declines', async () => {
     mockConfirmYesNo.mockResolvedValue(false);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       isCiMode: false,
       isYesMode: false,
@@ -113,7 +113,7 @@ describe('promptNoEnvScenario', () => {
   });
 
   it('handles different cwd paths correctly', async () => {
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       cwd: '/custom/project/path',
       isYesMode: true,
@@ -132,21 +132,8 @@ describe('promptNoEnvScenario', () => {
     expect(mockWriteFileSync).toHaveBeenCalledWith(expectedPath, '');
   });
 
-  it('defaults isCiMode and isYesMode to false when undefined in prompt call', async () => {
-    mockConfirmYesNo.mockResolvedValue(true);
-
-    const opts: ScanUsageOptions = { ...baseOpts };
-
-    await promptNoEnvScenario(opts);
-
-    expect(mockConfirmYesNo).toHaveBeenCalledWith(
-      "You don't have any .env files. Do you want to create a .env?",
-      { isCiMode: false, isYesMode: false },
-    );
-  });
-
   it('uses examplePath as target file when creating missing comparison file', async () => {
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       examplePath: '.env.example',
       isYesMode: true,
@@ -168,7 +155,7 @@ describe('promptNoEnvScenario', () => {
   it('uses examplePath in prompt text when prompting user', async () => {
     mockConfirmYesNo.mockResolvedValue(false);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       examplePath: '.env.local',
       isCiMode: false,
@@ -184,7 +171,7 @@ describe('promptNoEnvScenario', () => {
   });
 
   it('prioritizes examplePath over envPath when both are provided', async () => {
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       examplePath: '.env.example',
       envPath: '.env',
@@ -205,7 +192,7 @@ describe('promptNoEnvScenario', () => {
   });
 
   it('falls back to .env when neither examplePath nor envPath is provided', async () => {
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       isYesMode: true,
     };

@@ -28,8 +28,8 @@ export async function promptNoEnvScenario(
     : await confirmYesNo(
         `You don't have any .env files. Do you want to create a ${fileName}?`,
         {
-          isCiMode: opts.isCiMode ?? false,
-          isYesMode: opts.isYesMode ?? false,
+          isCiMode: opts.isCiMode,
+          isYesMode: opts.isYesMode,
         },
       );
 

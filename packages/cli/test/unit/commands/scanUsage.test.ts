@@ -84,6 +84,7 @@ import {
   loadBaselineFile,
   applyBaselineEntries,
 } from '../../../src/baseline/scanBaseline.js';
+import { makeScanUsageOptions } from '../../utils/options-helpers.js';
 
 describe('scanUsage', () => {
   const dummySecret: SecretFinding = {
@@ -111,7 +112,7 @@ describe('scanUsage', () => {
     fileContentMap: new Map(),
   };
 
-  const baseOpts: ScanUsageOptions = {
+  const baseOpts = makeScanUsageOptions({
     cwd: '/root',
     includeFiles: [],
     excludeFiles: [],
@@ -119,7 +120,7 @@ describe('scanUsage', () => {
     ignoreRegex: [],
     secrets: false,
     json: false,
-  };
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -571,26 +572,6 @@ describe('scanUsage', () => {
 
       expect(result.exitWithError).toBe(true);
     }
-  });
-
-  it('passes false to printComparisonError when json is not set (line 105)', async () => {
-    vi.mocked(determineComparisonFile).mockResolvedValue({
-      type: 'found',
-      file: { path: '/env/.env', name: '.env' },
-    });
-    vi.mocked(processComparisonFile).mockReturnValue({
-      error: { message: 'err', shouldExit: false },
-    } as ProcessComparisonResult);
-    vi.mocked(printComparisonError).mockReturnValue({ exit: false });
-
-    const { json: _omit, ...optsWithoutJson } = baseOpts;
-    await scanUsage(optsWithoutJson as ScanUsageOptions);
-
-    expect(printComparisonError).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(Boolean),
-      false,
-    );
   });
 
   it('handles undefined secrets gracefully in JSON mode (line 143)', async () => {

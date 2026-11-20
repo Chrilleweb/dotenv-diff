@@ -52,7 +52,7 @@ export function printScanResult(
   printHeader(comparedAgainst);
 
   // Show stats if requested
-  if (opts.showStats ?? true) {
+  if (opts.showStats) {
     printStats(scanResult.stats, true);
   }
 
@@ -84,7 +84,7 @@ export function printScanResult(
   }
 
   // Unused
-  if (opts.showUnused ?? true) {
+  if (opts.showUnused) {
     printUnused(scanResult.unused, comparedAgainst, opts.strict);
   }
 
@@ -95,7 +95,7 @@ export function printScanResult(
     scanResult.duplicates?.env ?? [],
     scanResult.duplicates?.example ?? [],
     isJson,
-    opts.fix ?? false,
+    opts.fix,
     opts.strict,
   );
 
@@ -134,7 +134,7 @@ export function printScanResult(
     printGitignoreWarning({
       envFile: DEFAULT_ENV_FILE,
       reason: gitignoreIssue.reason,
-      strict: opts.strict ?? false,
+      strict: opts.strict,
     });
   }
 
@@ -163,7 +163,7 @@ export function printScanResult(
     },
     hasGitignoreIssue,
     isJson,
-    opts.fix ?? false,
+    opts.fix,
   );
 
   return { exitWithError };

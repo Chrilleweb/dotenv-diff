@@ -96,7 +96,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
       const { exit } = printComparisonError(
         result.error.message,
         result.error.shouldExit,
-        opts.json ?? false,
+        opts.json,
       );
       if (exit) return { exitWithError: true };
     } else {
@@ -110,7 +110,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   }
 
   // Typo suggestions are advisory; drop them entirely when disabled via --no-suggest
-  if (opts.suggest === false) {
+  if (!opts.suggest) {
     scanResult.suggestions = [];
   }
 
@@ -119,7 +119,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
 
   // --baseline: write current warnings as the new baseline and exit cleanly
   if (opts.baseline) {
-    return writeBaseline(scanResult, opts.cwd, opts.json ?? false);
+    return writeBaseline(scanResult, opts.cwd, opts.json);
   }
 
   // Apply existing baseline suppressions (if any) before output
@@ -140,7 +140,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
     const jsonOutput = scanJsonOutput(
       scanResult,
       comparedAgainst,
-      opts.listAll ?? false,
+      opts.listAll,
       gitignoreIssue,
     );
     console.log(JSON.stringify(jsonOutput, null, 2));

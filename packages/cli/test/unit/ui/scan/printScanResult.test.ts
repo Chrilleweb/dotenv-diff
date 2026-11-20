@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type {
-  ScanResult,
-  ScanUsageOptions,
-} from '../../../../src/config/types.js';
+import type { ScanResult } from '../../../../src/config/types.js';
 
 vi.mock('../../../../src/ui/scan/printHeader.js', () => ({
   printHeader: vi.fn(),
@@ -123,6 +120,7 @@ import type {
   ExpireWarning,
 } from '../../../../src/config/types.js';
 import { GITIGNORE_ISSUES } from '../../../../src/config/constants.js';
+import { makeScanUsageOptions } from '../../../utils/options-helpers.js';
 
 describe('printScanResult', () => {
   const baseScanResult: ScanResult = {
@@ -141,7 +139,7 @@ describe('printScanResult', () => {
     logged: [],
   };
 
-  const baseOpts: ScanUsageOptions = {
+  const baseOpts = makeScanUsageOptions({
     cwd: '/root',
     includeFiles: [],
     excludeFiles: [],
@@ -149,7 +147,7 @@ describe('printScanResult', () => {
     ignoreRegex: [],
     secrets: false,
     json: false,
-  };
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -454,7 +452,7 @@ describe('printScanResult', () => {
       [],
       false,
       false,
-      undefined,
+      false,
     );
   });
 
@@ -476,7 +474,7 @@ describe('printScanResult', () => {
       [{ key: 'EX_KEY', count: 2 }],
       false,
       false,
-      undefined,
+      false,
     );
   });
 
@@ -514,10 +512,7 @@ describe('printScanResult', () => {
       '.env',
     );
 
-    expect(printConsolelogWarning).toHaveBeenCalledWith(
-      loggedUsages,
-      undefined,
-    );
+    expect(printConsolelogWarning).toHaveBeenCalledWith(loggedUsages, false);
   });
 
   it('keeps exitWithError false when secrets is undefined and no strict violations', () => {

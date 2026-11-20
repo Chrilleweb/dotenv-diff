@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { determineComparisonFile } from '../../../../src/core/scan/determineComparisonFile.js';
-import type { ScanUsageOptions } from '../../../../src/config/types.js';
 import { normalizePath } from '../../../../src/core/helpers/normalizePath.js';
 import fs from 'fs';
 import path from 'path';
+import { makeScanUsageOptions } from '../../../utils/options-helpers.js';
 
 vi.mock('fs');
 
 describe('determineComparisonFile', () => {
   const mockExistsSync = vi.mocked(fs.existsSync);
 
-  const baseOpts: ScanUsageOptions = {
+  const baseOpts = makeScanUsageOptions({
     cwd: '/project',
     includeFiles: [],
     excludeFiles: [],
@@ -18,7 +18,7 @@ describe('determineComparisonFile', () => {
     ignoreRegex: [],
     secrets: false,
     json: false,
-  };
+  });
 
   beforeEach(() => {
     mockExistsSync.mockClear();
@@ -32,7 +32,7 @@ describe('determineComparisonFile', () => {
     const expectedPath = normalizePath(path.resolve('/project/.env.example'));
     mockExistsSync.mockReturnValue(true);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       examplePath: '.env.example',
     };
@@ -53,7 +53,7 @@ describe('determineComparisonFile', () => {
     const expectedPath = normalizePath(path.resolve('/project/.env.local'));
     mockExistsSync.mockReturnValue(true);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       envPath: '.env.local',
     };
@@ -74,7 +74,7 @@ describe('determineComparisonFile', () => {
     const expectedPath = normalizePath(path.resolve('/project/.env.example'));
     mockExistsSync.mockReturnValue(true);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       examplePath: '.env.example',
       envPath: '.env',
@@ -96,7 +96,7 @@ describe('determineComparisonFile', () => {
     const expectedPath = path.resolve('/project/.env');
     mockExistsSync.mockImplementation((p) => p === expectedPath);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       examplePath: '.env.example',
       envPath: '.env',
@@ -117,7 +117,7 @@ describe('determineComparisonFile', () => {
     const expectedPath = path.resolve('/project/.env');
     mockExistsSync.mockImplementation((p) => p === expectedPath);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       envPath: '.env.missing',
     };
@@ -162,7 +162,7 @@ describe('determineComparisonFile', () => {
     );
     mockExistsSync.mockReturnValue(true);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       cwd: '/home/user/project',
       examplePath: 'config/.env.example',
@@ -184,7 +184,7 @@ describe('determineComparisonFile', () => {
     const expectedPath = normalizePath(absolutePath);
     mockExistsSync.mockReturnValue(true);
 
-    const opts: ScanUsageOptions = {
+    const opts = {
       ...baseOpts,
       examplePath: absolutePath,
     };

@@ -186,7 +186,7 @@ export function processComparisonFile(
   } catch (err) {
     error = {
       message: `Could not read ${compareFile.name}: ${compareFile.path} - ${err}`,
-      shouldExit: opts.isCiMode ?? false,
+      shouldExit: opts.isCiMode,
     };
   }
 

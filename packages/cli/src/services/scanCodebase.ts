@@ -29,7 +29,7 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
   const files = await findFiles(opts.cwd, {
     include: opts.includeFiles,
     exclude: [...DEFAULT_EXCLUDE_PATTERNS, ...opts.excludeFiles],
-    ...(opts.files?.length && { files: opts.files }),
+    ...(opts.files.length && { files: opts.files }),
   });
 
   const limit = createConcurrencyLimit(FILE_CONCURRENCY);
