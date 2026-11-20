@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
 import { printHeader } from '../../../../src/ui/scan/printHeader.js';
 
 describe('printHeader (scan)', () => {

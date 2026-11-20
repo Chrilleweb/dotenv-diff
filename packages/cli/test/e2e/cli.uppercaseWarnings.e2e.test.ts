@@ -30,7 +30,7 @@ function tmpDir() {
 describe('Uppercase Warnings', () => {
   it('warns when env variable names are not uppercase', () => {
     const cwd = tmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), `api_key=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'api_key=123');
 
     const res = runCli(cwd, []);
 
@@ -43,7 +43,7 @@ describe('Uppercase Warnings', () => {
   it('does not warn when variable key is already uppercase', () => {
     const cwd = tmpDir();
 
-    fs.writeFileSync(path.join(cwd, '.env'), `API_KEY=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'API_KEY=123');
 
     const res = runCli(cwd, []);
 
@@ -53,7 +53,7 @@ describe('Uppercase Warnings', () => {
 
   it('exits with error in strict mode when non-uppercase env vars are used', () => {
     const cwd = tmpDir();
-    fs.writeFileSync(path.join(cwd, '.env'), `api_key=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'api_key=123');
 
     const res = runCli(cwd, ['--strict']);
 
@@ -66,7 +66,7 @@ describe('Uppercase Warnings', () => {
   it('does not warn about uppercase when --no-uppercase-keys is not enabled', () => {
     const cwd = tmpDir();
 
-    fs.writeFileSync(path.join(cwd, '.env'), `api_key=123`);
+    fs.writeFileSync(path.join(cwd, '.env'), 'api_key=123');
 
     const res = runCli(cwd, ['--no-uppercase-keys']);
 

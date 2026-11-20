@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calculateStats } from '../../../../src/core/compare/calculateStats.js';
+import type { Filtered } from '../../../../src/config/types.js';
 
 describe('calculateStats', () => {
   it('calculates counts correctly without duplicates', () => {
@@ -8,7 +9,7 @@ describe('calculateStats', () => {
       ['A', 'B'],
       [],
       [],
-      { mismatches: [] } as any,
+      { mismatches: [] } as unknown as Filtered,
       false,
     );
 
@@ -27,7 +28,7 @@ describe('calculateStats', () => {
       ['A'],
       [{ key: 'A', count: 3 }],
       [{ key: 'A', count: 2 }],
-      { mismatches: [] } as any,
+      { mismatches: [] } as unknown as Filtered,
       false,
     );
 
@@ -45,7 +46,7 @@ describe('calculateStats', () => {
           { key: 'A', expected: 'x', actual: 'y' },
           { key: 'B', expected: 'x', actual: 'y' },
         ],
-      } as any,
+      } as unknown as Filtered,
       true,
     );
 
@@ -58,7 +59,7 @@ describe('calculateStats', () => {
       ['A'],
       [],
       [],
-      {} as any, // mismatches is undefined
+      {} as unknown as Filtered, // mismatches is undefined
       true,
     );
 

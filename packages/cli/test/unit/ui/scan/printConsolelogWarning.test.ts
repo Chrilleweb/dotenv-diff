@@ -19,7 +19,7 @@ describe('printConsolelogWarning', () => {
   });
 
   it('returns false when logged is undefined', () => {
-    const result = printConsolelogWarning(undefined as any);
+    const result = printConsolelogWarning(undefined as unknown as EnvUsage[]);
 
     expect(result).toBe(false);
     expect(logSpy).not.toHaveBeenCalled();
