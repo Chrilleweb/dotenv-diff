@@ -1,5 +1,19 @@
 # Changelog
 
+<!-- changesets: feat-version-flag.md -->
+## 2026-11-20
+
+### Highlights
+- feat: add `-v, --version` to print the installed version. `--help` now describes the default behavior (scanning the codebase) instead of only comparing `.env` files
+
+### Package Releases
+- dotenv-diff: minor
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | minor
+
 <!-- changesets: fix-config-value-types.md,fix-minified-file-detection.md -->
 ## 2026-11-08
 
