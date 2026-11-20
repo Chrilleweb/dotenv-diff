@@ -102,7 +102,7 @@ function processPair(
   const { exampleName, filtered, dupsEnv, dupsEx, currentKeys, exampleKeys } =
     computation;
 
-  printHeader(envName, exampleName, opts.json ?? false);
+  printHeader(envName, exampleName, opts.json);
 
   const stats = calculateStats(
     currentKeys,
@@ -122,9 +122,9 @@ function processPair(
     exampleName,
     dupsEnv,
     dupsEx,
-    opts.json ?? false,
-    opts.fix ?? false,
-    opts.strict ?? false,
+    opts.json,
+    opts.fix,
+    opts.strict,
   );
 
   const entry = compareJsonOutput({
@@ -211,9 +211,7 @@ function computePairComparison(
   // Cross-reference missing keys (in example, absent from current) against the
   // extra keys the current file has, to surface likely typos like DATABAS_URL.
   const suggestions =
-    opts.suggest !== false && run('missing')
-      ? suggestTypos(missingKeys, diff.extra)
-      : [];
+    opts.suggest && run('missing') ? suggestTypos(missingKeys, diff.extra) : [];
 
   const filtered: Filtered = {
     missing: run('missing') ? missingKeys : [],
@@ -260,9 +258,9 @@ function maybePrintStats(
     exampleName,
     stats,
     filtered,
-    opts.json ?? false,
+    opts.json,
     opts.showStats,
-    opts.checkValues ?? false,
+    opts.checkValues,
   );
 }
 
@@ -282,29 +280,19 @@ function printPairOutputs(
   dupsEnv: ReturnType<typeof findDuplicateKeys>,
   opts: Readonly<ComparisonOptions>,
 ): void {
-  printIssues(
-    filtered,
-    opts.json ?? false,
-    opts.fix ?? false,
-    opts.strict ?? false,
-  );
+  printIssues(filtered, opts.json, opts.fix, opts.strict);
 
   if (filtered.gitignoreIssue && !opts.json && !opts.fix) {
     printGitignoreWarning({
       envFile: envName,
       reason: filtered.gitignoreIssue.reason,
-      strict: opts.strict ?? false,
+      strict: opts.strict,
     });
   }
 
   const hasGitignoreIssue = filtered.gitignoreIssue !== null;
 
-  printFixTips(
-    filtered,
-    hasGitignoreIssue,
-    opts.json ?? false,
-    opts.fix ?? false,
-  );
+  printFixTips(filtered, hasGitignoreIssue, opts.json, opts.fix);
 
   if (!opts.fix) return;
 
@@ -320,7 +308,7 @@ function printPairOutputs(
     fixApplied: changed,
   };
 
-  printAutoFix(fixContext, envName, opts.json ?? false);
+  printAutoFix(fixContext, envName, opts.json);
 }
 
 /**
@@ -332,7 +320,7 @@ function printPairOutputs(
 function createCategoryFilter(
   opts: ComparisonOptions,
 ): (category: Category) => boolean {
-  const onlySet: Set<Category> | undefined = opts.only?.length
+  const onlySet: Set<Category> | undefined = opts.only.length
     ? new Set(opts.only)
     : undefined;
 

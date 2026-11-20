@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import fc from 'fast-check';
 import { scanFile } from '../../../../src/core/scan/scanFile.js';
-import type { ScanOptions } from '../../../../src/config/types.js';
+import { makeScanOptions } from '../../../utils/options-helpers.js';
 
 /**
  * Property-based ("fuzz") tests for the file scanner.
@@ -13,15 +13,15 @@ import type { ScanOptions } from '../../../../src/config/types.js';
  * truly stateless between calls. These properties guard exactly that.
  */
 describe('scanFile (property-based)', () => {
-  const opts: ScanOptions = {
+  const opts = makeScanOptions({
     cwd: '/project',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,
     json: false,
-  };
+  });
 
   // Realistic fragments so the env patterns actually match and the line/column
   // machinery gets exercised, interleaved with adversarial noise.

@@ -94,6 +94,7 @@ import { printIssues } from '../../../src/ui/compare/printIssues.js';
 import { printGitignoreWarning } from '../../../src/ui/shared/printGitignore.js';
 import { compareJsonOutput } from '../../../src/ui/compare/compareJsonOutput.js';
 import { printErrorNotFound } from '../../../src/ui/compare/printErrorNotFound.js';
+import { makeComparisonOptions } from '../../utils/options-helpers.js';
 
 describe('compareMany', () => {
   let cwd: string;
@@ -158,18 +159,7 @@ describe('compareMany', () => {
 
   const createOptions = (
     overrides: Partial<ComparisonOptions> = {},
-  ): ComparisonOptions => ({
-    checkValues: false,
-    cwd,
-    allowDuplicates: false,
-    fix: false,
-    json: false,
-    ignore: [],
-    ignoreRegex: [],
-    showStats: false,
-    strict: false,
-    ...overrides,
-  });
+  ): ComparisonOptions => makeComparisonOptions({ cwd, ...overrides });
 
   it('compares successfully when files exist and have no issues', async () => {
     const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
@@ -905,137 +895,6 @@ describe('compareMany', () => {
       expect.any(Object),
       false,
       true,
-      false,
-    );
-  });
-
-  it('falls back to strict=false when strict is undefined', async () => {
-    mockCheckGitignoreStatus.mockReturnValue({
-      reason: 'not-ignored',
-    });
-
-    const opts = createOptions();
-    delete opts.strict;
-    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
-
-    await compareMany(pairs, opts);
-
-    expect(mockPrintDuplicates).toHaveBeenCalledWith(
-      '.env',
-      '.env.example',
-      expect.any(Array),
-      expect.any(Array),
-      false,
-      false,
-      false,
-    );
-    expect(mockPrintIssues).toHaveBeenCalledWith(
-      expect.any(Object),
-      false,
-      false,
-      false,
-    );
-    expect(mockPrintGitignoreWarning).toHaveBeenCalledWith({
-      envFile: '.env',
-      reason: 'not-ignored',
-      strict: false,
-    });
-  });
-
-  it('falls back ?? false when json and fix are undefined (lines 103, 123-124, 266, 280-281)', async () => {
-    // opts.json and opts.fix are undefined → opts.json ?? false and opts.fix ?? false
-    // take the right-hand fallback branch for each ?? operator.
-    const opts = {
-      ...createOptions(),
-      json: undefined as unknown as boolean,
-      fix: undefined as unknown as boolean,
-    };
-    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
-
-    const result = await compareMany(pairs, opts);
-
-    expect(result.exitWithError).toBe(false);
-    // printHeader receives false from opts.json ?? false (line 103)
-    expect(mockPrintHeader).toHaveBeenCalledWith('.env', '.env.example', false);
-    // printDuplicates receives false for all ?? args (lines 123-125)
-    expect(mockPrintDuplicates).toHaveBeenCalledWith(
-      '.env',
-      '.env.example',
-      [],
-      [],
-      false,
-      false,
-      false,
-    );
-    // printIssues receives false for all ?? args
-    expect(mockPrintIssues).toHaveBeenCalledWith(
-      expect.any(Object),
-      false,
-      false,
-      false,
-    );
-    // printFixTips receives false for both ?? args (lines 280-281)
-    expect(mockPrintFixTips).toHaveBeenCalledWith(
-      expect.any(Object),
-      false,
-      false,
-      false,
-    );
-  });
-
-  it('falls back ?? false/false in printStats when showStats=true and json/checkValues are undefined (lines 244, 246)', async () => {
-    // opts.json=undefined → opts.json ?? false = false (line 244 right branch)
-    // opts.checkValues=undefined → opts.checkValues ?? false = false (line 246 right branch)
-    // opts.showStats=true (defined) → opts.showStats ?? true takes left branch (right is dead code)
-    const opts = {
-      ...createOptions({ showStats: true }),
-      json: undefined as unknown as boolean,
-      checkValues: undefined as unknown as boolean,
-    };
-    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
-
-    await compareMany(pairs, opts);
-
-    expect(mockPrintStats).toHaveBeenCalledWith(
-      '.env',
-      '.env.example',
-      expect.any(Object),
-      expect.any(Object),
-      false, // opts.json ?? false → false (right branch)
-      true, // opts.showStats → true (left branch, defined)
-      false, // opts.checkValues ?? false → false (right branch)
-    );
-  });
-
-  it('falls back json ?? false in printAutoFix when fix=true and json is undefined (line 298)', async () => {
-    // opts.fix=true → reaches applyFixes + printAutoFix
-    // opts.json=undefined → opts.json ?? false takes the right branch (line 298)
-    mockApplyFixes.mockReturnValue({
-      changed: true,
-      result: {
-        removedDuplicates: [],
-        addedEnv: ['NEW_KEY'],
-        gitignoreUpdated: false,
-      },
-    });
-    mockDiffEnv.mockReturnValue({
-      missing: ['NEW_KEY'],
-      extra: [],
-      valueMismatches: [],
-    });
-
-    const opts = {
-      ...createOptions({ fix: true }),
-      json: undefined as unknown as boolean,
-    };
-    const pairs: FilePair[] = [{ envName: '.env', envPath, examplePath }];
-
-    await compareMany(pairs, opts);
-
-    // printAutoFix called with false from opts.json ?? false
-    expect(mockPrintAutoFix).toHaveBeenCalledWith(
-      expect.any(Object),
-      '.env',
       false,
     );
   });

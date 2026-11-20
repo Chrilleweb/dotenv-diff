@@ -15,7 +15,7 @@ vi.mock('../../../src/core/scan/determineComparisonFile.js', () => ({
   determineComparisonFile: vi.fn(),
 }));
 
-vi.mock('../../../src/services/printScanResult.js', () => ({
+vi.mock('../../../src/ui/scan/printScanResult.js', () => ({
   printScanResult: vi.fn(),
 }));
 
@@ -67,7 +67,7 @@ vi.mock('../../../src/baseline/scanBaseline.js', () => ({
 import { scanUsage } from '../../../src/commands/scanUsage.js';
 import { scanCodebase } from '../../../src/services/scanCodebase.js';
 import { determineComparisonFile } from '../../../src/core/scan/determineComparisonFile.js';
-import { printScanResult } from '../../../src/services/printScanResult.js';
+import { printScanResult } from '../../../src/ui/scan/printScanResult.js';
 import { checkGitignoreStatus } from '../../../src/services/git.js';
 import { scanJsonOutput } from '../../../src/ui/scan/scanJsonOutput.js';
 import { processComparisonFile } from '../../../src/services/processComparisonFile.js';
@@ -84,6 +84,7 @@ import {
   loadBaselineFile,
   applyBaselineEntries,
 } from '../../../src/baseline/scanBaseline.js';
+import { makeScanUsageOptions } from '../../utils/options-helpers.js';
 
 describe('scanUsage', () => {
   const dummySecret: SecretFinding = {
@@ -111,15 +112,15 @@ describe('scanUsage', () => {
     fileContentMap: new Map(),
   };
 
-  const baseOpts: ScanUsageOptions = {
+  const baseOpts = makeScanUsageOptions({
     cwd: '/root',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,
     json: false,
-  };
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -573,26 +574,6 @@ describe('scanUsage', () => {
     }
   });
 
-  it('passes false to printComparisonError when json is not set (line 105)', async () => {
-    vi.mocked(determineComparisonFile).mockResolvedValue({
-      type: 'found',
-      file: { path: '/env/.env', name: '.env' },
-    });
-    vi.mocked(processComparisonFile).mockReturnValue({
-      error: { message: 'err', shouldExit: false },
-    } as ProcessComparisonResult);
-    vi.mocked(printComparisonError).mockReturnValue({ exit: false });
-
-    const { json: _omit, ...optsWithoutJson } = baseOpts;
-    await scanUsage(optsWithoutJson as ScanUsageOptions);
-
-    expect(printComparisonError).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(Boolean),
-      false,
-    );
-  });
-
   it('handles undefined secrets gracefully in JSON mode (line 143)', async () => {
     vi.mocked(scanCodebase).mockResolvedValue({
       ...baseScanResult,
@@ -657,7 +638,7 @@ describe('scanUsage', () => {
     );
   });
 
-  it('handles undefined logged and secrets in calculateStats (lines 249, 253)', async () => {
+  it('handles undefined logged and secrets when computing stats', async () => {
     vi.mocked(scanCodebase).mockResolvedValue({
       ...baseScanResult,
       logged: undefined as unknown as ScanResult['logged'],

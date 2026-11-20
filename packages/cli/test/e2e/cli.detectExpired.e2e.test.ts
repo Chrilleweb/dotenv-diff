@@ -89,7 +89,7 @@ describe('Expiration Warnings', () => {
 
     fs.writeFileSync(
       path.join(cwd, '.env'),
-      `API_KEY=secret123\nVALID_KEY=value456\n`,
+      'API_KEY=secret123\nVALID_KEY=value456\n',
     );
 
     // Create a file that uses these env vars

@@ -1,128 +1,126 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type {
-  ScanResult,
-  ScanUsageOptions,
-} from '../../../src/config/types.js';
+import type { ScanResult } from '../../../../src/config/types.js';
 
-vi.mock('../../../src/ui/scan/printHeader.js', () => ({
+vi.mock('../../../../src/ui/scan/printHeader.js', () => ({
   printHeader: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printStats.js', () => ({
+vi.mock('../../../../src/ui/scan/printStats.js', () => ({
   printStats: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printMissing.js', () => ({
+vi.mock('../../../../src/ui/scan/printMissing.js', () => ({
   printMissing: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printUnused.js', () => ({
+vi.mock('../../../../src/ui/scan/printUnused.js', () => ({
   printUnused: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/shared/printDuplicates.js', () => ({
+vi.mock('../../../../src/ui/shared/printDuplicates.js', () => ({
   printDuplicates: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printSecrets.js', () => ({
+vi.mock('../../../../src/ui/scan/printSecrets.js', () => ({
   printSecrets: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/shared/printSuccess.js', () => ({
+vi.mock('../../../../src/ui/shared/printSuccess.js', () => ({
   printSuccess: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/shared/printStrictModeError.js', () => ({
+vi.mock('../../../../src/ui/shared/printStrictModeError.js', () => ({
   printStrictModeError: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/shared/printFixTips.js', () => ({
+vi.mock('../../../../src/ui/shared/printFixTips.js', () => ({
   printFixTips: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/shared/printAutoFix.js', () => ({
+vi.mock('../../../../src/ui/shared/printAutoFix.js', () => ({
   printAutoFix: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printFrameworkWarnings.js', () => ({
+vi.mock('../../../../src/ui/scan/printFrameworkWarnings.js', () => ({
   printFrameworkWarnings: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printExampleWarnings.js', () => ({
+vi.mock('../../../../src/ui/scan/printExampleWarnings.js', () => ({
   printExampleWarnings: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printConsolelogWarning.js', () => ({
+vi.mock('../../../../src/ui/scan/printConsolelogWarning.js', () => ({
   printConsolelogWarning: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printUppercaseWarning.js', () => ({
+vi.mock('../../../../src/ui/scan/printUppercaseWarning.js', () => ({
   printUppercaseWarning: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printCommentWarnings.js', () => ({
+vi.mock('../../../../src/ui/scan/printCommentWarnings.js', () => ({
   printCommentWarnings: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printDriftWarnings.js', () => ({
+vi.mock('../../../../src/ui/scan/printDriftWarnings.js', () => ({
   printDriftWarnings: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printExpireWarnings.js', () => ({
+vi.mock('../../../../src/ui/scan/printExpireWarnings.js', () => ({
   printExpireWarnings: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printInconsistentNamingWarning.js', () => ({
+vi.mock('../../../../src/ui/scan/printInconsistentNamingWarning.js', () => ({
   printInconsistentNamingWarning: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/scan/printListAll.js', () => ({
+vi.mock('../../../../src/ui/scan/printListAll.js', () => ({
   printListAll: vi.fn(),
 }));
 
-vi.mock('../../../src/core/scan/computeHealthScore.js', () => ({
+vi.mock('../../../../src/core/scan/computeHealthScore.js', () => ({
   computeHealthScore: vi.fn(() => 100),
 }));
 
-vi.mock('../../../src/ui/scan/printHealthScore.js', () => ({
+vi.mock('../../../../src/ui/scan/printHealthScore.js', () => ({
   printHealthScore: vi.fn(),
 }));
 
-vi.mock('../../../src/ui/shared/printGitignore.js', () => ({
+vi.mock('../../../../src/ui/shared/printGitignore.js', () => ({
   printGitignoreWarning: vi.fn(),
 }));
 
-vi.mock('../../../src/services/git.js', () => ({
+vi.mock('../../../../src/services/git.js', () => ({
   checkGitignoreStatus: vi.fn(() => null),
 }));
 
-import { printScanResult } from '../../../src/services/printScanResult.js';
-import { printMissing } from '../../../src/ui/scan/printMissing.js';
-import { printAutoFix } from '../../../src/ui/shared/printAutoFix.js';
-import { checkGitignoreStatus } from '../../../src/services/git.js';
-import { printGitignoreWarning } from '../../../src/ui/shared/printGitignore.js';
-import { printStats } from '../../../src/ui/scan/printStats.js';
-import { printDuplicates } from '../../../src/ui/shared/printDuplicates.js';
-import { printUnused } from '../../../src/ui/scan/printUnused.js';
-import { printFrameworkWarnings } from '../../../src/ui/scan/printFrameworkWarnings.js';
-import { printUppercaseWarning } from '../../../src/ui/scan/printUppercaseWarning.js';
-import { printInconsistentNamingWarning } from '../../../src/ui/scan/printInconsistentNamingWarning.js';
-import { printListAll } from '../../../src/ui/scan/printListAll.js';
-import { printExampleWarnings } from '../../../src/ui/scan/printExampleWarnings.js';
-import { printSecrets } from '../../../src/ui/scan/printSecrets.js';
-import { printExpireWarnings } from '../../../src/ui/scan/printExpireWarnings.js';
-import { printCommentWarnings } from '../../../src/ui/scan/printCommentWarnings.js';
-import { printDriftWarnings } from '../../../src/ui/scan/printDriftWarnings.js';
-import { printConsolelogWarning } from '../../../src/ui/scan/printConsolelogWarning.js';
-import type { SecretFinding } from '../../../src/core/security/secretDetectors.js';
+import { printScanResult } from '../../../../src/ui/scan/printScanResult.js';
+import { printMissing } from '../../../../src/ui/scan/printMissing.js';
+import { printAutoFix } from '../../../../src/ui/shared/printAutoFix.js';
+import { checkGitignoreStatus } from '../../../../src/services/git.js';
+import { printGitignoreWarning } from '../../../../src/ui/shared/printGitignore.js';
+import { printStats } from '../../../../src/ui/scan/printStats.js';
+import { printDuplicates } from '../../../../src/ui/shared/printDuplicates.js';
+import { printUnused } from '../../../../src/ui/scan/printUnused.js';
+import { printFrameworkWarnings } from '../../../../src/ui/scan/printFrameworkWarnings.js';
+import { printUppercaseWarning } from '../../../../src/ui/scan/printUppercaseWarning.js';
+import { printInconsistentNamingWarning } from '../../../../src/ui/scan/printInconsistentNamingWarning.js';
+import { printListAll } from '../../../../src/ui/scan/printListAll.js';
+import { printExampleWarnings } from '../../../../src/ui/scan/printExampleWarnings.js';
+import { printSecrets } from '../../../../src/ui/scan/printSecrets.js';
+import { printExpireWarnings } from '../../../../src/ui/scan/printExpireWarnings.js';
+import { printCommentWarnings } from '../../../../src/ui/scan/printCommentWarnings.js';
+import { printDriftWarnings } from '../../../../src/ui/scan/printDriftWarnings.js';
+import { printConsolelogWarning } from '../../../../src/ui/scan/printConsolelogWarning.js';
+import type { SecretFinding } from '../../../../src/core/security/secretDetectors.js';
 import type {
   FrameworkWarning,
   UppercaseWarning,
   InconsistentNamingWarning,
   ExampleSecretWarning,
   ExpireWarning,
-} from '../../../src/config/types.js';
-import { GITIGNORE_ISSUES } from '../../../src/config/constants.js';
+} from '../../../../src/config/types.js';
+import { GITIGNORE_ISSUES } from '../../../../src/config/constants.js';
+import { makeScanUsageOptions } from '../../../utils/options-helpers.js';
 
 describe('printScanResult', () => {
   const baseScanResult: ScanResult = {
@@ -141,15 +139,15 @@ describe('printScanResult', () => {
     logged: [],
   };
 
-  const baseOpts: ScanUsageOptions = {
+  const baseOpts = makeScanUsageOptions({
     cwd: '/root',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,
     json: false,
-  };
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -454,7 +452,7 @@ describe('printScanResult', () => {
       [],
       false,
       false,
-      undefined,
+      false,
     );
   });
 
@@ -476,7 +474,7 @@ describe('printScanResult', () => {
       [{ key: 'EX_KEY', count: 2 }],
       false,
       false,
-      undefined,
+      false,
     );
   });
 
@@ -514,10 +512,7 @@ describe('printScanResult', () => {
       '.env',
     );
 
-    expect(printConsolelogWarning).toHaveBeenCalledWith(
-      loggedUsages,
-      undefined,
-    );
+    expect(printConsolelogWarning).toHaveBeenCalledWith(loggedUsages, false);
   });
 
   it('keeps exitWithError false when secrets is undefined and no strict violations', () => {

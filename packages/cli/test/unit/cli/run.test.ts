@@ -475,34 +475,6 @@ describe('run', () => {
     existsSpy.mockRestore();
   });
 
-  it('does not include only in compare options when opts.only is undefined', async () => {
-    const program = {
-      parse: vi.fn(),
-      getOptionValueSource: vi.fn(() => 'cli'),
-      opts: vi.fn(() => ({ compare: true })),
-    } as unknown as Command;
-
-    mockNormalizeOptions.mockReturnValue(
-      createBaseOptions({
-        compare: true,
-        envFlag: 'a.env',
-        exampleFlag: 'b.env',
-        only: undefined,
-      } as unknown as Partial<Options>),
-    );
-
-    const existsSpy = vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-    mockCompareMany.mockResolvedValue({ exitWithError: false });
-
-    await run(program);
-
-    const compareOptions = mockCompareMany.mock.calls[0]?.[1];
-    expect(compareOptions).toBeDefined();
-    expect('only' in compareOptions).toBe(false);
-
-    existsSpy.mockRestore();
-  });
-
   it('forwards strict, only and suggest to compare options', async () => {
     const program = {
       parse: vi.fn(),

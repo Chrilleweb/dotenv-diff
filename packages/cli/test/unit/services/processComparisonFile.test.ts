@@ -93,6 +93,7 @@ import { resolveFromCwd } from '../../../src/core/helpers/resolveFromCwd.js';
 import { detectOptionalKeys } from '../../../src/services/detectOptionalKeys.js';
 import { detectExampleDrift } from '../../../src/services/detectExampleDrift.js';
 import { detectSecretsInExample } from '../../../src/core/security/exampleSecretDetector.js';
+import { makeScanUsageOptions } from '../../utils/options-helpers.js';
 
 describe('processComparisonFile', () => {
   const baseScanResult: ScanResult = {
@@ -116,16 +117,16 @@ describe('processComparisonFile', () => {
     name: '.env',
   };
 
-  const baseOpts: ScanUsageOptions = {
+  const baseOpts = makeScanUsageOptions({
     cwd: '/root',
     examplePath: '.env.example',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,
     json: false,
-  };
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();

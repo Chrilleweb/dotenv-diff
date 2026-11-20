@@ -20,6 +20,7 @@ CLI flags always take precedence over configuration file values.
 - [--no-color](#--no-color)
 - [--ci](#--ci)
 - [--yes](#-y---yes)
+- [--version](#-v---version)
 
 ### File Scanning Flags
 
@@ -379,6 +380,19 @@ Usage in the configuration file:
   "yes": true
 }
 ```
+
+### `-v, --version`
+
+Print the installed version of dotenv-diff and exit.
+Useful when reporting a bug, or to check which version `npx` is actually running in CI.
+
+Example usage:
+
+```bash
+dotenv-diff --version
+```
+
+This flag is CLI-only and cannot be set in the configuration file.
 
 ## File Scanning Flags
 

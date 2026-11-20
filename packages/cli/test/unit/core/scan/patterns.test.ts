@@ -14,8 +14,8 @@ import type { ScanOptions } from '../../../../src/config/types';
 describe('scanFile - Pattern Detection', () => {
   const baseOpts: ScanOptions = {
     cwd: '/test/project',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     files: [],

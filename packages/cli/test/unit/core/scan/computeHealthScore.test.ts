@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { computeHealthScore } from '../../../../src/core/scan/computeHealthScore.js';
+import type { ScanResult } from '../../../../src/config/types.js';
 
 describe('computeHealthScore', () => {
   it('returns 100 for a clean scan', () => {
     const score = computeHealthScore({
       missing: [],
       unused: [],
-    } as any);
+    } as unknown as ScanResult);
 
     expect(score).toBe(100);
   });
@@ -15,7 +16,7 @@ describe('computeHealthScore', () => {
     const score = computeHealthScore({
       missing: [],
       secrets: [{ severity: 'high' }],
-    } as any);
+    } as unknown as ScanResult);
 
     expect(score).toBe(80);
   });
@@ -23,7 +24,7 @@ describe('computeHealthScore', () => {
   it('penalizes missing variables', () => {
     const score = computeHealthScore({
       missing: ['API_KEY'],
-    } as any);
+    } as unknown as ScanResult);
 
     expect(score).toBe(80);
   });
@@ -33,7 +34,7 @@ describe('computeHealthScore', () => {
       missing: ['A'],
       unused: ['B', 'C'],
       frameworkWarnings: [{}],
-    } as any);
+    } as unknown as ScanResult);
 
     // 100 - 20 (missing) - 2 (unused x2) - 5 (framework)
     expect(score).toBe(73);
@@ -43,7 +44,7 @@ describe('computeHealthScore', () => {
     const score = computeHealthScore({
       missing: Array(10).fill('A'),
       secrets: Array(10).fill({ severity: 'high' }),
-    } as any);
+    } as unknown as ScanResult);
 
     expect(score).toBe(0);
   });

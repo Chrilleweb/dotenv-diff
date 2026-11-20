@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import chalk from 'chalk';
 import fs from 'fs';
 import { printMissingExample } from '../../../../src/ui/scan/printMissingExample.js';
-import type { ScanUsageOptions } from '../../../../src/config/types.js';
+import { makeScanUsageOptions } from '../../../utils/options-helpers.js';
 
 // Mock resolveFromCwd
 vi.mock('../../../../src/core/helpers/resolveFromCwd.js', () => ({
@@ -22,15 +21,15 @@ describe('printMissingExample', () => {
     vi.restoreAllMocks();
   });
 
-  const baseOpts: ScanUsageOptions = {
+  const baseOpts = makeScanUsageOptions({
     cwd: '/root',
-    include: [],
-    exclude: [],
+    includeFiles: [],
+    excludeFiles: [],
     ignore: [],
     ignoreRegex: [],
     secrets: false,
     json: false,
-  };
+  });
 
   it('returns false if examplePath is not provided', () => {
     const result = printMissingExample({

@@ -90,7 +90,7 @@ describe('Environment variable console.log detection', () => {
 
     fs.writeFileSync(
       path.join(cwd, 'src/no-log.ts'),
-      `const x = process.env.SECRET_KEY;`,
+      'const x = process.env.SECRET_KEY;',
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'SECRET_KEY=1');
@@ -109,10 +109,10 @@ describe('Environment variable console.log detection', () => {
     const file3 = path.join(cwd, 'src/c.ts');
     const file4 = path.join(cwd, 'src/d.ts');
 
-    fs.writeFileSync(file1, `console.log(process.env.DEBUG_FLAG)`);
-    fs.writeFileSync(file2, `console.error(process.env.DEBUG_FLAG)`);
-    fs.writeFileSync(file3, `console.info(process.env.DEBUG_FLAG)`);
-    fs.writeFileSync(file4, `console.warn(process.env.DEBUG_FLAG)`);
+    fs.writeFileSync(file1, 'console.log(process.env.DEBUG_FLAG)');
+    fs.writeFileSync(file2, 'console.error(process.env.DEBUG_FLAG)');
+    fs.writeFileSync(file3, 'console.info(process.env.DEBUG_FLAG)');
+    fs.writeFileSync(file4, 'console.warn(process.env.DEBUG_FLAG)');
 
     fs.writeFileSync(path.join(cwd, '.env'), 'DEBUG_FLAG=1');
 
@@ -130,7 +130,7 @@ describe('Environment variable console.log detection', () => {
 
     fs.writeFileSync(
       path.join(cwd, 'src/page.ts'),
-      `console.log(process.env.PASSWORD);`,
+      'console.log(process.env.PASSWORD);',
     );
 
     fs.writeFileSync(path.join(cwd, '.env'), 'PASSWORD=abc');
@@ -163,7 +163,7 @@ describe('Environment variable console.log detection', () => {
     makeProject(cwd);
 
     const filePath = path.join(cwd, 'src', 'crossPlatform.ts');
-    fs.writeFileSync(filePath, `console.log(process.env.CROSS_PLATFORM_VAR);`);
+    fs.writeFileSync(filePath, 'console.log(process.env.CROSS_PLATFORM_VAR);');
     fs.writeFileSync(path.join(cwd, '.env'), 'CROSS_PLATFORM_VAR=shouldshow');
 
     const res = runCli(cwd, ['--scan-usage']);

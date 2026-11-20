@@ -35,8 +35,8 @@ describe('scanCodebase', () => {
 
     defaultOpts = {
       cwd: tmpDir,
-      include: [],
-      exclude: [],
+      includeFiles: [],
+      excludeFiles: [],
       ignore: [],
       ignoreRegex: [],
       files: [],
@@ -600,11 +600,10 @@ const x = process.env.API_KEY;`,
         }),
       );
     });
-    it('does not pass files option when undefined', async () => {
+    it('does not pass files option when empty', async () => {
       vi.mocked(findFiles).mockResolvedValue([]);
 
-      const { files: _files, ...optsWithoutFiles } = defaultOpts;
-      await scanCodebase(optsWithoutFiles);
+      await scanCodebase({ ...defaultOpts, files: [] });
 
       expect(findFiles).toHaveBeenCalledWith(
         tmpDir,

@@ -54,18 +54,7 @@ export async function run(program: Command): Promise<void> {
 
   // Handle --explain flag
   if (opts.explain) {
-    await explainKey({
-      key: opts.explain,
-      cwd: opts.cwd,
-      include: opts.includeFiles,
-      exclude: opts.excludeFiles,
-      ignore: opts.ignore,
-      ignoreRegex: opts.ignoreRegex,
-      files: opts.files,
-      secrets: opts.secrets,
-      ignoreUrls: opts.ignoreUrls,
-      json: opts.json,
-    });
+    await explainKey({ ...opts, key: opts.explain });
     setExitCode(false);
     return;
   }
@@ -73,13 +62,8 @@ export async function run(program: Command): Promise<void> {
   // Handle --matrix flag
   if (opts.matrix) {
     const { exitWithError } = await runMatrix({
-      cwd: opts.cwd,
+      ...opts,
       files: opts.matrixFiles,
-      ignore: opts.ignore,
-      ignoreRegex: opts.ignoreRegex,
-      checkValues: opts.checkValues,
-      json: opts.json,
-      showStats: opts.showStats,
     });
     setExitCode(exitWithError);
     return;
@@ -126,35 +110,10 @@ function setExitCode(exitWithError: boolean): void {
  * @returns Whether to exit with an error code
  */
 async function runScanMode(opts: Options): Promise<boolean> {
-  const envPath = resolveEnvPath(opts.envFlag);
-
   const { exitWithError } = await scanUsage({
-    cwd: opts.cwd,
-    allowDuplicates: opts.allowDuplicates,
-    include: opts.includeFiles,
-    exclude: opts.excludeFiles,
-    ignore: opts.ignore,
-    ignoreRegex: opts.ignoreRegex,
+    ...opts,
+    envPath: resolveEnvPath(opts.envFlag),
     examplePath: opts.exampleFlag,
-    envPath,
-    fix: opts.fix,
-    json: opts.json,
-    showUnused: opts.showUnused,
-    showStats: opts.showStats,
-    isCiMode: opts.isCiMode,
-    isYesMode: opts.isYesMode,
-    secrets: opts.secrets,
-    strict: opts.strict,
-    ignoreUrls: opts.ignoreUrls,
-    files: opts.files,
-    uppercaseKeys: opts.uppercaseKeys,
-    expireWarnings: opts.expireWarnings,
-    inconsistentNamingWarnings: opts.inconsistentNamingWarnings,
-    commentWarnings: opts.commentWarnings,
-    driftWarnings: opts.driftWarnings,
-    listAll: opts.listAll,
-    baseline: opts.baseline,
-    suggest: opts.suggest,
   });
 
   return exitWithError;
@@ -309,19 +268,8 @@ function buildCompareOptions(
   report: CompareJsonEntry[],
 ): ComparisonOptions {
   return {
-    checkValues: opts.checkValues,
-    cwd: opts.cwd,
-    allowDuplicates: opts.allowDuplicates,
-    fix: opts.fix,
-    json: opts.json,
-    ignore: opts.ignore,
-    ignoreRegex: opts.ignoreRegex,
-    showStats: opts.showStats,
-    uppercaseKeys: opts.uppercaseKeys,
-    strict: opts.strict,
-    suggest: opts.suggest,
+    ...opts,
     collect: (e: CompareJsonEntry) => report.push(e),
-    ...(opts.only ? { only: opts.only } : {}),
   };
 }
 

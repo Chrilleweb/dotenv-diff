@@ -1,14 +1,13 @@
 import { scanCodebase } from '../services/scanCodebase.js';
 import type {
   ScanUsageOptions,
-  EnvUsage,
   ExitResult,
-  ScanResult,
   ComparisonFile,
 } from '../config/types.js';
 import { determineComparisonFile } from '../core/scan/determineComparisonFile.js';
 import { computeExitDecision } from '../core/scan/computeExitDecision.js';
-import { printScanResult } from '../services/printScanResult.js';
+import { computeScanStats } from '../core/scan/computeScanStats.js';
+import { printScanResult } from '../ui/scan/printScanResult.js';
 import { scanJsonOutput } from '../ui/scan/scanJsonOutput.js';
 import { printMissingExample } from '../ui/scan/printMissingExample.js';
 import { processComparisonFile } from '../services/processComparisonFile.js';
@@ -97,7 +96,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
       const { exit } = printComparisonError(
         result.error.message,
         result.error.shouldExit,
-        opts.json ?? false,
+        opts.json,
       );
       if (exit) return { exitWithError: true };
     } else {
@@ -111,23 +110,23 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   }
 
   // Typo suggestions are advisory; drop them entirely when disabled via --no-suggest
-  if (opts.suggest === false) {
+  if (!opts.suggest) {
     scanResult.suggestions = [];
   }
 
   // Recalculate stats after filtering
-  calculateStats(scanResult);
+  scanResult.stats = computeScanStats(scanResult);
 
   // --baseline: write current warnings as the new baseline and exit cleanly
   if (opts.baseline) {
-    return writeBaseline(scanResult, opts.cwd, opts.json ?? false);
+    return writeBaseline(scanResult, opts.cwd, opts.json);
   }
 
   // Apply existing baseline suppressions (if any) before output
   const baselineFile = loadBaselineFile(opts.cwd);
   if (baselineFile) {
     scanResult = applyBaselineEntries(scanResult, baselineFile.entries);
-    calculateStats(scanResult);
+    scanResult.stats = computeScanStats(scanResult);
   }
 
   // JSON output
@@ -141,7 +140,7 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
     const jsonOutput = scanJsonOutput(
       scanResult,
       comparedAgainst,
-      opts.listAll ?? false,
+      opts.listAll,
       gitignoreIssue,
     );
     console.log(JSON.stringify(jsonOutput, null, 2));
@@ -161,38 +160,4 @@ export async function scanUsage(opts: ScanUsageOptions): Promise<ExitResult> {
   });
 
   return { exitWithError: result.exitWithError };
-}
-
-/**
- * Recalculates statistics for a scan result after filtering usages.
- * @param scanResult The current scan result
- * @returns void (modifies scanResult in place)
- */
-function calculateStats(scanResult: ScanResult): void {
-  const uniqueVariables = new Set(
-    scanResult.used.map((u: EnvUsage) => u.variable),
-  ).size;
-
-  const warningsCount =
-    (scanResult.frameworkWarnings?.length ?? 0) +
-    (scanResult.exampleWarnings?.length ?? 0) +
-    scanResult.logged?.length +
-    (scanResult.uppercaseWarnings?.length ?? 0) +
-    (scanResult.expireWarnings?.length ?? 0) +
-    (scanResult.inconsistentNamingWarnings?.length ?? 0) +
-    (scanResult.commentWarnings?.length ?? 0) +
-    (scanResult.driftWarnings?.length ?? 0) +
-    (scanResult.secrets?.length ?? 0) +
-    scanResult.missing.length +
-    scanResult.unused.length +
-    (scanResult.duplicates?.env?.length ?? 0) +
-    (scanResult.duplicates?.example?.length ?? 0);
-
-  scanResult.stats = {
-    filesScanned: scanResult.stats.filesScanned,
-    totalUsages: scanResult.used.length,
-    uniqueVariables,
-    warningsCount,
-    duration: scanResult.stats.duration,
-  };
 }

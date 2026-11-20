@@ -246,42 +246,50 @@ export interface ScanStats {
 }
 
 /**
- * Options for scanning the codebase
+ * Options for scanning the codebase.
+ * Picked from {@link Options} so the field names and types stay in sync.
  */
-export interface ScanOptions {
-  cwd: string;
-  include: string[];
-  exclude: string[];
-  ignore: string[];
-  ignoreRegex: RegExp[];
-  files?: string[];
-  secrets: boolean;
-  ignoreUrls?: string[];
-  json: boolean;
-}
+export type ScanOptions = Pick<
+  Options,
+  | 'cwd'
+  | 'includeFiles'
+  | 'excludeFiles'
+  | 'ignore'
+  | 'ignoreRegex'
+  | 'files'
+  | 'secrets'
+  | 'ignoreUrls'
+  | 'json'
+>;
 
 /**
- * Extends the basic ScanOptions with additional parameters.
- * All of these options are optional, as they may not be needed for every scan.
+ * Options for the scan-usage command (default mode).
  */
-export interface ScanUsageOptions extends ScanOptions {
-  envPath?: string | undefined;
-  examplePath?: string | undefined;
-  fix?: boolean;
-  showUnused?: boolean;
-  showStats?: boolean;
-  isCiMode?: boolean;
-  isYesMode?: boolean;
-  allowDuplicates?: boolean;
-  strict?: boolean;
-  uppercaseKeys?: boolean;
-  expireWarnings?: boolean;
-  inconsistentNamingWarnings?: boolean;
-  commentWarnings?: boolean;
-  driftWarnings?: boolean;
-  listAll?: boolean;
-  baseline?: boolean;
-  suggest?: boolean;
+export interface ScanUsageOptions
+  extends
+    ScanOptions,
+    Pick<
+      Options,
+      | 'fix'
+      | 'showUnused'
+      | 'showStats'
+      | 'isCiMode'
+      | 'isYesMode'
+      | 'allowDuplicates'
+      | 'strict'
+      | 'uppercaseKeys'
+      | 'expireWarnings'
+      | 'inconsistentNamingWarnings'
+      | 'commentWarnings'
+      | 'driftWarnings'
+      | 'listAll'
+      | 'baseline'
+      | 'suggest'
+    > {
+  /** Env file to compare against (--env, or .env if it exists) */
+  envPath: string | undefined;
+  /** Example file to compare against (--example) */
+  examplePath: string | undefined;
 }
 
 /**
@@ -366,23 +374,23 @@ export type CompareJsonEntry = {
 /**
  * Options for comparing environment files (--compare flag).
  */
-export interface ComparisonOptions {
-  checkValues: boolean;
-  cwd: string;
-  allowDuplicates?: boolean;
-  fix?: boolean;
-  json?: boolean;
-  ignore: string[];
-  ignoreRegex: RegExp[];
+export interface ComparisonOptions extends Pick<
+  Options,
+  | 'checkValues'
+  | 'cwd'
+  | 'allowDuplicates'
+  | 'fix'
+  | 'json'
+  | 'ignore'
+  | 'ignoreRegex'
+  | 'only'
+  | 'showStats'
+  | 'strict'
+  | 'uppercaseKeys'
+  | 'suggest'
+> {
+  /** Receives each comparison result, used to build --json output */
   collect?: (entry: CompareJsonEntry) => void;
-  only?: Category[];
-  showStats?: boolean;
-  strict?: boolean;
-  uppercaseKeys?: boolean;
-  expireWarnings?: boolean;
-  inconsistentNamingWarnings?: boolean;
-  commentWarnings?: boolean;
-  suggest?: boolean;
 }
 
 /**

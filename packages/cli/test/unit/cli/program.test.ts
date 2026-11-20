@@ -1,12 +1,20 @@
 import { describe, it, expect } from 'vitest';
+import fs from 'fs';
 import { createProgram } from '../../../src/cli/program.js';
+
+const pkg = JSON.parse(
+  fs.readFileSync(new URL('../../../package.json', import.meta.url), 'utf8'),
+) as { version: string };
 
 describe('createProgram', () => {
   it('creates a commander program with expected metadata', () => {
     const program = createProgram();
 
     expect(program.name()).toBe('dotenv-diff');
-    expect(program.description()).toBe('Compare .env and .env.example files');
+    expect(program.description()).toBe(
+      'Scan your codebase for environment variable usage and compare .env files',
+    );
+    expect(program.version()).toBe(pkg.version);
   });
 
   it('parses key CLI options correctly', () => {
