@@ -12,6 +12,7 @@ import {
 } from '../../../src/baseline/scanBaseline.js';
 import type { ScanResult, BaselineEntry } from '../../../src/config/types.js';
 import type { SecretFinding } from '../../../src/core/security/secretDetectors.js';
+import { makeScanResult } from '../../utils/scan-helpers.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -31,21 +32,7 @@ function makeSecret(file: string, snippet: string): SecretFinding {
   };
 }
 
-const emptyScanResult: ScanResult = {
-  used: [],
-  missing: [],
-  unused: [],
-  secrets: [],
-  duplicates: {},
-  logged: [],
-  stats: {
-    filesScanned: 0,
-    totalUsages: 0,
-    uniqueVariables: 0,
-    warningsCount: 0,
-    duration: 0,
-  },
-};
+const emptyScanResult: ScanResult = makeScanResult();
 
 // ---------------------------------------------------------------------------
 // Setup
@@ -221,7 +208,7 @@ describe('collectBaselineEntries', () => {
   it('collects env duplicate keys', () => {
     const result = collectBaselineEntries({
       ...emptyScanResult,
-      duplicates: { env: [{ key: 'DUP', count: 2 }] },
+      duplicates: { env: [{ key: 'DUP', count: 2 }], example: [] },
     });
     expect(result).toContainEqual({ rule: 'duplicate-env', key: 'DUP' });
   });
@@ -229,7 +216,7 @@ describe('collectBaselineEntries', () => {
   it('collects example duplicate keys', () => {
     const result = collectBaselineEntries({
       ...emptyScanResult,
-      duplicates: { example: [{ key: 'EX_DUP', count: 2 }] },
+      duplicates: { env: [], example: [{ key: 'EX_DUP', count: 2 }] },
     });
     expect(result).toContainEqual({ rule: 'duplicate-example', key: 'EX_DUP' });
   });
@@ -471,7 +458,7 @@ describe('applyBaselineEntries', () => {
   it('suppresses duplicate-env key', () => {
     const result: ScanResult = {
       ...emptyScanResult,
-      duplicates: { env: [{ key: 'DUP', count: 2 }] },
+      duplicates: { env: [{ key: 'DUP', count: 2 }], example: [] },
     };
     const entries: BaselineEntry[] = [{ rule: 'duplicate-env', key: 'DUP' }];
     const after = applyBaselineEntries(result, entries);
@@ -481,18 +468,20 @@ describe('applyBaselineEntries', () => {
   it('suppresses duplicate-example key', () => {
     const result: ScanResult = {
       ...emptyScanResult,
-      duplicates: { example: [{ key: 'EX', count: 2 }] },
+      duplicates: { env: [], example: [{ key: 'EX', count: 2 }] },
     };
     const entries: BaselineEntry[] = [{ rule: 'duplicate-example', key: 'EX' }];
     const after = applyBaselineEntries(result, entries);
     expect(after.duplicates.example).toHaveLength(0);
   });
 
-  it('leaves duplicates undefined when scanResult has no duplicates', () => {
-    const result: ScanResult = { ...emptyScanResult, duplicates: {} };
+  it('keeps duplicates empty when scanResult has no duplicates', () => {
+    const result: ScanResult = {
+      ...emptyScanResult,
+      duplicates: { env: [], example: [] },
+    };
     const after = applyBaselineEntries(result, []);
-    expect(after.duplicates.env).toBeUndefined();
-    expect(after.duplicates.example).toBeUndefined();
+    expect(after.duplicates).toEqual({ env: [], example: [] });
   });
 
   it('suppresses example-secret warning', () => {
@@ -513,14 +502,6 @@ describe('applyBaselineEntries', () => {
     ];
     const after = applyBaselineEntries(result, entries);
     expect(after.exampleWarnings).toHaveLength(0);
-  });
-
-  it('does not touch exampleWarnings when field is absent', () => {
-    const result: ScanResult = { ...emptyScanResult };
-    const after = applyBaselineEntries(result, [
-      { rule: 'example-secret', key: 'X' },
-    ]);
-    expect(after.exampleWarnings).toBeUndefined();
   });
 
   it('suppresses framework warning by variable + file', () => {
@@ -563,14 +544,6 @@ describe('applyBaselineEntries', () => {
     expect(after.frameworkWarnings).toHaveLength(1);
   });
 
-  it('does not touch frameworkWarnings when field is absent', () => {
-    const result: ScanResult = { ...emptyScanResult };
-    const after = applyBaselineEntries(result, [
-      { rule: 'framework', key: 'X', file: 'f.ts' },
-    ]);
-    expect(after.frameworkWarnings).toBeUndefined();
-  });
-
   it('suppresses uppercase warning', () => {
     const result: ScanResult = {
       ...emptyScanResult,
@@ -579,14 +552,6 @@ describe('applyBaselineEntries', () => {
     const entries: BaselineEntry[] = [{ rule: 'uppercase', key: 'myKey' }];
     const after = applyBaselineEntries(result, entries);
     expect(after.uppercaseWarnings).toHaveLength(0);
-  });
-
-  it('does not touch uppercaseWarnings when field is absent', () => {
-    const result: ScanResult = { ...emptyScanResult };
-    const after = applyBaselineEntries(result, [
-      { rule: 'uppercase', key: 'x' },
-    ]);
-    expect(after.uppercaseWarnings).toBeUndefined();
   });
 
   it('suppresses expire warning', () => {
@@ -599,12 +564,6 @@ describe('applyBaselineEntries', () => {
     expect(after.expireWarnings).toHaveLength(0);
   });
 
-  it('does not touch expireWarnings when field is absent', () => {
-    const result: ScanResult = { ...emptyScanResult };
-    const after = applyBaselineEntries(result, [{ rule: 'expire', key: 'x' }]);
-    expect(after.expireWarnings).toBeUndefined();
-  });
-
   it('suppresses comment warning', () => {
     const result: ScanResult = {
       ...emptyScanResult,
@@ -613,12 +572,6 @@ describe('applyBaselineEntries', () => {
     const entries: BaselineEntry[] = [{ rule: 'comment', key: 'UNDOC' }];
     const after = applyBaselineEntries(result, entries);
     expect(after.commentWarnings).toHaveLength(0);
-  });
-
-  it('does not touch commentWarnings when field is absent', () => {
-    const result: ScanResult = { ...emptyScanResult };
-    const after = applyBaselineEntries(result, [{ rule: 'comment', key: 'x' }]);
-    expect(after.commentWarnings).toBeUndefined();
   });
 
   it('suppresses drift warning', () => {
@@ -649,12 +602,6 @@ describe('applyBaselineEntries', () => {
     expect(after.driftWarnings).toHaveLength(1);
   });
 
-  it('does not touch driftWarnings when field is absent', () => {
-    const result: ScanResult = { ...emptyScanResult };
-    const after = applyBaselineEntries(result, [{ rule: 'drift', key: 'x' }]);
-    expect(after.driftWarnings).toBeUndefined();
-  });
-
   it('suppresses inconsistent-naming warning (sorted pair)', () => {
     const result: ScanResult = {
       ...emptyScanResult,
@@ -667,14 +614,6 @@ describe('applyBaselineEntries', () => {
     ];
     const after = applyBaselineEntries(result, entries);
     expect(after.inconsistentNamingWarnings).toHaveLength(0);
-  });
-
-  it('does not touch inconsistentNamingWarnings when field is absent', () => {
-    const result: ScanResult = { ...emptyScanResult };
-    const after = applyBaselineEntries(result, [
-      { rule: 'inconsistent-naming', key: 'A|B' },
-    ]);
-    expect(after.inconsistentNamingWarnings).toBeUndefined();
   });
 
   it('only suppresses matched entries, keeps unmatched ones', () => {

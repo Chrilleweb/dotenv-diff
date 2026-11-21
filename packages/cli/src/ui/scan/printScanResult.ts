@@ -61,27 +61,21 @@ export function printScanResult(
     scanResult.missing,
     scanResult.used,
     comparedAgainst,
-    scanResult.suggestions ?? [],
+    scanResult.suggestions,
   );
 
-  if (scanResult.frameworkWarnings) {
-    printFrameworkWarnings(scanResult.frameworkWarnings, opts.strict);
-  }
+  printFrameworkWarnings(scanResult.frameworkWarnings, opts.strict);
 
-  if (scanResult.uppercaseWarnings) {
-    printUppercaseWarning(
-      scanResult.uppercaseWarnings,
-      comparedAgainst,
-      opts.strict,
-    );
-  }
+  printUppercaseWarning(
+    scanResult.uppercaseWarnings,
+    comparedAgainst,
+    opts.strict,
+  );
 
-  if (scanResult.inconsistentNamingWarnings) {
-    printInconsistentNamingWarning(
-      scanResult.inconsistentNamingWarnings,
-      opts.strict,
-    );
-  }
+  printInconsistentNamingWarning(
+    scanResult.inconsistentNamingWarnings,
+    opts.strict,
+  );
 
   // Unused
   if (opts.showUnused) {
@@ -92,8 +86,8 @@ export function printScanResult(
   printDuplicates(
     comparedAgainst || DEFAULT_ENV_FILE,
     scanResult.exampleFile || 'example file',
-    scanResult.duplicates?.env ?? [],
-    scanResult.duplicates?.example ?? [],
+    scanResult.duplicates.env,
+    scanResult.duplicates.example,
     isJson,
     opts.fix,
     opts.strict,
@@ -103,27 +97,22 @@ export function printScanResult(
   if (opts.secrets) {
     printSecrets(scanResult.secrets, opts.strict);
   }
-  if (scanResult.exampleWarnings) {
-    printExampleWarnings(scanResult.exampleWarnings, opts.strict);
-  }
+  printExampleWarnings(scanResult.exampleWarnings, opts.strict);
 
   // Console log usage warning
-  if (scanResult.logged?.length) {
+  if (scanResult.logged.length) {
     printConsolelogWarning(scanResult.logged, opts.strict);
   }
 
   // Expiration warnings
-  if (scanResult.expireWarnings) {
-    printExpireWarnings(scanResult.expireWarnings, opts.strict);
-  }
+  printExpireWarnings(scanResult.expireWarnings, opts.strict);
+
   // Undocumented example keys
-  if (scanResult.commentWarnings) {
-    printCommentWarnings(scanResult.commentWarnings, opts.strict);
-  }
+  printCommentWarnings(scanResult.commentWarnings, opts.strict);
+
   // Keys in an env file that never made it into the example documenting it
-  if (scanResult.driftWarnings) {
-    printDriftWarnings(scanResult.driftWarnings, opts.strict);
-  }
+  printDriftWarnings(scanResult.driftWarnings, opts.strict);
+
   // Gitignore check
   const gitignoreIssue = checkGitignoreStatus({
     cwd: opts.cwd,
@@ -157,8 +146,8 @@ export function printScanResult(
   printFixTips(
     {
       missing: scanResult.missing,
-      duplicatesEnv: scanResult.duplicates?.env ?? [],
-      duplicatesEx: scanResult.duplicates?.example ?? [],
+      duplicatesEnv: scanResult.duplicates.env,
+      duplicatesEx: scanResult.duplicates.example,
       gitignoreIssue: hasGitignoreIssue ? { reason: 'not-ignored' } : null,
     },
     hasGitignoreIssue,

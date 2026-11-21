@@ -56,7 +56,7 @@ export function compareWithEnvFiles(
 
   // Keys declared by a central config loader (e.g. a Zod schema over the whole
   // process.env) are read indirectly, so they must not be reported as unused.
-  const declaredKeys = new Set(scanResult.declaredKeys ?? []);
+  const declaredKeys = new Set(scanResult.declaredKeys);
   const unused = [...envKeys].filter(
     (v) => !usedVariables.has(v) && !declaredKeys.has(v),
   );

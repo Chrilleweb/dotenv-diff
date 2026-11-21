@@ -5,11 +5,9 @@ import {
   EXPIRE_THRESHOLD_DAYS,
   URGENT_EXPIRE_DAYS,
 } from '../../../../src/config/constants.js';
+import { makeScanResult } from '../../../utils/scan-helpers.js';
 
-const base: ScanResult = {
-  used: [],
-  missing: [],
-  unused: [],
+const base: ScanResult = makeScanResult({
   stats: {
     filesScanned: 1,
     totalUsages: 0,
@@ -17,10 +15,7 @@ const base: ScanResult = {
     warningsCount: 0,
     duration: 0,
   },
-  secrets: [],
-  duplicates: {},
-  logged: [],
-};
+});
 
 /** Builds a scan result with the given overrides applied to the clean base. */
 const scan = (overrides: Partial<ScanResult> = {}): ScanResult => ({
@@ -95,10 +90,13 @@ describe('computeExitDecision', () => {
   describe('strict violations', () => {
     const cases: Array<[string, Partial<ScanResult>]> = [
       ['unused keys', { unused: ['OLD_KEY'] }],
-      ['duplicate env keys', { duplicates: { env: [{ key: 'K', count: 2 }] } }],
+      [
+        'duplicate env keys',
+        { duplicates: { env: [{ key: 'K', count: 2 }], example: [] } },
+      ],
       [
         'duplicate example keys',
-        { duplicates: { example: [{ key: 'K', count: 2 }] } },
+        { duplicates: { env: [], example: [{ key: 'K', count: 2 }] } },
       ],
       [
         'medium severity secrets',
@@ -174,17 +172,6 @@ describe('computeExitDecision', () => {
         ).toBe(true);
       });
     }
-
-    it('passes under --strict when secrets and logged are undefined', () => {
-      const result = computeExitDecision(
-        scan({
-          secrets: undefined,
-          logged: undefined,
-        } as unknown as Partial<ScanResult>),
-        { strict: true },
-      );
-      expect(result.exitWithError).toBe(false);
-    });
 
     it('does not fail on expire warnings beyond the strict threshold', () => {
       const result = computeExitDecision(

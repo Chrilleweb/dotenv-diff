@@ -94,12 +94,11 @@ import { detectOptionalKeys } from '../../../src/services/detectOptionalKeys.js'
 import { detectExampleDrift } from '../../../src/services/detectExampleDrift.js';
 import { detectSecretsInExample } from '../../../src/core/security/exampleSecretDetector.js';
 import { makeScanUsageOptions } from '../../utils/options-helpers.js';
+import { makeScanResult } from '../../utils/scan-helpers.js';
 
 describe('processComparisonFile', () => {
-  const baseScanResult: ScanResult = {
-    used: [],
+  const baseScanResult: ScanResult = makeScanResult({
     missing: ['NEW_KEY'],
-    unused: [],
     stats: {
       filesScanned: 1,
       totalUsages: 0,
@@ -107,10 +106,7 @@ describe('processComparisonFile', () => {
       warningsCount: 0,
       duration: 0,
     },
-    secrets: [],
-    duplicates: {},
-    logged: [],
-  };
+  });
 
   const compareFile: ComparisonFile = {
     path: '/env/.env',
@@ -238,18 +234,21 @@ describe('processComparisonFile', () => {
       allowDuplicates: false,
     });
 
-    expect(result.scanResult.duplicates?.env).toEqual([{ key: 'A', count: 2 }]);
+    expect(result.scanResult.duplicates.env).toEqual([{ key: 'A', count: 2 }]);
   });
 
   it('does not mutate the duplicates object of the scan result passed in', () => {
-    const input: ScanResult = { ...baseScanResult, duplicates: {} };
+    const input: ScanResult = {
+      ...baseScanResult,
+      duplicates: { env: [], example: [] },
+    };
 
     processComparisonFile(input, compareFile, {
       ...baseOpts,
       allowDuplicates: false,
     });
 
-    expect(input.duplicates).toEqual({});
+    expect(input.duplicates).toEqual({ env: [], example: [] });
   });
 
   it('detects expire warnings', () => {
@@ -291,7 +290,7 @@ describe('processComparisonFile', () => {
       allowDuplicates: false,
     });
 
-    expect(result.scanResult.duplicates?.env).toBeDefined();
+    expect(result.scanResult.duplicates.env).toBeDefined();
   });
 
   it('Will Load .env.example trough examplePath', () => {
@@ -363,7 +362,7 @@ describe('processComparisonFile', () => {
       2,
       path.join('/env', '.env.example'),
     );
-    expect(result.scanResult.duplicates?.example).toEqual([
+    expect(result.scanResult.duplicates.example).toEqual([
       { key: 'EX_KEY', count: 2 },
     ]);
   });
@@ -381,8 +380,8 @@ describe('processComparisonFile', () => {
 
     expect(result.fix.fixApplied).toBe(true);
     // The env file was deduplicated, the example file was never touched.
-    expect(result.scanResult.duplicates?.env).toBeUndefined();
-    expect(result.scanResult.duplicates?.example).toEqual([
+    expect(result.scanResult.duplicates.env).toEqual([]);
+    expect(result.scanResult.duplicates.example).toEqual([
       { key: 'EX_KEY', count: 2 },
     ]);
   });
@@ -401,8 +400,8 @@ describe('processComparisonFile', () => {
 
     // env duplicates still found, but the example is not checked a second time
     expect(findDuplicateKeys).toHaveBeenCalledTimes(1);
-    expect(result.scanResult.duplicates?.env).toBeDefined();
-    expect(result.scanResult.duplicates?.example).toBeUndefined();
+    expect(result.scanResult.duplicates.env).toBeDefined();
+    expect(result.scanResult.duplicates.example).toEqual([]);
   });
 
   it('does not clear state when fix returns changed=false', () => {
@@ -423,7 +422,7 @@ describe('processComparisonFile', () => {
 
     expect(result.fix.fixApplied).toBe(false);
     // duplicates should still be present on scanResult
-    expect(result.scanResult.duplicates?.env).toBeDefined();
+    expect(result.scanResult.duplicates.env).toBeDefined();
   });
 
   it('does not scan the example when it does not exist on disk', () => {
@@ -432,7 +431,7 @@ describe('processComparisonFile', () => {
     const result = processComparisonFile(baseScanResult, compareFile, baseOpts);
 
     expect(result.scanResult).not.toHaveProperty('exampleFile');
-    expect(result.scanResult).not.toHaveProperty('exampleWarnings');
+    expect(result.scanResult.exampleWarnings).toEqual([]);
     expect(detectSecretsInExample).not.toHaveBeenCalled();
     expect(result.error).toBeUndefined();
   });
@@ -466,7 +465,7 @@ describe('processComparisonFile', () => {
     });
 
     // The duplicate key ('A') doesn't match the regex, so it's kept.
-    expect(result.scanResult.duplicates?.env).toEqual([{ key: 'A', count: 2 }]);
+    expect(result.scanResult.duplicates.env).toEqual([{ key: 'A', count: 2 }]);
   });
 
   it('skips duplicate check when allowDuplicates is true (lines 105-109)', () => {
@@ -476,7 +475,7 @@ describe('processComparisonFile', () => {
     });
 
     expect(findDuplicateKeys).not.toHaveBeenCalled();
-    expect(result.scanResult.duplicates).toEqual({});
+    expect(result.scanResult.duplicates).toEqual({ env: [], example: [] });
   });
 
   it('reports only example duplicates when the env file has none', () => {
@@ -490,8 +489,8 @@ describe('processComparisonFile', () => {
       allowDuplicates: false,
     });
 
-    expect(result.scanResult.duplicates?.env).toBeUndefined();
-    expect(result.scanResult.duplicates?.example).toEqual([
+    expect(result.scanResult.duplicates.env).toEqual([]);
+    expect(result.scanResult.duplicates.example).toEqual([
       { key: 'EX_KEY', count: 2 },
     ]);
   });
@@ -525,6 +524,6 @@ describe('processComparisonFile', () => {
     });
 
     expect(result.scanResult.duplicates).toBeDefined();
-    expect(result.scanResult.duplicates?.env).toBeDefined();
+    expect(result.scanResult.duplicates.env).toBeDefined();
   });
 });
