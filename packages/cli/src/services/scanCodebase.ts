@@ -105,6 +105,14 @@ export async function scanCodebase(opts: ScanOptions): Promise<ScanResult> {
       example: [],
     },
     logged: loggedVariables,
+    suggestions: [],
+    frameworkWarnings: [],
+    exampleWarnings: [],
+    uppercaseWarnings: [],
+    expireWarnings: [],
+    inconsistentNamingWarnings: [],
+    commentWarnings: [],
+    driftWarnings: [],
     fileContentMap,
   };
 }

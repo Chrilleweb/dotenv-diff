@@ -21,10 +21,6 @@ export function excludeOptionalKeys(
   return {
     ...scanResult,
     missing: scanResult.missing.filter(isRequired),
-    ...(scanResult.suggestions
-      ? {
-          suggestions: scanResult.suggestions.filter((s) => isRequired(s.key)),
-        }
-      : {}),
+    suggestions: scanResult.suggestions.filter((s) => isRequired(s.key)),
   };
 }

@@ -176,13 +176,7 @@ export function processComparisonFile(
     }
 
     // Keep the duplicates that were not fixed for output
-    if (dupsEnv.length > 0 || dupsEx.length > 0) {
-      scanResult.duplicates = {
-        ...scanResult.duplicates,
-        ...(dupsEnv.length > 0 ? { env: dupsEnv } : {}),
-        ...(dupsEx.length > 0 ? { example: dupsEx } : {}),
-      };
-    }
+    scanResult.duplicates = { env: dupsEnv, example: dupsEx };
   } catch (err) {
     error = {
       message: `Could not read ${compareFile.name}: ${compareFile.path} - ${err}`,

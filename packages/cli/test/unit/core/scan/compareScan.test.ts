@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { compareWithEnvFiles } from '../../../../src/core/scan/compareScan.js';
-import type { EnvUsage, ScanResult } from '../../../../src/config/types.js';
+import type { EnvUsage } from '../../../../src/config/types.js';
+import { makeScanResult } from '../../../utils/scan-helpers.js';
 
 /**
  * Builds a complete EnvUsage for a variable, optionally at a specific file path.
@@ -13,28 +14,6 @@ function usage(variable: string, file = ''): EnvUsage {
     column: 0,
     pattern: 'process.env',
     context: '',
-  };
-}
-
-/**
- * Builds a minimal but fully-typed ScanResult, with optional overrides.
- */
-function makeScanResult(overrides: Partial<ScanResult> = {}): ScanResult {
-  return {
-    used: [],
-    missing: [],
-    unused: [],
-    stats: {
-      filesScanned: 0,
-      totalUsages: 0,
-      uniqueVariables: 0,
-      warningsCount: 0,
-      duration: 0,
-    },
-    secrets: [],
-    duplicates: {},
-    logged: [],
-    ...overrides,
   };
 }
 

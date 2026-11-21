@@ -503,6 +503,13 @@ dotenv-diff already excludes the following paths by default:
 
 Your custom --exclude-files patterns are appended to that list.
 
+Patterns are matched on path boundaries, not as substrings:
+
+- Plain names (`test`, `node_modules`) match a whole directory or file name, so `test` skips `src/test/` but not `src/latest/` or `contest.ts`.
+- Paths (`src/legacy`) match that exact sequence of directories.
+- File name fragments starting with a dot (`.test.`, `.d.ts`) match within the file name.
+- Globs (`tests/**`, `*.spec.ts`) work as usual.
+
 If you later want to scan files from one of the default excluded paths, use `--include-files` or `--files` to explicitly include them.
 
 ## Display Options
