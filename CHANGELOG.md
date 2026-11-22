@@ -1,5 +1,23 @@
 # Changelog
 
+<!-- changesets: feat-version-flag.md,fix-exclude-segment-match.md,fix-strip-quoted-values.md -->
+## 2026-11-22
+
+### Highlights
+- feat: add `-v, --version` to print the installed version. `--help` now describes the default behavior (scanning the codebase) instead of only comparing `.env` files
+- Fix exclude patterns matching as raw substrings, which silently skipped source files such as `src/latest/`, `src/workbench/`, `rebuild.ts` or `contest.ts` because their path contained a default exclude like `test`, `bench` or `build`. Plain names now match whole path segments, file name fragments like `.test.` or `.d.ts` match within the file name, and globs work as before.
+- Strip matching surrounding quotes from `.env` values, so `KEY="x"` and `KEY=x` are treated as the same value. Previously `--check-values` reported a false value mismatch between a quoted and an unquoted value.
+
+### Package Releases
+- dotenv-diff: minor
+- dotenv-diff: patch
+
+### Full Changelog
+Package | Release type
+--- | ---
+dotenv-diff | minor
+dotenv-diff | patch
+
 <!-- changesets: fix-config-value-types.md,fix-minified-file-detection.md -->
 ## 2026-11-08
 
