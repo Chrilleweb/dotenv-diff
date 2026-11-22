@@ -156,21 +156,56 @@ KEY2=test`,
     });
   });
 
-  it('handles quoted values (currently treated as literal quotes)', () => {
+  it('strips matching surrounding quotes from values', () => {
     const envPath = path.join(dir, '.env');
     fs.writeFileSync(
       envPath,
       `SINGLE='single quotes'
 DOUBLE="double quotes"
-MIXED='mixed"quotes'`,
+BACKTICK=\`backtick\`
+URL="postgres://u:p@host:5432/db"
+EMPTY_QUOTED=""
+INNER='it"s'`,
     );
 
     const result = parseEnvFile(envPath);
     expect(result).toEqual({
-      SINGLE: "'single quotes'",
-      DOUBLE: '"double quotes"',
-      MIXED: "'mixed\"quotes'",
+      SINGLE: 'single quotes',
+      DOUBLE: 'double quotes',
+      BACKTICK: 'backtick',
+      URL: 'postgres://u:p@host:5432/db',
+      EMPTY_QUOTED: '',
+      INNER: 'it"s',
     });
+  });
+
+  it('keeps quotes that do not wrap the whole value', () => {
+    const envPath = path.join(dir, '.env');
+    fs.writeFileSync(
+      envPath,
+      `MISMATCHED='mixed"
+UNCLOSED="abc
+TRAILING=abc"
+MIDDLE=a "b" c
+LONE="`,
+    );
+
+    const result = parseEnvFile(envPath);
+    expect(result).toEqual({
+      MISMATCHED: '\'mixed"',
+      UNCLOSED: '"abc',
+      TRAILING: 'abc"',
+      MIDDLE: 'a "b" c',
+      LONE: '"',
+    });
+  });
+
+  it('treats quoted and unquoted values as equal', () => {
+    const envPath = path.join(dir, '.env');
+    fs.writeFileSync(envPath, 'A="x"\nB=x');
+
+    const result = parseEnvFile(envPath);
+    expect(result.A).toBe(result.B);
   });
 
   it('handles only whitespace lines', () => {
