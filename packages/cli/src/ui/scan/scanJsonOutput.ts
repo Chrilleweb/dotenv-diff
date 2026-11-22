@@ -93,7 +93,7 @@ export function scanJsonOutput(
 
   output.stats = scanResult.stats;
 
-  if (scanResult.secrets?.length) {
+  if (scanResult.secrets.length) {
     output.secrets = scanResult.secrets.map((s) => ({
       file: normalizePath(s.file),
       line: s.line,
@@ -102,7 +102,7 @@ export function scanJsonOutput(
     }));
   }
 
-  if (scanResult.exampleWarnings?.length) {
+  if (scanResult.exampleWarnings.length) {
     output.exampleWarnings = scanResult.exampleWarnings.map((w) => ({
       key: w.key,
       value: w.value,
@@ -112,7 +112,7 @@ export function scanJsonOutput(
     }));
   }
 
-  if (scanResult.missing?.length) {
+  if (scanResult.missing.length) {
     const missingSet = new Set(scanResult.missing);
     const usagesByVariable = new Map<string, EnvUsage[]>();
 
@@ -135,11 +135,11 @@ export function scanJsonOutput(
     }));
   }
 
-  if (scanResult.suggestions?.length) {
+  if (scanResult.suggestions.length) {
     output.suggestions = scanResult.suggestions;
   }
 
-  if (scanResult.frameworkWarnings?.length) {
+  if (scanResult.frameworkWarnings.length) {
     output.frameworkWarnings = scanResult.frameworkWarnings.map((w) => ({
       variable: w.variable,
       reason: w.reason,
@@ -149,14 +149,14 @@ export function scanJsonOutput(
     }));
   }
 
-  if (scanResult.uppercaseWarnings?.length) {
+  if (scanResult.uppercaseWarnings.length) {
     output.uppercaseWarnings = scanResult.uppercaseWarnings.map((w) => ({
       key: w.key,
       suggestion: w.suggestion,
     }));
   }
 
-  if (scanResult.inconsistentNamingWarnings?.length) {
+  if (scanResult.inconsistentNamingWarnings.length) {
     output.inconsistentNamingWarnings =
       scanResult.inconsistentNamingWarnings.map((w) => ({
         key1: w.key1,
@@ -165,13 +165,13 @@ export function scanJsonOutput(
       }));
   }
 
-  if (scanResult.unused?.length) {
+  if (scanResult.unused.length) {
     output.unused = scanResult.unused;
   }
 
   const hasDuplicates =
-    (scanResult.duplicates.env?.length ?? 0) > 0 ||
-    (scanResult.duplicates.example?.length ?? 0) > 0;
+    scanResult.duplicates.env.length > 0 ||
+    scanResult.duplicates.example.length > 0;
 
   if (hasDuplicates) {
     output.duplicates = scanResult.duplicates;
@@ -182,7 +182,7 @@ export function scanJsonOutput(
   }
 
   // Add logged variables if any
-  if (scanResult.logged?.length) {
+  if (scanResult.logged.length) {
     output.logged = scanResult.logged.map((l) => ({
       variable: l.variable,
       file: normalizePath(l.file),
@@ -194,7 +194,7 @@ export function scanJsonOutput(
   }
 
   // Expire warnings
-  if (scanResult.expireWarnings?.length) {
+  if (scanResult.expireWarnings.length) {
     output.expireWarnings = scanResult.expireWarnings.map((w) => ({
       key: w.key,
       date: w.date,
@@ -203,7 +203,7 @@ export function scanJsonOutput(
   }
 
   // Undocumented example keys
-  if (scanResult.commentWarnings?.length) {
+  if (scanResult.commentWarnings.length) {
     output.commentWarnings = scanResult.commentWarnings.map((w) => ({
       key: w.key,
       line: w.line,
@@ -211,7 +211,7 @@ export function scanJsonOutput(
   }
 
   // Keys in an env file that are missing from the example documenting it
-  if (scanResult.driftWarnings?.length) {
+  if (scanResult.driftWarnings.length) {
     output.driftWarnings = scanResult.driftWarnings.map((w) => ({
       key: w.key,
       envFile: w.envFile,

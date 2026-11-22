@@ -121,12 +121,10 @@ import type {
 } from '../../../../src/config/types.js';
 import { GITIGNORE_ISSUES } from '../../../../src/config/constants.js';
 import { makeScanUsageOptions } from '../../../utils/options-helpers.js';
+import { makeScanResult } from '../../../utils/scan-helpers.js';
 
 describe('printScanResult', () => {
-  const baseScanResult: ScanResult = {
-    used: [],
-    missing: [],
-    unused: [],
+  const baseScanResult: ScanResult = makeScanResult({
     stats: {
       filesScanned: 1,
       totalUsages: 0,
@@ -134,10 +132,7 @@ describe('printScanResult', () => {
       warningsCount: 0,
       duration: 0,
     },
-    secrets: [],
-    duplicates: {},
-    logged: [],
-  };
+  });
 
   const baseOpts = makeScanUsageOptions({
     cwd: '/root',
@@ -439,7 +434,7 @@ describe('printScanResult', () => {
     printScanResult(
       {
         ...baseScanResult,
-        duplicates: {},
+        duplicates: { env: [], example: [] },
       },
       baseOpts,
       '',
@@ -460,7 +455,7 @@ describe('printScanResult', () => {
     printScanResult(
       {
         ...baseScanResult,
-        duplicates: { example: [{ key: 'EX_KEY', count: 2 }] },
+        duplicates: { env: [], example: [{ key: 'EX_KEY', count: 2 }] },
         exampleFile: '.env.sample',
       },
       baseOpts,
@@ -513,19 +508,6 @@ describe('printScanResult', () => {
     );
 
     expect(printConsolelogWarning).toHaveBeenCalledWith(loggedUsages, false);
-  });
-
-  it('keeps exitWithError false when secrets is undefined and no strict violations', () => {
-    const result = printScanResult(
-      {
-        ...baseScanResult,
-        secrets: undefined as unknown as [],
-      },
-      baseOpts,
-      '.env',
-    );
-
-    expect(result.exitWithError).toBe(false);
   });
 
   it('evaluates full strict violation chain and stays false when all checks are clean', () => {

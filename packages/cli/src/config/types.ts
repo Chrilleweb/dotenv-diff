@@ -309,6 +309,8 @@ export interface EnvScope {
 
 /**
  * Result of scanning the codebase for environment variable usages.
+ * Every list is always present (empty when the check did not run or found
+ * nothing), so consumers never need to guard against `undefined`.
  */
 export interface ScanResult {
   used: EnvUsage[];
@@ -319,25 +321,25 @@ export interface ScanResult {
    * whole `process.env`). Used only to suppress false "unused" findings — they do
    * not count as usages for missing detection, stats, or the health score.
    */
-  declaredKeys?: string[];
+  declaredKeys: string[];
   stats: ScanStats;
   secrets: SecretFinding[];
   duplicates: {
-    env?: Duplicate[];
-    example?: Duplicate[];
+    env: Duplicate[];
+    example: Duplicate[];
   };
-  frameworkWarnings?: FrameworkWarning[];
-  exampleWarnings?: ExampleSecretWarning[];
+  frameworkWarnings: FrameworkWarning[];
+  exampleWarnings: ExampleSecretWarning[];
   exampleFile?: string;
   logged: EnvUsage[];
-  uppercaseWarnings?: UppercaseWarning[];
-  expireWarnings?: ExpireWarning[];
-  inconsistentNamingWarnings?: InconsistentNamingWarning[];
-  commentWarnings?: CommentWarning[];
-  driftWarnings?: DriftWarning[];
+  uppercaseWarnings: UppercaseWarning[];
+  expireWarnings: ExpireWarning[];
+  inconsistentNamingWarnings: InconsistentNamingWarning[];
+  commentWarnings: CommentWarning[];
+  driftWarnings: DriftWarning[];
   /** Typo suggestions for variables used in code but not defined in the env file */
-  suggestions?: TypoSuggestion[];
-  fileContentMap?: Map<string, string>;
+  suggestions: TypoSuggestion[];
+  fileContentMap: Map<string, string>;
 }
 
 /**

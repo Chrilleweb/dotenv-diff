@@ -38,11 +38,11 @@ describe('parseEnvFile', () => {
     expect(parseEnvFile(file)).toEqual({});
   });
 
-  it('preserves quoted values as-is (quotes are not stripped)', () => {
+  it('strips surrounding quotes from quoted values', () => {
     const file = path.join(tmpDir, '.env');
     fs.writeFileSync(file, 'SECRET="my secret value"\n');
 
-    expect(parseEnvFile(file)).toEqual({ SECRET: '"my secret value"' });
+    expect(parseEnvFile(file)).toEqual({ SECRET: 'my secret value' });
   });
 
   it('ignores comment lines', () => {

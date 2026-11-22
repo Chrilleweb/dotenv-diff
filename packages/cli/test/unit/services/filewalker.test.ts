@@ -163,6 +163,60 @@ describe('filewalker', () => {
       const result = shouldExclude('app.js', 'src/app.js', ['node_modules']);
       expect(result).toBe(false);
     });
+
+    it.each([
+      ['x.ts', 'src/latest/x.ts', 'test'],
+      ['contest.ts', 'src/api/contest.ts', 'test'],
+      ['x.ts', 'src/workbench/x.ts', 'bench'],
+      ['rebuild.ts', 'src/api/rebuild.ts', 'build'],
+      ['counterexample.ts', 'src/counterexample.ts', 'example'],
+      ['x.ts', 'src/distribution/x.ts', 'dist'],
+      ['x.ts', 'src/gitops/x.ts', '.git'],
+    ])(
+      'does not exclude %s at %s for pattern "%s" (no substring matching)',
+      (fileName, relativePath, pattern) => {
+        expect(shouldExclude(fileName, relativePath, [pattern])).toBe(false);
+      },
+    );
+
+    it.each([
+      ['x.ts', 'test/x.ts', 'test'],
+      ['x.ts', 'packages/a/test/x.ts', 'test'],
+      ['test', 'src/test', 'test'],
+      ['x.ts', 'src\\test\\x.ts', 'test'],
+    ])(
+      'excludes %s at %s for pattern "%s" (whole segment)',
+      (fileName, relativePath, pattern) => {
+        expect(shouldExclude(fileName, relativePath, [pattern])).toBe(true);
+      },
+    );
+
+    it('matches path patterns on segment boundaries', () => {
+      expect(shouldExclude('x.ts', 'src/legacy/x.ts', ['src/legacy'])).toBe(
+        true,
+      );
+      expect(shouldExclude('x.ts', 'src/legacy/x.ts', ['src/legacy/'])).toBe(
+        true,
+      );
+      expect(shouldExclude('x.ts', 'src/legacy-v2/x.ts', ['src/legacy'])).toBe(
+        false,
+      );
+    });
+
+    it('ignores empty patterns instead of excluding everything', () => {
+      expect(shouldExclude('x.ts', 'src/x.ts', ['', '/', '//'])).toBe(false);
+    });
+
+    it('matches file name fragments within the file name', () => {
+      expect(shouldExclude('types.d.ts', 'src/types.d.ts', ['.d.ts'])).toBe(
+        true,
+      );
+      expect(
+        shouldExclude('button.stories.tsx', 'src/button.stories.tsx', [
+          '.stories.',
+        ]),
+      ).toBe(true);
+    });
   });
 
   describe('matchesGlobPattern', () => {
