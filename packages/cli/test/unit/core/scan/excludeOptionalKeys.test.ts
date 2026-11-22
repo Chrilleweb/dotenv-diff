@@ -1,28 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { excludeOptionalKeys } from '../../../../src/core/scan/excludeOptionalKeys.js';
-import type { ScanResult } from '../../../../src/config/types.js';
-
-/**
- * Builds a minimal but fully-typed ScanResult, with optional overrides.
- */
-function makeScanResult(overrides: Partial<ScanResult> = {}): ScanResult {
-  return {
-    used: [],
-    missing: [],
-    unused: [],
-    stats: {
-      filesScanned: 0,
-      totalUsages: 0,
-      uniqueVariables: 0,
-      warningsCount: 0,
-      duration: 0,
-    },
-    secrets: [],
-    duplicates: {},
-    logged: [],
-    ...overrides,
-  };
-}
+import { makeScanResult } from '../../../utils/scan-helpers.js';
 
 describe('excludeOptionalKeys', () => {
   it('removes optional keys from missing', () => {
@@ -45,11 +23,11 @@ describe('excludeOptionalKeys', () => {
     ]);
   });
 
-  it('leaves suggestions undefined when there were none', () => {
+  it('keeps suggestions empty when there were none', () => {
     const scanResult = makeScanResult({ missing: ['REDIS_URL'] });
     const result = excludeOptionalKeys(scanResult, new Set(['REDIS_URL']));
     expect(result.missing).toEqual([]);
-    expect(result).not.toHaveProperty('suggestions');
+    expect(result.suggestions).toEqual([]);
   });
 
   it('returns the scan result unchanged when no keys are optional', () => {

@@ -1,30 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { scanJsonOutput } from '../../../../src/ui/scan/scanJsonOutput.js';
-import type { ScanResult } from '../../../../src/config/types.js';
-
-function makeScanResult(partial: Partial<ScanResult> = {}): ScanResult {
-  return {
-    used: [],
-    missing: [],
-    unused: [],
-    stats: {
-      filesScanned: 0,
-      totalUsages: 0,
-      uniqueVariables: 0,
-      warningsCount: 0,
-      duration: 0,
-    },
-    secrets: [],
-    duplicates: {},
-    logged: [],
-    frameworkWarnings: [],
-    exampleWarnings: [],
-    uppercaseWarnings: [],
-    expireWarnings: [],
-    inconsistentNamingWarnings: [],
-    ...partial,
-  };
-}
+import { makeScanResult } from '../../../utils/scan-helpers.js';
 
 describe('scanJsonOutput', () => {
   it('includes the gitignore issue when one is passed', () => {

@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest';
 import fc from 'fast-check';
 import type { ScanResult } from '../../../../src/config/types.js';
 import { computeHealthScore } from '../../../../src/core/scan/computeHealthScore.js';
+import { makeScanResult } from '../../../utils/scan-helpers.js';
 
 /**
  * Property-based ("fuzz") tests for the scan health score.
@@ -36,6 +37,7 @@ const fill = (n: number) => Array.from({ length: n }, () => ({}));
 /** Build a minimal ScanResult carrying exactly the requested issue counts. */
 function buildScan(c: Counts): ScanResult {
   return {
+    ...makeScanResult(),
     missing: fill(c.missing),
     unused: fill(c.unused),
     logged: fill(c.logged),
@@ -168,17 +170,6 @@ describe('computeHealthScore (property-based)', () => {
         );
       }),
       { numRuns: 3000 },
-    );
-  });
-
-  test('never throws when optional fields are absent', () => {
-    // Only the non-optional `missing` array is guaranteed present in the type.
-    fc.assert(
-      fc.property(fc.array(fc.string(), { maxLength: 30 }), (missing) => {
-        const score = computeHealthScore({ missing } as unknown as ScanResult);
-        expect(score).toBe(Math.max(0, 100 - missing.length * 20));
-      }),
-      { numRuns: 2000 },
     );
   });
 });

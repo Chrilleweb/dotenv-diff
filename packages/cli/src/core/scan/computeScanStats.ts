@@ -13,19 +13,19 @@ export function computeScanStats(scanResult: ScanResult): ScanStats {
   const uniqueVariables = new Set(scanResult.used.map((u) => u.variable)).size;
 
   const warningsCount =
-    (scanResult.frameworkWarnings?.length ?? 0) +
-    (scanResult.exampleWarnings?.length ?? 0) +
-    (scanResult.logged?.length ?? 0) +
-    (scanResult.uppercaseWarnings?.length ?? 0) +
-    (scanResult.expireWarnings?.length ?? 0) +
-    (scanResult.inconsistentNamingWarnings?.length ?? 0) +
-    (scanResult.commentWarnings?.length ?? 0) +
-    (scanResult.driftWarnings?.length ?? 0) +
-    (scanResult.secrets?.length ?? 0) +
+    scanResult.frameworkWarnings.length +
+    scanResult.exampleWarnings.length +
+    scanResult.logged.length +
+    scanResult.uppercaseWarnings.length +
+    scanResult.expireWarnings.length +
+    scanResult.inconsistentNamingWarnings.length +
+    scanResult.commentWarnings.length +
+    scanResult.driftWarnings.length +
+    scanResult.secrets.length +
     scanResult.missing.length +
     scanResult.unused.length +
-    (scanResult.duplicates?.env?.length ?? 0) +
-    (scanResult.duplicates?.example?.length ?? 0);
+    scanResult.duplicates.env.length +
+    scanResult.duplicates.example.length;
 
   return {
     filesScanned: scanResult.stats.filesScanned,

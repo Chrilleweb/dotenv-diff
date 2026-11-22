@@ -1,6 +1,9 @@
 import { describe, test, expect } from 'vitest';
 import fc from 'fast-check';
-import { parseEnvContent } from '../../../src/core/parseEnv.js';
+import {
+  parseEnvContent,
+  unquoteEnvValue,
+} from '../../../src/core/parseEnv.js';
 import {
   parseEnvLine,
   splitEnvLines,
@@ -58,7 +61,9 @@ describe('parseEnv (property-based)', () => {
       .string()
       .filter((v) => !/[\r\n]/.test(v))
       .map((v) => v.trim())
-      .filter((v) => v.length > 0 && !v.startsWith('#'));
+      .filter((v) => v.length > 0 && !v.startsWith('#'))
+      // Fully quoted values are unquoted on purpose (covered separately).
+      .filter((v) => unquoteEnvValue(v) === v);
 
     fc.assert(
       fc.property(
@@ -74,6 +79,24 @@ describe('parseEnv (property-based)', () => {
           }
         },
       ),
+      { numRuns: 1000 },
+    );
+  });
+
+  test('a quoted value parses to the same value as its unquoted form', () => {
+    const key = fc
+      .stringMatching(/^[A-Za-z_][A-Za-z0-9_]*$/)
+      .filter((k) => k.length > 0);
+    const quote = fc.constantFrom('"', "'", '`');
+    const value = fc
+      .string()
+      .filter((v) => !/[\r\n]/.test(v))
+      .map((v) => v.trim());
+    fc.assert(
+      fc.property(key, quote, value, (k, q, v) => {
+        const parsed = parseEnvContent(`${k}=${q}${v}${q}`);
+        expect(parsed[k]).toBe(v);
+      }),
       { numRuns: 1000 },
     );
   });

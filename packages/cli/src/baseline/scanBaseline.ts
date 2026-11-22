@@ -100,20 +100,20 @@ export function collectBaselineEntries(
     });
   }
 
-  for (const warning of scanResult.exampleWarnings ?? []) {
+  for (const warning of scanResult.exampleWarnings) {
     entries.push({ rule: 'example-secret', key: warning.key });
   }
 
-  for (const dup of scanResult.duplicates.env ?? []) {
+  for (const dup of scanResult.duplicates.env) {
     entries.push({ rule: 'duplicate-env', key: dup.key });
   }
 
-  for (const dup of scanResult.duplicates.example ?? []) {
+  for (const dup of scanResult.duplicates.example) {
     entries.push({ rule: 'duplicate-example', key: dup.key });
   }
 
   // variable + file uniquely identifies a framework warning without line numbers
-  for (const warning of scanResult.frameworkWarnings ?? []) {
+  for (const warning of scanResult.frameworkWarnings) {
     entries.push({
       rule: 'framework',
       key: warning.variable,
@@ -121,25 +121,25 @@ export function collectBaselineEntries(
     });
   }
 
-  for (const warning of scanResult.uppercaseWarnings ?? []) {
+  for (const warning of scanResult.uppercaseWarnings) {
     entries.push({ rule: 'uppercase', key: warning.key });
   }
 
-  for (const warning of scanResult.expireWarnings ?? []) {
+  for (const warning of scanResult.expireWarnings) {
     entries.push({ rule: 'expire', key: warning.key });
   }
 
-  for (const warning of scanResult.commentWarnings ?? []) {
+  for (const warning of scanResult.commentWarnings) {
     entries.push({ rule: 'comment', key: warning.key });
   }
 
   // key + env file: the same key can drift in more than one env file
-  for (const warning of scanResult.driftWarnings ?? []) {
+  for (const warning of scanResult.driftWarnings) {
     entries.push({ rule: 'drift', key: warning.key, file: warning.envFile });
   }
 
   // Sort the key pair so the entry is identical regardless of scanner order
-  for (const warning of scanResult.inconsistentNamingWarnings ?? []) {
+  for (const warning of scanResult.inconsistentNamingWarnings) {
     const pair = [warning.key1, warning.key2].sort().join('|');
     entries.push({ rule: 'inconsistent-naming', key: pair });
   }
@@ -175,55 +175,37 @@ export function applyBaselineEntries(
       (s) => !has('secret', fingerprint(`${s.file}:${s.snippet}`)),
     ),
     duplicates: {
-      ...(scanResult.duplicates.env != null && {
-        env: scanResult.duplicates.env.filter(
-          (d) => !has('duplicate-env', d.key),
-        ),
-      }),
-      ...(scanResult.duplicates.example != null && {
-        example: scanResult.duplicates.example.filter(
-          (d) => !has('duplicate-example', d.key),
-        ),
-      }),
+      env: scanResult.duplicates.env.filter(
+        (d) => !has('duplicate-env', d.key),
+      ),
+      example: scanResult.duplicates.example.filter(
+        (d) => !has('duplicate-example', d.key),
+      ),
     },
-    ...(scanResult.exampleWarnings != null && {
-      exampleWarnings: scanResult.exampleWarnings.filter(
-        (w) => !has('example-secret', w.key),
-      ),
-    }),
-    ...(scanResult.frameworkWarnings != null && {
-      frameworkWarnings: scanResult.frameworkWarnings.filter(
-        (w) => !has('framework', w.variable, w.file),
-      ),
-    }),
-    ...(scanResult.uppercaseWarnings != null && {
-      uppercaseWarnings: scanResult.uppercaseWarnings.filter(
-        (w) => !has('uppercase', w.key),
-      ),
-    }),
-    ...(scanResult.expireWarnings != null && {
-      expireWarnings: scanResult.expireWarnings.filter(
-        (w) => !has('expire', w.key),
-      ),
-    }),
-    ...(scanResult.inconsistentNamingWarnings != null && {
-      inconsistentNamingWarnings: scanResult.inconsistentNamingWarnings.filter(
-        (w) => {
-          const pair = [w.key1, w.key2].sort().join('|');
-          return !has('inconsistent-naming', pair);
-        },
-      ),
-    }),
-    ...(scanResult.commentWarnings != null && {
-      commentWarnings: scanResult.commentWarnings.filter(
-        (w) => !has('comment', w.key),
-      ),
-    }),
-    ...(scanResult.driftWarnings != null && {
-      driftWarnings: scanResult.driftWarnings.filter(
-        (w) => !has('drift', w.key, w.envFile),
-      ),
-    }),
+    exampleWarnings: scanResult.exampleWarnings.filter(
+      (w) => !has('example-secret', w.key),
+    ),
+    frameworkWarnings: scanResult.frameworkWarnings.filter(
+      (w) => !has('framework', w.variable, w.file),
+    ),
+    uppercaseWarnings: scanResult.uppercaseWarnings.filter(
+      (w) => !has('uppercase', w.key),
+    ),
+    expireWarnings: scanResult.expireWarnings.filter(
+      (w) => !has('expire', w.key),
+    ),
+    inconsistentNamingWarnings: scanResult.inconsistentNamingWarnings.filter(
+      (w) => {
+        const pair = [w.key1, w.key2].sort().join('|');
+        return !has('inconsistent-naming', pair);
+      },
+    ),
+    commentWarnings: scanResult.commentWarnings.filter(
+      (w) => !has('comment', w.key),
+    ),
+    driftWarnings: scanResult.driftWarnings.filter(
+      (w) => !has('drift', w.key, w.envFile),
+    ),
   };
 }
 

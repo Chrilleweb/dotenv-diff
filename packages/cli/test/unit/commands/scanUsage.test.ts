@@ -85,6 +85,7 @@ import {
   applyBaselineEntries,
 } from '../../../src/baseline/scanBaseline.js';
 import { makeScanUsageOptions } from '../../utils/options-helpers.js';
+import { makeScanResult } from '../../utils/scan-helpers.js';
 
 describe('scanUsage', () => {
   const dummySecret: SecretFinding = {
@@ -95,10 +96,7 @@ describe('scanUsage', () => {
     severity: 'high',
   };
 
-  const baseScanResult: ScanResult = {
-    used: [],
-    missing: [],
-    unused: [],
+  const baseScanResult: ScanResult = makeScanResult({
     stats: {
       filesScanned: 1,
       totalUsages: 0,
@@ -106,11 +104,8 @@ describe('scanUsage', () => {
       warningsCount: 0,
       duration: 0,
     },
-    secrets: [],
-    duplicates: {},
-    logged: [],
     fileContentMap: new Map(),
-  };
+  });
 
   const baseOpts = makeScanUsageOptions({
     cwd: '/root',
@@ -516,8 +511,8 @@ describe('scanUsage', () => {
 
   it('returns exitWithError true in JSON strict mode for each warning type', async () => {
     const cases: Partial<ScanResult>[] = [
-      { duplicates: { env: [{ key: 'A', count: 2 }] } },
-      { duplicates: { example: [{ key: 'B', count: 2 }] } },
+      { duplicates: { env: [{ key: 'A', count: 2 }], example: [] } },
+      { duplicates: { env: [], example: [{ key: 'B', count: 2 }] } },
       {
         secrets: [
           {
@@ -574,17 +569,6 @@ describe('scanUsage', () => {
     }
   });
 
-  it('handles undefined secrets gracefully in JSON mode (line 143)', async () => {
-    vi.mocked(scanCodebase).mockResolvedValue({
-      ...baseScanResult,
-      secrets: undefined as unknown as SecretFinding[],
-    });
-
-    const result = await scanUsage({ ...baseOpts, json: true });
-
-    expect(result.exitWithError).toBe(false);
-  });
-
   it('returns false in strict JSON mode when there are no violations (lines 163-175)', async () => {
     const result = await scanUsage({ ...baseOpts, json: true, strict: true });
 
@@ -636,21 +620,6 @@ describe('scanUsage', () => {
       expect.anything(),
       expect.anything(),
     );
-  });
-
-  it('handles undefined logged and secrets when computing stats', async () => {
-    vi.mocked(scanCodebase).mockResolvedValue({
-      ...baseScanResult,
-      logged: undefined as unknown as ScanResult['logged'],
-      secrets: undefined as unknown as ScanResult['secrets'],
-    });
-    vi.mocked(determineComparisonFile).mockResolvedValue({ type: 'none' });
-
-    // Should not throw even when logged/secrets are undefined
-    await expect(
-      scanUsage({ ...baseOpts, isCiMode: true }),
-    ).resolves.not.toThrow();
-    expect(printScanResult).toHaveBeenCalled();
   });
 
   it('clears typo suggestions when suggest is false', async () => {
@@ -795,7 +764,7 @@ describe('scanUsage', () => {
       logged: [],
       missing: [],
       unused: [],
-      duplicates: {},
+      duplicates: { env: [], example: [] },
       secrets: [],
     }));
 

@@ -1,25 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import { computeScanStats } from '../../../../src/core/scan/computeScanStats.js';
 import type { ScanResult, EnvUsage } from '../../../../src/config/types.js';
+import { makeScanResult } from '../../../utils/scan-helpers.js';
 
 const usage = (variable: string): EnvUsage =>
   ({ variable, file: 'a.ts', line: 1, column: 1 }) as EnvUsage;
 
-const baseScanResult = (): ScanResult => ({
-  used: [],
-  missing: [],
-  unused: [],
-  secrets: [],
-  logged: [],
-  duplicates: { env: [], example: [] },
-  stats: {
-    filesScanned: 7,
-    totalUsages: 999,
-    uniqueVariables: 999,
-    warningsCount: 999,
-    duration: 1.5,
-  },
-});
+const baseScanResult = (): ScanResult =>
+  makeScanResult({
+    stats: {
+      filesScanned: 7,
+      totalUsages: 999,
+      uniqueVariables: 999,
+      warningsCount: 999,
+      duration: 1.5,
+    },
+  });
 
 describe('computeScanStats', () => {
   it('returns zero counts for an empty result and keeps filesScanned and duration', () => {
@@ -59,17 +55,6 @@ describe('computeScanStats', () => {
     });
 
     expect(stats.warningsCount).toBe(1 + 2 + 1 + 1 + 1 + 2 + 1);
-  });
-
-  it('treats undefined optional arrays as zero instead of producing NaN', () => {
-    const stats = computeScanStats({
-      ...baseScanResult(),
-      missing: ['A'],
-      logged: undefined as unknown as ScanResult['logged'],
-      secrets: undefined as unknown as ScanResult['secrets'],
-    });
-
-    expect(stats.warningsCount).toBe(1);
   });
 
   it('does not mutate the input', () => {

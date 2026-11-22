@@ -267,6 +267,13 @@ export function shouldInclude(
 
 /**
  * Checks if a file should be excluded based on its name, path, and exclude patterns.
+ *
+ * Patterns are matched on path boundaries, never as raw substrings, so `test`
+ * excludes `test/` and `src/test/` but not `src/latest/` or `contest.ts`:
+ *  - globs (`dist/**`, `*.spec.ts`) are matched with {@link matchesGlobPattern}
+ *  - paths (`src/legacy`) match that sequence of whole path segments
+ *  - file name fragments (`.test.`, `.d.ts`) match within the file name
+ *  - plain names (`node_modules`) match any whole path segment
  * @param fileName The name of the file.
  * @param relativePath The relative path of the file.
  * @param patterns The exclude patterns to match against.
@@ -277,21 +284,39 @@ export function shouldExclude(
   relativePath: string,
   patterns: string[],
 ): boolean {
-  // Check if filename or any part of the path should be excluded
-  return patterns.some((pattern) => {
-    // Direct name match (like 'node_modules')
-    if (fileName === pattern) return true;
+  const normalizedPath = relativePath.replace(/\\/g, '/');
+  const segments = normalizedPath.split('/');
 
-    // Path contains pattern
-    if (relativePath.includes(pattern)) return true;
+  return patterns.some((rawPattern) => {
+    const pattern = rawPattern.replace(/\\/g, '/').replace(/\/+$/, '');
+    if (!pattern) return false;
 
-    // Pattern matching for extensions and wildcards
     if (pattern.includes('*')) {
-      return matchesGlobPattern(relativePath, pattern);
+      return matchesGlobPattern(normalizedPath, pattern);
     }
 
-    return false;
+    if (pattern.includes('/')) {
+      return `/${normalizedPath}/`.includes(`/${pattern}/`);
+    }
+
+    if (isFileNameFragment(pattern) && fileName.includes(pattern)) {
+      return true;
+    }
+
+    return fileName === pattern || segments.includes(pattern);
   });
+}
+
+/**
+ * Checks if an exclude pattern is a file name fragment such as `.test.`,
+ * `.spec.` or `.d.ts`: it starts with a dot and contains a second one.
+ * Single-dot names like `.git` or `.next` are treated as whole names instead,
+ * so they don't also match `.gitignore` or `.nextrc`.
+ * @param pattern The exclude pattern.
+ * @returns True if the pattern should be matched within file names.
+ */
+function isFileNameFragment(pattern: string): boolean {
+  return pattern.startsWith('.') && pattern.indexOf('.', 1) !== -1;
 }
 
 /**
